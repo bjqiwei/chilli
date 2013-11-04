@@ -4,10 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "log4cplus", "libs\Win32\log4cplus.vcxproj", "{917836A4-0DDC-47BE-B930-1B3BFDF6C940}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testlibxml", "test\testlibxml\testlibxml.vcxproj", "{6B2FCEAF-0A3C-4DE7-BB4E-F384EC3BC143}"
+	ProjectSection(ProjectDependencies) = postProject
+		{917836A4-0DDC-47BE-B930-1B3BFDF6C940} = {917836A4-0DDC-47BE-B930-1B3BFDF6C940}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testsmscmxl", "test\testsmscmxl\testsmscmxl.vcxproj", "{37854432-9C4D-4430-987F-4E6B35516887}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testfsm", "test\testsmscmxl\testsmscmxl.vcxproj", "{37854432-9C4D-4430-987F-4E6B35516887}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D851713A-9D32-4693-89F5-B2ED52FEFEDB} = {D851713A-9D32-4693-89F5-B2ED52FEFEDB}
+		{917836A4-0DDC-47BE-B930-1B3BFDF6C940} = {917836A4-0DDC-47BE-B930-1B3BFDF6C940}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testlibxmlpath", "test\testlibxmlpath\testlibxmlpath.vcxproj", "{4261E1AA-A00C-43FD-8CAC-C30770094061}"
@@ -27,6 +31,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chilli", "chilli\chilli.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSM", "libs\FSM\FSM.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{917836A4-0DDC-47BE-B930-1B3BFDF6C940} = {917836A4-0DDC-47BE-B930-1B3BFDF6C940}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
