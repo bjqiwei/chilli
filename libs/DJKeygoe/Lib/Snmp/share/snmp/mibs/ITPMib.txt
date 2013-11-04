@@ -1,0 +1,2662 @@
+-----------------------------------------------------------
+-- 1.命名规则：节点首单词首字母小写后面单词首字母大写
+--             表和列以“itp”开头,表以“table”结尾
+--
+-- 2.关键位置需要搜索的串
+-- > : table定义位置
+-- # : scalar定义位置
+-- & : 数据类型定义
+-- 3.修改时间 2011-6-14
+-----------------------------------------------------------
+
+
+
+ITP-MIB DEFINITIONS ::= BEGIN
+     IMPORTS
+       NOTIFICATION-TYPE,enterprises,OBJECT-TYPE,Unsigned32,Integer32,TimeTicks,MODULE-IDENTITY
+
+                     FROM SNMPv2-SMI
+
+	InterfaceIndex, ifIndex                 FROM IF-MIB
+
+	Float FROM NET-SNMP-TC
+
+       TEXTUAL-CONVENTION,DateAndTime,DisplayString FROM SNMPv2-TC;
+
+--&
+	Float32 ::=
+        OCTET STRING (SIZE (4))
+
+	Alarm32 ::=
+	INTEGER{ok(0),alarm(1)}
+
+      
+itp MODULE-IDENTITY
+         LAST-UPDATED "201008241700Z"
+         ORGANIZATION "DONJIN ITP SS7 Working Group"
+         CONTACT-INFO "Donjin Communication Technology Co. Ltd.
+         Postal Code: 518040
+         Phone No.: 0086-755-83636988/83435288
+         Fax: 0086-755-83631239/83846752
+         Website: www.donjin.com
+         Address: 21/F, South Tower, Cangsong Bldg., Tairan Industrial Trade Park, Futian District, Shenzhen, P.R.C."
+         DESCRIPTION "The MIB module to describe ITP interfaces objects."
+         REVISION     "201008241700Z"
+         DESCRIPTION
+         "Modified by LiangYu DJ0312."
+         ::= { enterprises 35957 }
+         
+	settings          OBJECT IDENTIFIER ::= { itp 1 }
+	dsp	          OBJECT IDENTIFIER ::= { itp 5 }
+	ss7	          OBJECT IDENTIFIER ::= { itp 6 }
+	voip              OBJECT IDENTIFIER ::= { itp 7 }
+	deviceState       OBJECT IDENTIFIER ::= { itp 4 }
+	chassis           OBJECT IDENTIFIER ::= { itp 2 }
+	q931              OBJECT IDENTIFIER ::= { itp 8 }
+	pcRes             OBJECT IDENTIFIER ::= { itp 3 }
+	moduleInfo        OBJECT IDENTIFIER ::= { itp 9 }
+	
+ 	e1	          OBJECT IDENTIFIER ::= { dsp 1 }
+	mtp2	          OBJECT IDENTIFIER ::= { dsp 2 }
+	q921	          OBJECT IDENTIFIER ::= { dsp 3 }
+
+	mtp3	          OBJECT IDENTIFIER ::= { ss7 1 }
+
+	interfaceChannel  OBJECT IDENTIFIER ::= { deviceState 1 }
+
+	serialPortSettings OBJECT IDENTIFIER ::= { chassis 1 }
+
+--#
+	trapReceiverIPAddress OBJECT-TYPE
+    	SYNTAX      IpAddress
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "Trap receiver IP address."
+    	::= { settings 1 }
+
+	trapReceiverIPAddress2 OBJECT-TYPE
+    	SYNTAX      IpAddress
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "Trap receiver IP address 2."
+    	::= { settings 2 }
+
+	serialPort1Baud OBJECT-TYPE
+	SYNTAX      Integer32
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "1st serial port baud rate."
+    	::= { serialPortSettings 1 }
+
+	serialPort1Bits OBJECT-TYPE
+	SYNTAX      Integer32
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "1st serial port data bits."
+    	::= { serialPortSettings 2 }
+
+	serialPort2Baud OBJECT-TYPE
+	SYNTAX      Integer32
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "2rd serial port baud rate."
+    	::= { serialPortSettings 3 }
+
+	serialPort2Bits OBJECT-TYPE
+	SYNTAX      Integer32
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "2rd serial port data bits."
+    	::= { serialPortSettings 4 }
+
+	icStatisticInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "Time interval of statistic in seconds."
+    	::= { interfaceChannel 3 }
+
+	icSaveStatisticEnable OBJECT-TYPE
+	SYNTAX      INTEGER{disable(0),enable(1)}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "Whether save statistic info file."
+    	::= { interfaceChannel 4 }
+
+-->DSP E1 Entry define
+	itpDspInfoTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpDspInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "DspInfo."
+          ::= { dsp 4 }
+
+     	itpDspInfoEntry OBJECT-TYPE
+          SYNTAX  ItpDspInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the DspInfo table."
+          INDEX   { itpDspIndex }
+          ::= { itpDspInfoTable 1 }
+
+     	ItpDspInfoEntry::=
+          SEQUENCE {
+		itpDspIndex		InterfaceIndex,
+		itpDspState		INTEGER,
+		itpDspTrapEnable        INTEGER
+     	}
+
+	itpDspIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "index."
+          ::= { itpDspInfoEntry 1 }
+
+	itpDspState OBJECT-TYPE
+          SYNTAX  INTEGER {
+			normal(0),
+			linkdown(1),
+			free(2)}
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "dsp state."
+          ::= { itpDspInfoEntry 2 }
+	
+	itpDspTrapEnable  OBJECT-TYPE
+          SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)}
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "Indicates whether itpFasAlignChangeTrapEnable traps
+                 should be generated for this interface."
+          DEFVAL { disabled }
+          ::= { itpDspInfoEntry 3 }
+	
+	itpDspStateNotification NOTIFICATION-TYPE
+         OBJECTS { itpDspIndex,
+                   itpDspState
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpDspStateNotification trap is sent when the
+                 value of an instance itpDspState changes. "
+          ::= { dsp 5 }
+-->port status
+	itpPortStatusTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpPortStatusEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "The E1 port status."
+          ::= { e1 1 }
+
+	itpLostSignalNotification NOTIFICATION-TYPE
+         OBJECTS { itpPortUnitID,
+                   itpPortID,
+		   itpLostSignal }
+         STATUS  current
+         DESCRIPTION
+                 "A itpLostSignalNotification trap is sent when the
+                 value of an instance itpLostSignal changes."
+          ::= { e1 2 }
+
+	itpFasAlignNotification NOTIFICATION-TYPE
+         OBJECTS { itpPortUnitID,
+                   itpPortID,
+		   itpFasAlign }
+         STATUS  current
+         DESCRIPTION
+                 "Alarm for not receiving signals."
+          ::= { e1 3 }
+
+     	itpPortStatusEntry OBJECT-TYPE
+          SYNTAX  ItpPortStatusEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the e1 port status table."
+          INDEX   { itpPortIndex }
+          ::= { itpPortStatusTable 1 }
+
+     	ItpPortStatusEntry ::=
+          SEQUENCE {
+		itpPortIndex		InterfaceIndex,
+		itpPortUnitID		Unsigned32,
+		itpPortID		Unsigned32,
+              	itpLostSignal     	Unsigned32,
+              	itpFasAlign       	Unsigned32,
+              	itpMfAlign        	Unsigned32,
+              	itpCrc4Align		Unsigned32,
+	      	itpRemoteAlarm		Unsigned32,
+		itpRemoteMFAlarm	Unsigned32,
+		itpRxLevel		Unsigned32,
+		itpTxOpen		Unsigned32,
+		itpTxOverlimit		Unsigned32,
+		itpReserved		OCTET STRING,
+		itptotalSeconds		Unsigned32,
+		itpRLOSSeconds		Unsigned32,
+		itpLRCLSeconds		Unsigned32,
+		itpRUA1Seconds		Unsigned32,
+		itpRRASeconds		Unsigned32,
+		itpRDMASeconds		Unsigned32,
+		itpILUTSeconds		Unsigned32,
+		itpJALTSeconds		Unsigned32,
+		itpTOCDSeconds		Unsigned32,
+		itpTCLESeconds		Unsigned32,
+		itpRSLIPSeconds		Unsigned32,
+		itpTSLIPSeconds		Unsigned32,
+		itpLCVCRCount		Unsigned32,
+		itpPCVCRCount		Unsigned32,
+		itpFOSCRCount		Unsigned32,
+		itpEBCRCount		Unsigned32,
+		itpHDLC1TxPackets	Unsigned32,
+		itpHDLC1RxGoodpk	Unsigned32,
+		itpHDLC1RxBadpk		Unsigned32,
+		itpHDLC2TxPackets	Unsigned32,
+		itpHDLC2RxGoodpk	Unsigned32,
+		itpHDLC2RxBadpk		Unsigned32,
+		itpLostSignalEnable     INTEGER,
+		itpFasAlignEnable       INTEGER
+     	}
+	itpPortIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "port index."
+          ::= { itpPortStatusEntry 1 }
+
+     	itpPortUnitID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "dsp id."
+          ::= { itpPortStatusEntry 2 }
+
+     	itpPortID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link id."
+          ::= { itpPortStatusEntry 3 }
+
+     	itpLostSignal OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Alarm for not receiving signals."
+          ::= { itpPortStatusEntry 4 }
+
+	itpFasAlign OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Frame synchronization."
+          ::= { itpPortStatusEntry 5 }
+
+    	itpMfAlign OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Multi-frame synchronization."
+          ::= { itpPortStatusEntry 6 }
+
+     	itpCrc4Align	OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CRC4 synchronization."
+          ::= { itpPortStatusEntry 7 }
+
+    	itpRemoteAlarm	OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Remote alarm."
+          ::= { itpPortStatusEntry 8 }
+
+	itpRemoteMFAlarm	OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Remote MF alarm."
+          ::= { itpPortStatusEntry 9 }
+
+	itpRxLevel OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " Receive signal voltage."
+          ::= { itpPortStatusEntry 10 }
+
+	itpTxOpen OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Send alarm of opening circuit."
+          ::= { itpPortStatusEntry 11 }
+
+	itpTxOverlimit	OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Send alarm of short circuit."
+          ::= { itpPortStatusEntry 12 }
+
+	itpReserved	OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (3))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved bytes."
+          ::= { itpPortStatusEntry 13 }
+
+	itptotalSeconds OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for running."
+          ::= { itpPortStatusEntry 14 }
+
+	itpRLOSSeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for out of frame."
+          ::= { itpPortStatusEntry 15 }
+
+	itpLRCLSeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for no signal."
+          ::= { itpPortStatusEntry 16 }
+
+	itpRUA1Seconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for all 1 signal."
+          ::= { itpPortStatusEntry 17 }
+
+	itpRRASeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Seconds for remote alarm."
+          ::= { itpPortStatusEntry 18 }
+
+	itpRDMASeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Seconds for remote CAS multi-frame alarm."
+          ::= { itpPortStatusEntry 19 }
+
+	itpILUTSeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for low electrical level."
+          ::= { itpPortStatusEntry 20 }
+
+	itpJALTSeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for shake over limit."
+          ::= { itpPortStatusEntry 21 }
+	
+	itpTOCDSeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for sending open circuit error."
+          ::= { itpPortStatusEntry 22 }
+
+	itpTCLESeconds	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Total seconds for sending short circuit error."
+          ::= { itpPortStatusEntry 23 }
+
+	itpRSLIPSeconds OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "RSLIP seconds."
+          ::= { itpPortStatusEntry 24 }
+
+	itpTSLIPSeconds OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "TSLIP seconds."
+          ::= { itpPortStatusEntry 25 }
+
+	itpLCVCRCount	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of errors for receiving line code."
+          ::= { itpPortStatusEntry 26 }
+
+	itpPCVCRCount	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of errors for receiving CRC4."
+          ::= { itpPortStatusEntry 27 }
+
+	itpFOSCRCount	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Receive FAS error number."
+          ::= { itpPortStatusEntry 28 }
+
+	itpEBCRCount	OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of remote CRC4 E-BIT."
+          ::= { itpPortStatusEntry 29 }
+
+	itpHDLC1TxPackets OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC1 send packet number."
+          ::= { itpPortStatusEntry 30 }
+
+	itpHDLC1RxGoodpk OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC1 Correct receive packet number."
+          ::= { itpPortStatusEntry 31 }
+
+	itpHDLC1RxBadpk OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC1 Error receive packet number."
+          ::= { itpPortStatusEntry 32 }
+
+	itpHDLC2TxPackets OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC2 send packet number."
+          ::= { itpPortStatusEntry 33 }
+
+	itpHDLC2RxGoodpk OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC2 Correct receive packet number."
+          ::= { itpPortStatusEntry 34 }
+
+	itpHDLC2RxBadpk OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "HDLC2 Error receive packet number."
+          ::= { itpPortStatusEntry 35 }
+
+     	itpLostSignalEnable  OBJECT-TYPE
+          SYNTAX      INTEGER{
+                         enabled(1),
+                         disabled(2)
+                      }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "Indicates whether itpLostSignalEnable traps
+                 should be generated for this interface."
+          DEFVAL { disabled }
+          ::= { itpPortStatusEntry 36 }
+
+	 itpFasAlignEnable  OBJECT-TYPE
+          SYNTAX      INTEGER{
+                         enabled(1),
+                         disabled(2)
+                      }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "Indicates whether itpFasAlignEnable traps
+                 should be generated for this interface."
+          DEFVAL { disabled }
+          ::= { itpPortStatusEntry 37 }
+
+-->mtp2 link status
+	itpMtp2LinkStatusTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpMtp2LinkStatusEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "The MTP2 link status."
+          ::= { mtp2 1 }
+
+     	itpMtp2LinkStatusEntry OBJECT-TYPE
+          SYNTAX  ItpMtp2LinkStatusEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the MTP2 status table."
+          INDEX   { itpMtp2Index }
+          ::= { itpMtp2LinkStatusTable 1 }
+
+     	ItpMtp2LinkStatusEntry::=
+          SEQUENCE {
+		itpMtp2Index		InterfaceIndex,
+		itpMtp2UnitID		Integer32,
+		itpMtp2LinkID		Integer32,
+		itpMtp2U16Reserved1	OCTET STRING,--add by ly
+		itpLinkState		Unsigned32,
+		itpSSumNotFISU		Unsigned32,
+		itpMainCycleNumber	Unsigned32,
+		itpLocalDeniedNumber	Unsigned32,
+		itpRemoteDeniedNumber	Unsigned32,
+		itpCRCSSumIncludeFISU	Unsigned32,
+		itpCRCESumIncludeFISU	Unsigned32,
+		itpSumSendMSU		Unsigned32,
+		itpSumSendFISU		Unsigned32,
+		itpRecentRCError	Unsigned32,
+		itpPOCStatus		Unsigned32,
+		itpLinkStatusReason	Unsigned32,
+		itpIACStatus		Unsigned32,
+		itpSumRecvCgstionlocal	Unsigned32,
+		itpSumStartL3		Unsigned32,
+		itpSumStopL3		Unsigned32,
+		itpMtp2U16Reserved2	OCTET STRING,--add by ly
+		itpMtp2U8Reserved1	OCTET STRING,--add by ly
+		itpMtp2LineStatusEnable       INTEGER
+     	}
+	itpMtp2Index OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Mtp2 index."
+          ::= { itpMtp2LinkStatusEntry 1 }
+
+     	itpMtp2UnitID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "dsp id."
+          ::= { itpMtp2LinkStatusEntry 2 }
+
+     	itpMtp2LinkID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link id."
+          ::= { itpMtp2LinkStatusEntry 3 }
+
+	itpMtp2U16Reserved1 OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(2))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved."
+          ::= { itpMtp2LinkStatusEntry 4 }
+
+     	itpLinkState OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link state."
+          ::= { itpMtp2LinkStatusEntry 5 }
+
+     	itpSSumNotFISU OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Receive correct data packet (not-FISU) number."
+          ::= { itpMtp2LinkStatusEntry 6 }
+
+     	itpMainCycleNumber OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Main cycle number."
+          ::= { itpMtp2LinkStatusEntry 7 }
+
+     	itpLocalDeniedNumber OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Local denied acknowledging number."
+          ::= { itpMtp2LinkStatusEntry 8 }
+
+     	itpRemoteDeniedNumber OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Remote denied acknowledging number."
+          ::= { itpMtp2LinkStatusEntry 9 }
+
+     	itpCRCSSumIncludeFISU OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CRC correct packet number (include-FISU)."
+          ::= { itpMtp2LinkStatusEntry 10 }
+
+     	itpCRCESumIncludeFISU OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CRC error packet number."
+          ::= { itpMtp2LinkStatusEntry 11 }
+
+     	itpSumSendMSU OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of sending MSU packets."
+          ::= { itpMtp2LinkStatusEntry 12 }
+
+     	itpSumSendFISU OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of sending FISU packets."
+          ::= { itpMtp2LinkStatusEntry 13 }
+
+     	itpRecentRCError OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Recent RC error."
+          ::= { itpMtp2LinkStatusEntry 14 }
+
+     	itpPOCStatus OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "POC status."
+          ::= { itpMtp2LinkStatusEntry 15 }
+
+     	itpLinkStatusReason OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Link status change reason."
+          ::= { itpMtp2LinkStatusEntry 16 }
+
+     	itpIACStatus OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "IAC status."
+          ::= { itpMtp2LinkStatusEntry 17 }
+
+     	itpSumRecvCgstionlocal OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of receiving congestion locally."
+          ::= { itpMtp2LinkStatusEntry 18 }
+
+     	itpSumStartL3 OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of starting L3."
+          ::= { itpMtp2LinkStatusEntry 19 }
+
+     	itpSumStopL3 OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of stopping L3."
+          ::= { itpMtp2LinkStatusEntry 20 }
+
+	itpMtp2U16Reserved2 OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(2))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved."
+          ::= { itpMtp2LinkStatusEntry 21 }
+
+	itpMtp2U8Reserved1 OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(28))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved."
+          ::= { itpMtp2LinkStatusEntry 22 }
+
+	itpMtp2LineStatusEnable  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                         enabled(1),
+                         disabled(2)
+                      }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "Indicates whether itpMtp2LineStatusEnable traps
+                 should be generated for this interface."
+          DEFVAL { disabled }
+          ::= { itpMtp2LinkStatusEntry 23 }
+
+	itpMtp2LinkStateNotification NOTIFICATION-TYPE
+         OBJECTS { itpMtp2UnitID,
+                   itpMtp2LinkID,
+		   itpLinkState }
+         STATUS  current
+         DESCRIPTION
+                 "A itpMtp2LinkStateNotification trap is sent when the
+                 value of an instance itpLinkState changes."
+          ::= { mtp2 2 }
+-->ss7 mtp3
+itpStaDlSapInfTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpStaDlSapInfEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "The MTP2 link status."
+          ::= { mtp3 1 }
+
+     	itpStaDlSapInfEntry OBJECT-TYPE
+          SYNTAX  ItpStaDlSapInfEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the MTP3 status table."
+          INDEX   { itpStaIndex }
+          ::= { itpStaDlSapInfTable 1 }
+
+     	ItpStaDlSapInfEntry::=
+          SEQUENCE {
+		itpStaIndex		InterfaceIndex,
+		itpStaSS7UnitID		Integer32,
+		itpStaLinkIndexID	Integer32,
+		itpState		INTEGER,
+   		itpBndState		INTEGER,
+   		itpFlcSt		INTEGER,
+   		itpCongPrior		INTEGER,
+   		itpTQSize		Integer32,
+   		itpRTQSize		Integer32,
+   		itpBlkd			INTEGER,
+   		itpLocBlkd		INTEGER,
+   		itpRemBlkd		INTEGER,
+   		itpInhbt		INTEGER,
+   		itpLocInhbt		INTEGER,
+   		itpRmtInhbt		INTEGER,
+   		itpUninhbt		INTEGER,
+   		itpEmerg		INTEGER,
+		itpStaLinkID		INTEGER,
+		itpStaReserved		OCTET STRING,
+		itpMtp3LineStatusEnable       INTEGER
+     	}
+
+	itpStaIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "index."
+          ::= { itpStaDlSapInfEntry 1 }
+
+     	itpStaSS7UnitID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "SS7 Unit id."
+          ::= { itpStaDlSapInfEntry 2 }
+
+     	itpStaLinkIndexID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link index id."
+          ::= { itpStaDlSapInfEntry 3 }
+
+	itpState OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link state."
+          ::= { itpStaDlSapInfEntry 4 }
+
+     	itpBndState OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link bind state."
+          ::= { itpStaDlSapInfEntry 5 }
+
+     	itpFlcSt OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "flow control state."
+          ::= { itpStaDlSapInfEntry 6 }
+
+     	itpCongPrior OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "local link congestion priority."
+          ::= { itpStaDlSapInfEntry 7 }
+
+     	itpTQSize OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "transmit queue size."
+          ::= { itpStaDlSapInfEntry 8 }
+
+     	itpRTQSize OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "retransmit queue size."
+          ::= { itpStaDlSapInfEntry 9 }
+
+     	itpBlkd OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link is blocked."
+          ::= { itpStaDlSapInfEntry 10 }
+
+     	itpLocBlkd OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link is blocked locally."
+          ::= { itpStaDlSapInfEntry 11 }
+   
+     	itpRemBlkd OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link is blocked remotely."
+          ::= { itpStaDlSapInfEntry 12 }
+
+     	itpInhbt OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link is inhibited."
+          ::= { itpStaDlSapInfEntry 13 }
+
+     	itpLocInhbt OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "local inhibit indication."
+          ::= { itpStaDlSapInfEntry 14 }
+
+     	itpRmtInhbt OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "remote inhibit indication."
+          ::= { itpStaDlSapInfEntry 15 }
+
+     	itpUninhbt OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "uninhibit signalling indication."
+          ::= { itpStaDlSapInfEntry 16 }
+
+     	itpEmerg OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " emergency indication."
+          ::= { itpStaDlSapInfEntry 17 }
+
+	itpStaLinkID  OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " link id."
+          ::= { itpStaDlSapInfEntry 18 }
+
+	itpStaReserved OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(3))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " Reserved."
+          ::= { itpStaDlSapInfEntry 19 }
+
+	itpMtp3LineStatusEnable  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                         enabled(1),
+                         disabled(2)
+                      }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "Indicates whether iitpMtp3LineStatusEnable traps
+                 should be generated for this interface."
+          DEFVAL { disabled }
+          ::= { itpStaDlSapInfEntry 20 }
+-->StsDlSapInf
+
+	itpStsDlSapInfTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpStsDlSapInfEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "StsDlSapInf."
+          ::= { mtp3 2 }
+
+     	itpStsDlSapInfEntry OBJECT-TYPE
+          SYNTAX  ItpStsDlSapInfEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the StsDlSapInf table."
+          INDEX   { itpStsIndex }
+          ::= { itpStsDlSapInfTable 1 }
+
+     	ItpStsDlSapInfEntry::=
+          SEQUENCE {
+		itpStsIndex		InterfaceIndex,
+		itpStsSS7UnitID		Integer32,
+		itpStsLinkIndexID	Integer32,
+		itpDurLnkUnav		Integer32,
+		itpDurLnkCong		Integer32,
+		itpLnkErrPduRx		Integer32,
+		itpLnkConOrdTx		Integer32,
+		itpLnkConOrdRx		Integer32,
+		itpLnkConAckTx		Integer32,
+		itpLnkConAckRx		Integer32,
+		itpLnkTstRx		Integer32,
+		itpLnkTstTx		Integer32,
+		itpLnkTstAckRx		Integer32,
+		itpLnkTstAckTx		Integer32,
+		itpTxDrop		Integer32,
+		itpTxCongDrop		Integer32,
+		itpSifOctTx		Integer32,
+		itpSifOctRx		Integer32,
+		itpSioOctTx		Integer32,
+		itpSioOctRx		Integer32,
+		itpMsuTx		Integer32,
+		itpMsuRx		Integer32,
+		itpL3L2Cong		Integer32,
+		itpL3L4Cong		Integer32,
+		itpStsLinkID		INTEGER,
+		itpStsReserved		OCTET STRING
+     	}
+
+	itpStsIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "index."
+          ::= { itpStsDlSapInfEntry 1 }
+
+     	itpStsSS7UnitID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "SS7 Unit id."
+          ::= { itpStsDlSapInfEntry 2 }
+
+     	itpStsLinkIndexID OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link Index id."
+          ::= { itpStsDlSapInfEntry 3 }
+
+	itpDurLnkUnav OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "duration of link unavailability."
+          ::= { itpStsDlSapInfEntry 4 }
+
+     	itpDurLnkCong OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "duration of link congestion."
+          ::= { itpStsDlSapInfEntry 5 }
+
+     	itpLnkErrPduRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "number of errored messages received."
+          ::= { itpStsDlSapInfEntry 6 }
+
+     	itpLnkConOrdTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link connection order transmitted."
+          ::= { itpStsDlSapInfEntry 7 }
+
+     	itpLnkConOrdRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link connection order received."
+          ::= { itpStsDlSapInfEntry 8 }
+
+     	itpLnkConAckTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link connection ack transmitted."
+          ::= { itpStsDlSapInfEntry 9 }
+
+     	itpLnkConAckRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link connection ack received."
+          ::= { itpStsDlSapInfEntry 10 }
+
+     	itpLnkTstRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link test received."
+          ::= { itpStsDlSapInfEntry 11 }
+ 
+     	itpLnkTstTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link test transmitted."
+          ::= { itpStsDlSapInfEntry 12 }
+
+     	itpLnkTstAckRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link test ack received."
+          ::= { itpStsDlSapInfEntry 13 }
+
+     	itpLnkTstAckTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "link test ack transmitted."
+          ::= { itpStsDlSapInfEntry 14 }
+
+     	itpTxDrop OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "transmit messages dropped."
+          ::= { itpStsDlSapInfEntry 15 }
+
+     	itpTxCongDrop OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "MSUs dropped due to link congestion."
+          ::= { itpStsDlSapInfEntry 16 }
+
+     	itpSifOctTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of SIO octets transmitted."
+          ::= { itpStsDlSapInfEntry 17 }
+
+	itpSifOctRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of SIF octets received."
+          ::= { itpStsDlSapInfEntry 18 }
+
+     	itpSioOctTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of SIO octets transmitted."
+          ::= { itpStsDlSapInfEntry 19 }
+
+     	itpSioOctRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of SIO octets received."
+          ::= { itpStsDlSapInfEntry 20 }
+
+     	itpMsuTx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of MSU transmitted."
+          ::= { itpStsDlSapInfEntry 21 }
+
+     	itpMsuRx OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " number of MSU received."
+          ::= { itpStsDlSapInfEntry 22 }
+
+     	itpL3L2Cong OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " L3->L2 queue congestion."
+          ::= { itpStsDlSapInfEntry 23 }
+
+     	itpL3L4Cong OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " L3->L4 queue congestion."
+          ::= { itpStsDlSapInfEntry 24 }
+
+	itpStsLinkID  OBJECT-TYPE
+          SYNTAX  INTEGER(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 " link id."
+          ::= { itpStsDlSapInfEntry 25 }
+
+	itpStsReserved OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(3))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved."
+          ::= { itpStsDlSapInfEntry 26 }
+
+	itpMtp3LinkStateNotification NOTIFICATION-TYPE
+         OBJECTS { itpStaSS7UnitID,
+                   itpStaLinkIndexID,
+		   itpState }
+         STATUS  current
+         DESCRIPTION
+                 "A itpMtp3LinkStateNotification trap is sent when the
+                 value of an instance itpState changes."
+          ::= { mtp3 3 }
+
+-->InterfaceChannel
+
+	itpInterfaceChannelTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpInterfaceChannelEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "InterfaceChannel."
+          ::= { interfaceChannel 1 }
+
+     	itpInterfaceChannelEntry OBJECT-TYPE
+          SYNTAX  ItpInterfaceChannelEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the InterfaceChannel table."
+          INDEX   { itpICDsp }
+          ::= { itpInterfaceChannelTable 1 }
+
+     	ItpInterfaceChannelEntry::=
+          SEQUENCE {
+		itpICDsp		INTEGER,
+		itpICChannel		INTEGER,
+		itpICType		INTEGER,
+		itpICState		INTEGER
+     	}
+
+	itpICDsp OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "DSP unit ID."
+          ::= { itpInterfaceChannelEntry 1 }
+
+	itpICChannel OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Channel ID."
+          ::= { itpInterfaceChannelEntry 2 }
+
+	itpICType OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Interface channel sub type."
+          ::= { itpInterfaceChannelEntry 3 }
+
+	itpICState OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Interface channel state."
+          ::= { itpInterfaceChannelEntry 4 }
+
+-->ChannelStatistic
+
+	itpChannelStatisticTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpChannelStatisticEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "InterfaceChannel state statistic."
+          ::= { interfaceChannel 2 }
+
+     	itpChannelStatisticEntry OBJECT-TYPE
+          SYNTAX  ItpChannelStatisticEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the InterfaceChannelStatistic table."
+          INDEX   { itpICDsp }
+          ::= { itpChannelStatisticTable 1 }
+
+     	ItpChannelStatisticEntry::=
+          SEQUENCE {
+		itpCSDsp		INTEGER,
+		itpCSCallin		INTEGER,
+		itpCSFree		INTEGER,
+		itpCSFreeMin		INTEGER,
+		itpCSFreeMinTime	DateAndTime
+     	}
+	
+	itpCSDsp OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Dsp unit ID."
+          ::= { itpChannelStatisticEntry 1 }
+
+	itpCSCallin OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Statistic of call in event.Time interval is set by yourself."
+          ::= { itpChannelStatisticEntry 2 }
+
+	itpCSFree OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Number of free channel."
+          ::= { itpChannelStatisticEntry 3 }
+
+	itpCSFreeMin OBJECT-TYPE
+          SYNTAX  INTEGER
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The minimum number of free channel during statistic time interval."
+          ::= { itpChannelStatisticEntry 4 }
+
+	itpCSFreeMinTime OBJECT-TYPE
+          SYNTAX  DateAndTime
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Time of itpCSFreeMin happened."
+          ::= { itpChannelStatisticEntry 5 }
+
+-->ChassisConfig
+
+	itpChassisConfigTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpChassisConfigEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Chassis config info."
+          ::= { chassis 2 }
+
+     	itpChassisConfigEntry OBJECT-TYPE
+          SYNTAX  ItpChassisConfigEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Chassis config table."
+          INDEX   { itpChassisConfigPortIndex }
+          ::= { itpChassisConfigTable 1 }
+
+     	itpChassisConfigEntry::=
+          SEQUENCE {
+		itpChassisConfigPortIndex	Integer32,
+		itpChassisARKType		INTEGER,
+		itpChassisFANType		INTEGER
+     	}
+
+	itpChassisConfigPortIndex OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Serial port index."
+          ::= { itpChassisConfigEntry 1 }
+
+	itpChassisARKType OBJECT-TYPE
+          SYNTAX  INTEGER{chassis3u(0),chassis5u(1),chassis11u(2)}
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis type(3U(0),5U(1),11U(2))."
+          ::= { itpChassisConfigEntry 2 }
+
+	itpChassisFANType OBJECT-TYPE
+          SYNTAX  INTEGER{rotate(85),voltage(170)}
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Fan type(CheckRotate(85),CheckVoltage(170))."
+          ::= { itpChassisConfigEntry 3 }
+
+-->ChassisPowerPanel
+
+	itpChassisPowerPanelTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpChassisPowerPanelEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Chassis power panel info."
+          ::= { chassis 3 }
+
+     	itpChassisPowerPanelEntry OBJECT-TYPE
+          SYNTAX  ItpChassisPowerPanelEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Chassis power panel table."
+          INDEX   { itpChassisPowerPanelPortIndex, itpChassisPowerPanelID }
+          ::= { itpChassisPowerPanelTable 1 }
+
+     	itpChassisPowerPanelEntry::=
+          SEQUENCE {
+		itpChassisPowerPanelPortIndex	Integer32,
+		itpChassisPowerPanelID		OCTET STRING,
+		itpChassisPower1		Float32,
+		itpChassisPower2		Float32,
+		itpChassisPower3		Float32,
+		itpChassisPower4		Float32,
+		itpChassisPowerAlarm		Unsigned32
+     	}
+
+	itpChassisPowerPanelPortIndex OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Serial port index."
+          ::= { itpChassisPowerPanelEntry 1 }
+
+	itpChassisPowerPanelID OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE(1))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis power panel ID."
+          ::= { itpChassisPowerPanelEntry 2 }
+
+	itpChassisPower1 OBJECT-TYPE
+          SYNTAX  Float32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Value of 1st power module in panel."
+          ::= { itpChassisPowerPanelEntry 3 }
+
+	itpChassisPower2 OBJECT-TYPE
+          SYNTAX  Float32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Value of 2nd power module in panel."
+          ::= { itpChassisPowerPanelEntry 4 }
+
+	itpChassisPower3 OBJECT-TYPE
+          SYNTAX  Float32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Value of 3rd power module in panel."
+          ::= { itpChassisPowerPanelEntry 5 }
+
+	itpChassisPower4 OBJECT-TYPE
+          SYNTAX  Float32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Value of 4th power module in panel."
+          ::= { itpChassisPowerPanelEntry 6 }
+
+	itpChassisPowerAlarm OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Power alarm."
+          ::= { itpChassisPowerPanelEntry 7 }
+
+-->ChassisFan
+
+	itpChassisFanTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpChassisFanEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Chassis fan info."
+          ::= { chassis 4 }
+
+     	itpChassisFanEntry OBJECT-TYPE
+          SYNTAX  ItpChassisFanEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Chassis fan table."
+          INDEX   { itpChassisFanPortIndex, itpChassisFanIndex }
+          ::= { itpChassisFanTable 1 }
+
+     	itpChassisFanEntry::=
+          SEQUENCE {
+		itpChassisFanPortIndex		Integer32,
+		itpChassisFanIndex		Integer32,
+		itpChassisFanSpeed		INTEGER,
+		itpChassisFanAlarm		Unsigned32
+     	}
+
+	itpChassisFanPortIndex OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Serial port index."
+          ::= { itpChassisFanEntry 1 }
+
+	itpChassisFanIndex OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis fan index."
+          ::= { itpChassisFanEntry 2 }
+
+	itpChassisFanSpeed OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis fan speed."
+          ::= { itpChassisFanEntry 3 }
+
+	itpChassisFanAlarm OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Fan alarm."
+          ::= { itpChassisFanEntry 4 }
+
+-->ChassisTemperature
+
+	itpChassisTemperatureTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpChassisTemperatureEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Chassis temperature info."
+          ::= { chassis 5 }
+
+     	itpChassisTemperatureEntry OBJECT-TYPE
+          SYNTAX  ItpChassisTemperatureEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Chassis temperature table."
+          INDEX   { itpChassisTemperaturePortIndex }
+          ::= { itpChassisTemperatureTable 1 }
+
+     	itpChassisTemperatureEntry::=
+          SEQUENCE {
+		itpChassisTemperaturePortIndex	Integer32,
+		itpChassisTemperature		Float32,
+		itpChassisTemperatureAlarm	Unsigned32
+     	}
+
+	itpChassisTemperaturePortIndex OBJECT-TYPE
+          SYNTAX  Integer32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Serial port index."
+          ::= { itpChassisTemperatureEntry 1 }
+
+	itpChassisTemperature OBJECT-TYPE
+          SYNTAX  Float32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis temperature."
+          ::= { itpChassisTemperatureEntry 2 }
+
+	itpChassisTemperatureAlarm OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Temperature alarm."
+          ::= { itpChassisTemperatureEntry 3 }
+
+	itpChassisPowerNotification NOTIFICATION-TYPE
+         OBJECTS { itpChassisPowerPanelPortIndex,
+                   itpChassisPowerPanelID,
+                   itpChassisPowerAlarm
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpChassisPowerNotification trap is sent when the
+                 value of an instance itpChassisPowerAlarm changes. "
+          ::= { chassis 6 }
+
+	itpChassisFanNotification NOTIFICATION-TYPE
+         OBJECTS { itpChassisFanPortIndex,
+                   itpChassisFanIndex,
+                   itpChassisFanAlarm
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpChassisFanNotification trap is sent when the
+                 value of an instance itpChassisFanAlarm changes. "
+          ::= { chassis 7 }
+
+	itpChassisTemperatureNotification NOTIFICATION-TYPE
+         OBJECTS { itpChassisTemperaturePortIndex,
+                   itpChassisTemperatureAlarm
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpChassisTemperatureNotification trap is sent when the
+                 value of an instance itpChassisTemperatureAlarm changes. "
+          ::= { chassis 8 }
+
+-->Q931
+
+	itpQ931Table OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpQ931Entry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Q931 info."
+          ::= { q931 1 }
+
+	itpQ931Entry OBJECT-TYPE
+          SYNTAX  ItpQ931Entry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Q931 table."
+          INDEX   { itpQ931UnitID,itpQ931PcmID }
+          ::= { itpQ931Table 1 }
+
+     	itpQ931Entry::=
+          SEQUENCE {
+		itpQ931UnitID		Unsigned32,
+		itpQ931PcmID 		Unsigned32,
+		itpQ931PcmLinkState	INTEGER,
+		itpQ931PcmRestartFlag	Alarm32
+     	}
+
+	itpQ931UnitID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Unit ID."
+          ::= { itpQ931Entry 1 }
+
+	itpQ931PcmID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Pcm ID."
+          ::= { itpQ931Entry 2 }
+
+	itpQ931PcmLinkState OBJECT-TYPE
+          SYNTAX      INTEGER  {
+			establish(3),
+			release(5),
+			normal(10),
+			abnormal(11)}
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Pcm link state."
+          ::= { itpQ931Entry 3 }
+
+	itpQ931PcmRestartFlag OBJECT-TYPE
+          SYNTAX  Alarm32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Whether need to restart."
+          ::= { itpQ931Entry 4 }
+
+
+	itpQ931Notification1 NOTIFICATION-TYPE
+         OBJECTS { itpQ931UnitID,itpQ931PcmID,itpQ931PcmLinkState
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpQ931Notification1 trap is sent when the
+                 value of an instance itpQ931PcmLinkState changes. "
+          ::= { q931 2 }
+
+	itpQ931Notification2 NOTIFICATION-TYPE
+         OBJECTS { itpQ931UnitID,itpQ931PcmID,
+                   itpQ931PcmRestartFlag
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpQ931Notification2 trap is sent when the
+                 value of an instance itpQ931PcmRestartFlag changes. "
+          ::= { q931 3 }
+
+-->Q921
+
+	itpQ921Table OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpQ921Entry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Q921 info."
+          ::= { q921 1 }
+
+	itpQ921Entry OBJECT-TYPE
+          SYNTAX  ItpQ921Entry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the Q921 table."
+          INDEX   { itpQ921UnitID,itpQ921PcmID }
+          ::= { itpQ921Table 1 }
+
+     	itpQ921Entry::=
+          SEQUENCE {
+		itpQ921UnitID		Unsigned32,
+		itpQ921PcmID 		Unsigned32,
+		itpQ921E1Alarm		Unsigned32,
+		itpQ921L2State		Unsigned32,
+		itpQ921L2LmeState	Unsigned32,
+		itpQ921MdlErrCode	Unsigned32,
+		itpQ921RxJam		Unsigned32,
+		itpQ921PeerJam		Unsigned32,
+		itpQ921Vs		Unsigned32,
+		itpQ921Vr		Unsigned32,
+		itpQ921Va		Unsigned32,
+		itpQ921RxCrcGoodCnt	Unsigned32,
+		itpQ921RxCrcBadCnt	Unsigned32,
+		itpQ921TxIFrameCnt	Unsigned32,
+		itpQ921RxLmeState	Unsigned32,
+		itpQ921Reserved0	Unsigned32,
+		itpQ921TxCtrlCnt	Unsigned32,
+		itpQ921RxCtrlCnt	Unsigned32,
+		itpQ921TxCtrlData	OCTET STRING,
+		itpQ921RxCtrlData	OCTET STRING
+     	}
+
+	itpQ921UnitID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Unit ID."
+          ::= { itpQ921Entry 1 }
+
+	itpQ921PcmID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Pcm ID."
+          ::= { itpQ921Entry 2 }
+
+	itpQ921E1Alarm OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "E1 alarm."
+          ::= { itpQ921Entry 3 }
+
+	itpQ921L2State OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "L2 state(TEI_assigned(4),Awaiting_Establishment(5),Awaiting_Release(6),M_Frame_Established(7),Timer_Recovery(8))."
+          ::= { itpQ921Entry 4 }
+
+	itpQ921L2LmeState OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "L2 lme state."
+          ::= { itpQ921Entry 5 }
+
+	itpQ921MdlErrCode OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Error code."
+          ::= { itpQ921Entry 6 }
+
+	itpQ921RxJam OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Rx jam."
+          ::= { itpQ921Entry 7 }
+
+	itpQ921PeerJam OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Peer jam."
+          ::= { itpQ921Entry 8 }
+
+	itpQ921Vs OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Var of send state."
+          ::= { itpQ921Entry 9 }
+
+	itpQ921Vr OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Var of recv state."
+          ::= { itpQ921Entry 10 }
+
+	itpQ921Va OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Var of approve state."
+          ::= { itpQ921Entry 11 }
+
+	itpQ921RxCrcGoodCnt OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Recv crc good cnt."
+          ::= { itpQ921Entry 12 }
+
+	itpQ921RxCrcBadCnt OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Recv crc bad cnt."
+          ::= { itpQ921Entry 13 }
+
+	itpQ921TxIFrameCnt OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Tx i frame cnt."
+          ::= { itpQ921Entry 14 }
+
+	itpQ921RxLmeState OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Rx lme state."
+          ::= { itpQ921Entry 15 }
+
+	itpQ921Reserved0 OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Reserved."
+          ::= { itpQ921Entry 16 }
+
+	itpQ921TxCtrlCnt OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Tx ctrl cnt."
+          ::= { itpQ921Entry 17 }
+
+	itpQ921RxCtrlCnt OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Rx ctrl cnt."
+          ::= { itpQ921Entry 18 }
+
+	itpQ921TxCtrlData OBJECT-TYPE
+          SYNTAX  OCTET STRING(SIZE(16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Tx ctrl cnt."
+          ::= { itpQ921Entry 19 }
+
+	itpQ921RxCtrlData OBJECT-TYPE
+          SYNTAX  OCTET STRING(SIZE(16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Rx ctrl cnt."
+          ::= { itpQ921Entry 20 }
+
+	itpQ921Notification1 NOTIFICATION-TYPE
+         OBJECTS { itpQ921UnitID,itpQ921PcmID,
+                   itpQ921E1Alarm
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpQ921Notification trap is sent when the
+                 value of an instance itpQ921E1Alarm changes. "
+          ::= { q921 2 }
+
+	itpQ921Notification2 NOTIFICATION-TYPE
+         OBJECTS { itpQ921UnitID,itpQ921PcmID,
+                   itpQ921L2State
+		 }
+         STATUS  current
+         DESCRIPTION
+                 "A itpQ921Notification trap is sent when the
+                 value of an instance itpQ921L2State changes. "
+          ::= { q921 3 }
+
+-->PcRes
+
+	itpPcResTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpPcResEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "PcRes info."
+          ::= { pcRes 1 }
+
+	itpPcResEntry OBJECT-TYPE
+          SYNTAX  ItpPcResEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the PcRes table."
+          INDEX   { itpPcResIndex }
+          ::= { itpPcResTable 1 }
+
+     	itpPcResEntry::=
+          SEQUENCE {
+		itpPcResIndex		Unsigned32,
+		itpPcResIPAddr		OCTET STRING,
+		itpPcResCPUIdle1	Unsigned32,
+		itpPcResCPUIdle2	Unsigned32,
+		itpPcResCPUIdle3	Unsigned32,
+		itpPcResCPUIdle4	Unsigned32,
+		itpPcResCPUIdle5	Unsigned32,
+		itpPcResCPUIdle6	Unsigned32,
+		itpPcResCPUIdle7	Unsigned32,
+		itpPcResCPUIdle8	Unsigned32,
+		itpPcResMemFree		Unsigned32,
+		itpPcResSwapFree	Unsigned32,
+		itpPcResHDFree		Unsigned32
+     	}
+
+	itpPcResIndex OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "PC index."
+          ::= { itpPcResEntry 1 }
+
+	itpPcResIPAddr OBJECT-TYPE
+          SYNTAX  OCTET STRING(SIZE(4))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "PC IP."
+          ::= { itpPcResEntry 2 }
+
+	itpPcResCPUIdle1 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 3 }
+
+	itpPcResCPUIdle2 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 4 }
+
+	itpPcResCPUIdle3 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 5 }
+
+	itpPcResCPUIdle4 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 6 }
+
+
+	itpPcResCPUIdle5 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 7 }
+
+	itpPcResCPUIdle6 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 8 }
+
+	itpPcResCPUIdle7 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 9 }
+
+	itpPcResCPUIdle8 OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "CPU idle."
+          ::= { itpPcResEntry 10 }
+
+	itpPcResMemFree OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Ram idle."
+          ::= { itpPcResEntry 11 }
+
+	itpPcResSwapFree OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Swap idle."
+          ::= { itpPcResEntry 12 }
+
+	itpPcResHDFree OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Hard disk idle."
+          ::= { itpPcResEntry 13 }
+
+-->ModuleInfo
+	itpModuleInfoTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpModuleInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Module info."
+          ::= { moduleInfo 1 }
+
+	itpModuleInfoEntry OBJECT-TYPE
+          SYNTAX  ItpModuleInfoEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the ModuleInfo table."
+          INDEX   { itpMIIndex }
+          ::= { itpModuleInfoTable 1 }
+
+     	itpModuleInfoEntry::=
+          SEQUENCE {
+		itpMIIndex		Unsigned32,
+		itpMIType		Unsigned32,
+		itpMIUnitID		Unsigned32,
+		itpMIDspType		Unsigned32,
+		itpMIIsEnable		Unsigned32,
+		itpMIStates		Unsigned32,
+		itpMILostHeartNum	Unsigned32,
+		itpMIHeartTime		Unsigned32,
+		itpMIStateTime		Unsigned32,
+		itpMIIniFileAddr	OCTET STRING,
+		itpMIModuleName		OCTET STRING,
+		itpMIIP			Unsigned32,
+		itpMIPort		Unsigned32,
+		itpMIVertion		Unsigned32,
+		itpMIMac		OCTET STRING
+     	}
+
+	itpMIIndex OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module index."
+          ::= { itpModuleInfoEntry 1 }
+
+	itpMIType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module type."
+          ::= { itpModuleInfoEntry 2 }
+
+	itpMIUnitID OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module unit id."
+          ::= { itpModuleInfoEntry 3 }
+
+	itpMIDspType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Dsp type, 0 if not dsp."
+          ::= { itpModuleInfoEntry 4 }
+
+	itpMIIsEnable OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module enable."
+          ::= { itpModuleInfoEntry 5 }
+
+	itpMIStates OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module state, please view itpmsgpublic.h."
+          ::= { itpModuleInfoEntry 6 }
+
+	itpMILostHeartNum OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The number of consecutive missing heartbeat packetsh."
+          ::= { itpModuleInfoEntry 7 }
+
+	itpMIHeartTime OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Last time sending heartbeat packets."
+          ::= { itpModuleInfoEntry 8 }
+
+	itpMIStateTime OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Last time sending module info packets."
+          ::= { itpModuleInfoEntry 9 }
+
+	itpMIIniFileAddr OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (32))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Ini file address."
+          ::= { itpModuleInfoEntry 10 }
+
+	itpMIModuleName OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module name."
+          ::= { itpModuleInfoEntry 11 }
+
+	itpMIIP OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "IP."
+          ::= { itpModuleInfoEntry 12 }
+
+	itpMIPort OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Port."
+          ::= { itpModuleInfoEntry 13 }
+
+	itpMIVertion OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Version."
+          ::= { itpModuleInfoEntry 14 }
+
+	itpMIMac OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (20))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Mac."
+          ::= { itpModuleInfoEntry 15 }
+
+-->RelateInfo
+
+	itpRelateInfoTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpRelateInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Relate info."
+          ::= { moduleInfo 2 }
+
+	itpRelateInfoEntry OBJECT-TYPE
+          SYNTAX  ItpRelateInfoEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the RelateInfo table."
+          INDEX   { itpRIModuleIndex, itpRIDown }
+          ::= { itpRelateInfoTable 1 }
+
+     	itpRelateInfoEntry::=
+          SEQUENCE {
+		itpRIModuleIndex	Unsigned32,
+		itpRIDown		Unsigned32,
+		itpRIConnStates		Unsigned32,
+		itpRIConnNum		Unsigned32,
+		itpRIDstModuleType	Unsigned32,
+		itpRIDstUnitID		Unsigned32,
+		itpRIDstPort		Unsigned32,
+		itpRIDstIP		IpAddress
+     	}
+
+	itpRIModuleIndex OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module index."
+          ::= { itpRelateInfoEntry 1 }
+
+	itpRIDown OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "0=up relate, 1=down relate."
+          ::= { itpRelateInfoEntry 2 }
+
+	itpRIConnStates OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Whether source module is related to destination."
+          ::= { itpRelateInfoEntry 3 }
+
+	itpRIConnNum OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Times of connecting."
+          ::= { itpRelateInfoEntry 4 }
+
+	itpRIDstModuleType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module type of destination."
+          ::= { itpRelateInfoEntry 5 }
+
+	itpRIDstUnitID OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Unit id of destination."
+          ::= { itpRelateInfoEntry 6 }
+
+	itpRIDstPort OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Port of destination."
+          ::= { itpRelateInfoEntry 7 }
+
+	itpRIDstIP OBJECT-TYPE
+          SYNTAX  IpAddress
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "IP of destination."
+          ::= { itpRelateInfoEntry 8 }
+
+-->HostModuleDownLink
+
+	itpHostModuleDownLinkTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpHostModuleDownLinkEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Downward link information of host module."
+          ::= { moduleInfo 3 }
+
+	itpHostModuleDownLinkEntry OBJECT-TYPE
+          SYNTAX  ItpHostModuleDownLinkEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the HostModuleDownLink table."
+          INDEX   { itpHMDLModuleIndex,itpHMDLLinkIndex }
+          ::= { itpHostModuleDownLinkTable 1 }
+
+     	itpHostModuleDownLinkEntry::=
+          SEQUENCE {
+		itpHMDLModuleIndex	Unsigned32,
+		itpHMDLLinkIndex	Unsigned32,
+		itpHMDLModuleType	Unsigned32,
+		itpHMDLUnitID		Unsigned32,
+		itpHMDLLinkState	Unsigned32
+     	}
+
+	itpHMDLModuleIndex OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module index."
+          ::= { itpHostModuleDownLinkEntry 1 }
+
+	itpHMDLLinkIndex OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Link index of module."
+          ::= { itpHostModuleDownLinkEntry 2 }
+
+	itpHMDLModuleType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module type of destination."
+          ::= { itpHostModuleDownLinkEntry 3 }
+
+	itpHMDLUnitID OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Unit ID of destination."
+          ::= { itpHostModuleDownLinkEntry 4 }
+
+	itpHMDLLinkState OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Link state."
+          ::= { itpHostModuleDownLinkEntry 5 }
+
+-->BoardInfo
+
+	itpBoardInfoTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF ItpBoardInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "Dsp hardware info."
+          ::= { moduleInfo 4 }
+
+	itpBoardInfoEntry OBJECT-TYPE
+          SYNTAX  ItpBoardInfoEntry 
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+                 "An entry in the BoardInfo table."
+          INDEX   { itpBIDspUnitID }
+          ::= { itpBoardInfoTable 1 }
+
+     	itpBoardInfoEntry::=
+          SEQUENCE {
+		itpBIDspUnitID		Unsigned32,
+		itpBIMac		OCTET STRING,
+		itpBIChassisType	Unsigned32,
+		itpBIChassisIndex	Unsigned32,
+		itpBIChassisSlot	Unsigned32,
+		itpBISubBoardIndex	Unsigned32,
+		itpBIBoardType		Unsigned32,
+		itpBIRfu1		OCTET STRING,
+		itpBISystemName		OCTET STRING,
+		itpBIRfu2		OCTET STRING,
+		itpBILoginPassword	OCTET STRING,
+		itpBILocalIP		IpAddress,
+		itpBILocalIPMask	Unsigned32,
+		itpBIGatewayIP		Unsigned32,
+		itpBIListenPort		Unsigned32,
+		itpBIInvalidFlag	OCTET STRING,
+		itpBIFirmwareName	OCTET STRING,
+		itpBIFirmwareVer	OCTET STRING,
+		itpBIRevisionDate	OCTET STRING
+     	}
+
+	itpBIDspUnitID OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Dsp unit id."
+          ::= { itpBoardInfoEntry 1 }
+
+	itpBIMac OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (6))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Mac."
+          ::= { itpBoardInfoEntry 2 }
+
+	itpBIChassisType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis type."
+          ::= { itpBoardInfoEntry 3 }
+
+	itpBIChassisIndex OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis index."
+          ::= { itpBoardInfoEntry 4 }
+
+	itpBIChassisSlot OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Chassis slot."
+          ::= { itpBoardInfoEntry 5 }
+
+	itpBISubBoardIndex OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Module index inside one board."
+          ::= { itpBoardInfoEntry 6 }
+
+	itpBIBoardType OBJECT-TYPE
+          SYNTAX  Unsigned32(0..255)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Board type."
+          ::= { itpBoardInfoEntry 7 }
+
+	itpBIRfu1 OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (1))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Byte alignment."
+          ::= { itpBoardInfoEntry 8 }
+
+	itpBISystemName OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "System name."
+          ::= { itpBoardInfoEntry 9 }
+
+	itpBIRfu2 OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Byte alignment."
+          ::= { itpBoardInfoEntry 10 }
+
+	itpBILoginPassword OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (16))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Password."
+          ::= { itpBoardInfoEntry 11 }
+
+	itpBILocalIP OBJECT-TYPE
+          SYNTAX  IpAddress
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Local ip."
+          ::= { itpBoardInfoEntry 12 }
+
+	itpBILocalIPMask OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Local ip mask."
+          ::= { itpBoardInfoEntry 13 }
+
+	itpBIGatewayIP OBJECT-TYPE
+          SYNTAX  Unsigned32
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Gateway ip."
+          ::= { itpBoardInfoEntry 14 }
+
+	itpBIListenPort OBJECT-TYPE
+          SYNTAX  Unsigned32(0..65535)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Listen port."
+          ::= { itpBoardInfoEntry 15 }
+
+	itpBIInvalidFlag OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (2))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "This flag set to 0x55AA for new version."
+          ::= { itpBoardInfoEntry 16 }
+
+	itpBIFirmwareName OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (8))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Fireware name."
+          ::= { itpBoardInfoEntry 17 }
+
+	itpBIFirmwareVer OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (8))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Fireware version."
+          ::= { itpBoardInfoEntry 18 }
+
+	itpBIRevisionDate OBJECT-TYPE
+          SYNTAX  OCTET STRING (SIZE (8))
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "Revision date."
+          ::= { itpBoardInfoEntry 19 }
+
+END

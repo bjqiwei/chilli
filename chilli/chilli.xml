@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ShCTI>
+  <config>
+    <Extensions>
+      <Extension ExtensionNumber="1000" ChannelID="0" Type="Analog_Trunk" Enable="1" StateMachine="./Analog_Trunk.xml"></Extension>
+      <Extension ExtensionNumber="1001" ChannelID="1" Type="Anolog_User" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1002" ChannelID="2" Type="Anolog_User" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1003" ChannelID="3" Type="Anolog_User" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1004" ChannelID="71" Type="A_USER" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1005" ChannelID="72" Type="A_USER" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1006" ChannelID="65" Type="A_TRUNK" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1007" ChannelID="66" Type="A_TRUNK" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1008" ChannelID="8" Type="A_USER" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1009" ChannelID="9" Type="A_USER" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+      <Extension ExtensionNumber="1010" ChannelID="10" Type="A_USER" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
+    </Extensions>
+    <IVRExtensions>
+      <Extension ExtensionNumber="5001" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5002" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5003" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5004" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5005" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5006" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5007" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5008" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5009" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+      <Extension ExtensionNumber="5010" Type="IVR" Enable="1" StateMachine="./IVR.xml"></Extension>
+    </IVRExtensions>
+    <Voices>
+      <Voice ChannelID="0" Type="BASE" Enable="0"></Voice>
+      <Voice ChannelID="1" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="2" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="3" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="4" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="5" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="6" Type="BASE" Enable="1"></Voice>
+      <Voice ChannelID="7" Type="BASE" Enable="1"></Voice>
+    </Voices>
+    <Conferences>
+      <Conf ChannelID="0" Type="BASE" Enable="0"></Conf>
+      <Conf ChannelID="1" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="2" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="3" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="4" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="5" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="6" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="7" Type="BASE" Enable="1"></Conf>
+    </Conferences>
+    <groups>
+      <group ExtensionNumber ="5000" name ="IVR"  Enable="1" StateMachine="./Group.xml">
+        <Extension>5001</Extension>
+        <Extension>5002</Extension>
+        <Extension>5003</Extension>
+        <Extension>5004</Extension>
+        <Extension>5005</Extension>
+        <Extension>5006</Extension>
+        <Extension>5007</Extension>
+        <Extension>5008</Extension>
+        <Extension>5009</Extension>
+        <Extension>5010</Extension>
+    </group>
+    </groups>
+  </config>
+  <dialplan>
+    <extension name="IVR">
+      <condition field="CalledNumber" expression="8079">
+        <action application="transfer" data="5000"/>
+      </condition>
+    </extension>
+  </dialplan>
+</ShCTI>

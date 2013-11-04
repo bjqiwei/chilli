@@ -1,0 +1,36 @@
+#pragma once
+
+#ifndef _CHILLI_HEADER_
+#define _CHILLI_HEADER_
+#include <xmlHelper.h>
+
+
+namespace chilli
+{
+	class App
+	{
+	public:
+		App(void);
+		virtual ~App(void);
+		static bool CoreInit(void);
+		static void CoreDestroy(void);
+		static void AppInit(void);
+		static int Run(void);
+		static void CoreRuntimeLoop(int bg);
+		static volatile int running;	
+	private:
+		static bool ReadXMLConfig(void);
+		static void ConsoleLoop();
+		static fsm::xmlHelper::xmlDocumentPtr _docPtr;
+		static std::string strFileDir;
+		static std::string strFileNameNoExtension;
+	};
+}//end namespace KeygoeAdapter
+
+
+BOOL WINAPI ConsoleHandler(DWORD msgType);
+void SignalHandler(int  sig);
+void WINAPI ServiceCtrlHandler(DWORD  dwOpcode);
+void WINAPI ServiceMain(DWORD  dwArgc, LPTSTR* lpszArgv);
+#endif
+

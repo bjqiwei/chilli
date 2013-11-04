@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{61C9D508-31EC-4BE4-8CC6-EF59BFA2C068}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>CardAdapter</RootNamespace>
+    <ProjectName>chilli</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2-rc1\include;$(SolutionDir)\libs\libxml2-2.7.7.win32\include;$(SolutionDir)\libs\iconv-1.9.2.win32\include;$(SolutionDir)\libs\SpiderMonkey-1.8.5\include;$(SolutionDir)\libs\FSM\;$(IncludePath)</IncludePath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7.win32\lib;$(SolutionDir)\libs\iconv-1.9.2.win32\lib\;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\zlib-1.2.5\lib\;$(SolutionDir)\libs\SpiderMonkey-1.8.5\lib;$(SolutionDir)\libs\log4cplus-1.1.2-rc1\lib;$(SolutionDir)\libs\FSM\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.1-rc4\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XP_WIN;STATIC_EXPORTABLE_JS_API;JS_USE_JSID_STRUCT_TYPES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>log4cplusD.lib;FSMD.lib;iconv.lib;SHP_A3.lib;libxml2.lib;zdll.lib;Winmm.lib;mozjs-25.0a.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y chilli.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7.win32\bin\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\iconv-1.9.2.win32\bin\iconv.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\zlib-1.2.5\bin\zlib1.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\SpiderMonkey-1.8.5\bin\mozjs-25.0a.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Sh\ShIndex.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Sh\ShConfig.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="log4cplus.properties">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <None Include="Analog_Trunk.xml" />
+    <None Include="Analog_User.xml" />
+    <None Include="Group.xml" />
+    <None Include="IVR.xml" />
+    <None Include="ReadMe.txt" />
+    <None Include="welcome.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ACD\ACDModule.h" />
+    <ClInclude Include="Device\DevModule.h" />
+    <ClInclude Include="EventBuffer.h" />
+    <ClInclude Include="IVR\IVRExtension.h" />
+    <ClInclude Include="IVR\IVRModule.h" />
+    <ClInclude Include="model\AcdEventtDispatcher.h" />
+    <ClInclude Include="model\AcdProcess.h" />
+    <ClInclude Include="model\BaseObject.h" />
+    <ClInclude Include="model\Channel.h" />
+    <ClInclude Include="model\Extension.h" />
+    <ClInclude Include="model\GlobalObject.h" />
+    <ClInclude Include="model\Group.h" />
+    <ClInclude Include="model\ProcessModule.h" />
+    <ClInclude Include="ServiceModule.h" />
+    <ClInclude Include="chilli.h" />
+    <ClInclude Include="Sh\ShChannel.h" />
+    <ClInclude Include="Sh\ShDevModule.h" />
+    <ClInclude Include="Sh\ShExtension.h" />
+    <ClInclude Include="Sh\shpa3api.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ACD\ACDModule.cpp" />
+    <ClCompile Include="Device\DevModule.cpp" />
+    <ClCompile Include="EventBuffer.cpp" />
+    <ClCompile Include="IVR\IVRExtension.cpp" />
+    <ClCompile Include="IVR\IVRModule.cpp" />
+    <ClCompile Include="model\AcdEventtDispatcher.cpp" />
+    <ClCompile Include="model\BaseObject.cpp" />
+    <ClCompile Include="model\Extension.cpp" />
+    <ClCompile Include="model\GlobalObject.cpp" />
+    <ClCompile Include="model\Group.cpp" />
+    <ClCompile Include="model\ProcessModule.cpp" />
+    <ClCompile Include="ServiceModule.cpp" />
+    <ClCompile Include="chilli.cpp" />
+    <ClCompile Include="Sh\ShChannel.cpp" />
+    <ClCompile Include="Sh\ShDevModule.cpp" />
+    <ClCompile Include="Sh\ShExtension.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libs\Win32\log4cplus.vcxproj">
+      <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="model">
+      <UniqueIdentifier>{f4d5888f-d8f7-45d4-85b2-0d226e1cb216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sh">
+      <UniqueIdentifier>{90ddb62a-88e5-48a0-963a-ac43f2a098a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IVR">
+      <UniqueIdentifier>{23c3db04-58bb-4976-b079-1d643c10a741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Device">
+      <UniqueIdentifier>{683e62f6-13e1-4c0a-ad8f-f875691278aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ACD">
+      <UniqueIdentifier>{704ea279-ecaa-4f36-a30f-e34b91eab198}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Group.xml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="IVR.xml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Analog_Trunk.xml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="welcome.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Analog_User.xml">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\AcdEventtDispatcher.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Channel.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Extension.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\ShChannel.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
+    <ClInclude Include="model\ProcessModule.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\ShDevModule.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\ShExtension.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
+    <ClInclude Include="model\GlobalObject.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\AcdProcess.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="IVR\IVRModule.h">
+      <Filter>IVR</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\DevModule.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="IVR\IVRExtension.h">
+      <Filter>IVR</Filter>
+    </ClInclude>
+    <ClInclude Include="ACD\ACDModule.h">
+      <Filter>ACD</Filter>
+    </ClInclude>
+    <ClInclude Include="model\BaseObject.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Group.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\shpa3api.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
+    <ClInclude Include="chilli.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model\AcdEventtDispatcher.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Extension.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Sh\ShChannel.cpp">
+      <Filter>Sh</Filter>
+    </ClCompile>
+    <ClCompile Include="model\ProcessModule.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Sh\ShDevModule.cpp">
+      <Filter>Sh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sh\ShExtension.cpp">
+      <Filter>Sh</Filter>
+    </ClCompile>
+    <ClCompile Include="model\GlobalObject.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="IVR\IVRModule.cpp">
+      <Filter>IVR</Filter>
+    </ClCompile>
+    <ClCompile Include="Device\DevModule.cpp">
+      <Filter>Device</Filter>
+    </ClCompile>
+    <ClCompile Include="IVR\IVRExtension.cpp">
+      <Filter>IVR</Filter>
+    </ClCompile>
+    <ClCompile Include="ACD\ACDModule.cpp">
+      <Filter>ACD</Filter>
+    </ClCompile>
+    <ClCompile Include="model\BaseObject.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Group.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="chilli.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="log4cplus.properties">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
