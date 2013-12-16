@@ -6,7 +6,7 @@
 #include <scxml/env/SimpleContext.h>
 #include <scxml/env/SimpleEvaluator.h>
 #include <scxml/SCInstance.h>
-#include "AcdEventtDispatcher.h"
+#include "AcdEventDispatcher.h"
 #include "Extension.h"
 
 namespace chilli

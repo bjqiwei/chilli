@@ -62,9 +62,6 @@
     <ClInclude Include="EventBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model\AcdEventtDispatcher.h">
-      <Filter>model</Filter>
-    </ClInclude>
     <ClInclude Include="model\Channel.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -113,6 +110,9 @@
     <ClInclude Include="chilli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="model\AcdEventDispatcher.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -123,9 +123,6 @@
     </ClCompile>
     <ClCompile Include="EventBuffer.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="model\AcdEventtDispatcher.cpp">
-      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\Extension.cpp">
       <Filter>model</Filter>
@@ -165,6 +162,9 @@
     </ClCompile>
     <ClCompile Include="chilli.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model\AcdEventDispatcher.cpp">
+      <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

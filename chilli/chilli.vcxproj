@@ -126,7 +126,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="EventBuffer.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
-    <ClInclude Include="model\AcdEventtDispatcher.h" />
+    <ClInclude Include="model\AcdEventDispatcher.h" />
     <ClInclude Include="model\AcdProcess.h" />
     <ClInclude Include="model\BaseObject.h" />
     <ClInclude Include="model\Channel.h" />
@@ -149,7 +149,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="EventBuffer.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
-    <ClCompile Include="model\AcdEventtDispatcher.cpp" />
+    <ClCompile Include="model\AcdEventDispatcher.cpp" />
     <ClCompile Include="model\BaseObject.cpp" />
     <ClCompile Include="model\Extension.cpp" />
     <ClCompile Include="model\GlobalObject.cpp" />

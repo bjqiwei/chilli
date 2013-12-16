@@ -4,7 +4,7 @@
 #include "BaseObject.h"
 #include <FSM.h>
 #include <scxml/EventDispatcher.h>
-#include "AcdEventtDispatcher.h"
+#include "AcdEventDispatcher.h"
 #include "AcdProcess.h"
 
 namespace chilli{

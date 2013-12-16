@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "AcdEventtDispatcher.h"
+#include "AcdEventDispatcher.h"
 #include <xmlHelper.h>
 #include "..\acd\ACDModule.h"
 
