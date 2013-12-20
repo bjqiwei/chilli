@@ -3,18 +3,17 @@
 #include "xmlHelper.h"
 #include <string>
 #include <map>
-
-#ifdef USE_LOG4CPLUS
-#include <log4cplus/logger.h>
-#endif
 #include "config.h"
-#include <scxml/TriggerEvent.h>
-#include <scxml/EventDispatcher.h>
-#include <scxml/Context.h>
-#include <scxml/Evaluator.h>
-#include <scxml/SCInstance.h>
-#include <scxml/model/Transition.h>
-#include <scxml/model/Log.h>
+#include <log4cplus/logger.h>
+
+#include "scxml/TriggerEvent.h"
+#include "scxml/EventDispatcher.h"
+#include "scxml/Context.h"
+#include "scxml/Evaluator.h"
+#include "scxml/SCInstance.h"
+#include "scxml/model/Transition.h"
+#include "scxml/model/Log.h"
+#include "scxml/lock.h"
 
 
 using namespace std;
@@ -31,34 +30,33 @@ namespace fsm{
 		StateMachine & operator=(const StateMachine & other);
 		
 		//初始化状态机
-		void Init(void);
-		void Init(const string xmlFile);
+		bool Init(void);
+		bool Init(const string xmlFile);
 		//开始进入初始化状态
 		void go();
 		const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
 		void pushEvent(TriggerEvent & Evt) const;
-		void setName(const string strName);
+		void setName(const string &strName);
 		bool addEventDispatcher( EventDispatcher * evtDsp);
 		const std::string& getName();
-		const std::string& getSessionId();
+		const std::string& getSessionId()const;
 		Evaluator * getEvaluator() const;
 		Context  *  getRootContext(); 
 		xmlNodePtr getDataModel(); 
 		void setscInstance(SCInstance *);
 		void setLog(log4cplus::Logger log);
+		void setSessionID(std::string strSessionid);
 	protected:
-		std::string _strStateFile;
-		xmlHelper::xmlDocumentPtr _docPtr;
+		std::string m_strStateFile;
+		xmlHelper::xmlDocumentPtr m_xmlDocPtr;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
-		xmlNodePtr  _initState;
-		mutable xmlNodePtr _currentState;
-		xmlNodePtr _rootNode;
-		mutable std::string _strSessionID;
-		std::string _strName;
-		#ifdef USE_LOG4CPLUS
-		log4cplus::Logger log;
-		#endif
+		xmlNodePtr  m_initState;
+		mutable xmlNodePtr m_currentStateNode;
+		xmlNodePtr m_rootNode;
+		std::string m_strSessionID;
+		std::string m_strName;
+		log4cplus::Logger  log;
 
 		void normalize(const xmlNodePtr rootNode);
 		bool isState(const xmlNodePtr xmlNode) const;
@@ -77,9 +75,10 @@ namespace fsm{
 
 		void processEvent( xmlNodePtr eventNode) const;
 		void processTransition(model::Transition & transition) const;
-		void processLog( model::Log &log) const;
 		void processExit(const xmlNodePtr node) const;
-		void processEntry(const xmlNodePtr node)const;
+
+		//处理entry节点函数，传入entry节点指针，返回值表示是否继续执行余下的entry节点。
+		bool processEntry(const xmlNodePtr node)const;
 		void processSend(const xmlNodePtr node)const;
 		void processScript(const xmlNodePtr node)const;
 		void processTimer(const xmlNodePtr node)const;
@@ -91,9 +90,11 @@ namespace fsm{
 		const ::xmlNodePtr getParentState(const xmlNodePtr currentState)const;
 		xmlNodePtr getTargetStates(const xmlNodePtr transition) const;
 	private:
-		std::map<std::string, EventDispatcher *> _vecSend;
-		SCInstance * scInstance;
-		mutable CRITICAL_SECTION csection;
+		std::map<std::string, EventDispatcher *> m_mapSendObject;
+		SCInstance * m_scInstance;
+		mutable fsm::CLock m_lock;
+	public:
+		mutable TriggerEvent m_currentEvt;
 		
 	};
 }

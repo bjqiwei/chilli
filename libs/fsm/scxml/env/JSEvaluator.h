@@ -4,12 +4,11 @@
 #include "../Evaluator.h"
 #include "../Context.h"
 #include "JSContext.h"
-#pragma warning (disable:4800)
 #include <jsapi.h>
-#include <config.h>
 #include <string>
 #include <map>
 #include <vector>
+#include <log4cplus/logger.h>
 
 
 namespace fsm
@@ -41,21 +40,21 @@ namespace env
 		/// <param name="expr"> expression </param>
 		/// <returns> a result of the evaluation </returns>
 		/// <exception cref="SCXMLExpressionException"> For a malformed expression </exception>
-		virtual std::string eval(Context *const ctx, const std::string &expr,unsigned int line);
+		/*virtual std::string eval(Context *const ctx, const std::string &expr,const std::string &filename, unsigned int line);
 
 
-		virtual bool evalCond(Context *const ctx, const std::string &expr,unsigned int line);
+		virtual bool evalCond(Context *const ctx, const std::string &expr,const std::string &filename, unsigned int line);
 
 		/// <seealso cref= Evaluator#evalLocation(Context, String) </seealso>
-		virtual xmlNodePtr evalLocation(Context *const ctx, const std::string &expr,unsigned int line);
-
+		virtual xmlNodePtr evalLocation(Context *const ctx, const std::string &expr, const std::string &filename, unsigned int line);
+*/
 		/// <summary>
 		/// Create a new child context.
 		/// </summary>
 		/// <param name="parent"> parent context </param>
 		/// <returns> new child context </returns>
 		/// <seealso cref= Evaluator#newContext(Context) </seealso>
-		virtual Context * newContext(Context *const parent,log4cplus::Logger log);
+		virtual Context * newContext(Context *const parent);
 		/// <summary>
 		/// Create a new context which is the summation of contexts from the
 		/// current state to document root, child has priority over parent

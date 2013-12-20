@@ -3,6 +3,7 @@
 #define _FSM_MODEL_DATAMODEL_HEADER_
 #include <libxml/tree.h>
 #include "Action.h"
+#include <log4cplus/logger.h>
 
 namespace fsm
 {
@@ -25,13 +26,12 @@ namespace model
 		/// children of this &lt;datamodel&gt; element.
 		/// </summary>
 		xmlNodePtr node;
-
-		/// <summary>
-		/// Constructor.
-		/// </summary>
+		std::string m_strSession;
+		log4cplus::Logger log;
+		std::string m_strFilename;
 	public:
-		Datamodel(xmlNodePtr xNode);
-		virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx);
+		Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename);
+		virtual void execute(fsm::Context * ctx);
 	};
 }
 }

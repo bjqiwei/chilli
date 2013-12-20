@@ -5,11 +5,11 @@
 
 namespace fsm{
 namespace model{
-	void OnEntry::execute(fsm::Evaluator * evl,fsm::Context * ctx)
+	void OnEntry::execute(fsm::Context * ctx)
 	{
 		if (_node == NULL) return;
 
-		for (xmlNodePtr exeNode = _node->children ; exeNode !=  NULL; exeNode = exeNode->next)
+		/*for (xmlNodePtr exeNode = _node->children ; exeNode !=  NULL; exeNode = exeNode->next)
 		{
 			if(exeNode->type == XML_ELEMENT_NODE &&
 				xmlStrEqual(exeNode->name, BAD_CAST("script"))){
@@ -26,7 +26,7 @@ namespace model{
 					tst.execute(evl,ctx);
 					break;
 			}
-		}
+		}*/
 	}
 }
 }

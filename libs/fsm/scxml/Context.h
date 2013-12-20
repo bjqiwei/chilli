@@ -2,9 +2,10 @@
 #ifndef _CONTEXT_HEADER_
 #define _CONTEXT_HEADER_
 #include <map>
-#include "config.h"
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
+#include <string>
+#include "libxml/tree.h"
+
+
 namespace fsm{
 
 
@@ -15,12 +16,9 @@ namespace fsm{
 	class FSM_EXPORT Context
 	{
 	public:
-		Context(void):parent(NULL){
-			log = log4cplus::Logger::getInstance("fsm.Context");
-			LOG4CPLUS_DEBUG(log,"new a fsm.Context object");
+		Context(Context * _parent=NULL):parent(_parent){
 		};
 		virtual ~Context(void){
-			LOG4CPLUS_DEBUG(log,"destruction a fsm.Context object");
 		};
 
 	public:
@@ -40,7 +38,7 @@ namespace fsm{
 		/// </summary>
 		/// <param name="name"> The variable name </param>
 		/// <param name="value"> The variable value </param>
-		virtual void setLocal(const std::string &name, const std::string & value) = 0;
+		virtual void setLocal(const std::string & name, const std::string & value,bool isDelete=true) = 0;
 
 		/// <summary>
 		/// Get the value of this variable; delegating to parent.
@@ -54,7 +52,7 @@ namespace fsm{
 		/// </summary>
 		/// <param name="name"> The name of the variable </param>
 		/// <returns> Whether a variable with the name exists in this Context </returns>
-		virtual bool has(const std::string &name) = 0;
+		virtual bool has(const std::string & name) = 0;
 
 		/// <summary>
 		/// Get the Map of all variables in this Context.
@@ -63,6 +61,11 @@ namespace fsm{
 		/// To get variables in parent Context, call getParent().getVars(). </returns>
 		/// <seealso cref= #getParent() </seealso>
 		virtual std::map<std::string,std::string> & getVars() = 0;
+
+		/// <summary>
+		/// Set the Map of all variables in this Context.
+		/// </summary>
+		virtual void setVars(const std::map<std::string,std::string> &vars) = 0;
 
 		/// <summary>
 		/// Clear this Context.
@@ -74,10 +77,31 @@ namespace fsm{
 		/// </summary>
 		/// <returns> The parent Context in a chained Context environment </returns>
 		virtual Context *getParent() = 0;
-		virtual bool CompileScript(const std::string script) = 0;
-		void setLog(log4cplus::Logger _log){log = _log;};
-	public:
-		log4cplus::Logger log;
+
+		///<summary>
+		///编译一段脚本。
+		///</summary>
+		///<returns>返回此脚本执行是否成功的结果。</returns>
+		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line) = 0;
+
+		///<summary>
+		///计算一段表达式脚本。
+		///</summary>
+		///<returns>返回此表达式执行的结果，转换为string类型。</returns>
+		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line) = 0;
+
+		///<summary>
+		///计算一段boolen表达式脚本
+		///</summary>
+		///<returns>返回此表达式执行的结果。</returns>
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line) = 0;
+
+		///<summary>
+		///返回指向本xml文档内容的一个节点指针。
+		///</summary>
+		///<returns>返回指向本xml文档内容的一个节点指针。</returns>
+		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line) = 0;
+
 	protected:
 		//父Context
 		Context *parent;

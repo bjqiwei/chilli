@@ -1,5 +1,5 @@
 #include "Script.h"
-#include <xmlHelper.h>
+#include "../../xmlHelper.h"
 
 namespace fsm
 {
@@ -7,9 +7,10 @@ namespace model
 {
 
 
-	Script::Script(xmlNodePtr xNode):node(xNode)
+	Script::Script(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
+		m_strSession(session),m_strFilename(filename)
 	{
-		//log = log4cplus::Logger::getInstance("fsm.model.script");
+		//log = TLogFile *::getInstance("fsm.model.script");
 		this->content =  xmlHelper::XStr(xmlNodeGetContent(node)).strForm();
 	}
 
@@ -17,9 +18,9 @@ namespace model
 	//{
 	//	return content;
 	//}
-	void Script::execute(fsm::Evaluator * evl,fsm::Context * ctx)
+	void Script::execute(fsm::Context * ctx)
 	{
-		evl->eval(ctx,this->content,node->line);
+		ctx->eval(this->content,m_strFilename,node->line);
 	}
 }
 }

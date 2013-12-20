@@ -5,15 +5,30 @@
 #include "Context.h"
 #include "model/Datamodel.h"
 #include "SCXMLHelper.h"
-#pragma warning(disable:4800)
+//#pragma warning(disable:4800)
 #include <jsapi.h>
 #include <string>
 #include <map>
 #include <set>
 #include <list>
+#include <log.h>
 #include "Timer.h"
+#include "lock.h"
+#include <log4cplus/logger.h>
+#if  defined(WIN32)
+#include <Windows.h>
+#else
+typedef int HANDLE; 
+#include <pthread.h>
 
+typedef struct 
+{
+	pthread_mutex_t	mutex;
+	pthread_cond_t		condition;
+	int			semCount;	
+}sem_private_struct, *sem_private;
 
+#endif
 
 
 namespace fsm
@@ -21,7 +36,11 @@ namespace fsm
 	//thread data Including thread handle and thread id
 	struct thread_data {
 		HANDLE thread_hnd;
+#ifdef WIN32 
 		unsigned thread_id;
+#else
+		pthread_t thread_id;
+#endif
 	};
 
 	/// <summary>
@@ -48,9 +67,8 @@ namespace fsm
 		/// The root context.
 		/// </summary>
 		//mutable Context *rootContext;
-		log4cplus::Logger log;
-		mutable JSClass *global_cls;
-		JSFunctionSpec * functions;
+		static log4cplus::Logger log;
+
 	public:
 		SCInstance();
 		virtual ~SCInstance();
@@ -59,32 +77,38 @@ namespace fsm
 
 		//virtual void setEvaluator(Evaluator *const evaluator);
 
-		virtual  Context *getRootContext(log4cplus::Logger log) const ;
+		virtual  Context *getRootContext() const ;
 
 		//virtual void setRootContext(Context *const context);
 
-		virtual Context * getContext(xmlNodePtr xNode,log4cplus::Logger log) const;
+		virtual Context * getContext(xmlNodePtr xNode) const;
 		virtual void removeContext(xmlNodePtr xNode);
 
 		virtual Context *lookupContext(xmlNodePtr xNode);
 
 		virtual void setContext(xmlNodePtr xNode, Context *const context);
-		void setLog(log4cplus::Logger log);
+
 		void StartTimerThread();
-		void AddTimer(fsm::Timer _timer);
-		typedef void (*addEvent)(std::string); 
-		addEvent addEventFunction;
+		void AddTimer(fsm::Timer & _timer);
+		typedef void (*TimerFunction)(std::string); 
+		TimerFunction timerFunction;
 	private:
+#ifdef WIN32
 		static unsigned int __stdcall TimerThreadProc( void *pParam );
 		HANDLE timerTheradSemaphore;
+#else
+		static void *  TimerThreadProc( void *pParam );
+		sem_private timerTheradSemaphore;
+#endif
+		
 
 		//定时器队列
 		std::list<fsm::Timer >m_timer; 
 
-		thread_data td;
+		struct thread_data td;
 
-		//临界资源
-		CRITICAL_SECTION csection;
+		fsm::CLock m_lock;
+
 	};
 }
 #endif //end head file

@@ -14,11 +14,14 @@ namespace model
 	{
 
 	public:
-		OnExit(xmlNodePtr xNode):node(xNode){};
+		OnExit(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
+		m_strSession(session),m_strFilename(filename){};
 		~OnExit(){};
-		virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx);
+		virtual void execute(fsm::Context * ctx);
 	private: 
 		xmlNodePtr node ;
+		std::string m_strSession;
+		std::string m_strFilename;
 	};
 
 

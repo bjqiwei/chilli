@@ -4,9 +4,10 @@
 
 #include <string>
 #include <vector>
-#include <xmlHelper.h>
-#include <log4cplus/logger.h>
+#include "../../xmlHelper.h"
+#include <log.h>
 #include "Action.h"
+#include <log4cplus/logger.h>
 
 namespace fsm
 {
@@ -22,15 +23,18 @@ namespace model
 		std::string m_strCond;
 		std::string m_strEvent;
 		bool m_bCond;
+		std::string m_strSession;
+		std::string m_strFilename;
+		fsm::Context * cx;
 
-		std::string &getCond();
-		std::string &getEvent();
+		const std::string &getCond();
+		const std::string &getEvent();
 		
 	public:
-		Event(xmlNodePtr xNode);
+		Event(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 		bool isEnabledEvent(const string& strEventName) const ;
-		bool isEnabledCondition()const;
-		virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx);
+		bool isEnabledCondition();
+		virtual void execute(fsm::Context * ctx);
 	};
 }
 }

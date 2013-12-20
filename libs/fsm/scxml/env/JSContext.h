@@ -1,19 +1,28 @@
 #pragma once
 #ifndef _FSM_ENV_JSCONTEXT_HEADER_
 #define _FSM_ENV_JSCONTEXT_HEADER_
-#include <scxml/Context.h>
-#pragma warning (disable:4800)
-#pragma warning (disable:4099)
+#include "../Context.h"
 #include <jsapi.h>
-#include <jsfriendapi.h>
 #include <string>
 #include <map>
 #include <log4cplus/logger.h>
+#include "libxml/tree.h"
+
 
 namespace fsm
 {
 namespace env
 {
+	#if (defined(DEBUG) && defined(__SUNPRO_CC))  || defined(JS_CPU_SPARC)
+	/* Sun compiler uses larger stack space for js_Interpret() with debug
+	   Use a bigger gMaxStackSize to make "make check" happy. */
+	#define DEFAULT_MAX_STACK_SIZE 5000000
+	#else
+	#define DEFAULT_MAX_STACK_SIZE 500000
+	#endif
+
+	#define JS_DEFAULT_SCRIPT_STACK_QUOTA   ((size_t) 0x8000000)
+	
 	//java解析器的上下文环境
 	class  JsContext : public Context
 	{
@@ -24,24 +33,17 @@ namespace env
 		::JSRuntime * JSrt;
 		//JS Context需要资源
 		JSAutoRequest *ar;
-		//JS context 需要资源
-		JSAutoCompartment *ac;
-		//Js Context 中全局对象
-		static JSClass global_class;
-		//Js Context 中调用的C++函数
-		static JSBool  logging(JSContext *context,  unsigned int argc, jsval *value);
-		//Js Context 中的C++函数集合
-		static JSFunctionSpec global_functions[];
-		
+		log4cplus::Logger log;
+	
+		static unsigned long StackChunkSize; 
+		static size_t  gMaxStackSize;
+		static size_t gScriptStackQuota;
 	public:
 		::JSContext * ctx;
 		::JSObject * global_obj;
 	public:
-
-		JsContext(::JSRuntime * rt,log4cplus::Logger log); 
+		JsContext(::JSRuntime * rt,Context *const parent=NULL); 
 		virtual ~JsContext();
-
-		JsContext(::JSRuntime * rt,Context *const parent,log4cplus::Logger log); 
 
 		/// <summary>
 		/// Assigns a new value to an existing variable or creates a new one.
@@ -81,28 +83,41 @@ namespace env
 		/// </summary>
 		/// <param name="name"> The variable name </param>
 		/// <param name="value"> The variable value </param>
-		virtual void setLocal(const std::string &name, const std::string & value);
+		virtual void setLocal(const std::string &name, const std::string & value, bool isDelete=true);
 
-		/// <summary>
-		/// Set the variables map.
-		/// </summary>
-		/// <param name="vars"> The new Map of variables. </param>
+		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line);
+
+		///<summary>
+		///计算一段boolen表达式脚本
+		///</summary>
+		///<returns>返回此表达式执行的结果。</returns>
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line);
+		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line);
+		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line);
+		virtual void SetContextPrivate(void *data);
 	protected:
-		virtual void setVars(const std::map<std::string,std::string> & vars);
 
+
+	public:
 		/// <summary>
 		/// Get the Map of all local variables in this Context.
 		/// </summary>
 		/// <returns> Returns the vars. </returns>
-	public:
 		virtual std::map<std::string,std::string> & getVars();
+
+		/// <summary>
+		/// Set the Map of all variables in this Context.
+		/// </summary>
+		virtual void setVars(const std::map<std::string,std::string> &varMap);
+
 		virtual JSObject * JSDefineObject (const char * name, JSClass * clasp);
 		virtual bool JSDefineProperties (JSObject *obj,  JSPropertySpec *ps);
-		virtual bool CompileScript(const std::string script);
-
+		static void reportError(::JSContext *_ctx, const char *message, JSErrorReport *report);
+		static void ReportException(JSContext *cx);
+		static JSBool ShellOperationCallback(JSContext *cx);
+		
 	private:
 		void InitializeInstanceFields();
-		static void reportError(::JSContext *_ctx, const char *message, JSErrorReport *report);
 	};
 
 	

@@ -20,13 +20,16 @@ namespace model
 		std::string m_strCond;
 		std::string m_strTarget;
 		bool m_bCond;
+		std::string m_strSession;
+		std::string m_strFilename;
+		fsm::Context * cx;
 	public:
-		Transition(xmlNodePtr xNode);
+		Transition(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 
 		std::string &getCond();
 		std::string &getTarget();
-		bool isEnabledCondition()const;
-		virtual  void execute(fsm::Evaluator * evl,fsm::Context * ctx);
+		bool isEnabledCondition();
+		virtual  void execute(fsm::Context * ctx);
 	};
 }
 }

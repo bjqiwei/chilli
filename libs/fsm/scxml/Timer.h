@@ -3,6 +3,8 @@
 #define _SCXML_TIMER_HEADER_
 #include <string>
 #include <ctime>
+#include <log4cplus/logger.h>
+#include <sys/timeb.h>
 #include "config.h"
 
 
@@ -28,7 +30,8 @@ namespace   fsm{
 		std::string m_ext;
 		std::string m_strTimerId;
 		int m_interval;
-		clock_t m_startTime;
+		struct timeb m_startTime;
+		log4cplus::Logger log;
 	};
 }
 #endif // end timer header

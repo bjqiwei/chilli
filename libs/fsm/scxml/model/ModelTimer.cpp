@@ -1,13 +1,14 @@
-#include "Timer.h"
-#include "scxml/SCXMLHelper.h"
-#include <xmlHelper.h>
+#include "ModelTimer.h"
+#include "../SCXMLHelper.h"
+#include "../../xmlHelper.h"
 
 namespace fsm{
 namespace model{
 
-	Timer::Timer(xmlNodePtr xNode):node(xNode)
+	Timer::Timer(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
+		m_strSession(session),m_strFilename(filename)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Timer");
+		log = log4cplus::Logger::getInstance("StateMachine.model.Timer");
 		this->id = fsm::xmlHelper::getXmlNodeAttributesValue(node,"id");
 		this->idexpr = fsm::xmlHelper::getXmlNodeAttributesValue(node,"idexpr");
 		this->interval = fsm::xmlHelper::getXmlNodeAttributesValue(node,"interval");
@@ -30,11 +31,11 @@ namespace model{
 		return atoi(interval.c_str());
 	}
 
-	void Timer::execute(fsm::Evaluator * evl,fsm::Context * ctx)
+	void Timer::execute(fsm::Context * ctx)
 	{
 
 		if (SCXMLHelper::isStringEmpty(id)){
-			id = evl->eval(ctx,idexpr,node->line);
+			id = ctx->eval(idexpr,m_strFilename,node->line);
 		}
 	}
 }

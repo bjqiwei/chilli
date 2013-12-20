@@ -1,4 +1,5 @@
 #include "SimpleContext.h"
+#include <log4cplus/loggingmacros.h>
 
 
 namespace fsm
@@ -9,18 +10,21 @@ namespace env
 	SimpleContext::SimpleContext():parent(NULL)
 	{
 		InitializeInstanceFields();
+		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
 	SimpleContext::SimpleContext(Context *const parent):parent(NULL)
 	{
 		InitializeInstanceFields();
 		this->parent  =parent;
+		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
 	SimpleContext::SimpleContext(std::map<std::string,std::string>const &initialVars):parent(NULL)
 	{
 		InitializeInstanceFields();
 		this->vars = initialVars;
+		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
 	SimpleContext::SimpleContext(Context *const parent, std::map<std::string,std::string>const &initialVars):parent(NULL)
@@ -28,9 +32,11 @@ namespace env
 		InitializeInstanceFields();
 		this->parent = parent;
 		this->vars = initialVars;
-
+		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
-	SimpleContext::~SimpleContext(){}
+	SimpleContext::~SimpleContext(){
+		LOG4CPLUS_TRACE(log,"deconstruct a SimpleContext object.");
+	}
 
 	void SimpleContext::set(const std::string &name, const std::string &value)
 	{
@@ -87,10 +93,10 @@ namespace env
 		return parent;
 	}
 
-	void SimpleContext::setLocal(const std::string &name, const std::string & value)
+	void SimpleContext::setLocal(const std::string &name, const std::string & value,bool isDelete)
 	{
-		vars[name]=value;
-		LOG4CPLUS_WARN(log, name << "=" << value);
+		if(isDelete)vars[name]=value;
+		LOG4CPLUS_ERROR(log, name << "=" << value);
 	}
 
 	void SimpleContext::setVars(std::map<std::string,std::string>const & vars)
@@ -115,12 +121,33 @@ namespace env
 
 	void SimpleContext::InitializeInstanceFields()
 	{
-		log = log4cplus::Logger::getInstance("scxml.SimpleContext");
+		log = log4cplus::Logger::getInstance("SimpleContext");
 	}
-	bool SimpleContext::CompileScript(const std::string script)
+	bool SimpleContext::CompileScript(const std::string script,const std::string &filename, unsigned int line)
 	{
-		LOG4CPLUS_WARN(log,"CompileScript is not implement.");
+		LOG4CPLUS_ERROR(log, "CompileScript is not implement.");
 		return true;
+	}
+
+	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
+	{
+		return get(expr);
+	}
+
+	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)
+	{
+		if(get(expr).compare("0") ==0)
+			return false;
+		return true;
+	}
+
+	xmlNodePtr SimpleContext::evalLocation(const std::string &expr,const std::string &filename, unsigned int line)
+	{
+		if (expr == "")
+		{
+			return NULL;
+		}
+		return NULL;
 	}
 }
 }

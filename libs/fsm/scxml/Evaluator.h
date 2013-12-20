@@ -26,7 +26,7 @@ namespace fsm
 		/// <returns> a result of the evaluation </returns>
 		/// <exception cref="SCXMLExpressionException"> A malformed exception </exception>
 	public:
-		virtual std::string eval(Context *const ctx, const std::string &expr,unsigned int line) = 0;
+		//virtual std::string eval(Context *const ctx, const std::string &expr,const std::string &filename,unsigned int line) = 0;
 
 		/// <summary>
 		/// Evaluate a condition.
@@ -36,7 +36,7 @@ namespace fsm
 		/// <param name="expr"> expression </param>
 		/// <returns> true/false </returns>
 		/// <exception cref="SCXMLExpressionException"> A malformed exception </exception>
-		virtual bool evalCond(Context *const ctx, const std::string &expr,unsigned int line) = 0;
+		//virtual bool evalCond(Context *const ctx, const std::string &expr,const std::string &filename,unsigned int line) = 0;
 
 		/// <summary>
 		/// Evaluate a location that returns a Node within an XML data tree.
@@ -46,14 +46,14 @@ namespace fsm
 		/// <param name="expr"> expression </param>
 		/// <returns> The location node. </returns>
 		/// <exception cref="SCXMLExpressionException"> A malformed exception </exception>
-		virtual xmlNodePtr evalLocation(Context *const ctx, const std::string &expr,unsigned int line) = 0;
+		//virtual xmlNodePtr evalLocation(Context *const ctx, const std::string &expr,const std::string & filename,unsigned int line) = 0;
 
 		/// <summary>
 		/// Create a new child context.
 		/// </summary>
 		/// <param name="parent"> parent context </param>
 		/// <returns> new child context </returns>
-		virtual Context * newContext(Context * const parent,log4cplus::Logger log) = 0;
+		virtual Context * newContext(Context * const parent) = 0;
 
 	};
 

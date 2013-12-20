@@ -2,7 +2,7 @@
 #ifndef _SCXML_ENV_SIMPLEEVALUATOR_HEADER_
 #define _SCXML_ENV_SIMPLEEVALUATOR_HEADER_
 #include "../Evaluator.h"
-#include "scxml/Context.h"
+#include "../Context.h"
 #include "SimpleContext.h"
 #include <string>
 #include <map>
@@ -22,15 +22,6 @@ namespace env
 
 		SimpleEvaluator(); 
 		virtual ~SimpleEvaluator();
-
-	
-		virtual std::string eval(Context *const ctx, const std::string &expr);
-
-		
-		virtual bool evalCond(Context *const ctx, const std::string &expr);
-
-		/// <seealso cref= Evaluator#evalLocation(Context, String) </seealso>
-		virtual xmlNodePtr evalLocation(Context *const ctx, const std::string &expr);
 
 	
 		virtual Context * newContext(Context *const parent);

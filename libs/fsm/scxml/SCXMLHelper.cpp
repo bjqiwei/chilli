@@ -1,4 +1,6 @@
 #include "SCXMLHelper.h"
+#include "log4cplus/logger.h"
+#include <log4cplus/loggingmacros.h>
 
 
 namespace fsm
@@ -33,6 +35,7 @@ namespace fsm
 
 	void SCXMLHelper::setNodeValue(xmlNodePtr const node, const std::string &value)
 	{
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("SCXMLHelper");
 		switch (node->type)
 		{
 			case XML_ATTRIBUTE_NODE:
@@ -53,7 +56,6 @@ namespace fsm
 				xmlNodeSetContent(node,BAD_CAST value.c_str());
 				break;
 			default:
-				log4cplus::Logger log = log4cplus::Logger::getInstance("SCXMLHelper.setNodeValue");
 				LOG4CPLUS_ERROR(log, "Trying to set value of a strange Node type: " << node->type);
 				//Logger.logln(Logger.E, err);
 				break;
@@ -62,6 +64,7 @@ namespace fsm
 
 	std::string SCXMLHelper::getNodeValue(xmlNodePtr const node)
 	{
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("SCXMLHelper");
 		std::string result = "";
 		if (node == 0) return result;
 
@@ -86,31 +89,11 @@ namespace fsm
 				result = xmlHelper::XStr(xmlNodeGetContent(node)).strForm();
 				break;
 			default:
-				log4cplus::Logger log = log4cplus::Logger::getInstance("SCXMLHelper.getNodeValue");
 				LOG4CPLUS_ERROR(log, "Trying to get value of a strange Node type: " << node->type);
 		}
 		return result;
 	}
 
-
-	void SCXMLHelper::cloneFunctionmodel(const xmlNodePtr fucmodel, Context *const ctx, 
-		Evaluator *const evaluator,
-		log4cplus::Logger const log)
-	{
-		if (fucmodel == 0) return;
-
-		for (xmlNodePtr fuctNode = fucmodel->children ; fuctNode !=  NULL; fuctNode = fuctNode->next)
-		{
-			if(fuctNode->type != XML_ELEMENT_NODE ||
-				!xmlStrEqual(fuctNode->name, BAD_CAST("function")))
-				continue;
-			std::string expr = xmlHelper::XStr(xmlNodeGetContent(fuctNode)).strForm();
-			if (!SCXMLHelper::isStringEmpty(expr))
-			{
-				ctx->CompileScript(expr);
-			}
-		}
-	}
 
 	std::string SCXMLHelper::escapeXML(const std::string &str)
 	{

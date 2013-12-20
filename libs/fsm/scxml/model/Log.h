@@ -5,6 +5,7 @@
 #include <string>
 #include <libxml/tree.h>
 #include "Action.h"
+#include <log4cplus/logger.h>
 
 
 namespace fsm
@@ -18,12 +19,16 @@ namespace fsm
 			xmlNodePtr node;
 			std::string m_strExpr;
 			std::string m_strLevel;
+			std::string m_Type;
+			std::string m_strSession;
+			std::string m_strFilename;
+			log4cplus::Logger log;
 		public:
-			Log(xmlNodePtr xNode);
+			Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename);
 			virtual ~Log(){};
 			std::string & getExpr();
 			std::string & getLevel();
-			virtual  void execute(Evaluator * evl,Context * ctx);
+			virtual  void execute(Context * ctx);
 		};
 
 

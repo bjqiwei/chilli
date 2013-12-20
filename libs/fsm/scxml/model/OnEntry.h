@@ -14,12 +14,15 @@ namespace model
 	{
 		
 	public:
-		OnEntry(xmlNodePtr xNode):_node(xNode){};
+		OnEntry(xmlNodePtr xNode,const std::string &session,const std::string & filename):_node(xNode),
+		m_strSession(session),m_strFilename(filename){};
 		~OnEntry(){};
 
-		virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx); 
+		virtual void execute(fsm::Context * ctx); 
 	private: 
 		xmlNodePtr _node;
+		std::string m_strSession;
+		std::string m_strFilename;
 	};
 }
 }

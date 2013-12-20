@@ -15,13 +15,15 @@ namespace model
 	class  Script :public Action
 	{
 	private:
-		//log4cplus::Logger log;
+		//TLogFile * log;
 		xmlNodePtr node;
 		std::string content;
+		std::string m_strSession;
+		std::string m_strFilename;
 	public:
-		Script(xmlNodePtr xNode);
+		Script(xmlNodePtr xNode,const std::string &session,const std::string & filename);
 		/*std::string &getContent();*/
-		virtual  void execute(Evaluator * evl,Context * ctx);
+		virtual  void execute(Context * ctx);
 	};
 
 

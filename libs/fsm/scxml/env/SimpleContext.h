@@ -1,11 +1,11 @@
 #pragma once
 #ifndef _SCXML_ENV_SIMPLECONTEXT_HEADER_
 #define _SCXML_ENV_SIMPLECONTEXT_HEADER_
-#include <scxml/Context.h>
+#include "../Context.h"
 #include <string>
 #include <map>
 #include <log4cplus/logger.h>
-#include <FSM.h>
+#include "../../FSM.h"
 
 namespace fsm
 {
@@ -45,7 +45,7 @@ namespace env
 
 		virtual Context *getParent();
 
-		virtual void setLocal(const std::string &name, const std::string & value);
+		virtual void setLocal(const std::string &name, const std::string & value,bool isDelete=true);
 
 		
 	protected:
@@ -62,6 +62,10 @@ namespace env
 		/// Set the log used by this <code>Context</code> instance.
 		/// </summary>
 		/// <param name="log"> The new log. </param>
+
+		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line);
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line);
+		virtual xmlNodePtr evalLocation(const std::string &expr,const std::string &filename, unsigned int line);
 	protected:
 		virtual void setLog(log4cplus::Logger log);
 
@@ -70,7 +74,7 @@ namespace env
 		/// </summary>
 		/// <returns> Log The log being used. </returns>
 		virtual log4cplus::Logger getLog();
-		virtual bool CompileScript(const std::string script);
+		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line);
 
 	private:
 		void InitializeInstanceFields();

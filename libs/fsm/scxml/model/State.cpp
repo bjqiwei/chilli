@@ -5,10 +5,10 @@ namespace fsm
 namespace model
 {
 
-	State::State(xmlNodePtr xNode)
+	State::State(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
+		m_strSession(session),m_strFilename(filename)
 	{
 		InitializeInstanceFields();
-		this->node = xNode;
 		m_strId = xmlHelper::getXmlNodeAttributesValue(node,"id");
 		m_strName = xmlHelper::getXmlNodeAttributesValue(node,"name");
 		//m_strVersion = xmlHelper::getXmlNodeAttributesValue(node,"version");
@@ -18,7 +18,7 @@ namespace model
 
 	void State::InitializeInstanceFields()
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.state");
+		
 	}
 	std::string & State::getId()
 	{

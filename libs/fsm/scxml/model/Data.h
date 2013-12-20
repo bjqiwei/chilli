@@ -3,6 +3,7 @@
 #define _FSM_MODEL_DATA_HEADER_
 #include <string>
 #include <libxml/tree.h>
+#include <log4cplus/logger.h>
 #include "Action.h"
 
 namespace fsm
@@ -19,8 +20,11 @@ private:
 	xmlNodePtr node;
 	std::string m_strId;
 	std::string m_strExpr;
+	std::string m_strSession;
+	log4cplus::Logger log;
+	std::string m_strFileName;
 public:
-	Data(xmlNodePtr xNode);
+	Data(xmlNodePtr xNode,const std::string & session,const std::string &filename);
 
 	const std::string  &getId() const;
 	//void setId(const std::string &id);
@@ -30,7 +34,7 @@ public:
 	//void setExpr(const std::string &expr);
 	//xmlNodePtr getNode() ;
 	//void setNode( xmlNodePtr const node);
-	virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx);
+	virtual void execute(fsm::Context * ctx);
 
 };
 

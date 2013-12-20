@@ -9,13 +9,12 @@
 #include<algorithm>
 #include<iostream>
 #include<cctype>
-#include <xmlHelper.h>
-#include <log4cplus/logger.h>
+#include "../xmlHelper.h"
 
 
 // Base class include file.
 
-#include "model\Datamodel.h"
+#include "model/Datamodel.h"
 #include "Context.h"
 #include "Evaluator.h"
 
@@ -59,15 +58,6 @@ namespace fsm
 		static std::string getNodeValue(xmlNodePtr const node);
 
 
-
-		/// <summary>
-		/// Clone function model.
-		/// </summary>
-		/// <param name="fucmodel"> The function model to clone. </param>
-		/// <param name="ctx"> The context to clone to. </param>
-		/// <param name="evaluator"> The expression evaluator. </param>
-		/// <param name="log"> The error log. </param>
-		static void cloneFunctionmodel(const xmlNodePtr fucmodel, Context *const ctx, Evaluator *const evaluator, log4cplus::Logger const log);
 		/// <summary>
 		/// Escape XML strings for serialization.
 		/// The basic algorithm is taken from Commons Lang (see oacl.Entities.java)

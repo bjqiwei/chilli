@@ -1,19 +1,17 @@
-
 #ifndef _XMLHELPER_HEADER_
 #define _XMLHELPER_HEADER_
-#pragma  warning(disable:4099)
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/tree.h>
-#include <WinSock.h>
+//#include <WinSock.h>
 #include <vector>
 #include <string>
 #include <log4cplus/logger.h>
 #include "config.h"
 
 
-#pragma comment(lib,"ws2_32.lib")
+//#pragma comment(lib,"ws2_32.lib")
 
 using namespace std;
 namespace fsm{
@@ -103,7 +101,9 @@ public:
 	void setRootNode(std::string strRoot);
 	void setRootNode(xmlNodePtr rootNode);
 	void newRootProp(std::string  name, std::string strValue);
+	xmlAttrPtr copyProp2Root(xmlAttrPtr cur);
 	void addChild(xmlNodePtr xChild);
+	void addAddChildList(xmlNodePtr xChild);
 	void addChild(std::string name,std::string  content);
 	std::string getContent();
 private:

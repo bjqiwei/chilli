@@ -14,35 +14,6 @@ namespace env
 	}
 	SimpleEvaluator::~SimpleEvaluator(){}
 
-	std::string SimpleEvaluator::eval(Context *const ctx, const std::string &expr)
-	{
-		if (expr == "" || !ctx)
-		{
-			return "";
-		}
-		return ctx->get(expr);
-		
-	}
-
-	bool SimpleEvaluator::evalCond(Context *const ctx, const std::string &expr) 
-	{
-		if (expr == "")
-		{
-			return false;
-		}
-		if(ctx->get(expr).compare("0") ==0)
-			return false;
-		return true;
-	}
-
-	xmlNodePtr SimpleEvaluator::evalLocation(Context *const ctx, const std::string &expr)
-	{
-		if (expr == "")
-		{
-			return NULL;
-		}
-		return NULL;
-	}
 
 	Context * SimpleEvaluator::newContext(Context *const parent)
 	{

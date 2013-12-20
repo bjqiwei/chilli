@@ -1,7 +1,9 @@
 #include "xmlHelper.h"
 #include <string>
 #include <vector>
+#include <cstring>
 #include <log4cplus/loggingmacros.h>
+
 
 using namespace std;
 namespace fsm{
@@ -196,19 +198,30 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
  void CXmlDocmentHelper::setRootNode(std::string strRoot)
  {
 	 _root = xmlNewNode(NULL,BAD_CAST strRoot.c_str());
-	 xmlDocSetRootElement(doc._xDocPtr, _root);
+	 xmlNodePtr ret_val = xmlDocSetRootElement(doc._xDocPtr, _root);
+	 if ((ret_val != NULL)) {
+		 xmlUnlinkNode(ret_val);
+		 xmlFreeNode(ret_val);
+	 }
  }
 
  void CXmlDocmentHelper::setRootNode(xmlNodePtr rootNode)
  {
 	 _root = xmlCopyNode(rootNode,1);
-	 xmlDocSetRootElement(doc._xDocPtr, _root);
+	 xmlNodePtr ret_val = xmlDocSetRootElement(doc._xDocPtr, _root);
+	 if ((ret_val != NULL)) {
+		 xmlUnlinkNode(ret_val);
+		 xmlFreeNode(ret_val);
+	 }
  }
 
  void CXmlDocmentHelper::newRootProp(std::string  name, std::string strValue){
 	 xmlNewProp(_root,BAD_CAST name.c_str(),BAD_CAST strValue.c_str());
  }
  
+ xmlAttrPtr CXmlDocmentHelper::copyProp2Root(xmlAttrPtr cur){
+	 return xmlCopyProp(_root,cur);
+ }
  std::string CXmlDocmentHelper::getContent()
  {
 	 xmlChar *xmlbuff;
@@ -223,6 +236,12 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 	xmlAddChild(_root,xNewChild);
  }
 
+ void CXmlDocmentHelper::addAddChildList(xmlNodePtr xChild)
+ {
+	 xmlNodePtr xNewChild = xmlCopyNodeList(xChild);
+	 xmlAddChildList(_root,xNewChild);
+ }
+
  void CXmlDocmentHelper::addChild(std::string name,std::string  strContent){
 	 xmlNodePtr node = xmlNewNode(NULL,BAD_CAST name.c_str());
 	 xmlNodePtr content = xmlNewText(BAD_CAST strContent.c_str());
@@ -230,34 +249,34 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 	 xmlAddChild(node,content);
 }
 
-CXmlParseHelper::CXmlParseHelper(const std::string &str):doc(NULL)
+CXmlParseHelper::CXmlParseHelper(const std::string &str ):doc(NULL),_root(NULL)
 {
 	log = log4cplus::Logger::getInstance("CXmlParseHelper");
 	doc = xmlParseMemory(str.c_str(),str.length());
 	if (doc._xDocPtr == NULL)
 	{
-		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string="<<str);
+		LOG4CPLUS_ERROR(log,  ": Convert a string to xml error was encountered,string=" << str);
 		return;
 	}
 	_root = xmlDocGetRootElement(doc._xDocPtr);
 
 	if (_root == NULL){
-		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string="<<str);
+		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << str);
 	}
 }
-CXmlParseHelper::CXmlParseHelper(const char * xmlCh):doc(NULL){
+CXmlParseHelper::CXmlParseHelper(const char * xmlCh):doc(NULL),_root(NULL){
 	log = log4cplus::Logger::getInstance("CXmlParseHelper");
 	doc = xmlParseMemory(xmlCh,strlen(xmlCh));
 	if (doc._xDocPtr == NULL)
 	{
-		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string="<<xmlCh);
+		LOG4CPLUS_ERROR(log,": Convert a string to xml error was encountered,string=" << xmlCh);
 		return;
 	}
 
 	_root = xmlDocGetRootElement(doc._xDocPtr);
 
 	if (_root == NULL){
-		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string="<<xmlCh);
+		LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << xmlCh);
 	}
 
 }

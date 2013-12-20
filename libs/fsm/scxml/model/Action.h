@@ -2,9 +2,8 @@
 #ifndef _FSM_MODEL_ACTION_HEADER_
 #define _FSM_MODEL_ACTION_HEADER_
 #include <string>
-#include "config.h"
-#include "scxml/Evaluator.h"
-#include "scxml/Context.h"
+#include "../Evaluator.h"
+#include "../Context.h"
 
 namespace fsm
 {
@@ -25,7 +24,7 @@ namespace model
 
 		Action(){}; //super();
 		virtual~Action(){};
-		virtual void execute(fsm::Evaluator * evl,fsm::Context * ctx) = 0;
+		virtual void execute(fsm::Context * ctx) = 0;
 
 	};
 }
