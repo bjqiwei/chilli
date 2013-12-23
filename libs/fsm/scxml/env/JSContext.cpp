@@ -132,27 +132,18 @@ namespace env
 
 			std::stringstream ss;
 
-			if (status == JS_TRUE ){ 
-				if (JSVAL_IS_STRING(rval))
-				{
-					JSString *jsstr =NULL;
-					jsstr = JSVAL_TO_STRING(rval);
-					char * bytes = NULL;
-					if (jsstr)bytes =JS_EncodeString(ctx,jsstr);
-					ss << bytes;
-					JS_free(ctx,bytes);
-				}
-				else if (JSVAL_IS_INT(rval))
-				{
-					ss << JSVAL_TO_INT(rval);
-				}
-				else if (JSVAL_IS_BOOLEAN(rval))
-				{
-					ss << JSVAL_TO_BOOLEAN(rval);
-				}else if (JSVAL_IS_NUMBER(rval))
-				{
-					ss << JSVAL_TO_DOUBLE(rval);
-				}
+			if (status == JS_TRUE && !JSVAL_IS_VOID(rval) && !JSVAL_IS_NULL(rval)){ 
+				
+				JSString * str = JS_ValueToString(ctx,rval);
+				if (!str)
+					return ss.str();
+
+				char * bytes = NULL;
+				bytes = JS_EncodeString(ctx, str);
+				if (!bytes)
+					return ss.str();
+				ss << bytes;
+				JS_free(ctx, bytes);
 			}
 			//JS_RemoveValueRoot(jsctx->ctx,&rval);
 
