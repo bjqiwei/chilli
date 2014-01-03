@@ -8,11 +8,13 @@
 #include <log4cplus/helpers/stringhelper.h>
 #include <log4cplus/loggingmacros.h>
 
+JSBool compileAndRepeat(JSContext *cx, JSObject *global,const char * script,const char *filename);
+
 /* The class of the global object. */
 static JSClass global_class = { "global",
 	JSCLASS_NEW_RESOLVE | JSCLASS_GLOBAL_FLAGS,
 	JS_PropertyStub,
-	JS_DeletePropertyStub,
+	JS_PropertyStub,
 	JS_PropertyStub,
 	JS_StrictPropertyStub,
 	JS_EnumerateStub,
@@ -35,12 +37,13 @@ int run(JSContext *cx) {
 	JSAutoRequest ar(cx);
 
 	/* Create the global object in a new compartment. */
-	JSObject *global = JS_NewGlobalObject(cx, &global_class, NULL);
+	JSObject *global = JS_NewCompartmentAndGlobalObject(cx, &global_class,NULL);
 	if (global == NULL)
 		return 1;
 
 	/* Set the context's global */
-	JSAutoCompartment ac(cx, global);
+	JSAutoEnterCompartment ac;
+	ac.enter(cx, global);
 	JS_SetGlobalObject(cx, global);
 
 	/* Populate the global object with the standard globals, like Object and Array. */
@@ -51,7 +54,8 @@ int run(JSContext *cx) {
 	char *script = "(function(a, b){return a * b;})(15, 6);"; 
 	jsval rval; 
 
-	JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
+	JSBool status = compileAndRepeat(cx,global,script,"");
+	//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 
 	if (status == JS_TRUE){ 
 		JSString *d; 
@@ -65,7 +69,7 @@ int run(JSContext *cx) {
 int main(int argc, const char *argv[]) {
 	log4cplus::initialize();
 	/* Create a JS runtime. */
-	JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L, JS_NO_HELPER_THREADS);
+	JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
 	if (rt == NULL)
 		return 1;
 
@@ -82,4 +86,33 @@ int main(int argc, const char *argv[]) {
 	JS_DestroyRuntime(rt);
 	JS_ShutDown();
 	return status;
+}
+
+/*
+ * Compile a script and execute it repeatedly until an
+ * error occurs.  (If this ever returns, it returns false.
+ * If there's no error it just keeps going.)
+ */
+JSBool compileAndRepeat(JSContext *cx, JSObject *global,const char * content,const char *filename)
+{
+    JSObject *scriptObj;
+
+	scriptObj = JS_CompileScript(cx, global, content,strlen(content),filename,0);
+	if (scriptObj == NULL)
+        return JS_FALSE;   /* compilation error */
+
+	
+    if (!JS_AddNamedObjectRoot(cx, &scriptObj, "compileAndRepeat script object"))
+        return JS_FALSE;
+
+    for (;;) {
+        jsval result;
+        if (!JS_ExecuteScript(cx, global, scriptObj, &result))
+            break;
+        JS_MaybeGC(cx);
+    }
+
+    JS_RemoveObjectRoot(cx, &scriptObj);  /* scriptObj becomes unreachable
+                                             and will eventually be collected. */
+    return JS_FALSE;
 }
