@@ -47,8 +47,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7.win32\include;$(SolutionDir)\libs\log4cplus-1.1.2-rc1\include\;$(SolutionDir)\libs\iconv-1.9.2.win32\include\;$(ProjectDir)\;$(SolutionDir)\libs\SpiderMonkey-1.8.5\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\log4cplus-1.1.2-rc1\lib\;$(SolutionDir)\libs\libxml2-2.7.7.win32\lib\;$(SolutionDir)\libs\SpiderMonkey-1.8.5\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include;$(ProjectDir)\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
