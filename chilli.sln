@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chilli", "chilli\chilli.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSM", "libs\fsm\FSM.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testLog4cplus", "test\testLog4cplus\testLog4cplus.vcxproj", "{63AF3784-3FFB-46AC-B341-76B55AEE3148}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug with ICU|Win32 = Debug with ICU|Win32
@@ -223,6 +225,44 @@ Global
 		{D851713A-9D32-4693-89F5-B2ED52FEFEDB}.Static Release|Win32.ActiveCfg = Release|Win32
 		{D851713A-9D32-4693-89F5-B2ED52FEFEDB}.Static Release|Win32.Build.0 = Release|Win32
 		{D851713A-9D32-4693-89F5-B2ED52FEFEDB}.Static Release|x64.ActiveCfg = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug with ICU|Win32.ActiveCfg = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug with ICU|x64.ActiveCfg = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug with ICU|x64.Build.0 = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug_Unicode|Win32.ActiveCfg = Debug_Unicode|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug_Unicode|Win32.Build.0 = Debug_Unicode|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug_Unicode|x64.ActiveCfg = Debug_Unicode|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug_Unicode|x64.Build.0 = Debug_Unicode|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug|Win32.ActiveCfg = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug|Win32.Build.0 = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug|x64.ActiveCfg = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Debug|x64.Build.0 = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Debug|Win32.ActiveCfg = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Debug|Win32.Build.0 = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Debug|x64.ActiveCfg = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Debug|x64.Build.0 = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Release|Win32.ActiveCfg = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Release|Win32.Build.0 = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Release|x64.ActiveCfg = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.ICU Release|x64.Build.0 = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release with ICU|Win32.ActiveCfg = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release with ICU|x64.ActiveCfg = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release with ICU|x64.Build.0 = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release_Unicode|Win32.ActiveCfg = Release_Unicode|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release_Unicode|Win32.Build.0 = Release_Unicode|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release_Unicode|x64.ActiveCfg = Release_Unicode|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release_Unicode|x64.Build.0 = Release_Unicode|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release|Win32.ActiveCfg = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release|Win32.Build.0 = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release|x64.ActiveCfg = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Release|x64.Build.0 = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Debug|Win32.ActiveCfg = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Debug|Win32.Build.0 = Debug|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Debug|x64.ActiveCfg = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Debug|x64.Build.0 = Debug|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Release|Win32.ActiveCfg = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Release|Win32.Build.0 = Release|Win32
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Release|x64.ActiveCfg = Release|x64
+		{63AF3784-3FFB-46AC-B341-76B55AEE3148}.Static Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
