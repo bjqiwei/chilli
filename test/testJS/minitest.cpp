@@ -2,11 +2,7 @@
 #include <strstream>
 #include <iostream>
 
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/configurator.h>
-#include <log4cplus/helpers/loglog.h>
-#include <log4cplus/helpers/stringhelper.h>
-#include <log4cplus/loggingmacros.h>
+
 
 JSBool compileAndRepeat(JSContext *cx, JSObject *global,const char * script,const char *filename);
 
@@ -67,7 +63,6 @@ int run(JSContext *cx) {
 }
 
 int main(int argc, const char *argv[]) {
-	log4cplus::initialize();
 	/* Create a JS runtime. */
 	JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
 	if (rt == NULL)

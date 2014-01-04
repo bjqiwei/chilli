@@ -50,7 +50,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Winmm.lib;libxml2.lib;Psapi.lib;log4cplusD.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
