@@ -25,14 +25,9 @@
 #include <libxml/xpathInternals.h>
 #include <string>
 #include <iostream>
-#include <log4cplus/logger.h>
-#include <log4cplus/helpers/loglog.h>
-#include <log4cplus/configurator.h>
-#include <xmlHelper.h>
 #pragma comment(lib,"ws2_32.lib")
 
 #if defined(LIBXML_XPATH_ENABLED) && defined(LIBXML_SAX1_ENABLED)
-using namespace fsm::xmlHelper;
 using namespace std;
 
 static void usage(const char *name);
@@ -51,9 +46,6 @@ main(int argc, char **argv) {
     
 	/*******************************************************************************************************/
 	
-	log4cplus::initialize();
-	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
-	log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
 	/*******************************************************************************************************/
 
     /* Init libxml */     

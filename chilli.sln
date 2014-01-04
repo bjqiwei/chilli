@@ -15,10 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testfsm", "test\testsmscmxl
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testlibxmlpath", "test\testlibxmlpath\testlibxmlpath.vcxproj", "{4261E1AA-A00C-43FD-8CAC-C30770094061}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D851713A-9D32-4693-89F5-B2ED52FEFEDB} = {D851713A-9D32-4693-89F5-B2ED52FEFEDB}
-		{917836A4-0DDC-47BE-B930-1B3BFDF6C940} = {917836A4-0DDC-47BE-B930-1B3BFDF6C940}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testJS", "test\testJS\testJS.vcxproj", "{B3DDB095-F19A-4E87-B38B-E795F03BE598}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -30,7 +26,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chilli", "chilli\chilli.vcx
 		{D851713A-9D32-4693-89F5-B2ED52FEFEDB} = {D851713A-9D32-4693-89F5-B2ED52FEFEDB}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSM", "libs\FSM\FSM.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSM", "libs\fsm\FSM.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{917836A4-0DDC-47BE-B930-1B3BFDF6C940} = {917836A4-0DDC-47BE-B930-1B3BFDF6C940}
 	EndProjectSection

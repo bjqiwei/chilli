@@ -39,8 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7.win32\include;$(SolutionDir)\libs\iconv-1.9.2.win32\include;$(SolutionDir)\libs\zlib-1.2.5\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\log4cplus-1.1.2-rc1\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7.win32\lib\;$(SolutionDir)\libs\iconv-1.9.2.win32\lib\;$(SolutionDir)\libs\zlib-1.2.5\lib;$(SolutionDir)\libs\log4cplus-1.1.2-rc1\lib;$(SolutionDir)\libs\fsm\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -57,8 +57,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;iconv.lib;zdll.lib;log4cplusD.lib;fsmd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
