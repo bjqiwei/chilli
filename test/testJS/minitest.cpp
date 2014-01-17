@@ -1,6 +1,13 @@
 #include "jsapi.h"
-#include <strstream>
+#include <sstream>
 #include <iostream>
+#include <jsperf.h>
+#include <list>
+#include <time.h>
+#include <log4cplus/logger.h>
+#include <log4cplus/loggingmacros.h>
+#include <log4cplus/appender.h>
+#include <log4cplus/consoleappender.h>
 
 
 
@@ -45,42 +52,126 @@ int run(JSContext *cx) {
 	/* Populate the global object with the standard globals, like Object and Array. */
 	if (!JS_InitStandardClasses(cx, global))
 		return 1;
-
+	if (!JS::RegisterPerfMeasurement(cx, global))
+		return 1 ;
+	JS_WrapObject(cx,&global);
 	/* Your application code here. This may include JSAPI calls to create your own custom JS objects and run scripts. */
-	char *script = "(function(a, b){return a * b;})(15, 6);"; 
+	const char *script = "x=(function(a, b){return a * b;})(15, 6);"; 
 	jsval rval; 
+	JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
+	script = "\"value=\"+x;";
+	for(long i=0; i<20;i++){
+		//JSBool status = compileAndRepeat(cx,global,script,"");
+		JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 
-	JSBool status = compileAndRepeat(cx,global,script,"");
-	//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
+		if (status == JS_TRUE){ 
+			JSString *d; 
+			//JS_NewExternalString(cx,);
+			d =JS_ValueToString(cx, rval); 
+			
+			int length  = JS_GetStringEncodingLength(cx,d);
+			char* bytes ;//=  new char[length+1];
+			bytes = JS_EncodeString(cx,d);
+			//JS_EncodeStringToBuffer(d,bytes,length);
+			//bytes[length] =0;
 
-	if (status == JS_TRUE){ 
-		JSString *d; 
-		d =JS_ValueToString(cx, rval); 
-		std::cout << "eval result =" << d;
-		
-	} 
+			//std::cout << "the result=" << bytes <<std::endl;
+			//delete[] bytes;
+			JS_free(cx,bytes);
+			
+		} 
+	}
 	return 0;
 }
 
+log4cplus::Logger loger;
 int main(int argc, const char *argv[]) {
+	log4cplus::initialize();
+	log4cplus::SharedAppenderPtr _append(new log4cplus::ConsoleAppender());
+	_append->setName("append test");
+	std::string pattern = "%d{%m/%d/%y %H:%M:%S}  - %m [%l]%n";    
+	//log4cplus::Layout _layout(new PatternLayout(pattern));   
+	/* step 3: Attach the layout object to the appender */    
+	//_append->setLayout( _layout );   
+	loger= log4cplus::Logger::getInstance("console");
+	loger.addAppender(_append);
+
 	/* Create a JS runtime. */
-	JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
+	JSRuntime *rt = JS_NewRuntime(320L * 1024L * 1024L);
 	if (rt == NULL)
 		return 1;
+	std::list<JSContext *> contexts;
 
-	/* Create a context. */
-	JSContext *cx = JS_NewContext(rt, 8192);
-	if (cx == NULL)
-		return 1;
-	JS_SetOptions(cx, JSOPTION_VAROBJFIX);
-	JS_SetErrorReporter(cx, reportError);
+	time_t nowtime;
+	nowtime=time(NULL);//获取日历时间??
+	std::cout<<nowtime<<std::endl;//输出nowtim
 
-	int status = run(cx);
+	for (long i =0 ;i < 100; i++)
+	{
+		/* Create a context. */
+		JSContext *cx = JS_NewContext(rt, 8192);
+		if (cx == NULL)
+			return 1;
+		JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+		JS_SetErrorReporter(cx, reportError);
 
-	JS_DestroyContext(cx);
-	JS_DestroyRuntime(rt);
-	JS_ShutDown();
-	return status;
+		int status = run(cx);
+		contexts.push_front(cx);
+		//JS_GC(cx);
+	}
+
+	nowtime=time(NULL);//获取日历时间??
+	std::cout<< "100:" << nowtime<<std::endl;//输出nowtim
+	for (std::list<JSContext *>::iterator it = contexts.begin(); it != contexts.end();it++)
+	{
+		//JS_GC(*it);
+	}
+
+	nowtime=time(NULL);//获取日历时间??
+	std::cout<< "GC:" << nowtime<<std::endl;//输出nowtim
+
+	while(contexts.size()>0){
+		 nowtime=time(NULL);//获取日历时间??
+		 std::cout<< "DestroyContext"<<nowtime<<std::endl;//输出nowtim
+		 JS_DestroyContext(contexts.front());
+		 contexts.pop_front();
+	 }
+	 nowtime=time(NULL);//获取日历时间??
+	 std::cout<<nowtime<<std::endl;//输出nowtim
+
+	 for (long i =0 ;i < 1; i++)
+	 {
+		 /* Create a context. */
+		 JSContext *cx = JS_NewContext(rt, 8192);
+		 if (cx == NULL)
+			 return 1;
+		 JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+		 JS_SetErrorReporter(cx, reportError);
+
+		 int status = run(cx);
+		 contexts.push_front(cx);
+		 JS_GC(cx);
+
+	 }
+
+	 nowtime=time(NULL);//获取日历时间??
+	 std::cout<<nowtime<<std::endl;//输出nowtim
+
+	 while(contexts.size()){
+		 JS_DestroyContext(contexts.front());
+		 contexts.pop_front();
+	 }
+	 nowtime=time(NULL);//获取日历时间??
+	 std::cout<<nowtime<<std::endl;//输出nowtim
+
+	 int i;
+	 std::cin >> i;
+
+	 JS_DestroyRuntime(rt);
+	 JS_ShutDown();
+	
+	
+	 return 0;
 }
 
 /*
@@ -100,7 +191,7 @@ JSBool compileAndRepeat(JSContext *cx, JSObject *global,const char * content,con
     if (!JS_AddNamedObjectRoot(cx, &scriptObj, "compileAndRepeat script object"))
         return JS_FALSE;
 
-    for (;;) {
+    for (long i =0; i < 10; i++) {
         jsval result;
         if (!JS_ExecuteScript(cx, global, scriptObj, &result))
             break;
