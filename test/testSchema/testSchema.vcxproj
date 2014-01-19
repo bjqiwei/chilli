@@ -90,7 +90,9 @@ xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"<
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="StateMachine.xml" />
+    <None Include="StateMachine.xml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xsd Include="scm.xsd" />
