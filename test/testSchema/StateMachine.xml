@@ -6,7 +6,7 @@
   </state>
   <state id="play">
     <onentry>
-      <send  type="response" target="callmanager">
+      <send  type="response" target="callmanager" from="id">
         <cmddata>
           <![CDATA[<Response>
 				<Get action="handle-user-input.jsp" numdigits="1">

@@ -3,6 +3,11 @@
 #include "libxml/parser.h"    
 #include "libxml/xmlschemas.h"    
         
+void XMLCALL myXmlStructuredErrorFunc (void *userData, xmlErrorPtr error)
+{
+	fprintf(stderr,"%s file'%s',line:%d",error->message,error->file,error->line);
+	return;
+}
 /****************************************************  
     @describle   应用XML Schema模板文件验证案例文档 
     @param schema_filename  模式文件  
@@ -15,20 +20,17 @@ int is_valid(const char *schema_filename, const char *xmldoc) {
     //doc = xmlReadFile(xmldoc, NULL, XML_PARSE_NONET|XML_PARSE_NOENT);  
 	doc = xmlParseFile(xmldoc);
     if ( NULL == doc) {    
-        std::cout << "读取XML文档错误"<<std::endl;  
+        fprintf(stderr, "读取XML文档错误\n");  
         return -1;    
     }      
    
     xmlSchemaParserCtxtPtr parser_ctxt = xmlSchemaNewParserCtxt(schema_filename);  
     if (NULL == parser_ctxt) {  
-		std::cout << "读取Schema错误" << std::endl;  
+		fprintf(stderr,"读取Schema错误\n");  
         return -1;  
     }      
-	xmlSchemaSetParserErrors(parser_ctxt,
-		(xmlSchemaValidityErrorFunc) fprintf,
-		(xmlSchemaValidityWarningFunc) fprintf,
-		stderr);
 	
+	xmlSchemaSetParserStructuredErrors(parser_ctxt,myXmlStructuredErrorFunc,stderr);
 
     xmlSchemaPtr schema = xmlSchemaParse(parser_ctxt);  
     if (schema == NULL) {    
@@ -41,11 +43,7 @@ int is_valid(const char *schema_filename, const char *xmldoc) {
         return -1;    
     }   
 
-	xmlSchemaSetValidErrors(valid_ctxt,
-		(xmlSchemaValidityErrorFunc) fprintf,
-		(xmlSchemaValidityWarningFunc) fprintf,
-		stderr);
-
+	xmlSchemaSetValidStructuredErrors(valid_ctxt,myXmlStructuredErrorFunc,stderr);
     int ret = xmlSchemaValidateDoc(valid_ctxt,doc);  
 	if (ret == 0) {
 		printf("%s validates\n", xmldoc);
@@ -60,7 +58,14 @@ int is_valid(const char *schema_filename, const char *xmldoc) {
       
     return ret;  
 } 
-int main(void)
+int main(int argc, char **argv)
 {
-	return is_valid("scm.xsd","./StateMachine.xml");
+	if (argc < 3)
+	{
+		fprintf(stderr,"parameter error.\n"\
+			"use this command schemafile xmlfile.\n");
+		return -1;
+	}
+
+	return is_valid(argv[1],argv[2]);
 }
