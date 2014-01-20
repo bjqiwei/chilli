@@ -5,7 +5,7 @@
         
 void XMLCALL myXmlStructuredErrorFunc (void *userData, xmlErrorPtr error)
 {
-	fprintf(stderr,"%s file'%s',line:%d",error->message,error->file,error->line);
+	fprintf(stderr,"%s file'%s',line:%d\n",error->message,error->file,error->line);
 	return;
 }
 /****************************************************  

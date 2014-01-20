@@ -6,8 +6,8 @@
   </state>
   <state id="play">
     <onentry>
-      <send  type="response" target="callmanager" from="id">
-        <cmddata>
+      <send  type="response" target="callmanager">
+        <cmddata type="text">
           <![CDATA[<Response>
 				<Get action="handle-user-input.jsp" numdigits="1">
 				<Play>menu.wav</Play>
