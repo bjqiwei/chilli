@@ -60,9 +60,15 @@ int run(JSContext *cx) {
 	jsval rval; 
 	JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 	script = "\"value=\"+x;";
-	for(long i=0; i<20;i++){
+	for(long i=2000000; i>0 ; i--){
 		//JSBool status = compileAndRepeat(cx,global,script,"");
-		JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
+		//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
+		uint32 oldopts = JS_GetOptions(cx);
+		JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
+		JSObject * obj = JS_CompileFile(cx,global,"./test.js");
+		JS_SetOptions(cx, oldopts);
+		JSBool status = JS_ExecuteScript(cx,global,obj,&rval);
+
 
 		if (status == JS_TRUE){ 
 			JSString *d; 
@@ -75,7 +81,7 @@ int run(JSContext *cx) {
 			//JS_EncodeStringToBuffer(d,bytes,length);
 			//bytes[length] =0;
 
-			//std::cout << "the result=" << bytes <<std::endl;
+			std::cout << "the result=" << i <<std::endl;
 			//delete[] bytes;
 			JS_free(cx,bytes);
 			
@@ -97,7 +103,7 @@ int main(int argc, const char *argv[]) {
 	loger.addAppender(_append);
 
 	/* Create a JS runtime. */
-	JSRuntime *rt = JS_NewRuntime(320L * 1024L * 1024L);
+	JSRuntime *rt = JS_NewRuntime(160L * 1024L * 1024L);
 	if (rt == NULL)
 		return 1;
 	std::list<JSContext *> contexts;
@@ -106,7 +112,7 @@ int main(int argc, const char *argv[]) {
 	nowtime=time(NULL);//获取日历时间??
 	std::cout<<nowtime<<std::endl;//输出nowtim
 
-	for (long i =0 ;i < 100; i++)
+	for (long i =0 ;i < 1; i++)
 	{
 		/* Create a context. */
 		JSContext *cx = JS_NewContext(rt, 8192);
@@ -139,7 +145,7 @@ int main(int argc, const char *argv[]) {
 	 nowtime=time(NULL);//获取日历时间??
 	 std::cout<<nowtime<<std::endl;//输出nowtim
 
-	 for (long i =0 ;i < 1; i++)
+	 for (long i =0 ;i < 0; i++)
 	 {
 		 /* Create a context. */
 		 JSContext *cx = JS_NewContext(rt, 8192);
