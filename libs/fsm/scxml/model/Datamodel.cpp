@@ -15,7 +15,7 @@ namespace model
 
 
 	void Datamodel::execute(fsm::Context * ctx){
-		LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
+		//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
 		if (node == 0) return;
 		bool bFindData = false;
 		for (xmlNodePtr dataNode = node->children ; dataNode !=  NULL; dataNode = dataNode->next)
@@ -31,7 +31,7 @@ namespace model
 		{
 			LOG4CPLUS_WARN(log,"not find data element in this datamodel.");
 		}
-		LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
+		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 	}
 }
 }

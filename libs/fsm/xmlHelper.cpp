@@ -10,7 +10,7 @@ namespace fsm{
 namespace xmlHelper{
 
 
-string  getXmlChildNodeValue(const xmlNodePtr  xNode, const string strChildNodeName)
+string  getXmlChildNodeValue(const xmlNodePtr  xNode, const string &strChildNodeName)
 {
 	if (!xNode)
 	{
@@ -27,7 +27,7 @@ string  getXmlChildNodeValue(const xmlNodePtr  xNode, const string strChildNodeN
 	}
 	return "";
 }
-xmlNodePtr  getXmlChildNode(const xmlNodePtr  xNode,const string strChildNodeName)
+xmlNodePtr  getXmlChildNode(const xmlNodePtr  xNode,const string &strChildNodeName)
 {
 	if (!xNode)
 	{
@@ -44,7 +44,7 @@ xmlNodePtr  getXmlChildNode(const xmlNodePtr  xNode,const string strChildNodeNam
 	return NULL;
 }
 
-void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeName,const string strValue)
+void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string &strAttributeName,const string &strValue)
 {
 	if (!xNode) return ;
 
@@ -52,7 +52,7 @@ void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeName,
 	return ;
 }
 
-string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeName)
+string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string &strAttributeName)
 {
 	if (!xNode) return  "";
 
@@ -83,7 +83,7 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
  {
 	 // Call the private transcoding method
 	 _xChValue = toTranscode;
-	 if (_xChValue) _strValue = string((char *) _xChValue);
+	 if (_xChValue) _strValue = (char *) _xChValue;
 	 else
 		 _strValue = "";
  }
@@ -96,7 +96,7 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 	 }
  }
 
- string  XStr::strForm() const
+ const string  &XStr::strForm() const
  {
 	 return _strValue;
  }
@@ -195,7 +195,7 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 
  }
 
- void CXmlDocmentHelper::setRootNode(std::string strRoot)
+ void CXmlDocmentHelper::setRootNode(const std::string &strRoot)
  {
 	 _root = xmlNewNode(NULL,BAD_CAST strRoot.c_str());
 	 xmlNodePtr ret_val = xmlDocSetRootElement(doc._xDocPtr, _root);
@@ -215,7 +215,7 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 	 }
  }
 
- void CXmlDocmentHelper::newRootProp(std::string  name, std::string strValue){
+ void CXmlDocmentHelper::newRootProp(const std::string  &name, const std::string &strValue){
 	 xmlNewProp(_root,BAD_CAST name.c_str(),BAD_CAST strValue.c_str());
  }
  
@@ -242,7 +242,7 @@ string getXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeNam
 	 xmlAddChildList(_root,xNewChild);
  }
 
- void CXmlDocmentHelper::addChild(std::string name,std::string  strContent){
+ void CXmlDocmentHelper::addChild(const std::string &name,const std::string  &strContent){
 	 xmlNodePtr node = xmlNewNode(NULL,BAD_CAST name.c_str());
 	 xmlNodePtr content = xmlNewText(BAD_CAST strContent.c_str());
 	 xmlAddChild(_root,node);
@@ -289,7 +289,7 @@ std::string CXmlParseHelper::getRootProp(std::string name){
 std::string CXmlParseHelper::getChildContent(std::string childName){
 	return getXmlChildNodeValue(_root,childName);
 }
-void CXmlParseHelper::setRootAttributesValue(const std::string strAttributeName,const std::string strValue)
+void CXmlParseHelper::setRootAttributesValue(const std::string &strAttributeName,const std::string &strValue)
 {
 	setXmlNodeAttributesValue(_root,strAttributeName,strValue);
 }

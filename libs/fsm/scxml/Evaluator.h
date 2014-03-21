@@ -3,7 +3,7 @@
 #define _FSM_CONTEXT_HEADER_
 #include "Context.h"
 #include "libxml/tree.h"
-#include <log4cplus/logger.h>
+#include <list>
 
 
 namespace fsm
@@ -54,6 +54,11 @@ namespace fsm
 		/// <param name="parent"> parent context </param>
 		/// <returns> new child context </returns>
 		virtual Context * newContext(Context * const parent) = 0;
+		virtual void deleteContext(Context * const cx) = 0;
+		virtual unsigned int getContextCount(){ return contexts.size();};
+		virtual bool hasContext() = 0;
+	protected:
+		std::list<Context * > contexts;
 
 	};
 

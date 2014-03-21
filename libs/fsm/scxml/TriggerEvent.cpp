@@ -4,31 +4,17 @@
 namespace fsm
 {
 
-	TriggerEvent::TriggerEvent(const std::string &name, int const type):m_ParamPtr(NULL)
+	TriggerEvent::TriggerEvent(const std::string &name, int const type):m_strEventName(name),m_ParamPtr(NULL),m_port(0)
 	{
-		this->m_strEventName = name;
 		this->type = type;
 	}
 
-	TriggerEvent::TriggerEvent(const std::string &name, const std::string &data,int const type):m_ParamPtr(NULL)
+	TriggerEvent::TriggerEvent(const std::string &name, const std::string &data,int const type):m_strEventName(name),
+		m_strData(data),m_ParamPtr(NULL),m_port(0)
 	{
-		this->m_strEventName = name;
 		this->type = type;
-		this->m_strData = data;
 	}
-	std::string &TriggerEvent::getName()
-	{
-		return name;
-	}
-	std::string &TriggerEvent::getData()
-	{
-		return data;
-	}
-
-	int TriggerEvent::getType()
-	{
-		return type;
-	}
+	
 
 	bool TriggerEvent::Equals(const TriggerEvent & obj)
 	{

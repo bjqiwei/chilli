@@ -15,8 +15,8 @@ namespace model{
 	}
 	void Log::execute(Context * ctx)
 	{
-		if(m_Type.compare("script") == 0)
-			m_strExpr = ctx->eval(m_strExpr,m_strFilename,node->line);
+		if(ctx && m_Type.compare("script") == 0)
+			m_strExpr = ctx->eval(m_strExpr,m_strFilename,node->line,node);
 
 		if (m_strLevel.compare("trace") == 0){
 			LOG4CPLUS_TRACE(log, m_strSession << "," << m_strExpr);

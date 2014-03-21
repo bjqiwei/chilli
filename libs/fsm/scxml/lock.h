@@ -21,6 +21,9 @@ public:
 
 private:
 	CRITICAL_SECTION m_CriticalSection;
+private:
+	CLock(const CLock &);
+	void operator =(const CLock &);
 
 };
 }// end namespace fsm
@@ -41,6 +44,9 @@ public:
 
 private:
 	pthread_mutex_t m_Mutex;
+private:
+	CLock(const CLock &);
+	void operator =(const CLock &);
 };
 }//end namespace fsm
 #endif //end class

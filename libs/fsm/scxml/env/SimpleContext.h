@@ -18,7 +18,6 @@ namespace env
 
 		log4cplus::Logger log;
 
-		Context *parent;
 		std::map<std::string,std::string> vars;
 	public:
 
@@ -63,10 +62,10 @@ namespace env
 		/// </summary>
 		/// <param name="log"> The new log. </param>
 
-		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line);
-		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line);
-		virtual xmlNodePtr evalLocation(const std::string &expr,const std::string &filename, unsigned int line);
-	protected:
+		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
+		virtual xmlNodePtr evalLocation(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
+		virtual void ExecuteFile(const std::string &fileName);
 		virtual void setLog(log4cplus::Logger log);
 
 		/// <summary>
@@ -74,7 +73,8 @@ namespace env
 		/// </summary>
 		/// <returns> Log The log being used. </returns>
 		virtual log4cplus::Logger getLog();
-		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line);
+		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void*);
+		virtual void SetContextPrivate(void *data);
 
 	private:
 		void InitializeInstanceFields();

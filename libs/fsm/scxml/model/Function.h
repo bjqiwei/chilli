@@ -18,6 +18,7 @@ public:
 private:
 	xmlNodePtr node;
 	std::string m_strContent;
+	std::string m_fileName;
 	std::string m_strSession;
 	std::string m_strFileName;
 	log4cplus::Logger log;

@@ -15,10 +15,10 @@
 namespace fsm
 {
 
-	log4cplus::Logger SCInstance::log = log4cplus::Logger::getInstance("SCInstance");
-	SCInstance::SCInstance():evaluator(NULL),timerFunction(NULL)
+	log4cplus::Logger SCInstance::log = log4cplus::Logger::getInstance("fsm.SCInstance");
+	SCInstance::SCInstance():timerFunction(NULL)
 	{
-		
+		LOG4CPLUS_DEBUG(log,"new fsm.SCInstance object...");
 #ifdef WIN32
 		timerTheradSemaphore = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
 		if (NULL == timerTheradSemaphore){
@@ -50,45 +50,54 @@ namespace fsm
 
 	SCInstance::~SCInstance()
 	{
+		LOG4CPLUS_DEBUG(log , "destruction fsm.SCInstance object...");
 #ifdef WIN32
-		ReleaseSemaphore(timerTheradSemaphore, 1, NULL);
+		TerminateThread(td.thread_hnd,0);
+		CloseHandle(timerTheradSemaphore);
 #else
-		pthread_mutex_lock(&(timerTheradSemaphore->mutex));
-		timerTheradSemaphore->semCount ++;
-		pthread_cond_signal(&(timerTheradSemaphore->condition));
-		pthread_mutex_unlock(&(timerTheradSemaphore->mutex));
+		pthread_cancel(td.thread_id);
+		pthread_mutex_destroy(&(timerTheradSemaphore->mutex));
+		pthread_cond_destroy(&(timerTheradSemaphore->condition));
+		delete timerTheradSemaphore;
 #endif
 		
-		for (std::map<xmlNodePtr,Context*>::const_iterator it = contexts.begin();
-			it != contexts.end(); it++)
-		{
-			delete it->second;
-		}
 		contexts.clear();
-		//if (rootContext) delete rootContext;
-		if (evaluator) delete evaluator;
-#ifdef WIN32
-		CloseHandle(td.thread_hnd);
-#endif
 
+		removedContexts.clear();
+		//if (rootContext) delete rootContext;
+		for (std::vector<Evaluator *>::iterator it = evaluator.begin(); it != evaluator.end(); ++it)
+		{
+			delete *it;
+		}
+
+			
 		LOG4CPLUS_DEBUG(log , "destruction fsm.SCInstance object.");
 	}
 	Evaluator *SCInstance::getEvaluator()const
 	{
-		if (evaluator == NULL)
+		LOG4CPLUS_DEBUG(log,"getEvaluator,evaluator vector size="<< evaluator.size());
+		for (std::vector<Evaluator *>::iterator it = evaluator.begin(); it != evaluator.end(); ++it)
 		{
-			try
-			{
-				LOG4CPLUS_INFO(log,"evaluator is null ,new a JSEvaluator.");
-				evaluator = new env::JSEvaluator();
-			}
-			
-			catch (...)
-			{
-				throw;
+			if((*it)->hasContext()){
+				LOG4CPLUS_DEBUG(log,"find a evaluator " << *it);
+				return *it;
 			}
 		}
-		return evaluator;
+		
+		Evaluator * evl = NULL;
+		try
+		{
+			LOG4CPLUS_INFO(log,"not find idle evaluator ,new a JSEvaluator.");
+			evl = new env::JSEvaluator();
+			evaluator.push_back(evl);
+			return evl;
+		}
+			
+		catch (...)
+		{
+			throw;
+		}
+		return NULL;
 	}
 
 	//void SCInstance::setEvaluator(Evaluator *const evaluator)
@@ -99,14 +108,14 @@ namespace fsm
 
 	Context *SCInstance::getRootContext()const
 	{
-		if (getEvaluator() != 0)
+		/*if (getEvaluator() != 0)
 		{
 			if (contexts[0] == 0)
 			{
 				contexts[0] = getEvaluator()->newContext(NULL);
 			}
 			return contexts[0];
-		}
+		}*/
 		return NULL;
 	}
 
@@ -120,36 +129,59 @@ namespace fsm
 	Context *SCInstance::getContext(xmlNodePtr xNode)const
 	{
 		Context *context =NULL ; 
-		if (contexts.count(xNode) > 0)
+		std::map<xmlNodePtr,Context *>::iterator it = contexts.find(xNode);
+		if (it != contexts.end())
 		{
-			context=contexts[xNode];
-			//LOG4CPLUS_DEBUG(log,"find a context by id=" << xNode);
+			context = it->second;
+			//LOG4CPLUS_DEBUG(log,"find the context "  << context <<" by key:" << xNode);
 		}
+		
 		if (context == NULL && xNode != NULL)
 		{
-			
-			xmlNodePtr parent = xNode->parent;
-			if (parent == 0 || parent->type == XML_DOCUMENT_NODE)
-			{// docroot
-				LOG4CPLUS_DEBUG(log,"not find  context by id=" << xNode << ",serch parent context,parent id=NULL");
-				context = getEvaluator()->newContext(getRootContext());
-			}
-			else
+			if (!removedContexts.empty())
 			{
-				LOG4CPLUS_DEBUG(log,"not find  context by id=" << xNode << ",serch parent context,parent id=" << parent);
-				context = getEvaluator()->newContext(getContext(parent));
+				context = removedContexts.front();
+				removedContexts.pop_front();
+				LOG4CPLUS_DEBUG(log,"find a context " << context << " in the removedContext set. still has " << removedContexts.size());
 			}
+			
+
+			if (context == NULL)
+			{
+				Evaluator * evl = getEvaluator();
+				context = evl->newContext(NULL);
+			}
+			
+			//xmlNodePtr parent = xNode->parent;
+			//if (parent == 0 || parent->type == XML_DOCUMENT_NODE)
+			//{// docroot
+			//	LOG4CPLUS_DEBUG(log,"not find  context by id=" << xNode << ",serch parent context,parent id=NULL");
+			//	//context = getEvaluator()->newContext(getRootContext());
+			//}
+			//else
+			//{
+			//	LOG4CPLUS_DEBUG(log,"not find  context by id=" << xNode << ",serch parent context,parent id=" << parent);
+			//	context = getEvaluator()->newContext(getContext(parent));
+			//}
 			contexts[xNode] = context;
 		}
 		return context;
 	}
 	void SCInstance::removeContext(xmlNodePtr xNode)
 	{
-		if (contexts.count(xNode) > 0 && contexts[xNode] != NULL)
+		std::map<xmlNodePtr,Context *>::iterator it = contexts.find(xNode);
+		if (it != contexts.end())
 		{
-			delete contexts[xNode];
+			LOG4CPLUS_DEBUG(log,"removeing context " << it->second);
+			//delete contexts[xNode];
+
+			removedContexts.push_back(it->second);
+			it->second->reset();
+			contexts.erase(it);
+			LOG4CPLUS_DEBUG(log,"remove from contexts to removedContexts,contexts size " << contexts.size() << " add  removedContexts size " << removedContexts.size());
 		}
-		contexts.erase(xNode);
+		
+		LOG4CPLUS_DEBUG(log,"context size:" << contexts.size());
 	}
 	Context *SCInstance::lookupContext(xmlNodePtr xNode)
 	{
@@ -178,31 +210,25 @@ namespace fsm
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("StateMachine.TimerThread");
 		LOG4CPLUS_TRACE(log,"start up thread.");
 		SCInstance * scInstance = (SCInstance *)pParam;
+		
 #ifdef WIN32
+		unsigned long millisec = INFINITE;
 		HANDLE semaphore = scInstance->timerTheradSemaphore;
 		DWORD rv;
 		while(1)
 		{
-			rv = WaitForSingleObject(semaphore,10);
-			switch (rv) {
-			case WAIT_OBJECT_0:{
-
-					CloseHandle(semaphore);
-					LOG4CPLUS_INFO(log,"exit timer thread.");
-					_endthreadex(0);
-					return 0;
-				}
-				break;
-			case WAIT_TIMEOUT:
+			rv = WaitForSingleObject(semaphore,millisec);
 #else
-
+#define  MAXLONGLONG  (0x7fffffffffffffff)
+		long long millisec = MAXLONGLONG;
+		pthread_setcanceltype(PTHREAD_CANCEL_ENABLE,NULL);
+		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
 		sem_private semaphore = scInstance->timerTheradSemaphore;
 		int rv;
 		while(1)
 		{
 			struct timespec tm;
 			struct timeb tp;
-			long millisec = 10;
 
 			ftime( &tp );
 			tp.time += millisec/1000;
@@ -218,6 +244,7 @@ namespace fsm
 			pthread_mutex_lock(&(semaphore->mutex));
 			while (semaphore->semCount <= 0)
 			{
+				LOG4CPLUS_DEBUG(log,"set cond_timewait . interval=" << millisec );
 				rv = pthread_cond_timedwait(&(semaphore->condition), &(semaphore->mutex), &tm);
 				if (rv && (errno != EINTR) )
 					break;
@@ -225,31 +252,49 @@ namespace fsm
 			if(rv == 0)semaphore->semCount--;
 			pthread_mutex_unlock(&(semaphore->mutex));
 			//LOG4CPLUS_TRACE(log,"pthread_cond_timewait finished.");
-			switch(rv){
-			case 0:{
-					pthread_mutex_destroy(&(semaphore->mutex));
-					pthread_cond_destroy(&(semaphore->condition));
-					delete semaphore;
-					LOG4CPLUS_INFO(log,"exit timer thread.");
-					pthread_exit(0);
-					return 0;
-				   }
-				   break;
-			case ETIMEDOUT:
 #endif
-				scInstance->m_lock.Lock();
-				for (std::list<Timer>::iterator iter =scInstance->m_timer.begin();iter != scInstance->m_timer.end(); iter++)
-				{
-					if (iter->valid == false)
-					{
-						iter = scInstance->m_timer.erase(iter);
+			switch (rv) {
+#ifdef WIN32
+				case WAIT_TIMEOUT:
+#else// WIN32
+				case ETIMEDOUT:
+#endif 
+				scInstance->m_timerLock.Lock();
+				while(!scInstance->m_timer.empty()){
+					fsm::Timer * timer = scInstance->m_timer.top();
+
+					millisec = scInstance->m_timer.top()->getInterval();
+					//LOG4CPLUS_DEBUG(log,"timer event . interval=" << millisec );
+					if (millisec > 0){
 						break;
 					}
+					
+					std::string strContent = timer->execute();
+
+					if (scInstance->timerFunction != NULL)
+					{
+						scInstance->timerFunction(strContent);
+					}else if (scInstance->timerFunction == NULL)
+					{
+						LOG4CPLUS_ERROR(log,"timer event callback function is empty. event=" << strContent);
+					}
+					scInstance->m_timer.pop();
+					delete timer;
+					
+				}
+				/*for (std::priority_queue<fsm::Timer *,vector<fsm::Timer *>,fsm::Timer>::iterator iter =scInstance->m_timer.begin();iter != scInstance->m_timer.end();)
+				{
+					if ((*iter)->valid == false)
+					{
+						delete (*iter);
+						scInstance->m_timer.erase(iter++);
+					}else
+						iter++;
 				}
 			
-				for (std::list<Timer>::iterator iter =scInstance->m_timer.begin();iter != scInstance->m_timer.end(); iter++)
+				for (std::priority_queue<fsm::Timer *,vector<fsm::Timer *>,fsm::Timer>::iterator iter =scInstance->m_timer.begin();iter != scInstance->m_timer.end(); iter++)
 				{
-					std::string strContent = iter->Step();
+					std::string strContent = (*iter)->Step();
 		
 					if (scInstance->timerFunction != NULL && !SCXMLHelper::isStringEmpty(strContent))
 					{
@@ -258,8 +303,23 @@ namespace fsm
 					{
 						LOG4CPLUS_ERROR(log,"timer event callback function is empty. event=" << strContent);
 					}
+				}*/
+				scInstance->m_timerLock.Unlock();
+#ifdef WIN32
+			case WAIT_OBJECT_0:
+#else// WIN32
+			case 0:
+#endif 
+
+				if (!scInstance->m_timer.empty())
+				{
+					millisec = scInstance->m_timer.top()->getInterval();
+					continue;
+				}else{
+					millisec = MAXLONGLONG;
+					continue;
 				}
-				scInstance->m_lock.Unlock();
+				LOG4CPLUS_DEBUG(log,"ResumeThread.");
 				break;
 #ifdef WIN32
 			case WAIT_FAILED:
@@ -299,11 +359,19 @@ namespace fsm
 		
 	}
 
-	void SCInstance::AddTimer(Timer & _timer)
+	void SCInstance::AddTimer(Timer * _timer)
 	{
-		this->m_lock.Lock();
-		m_timer.push_back(_timer);
-		this->m_lock.Unlock();
+		this->m_timerLock.Lock();
+		m_timer.push(_timer);
+#ifdef WIN32
+		ReleaseSemaphore(timerTheradSemaphore, 1, NULL);
+#else
+		pthread_mutex_lock(&(timerTheradSemaphore->mutex));
+		timerTheradSemaphore->semCount ++;
+		pthread_cond_signal(&(timerTheradSemaphore->condition));
+		pthread_mutex_unlock(&(timerTheradSemaphore->mutex));
+#endif
+		this->m_timerLock.Unlock();
 	}
 }
 

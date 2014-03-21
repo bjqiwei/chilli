@@ -34,6 +34,8 @@ namespace env
 		/// <param name="nodeCtx"> The JexlContext for this state. </param>
 		/// <returns> The effective JexlContext for the path leading up to
 		///         document root. </returns>
+		virtual void deleteContext(Context * const cx);
+		virtual bool hasContext();
 	private:
 		env::SimpleContext  *getEffectiveContext(env::SimpleContext *const nodeCtx);
 

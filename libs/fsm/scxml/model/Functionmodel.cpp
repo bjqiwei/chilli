@@ -13,7 +13,7 @@ Functionmodel::Functionmodel(xmlNodePtr xnode,const std::string &session, const 
 }
 
 void Functionmodel::execute(fsm::Context * ctx){
-	LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
+	//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
 	if (node == 0) return;
 	bool bFindData = false;
 	for (xmlNodePtr funNode = node->children ; funNode !=  NULL; funNode = funNode->next)
@@ -29,7 +29,7 @@ void Functionmodel::execute(fsm::Context * ctx){
 	{
 		LOG4CPLUS_WARN(log,"not find data element in this functionmodel.");
 	}
-	LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
+	//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 }
 
 Functionmodel::~Functionmodel(void)

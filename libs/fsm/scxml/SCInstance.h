@@ -10,8 +10,8 @@
 #include <string>
 #include <map>
 #include <set>
+#include <queue>
 #include <list>
-#include <log.h>
 #include "Timer.h"
 #include "lock.h"
 #include <log4cplus/logger.h>
@@ -57,23 +57,24 @@ namespace fsm
 		/// <code>TransitionTarget</code>.
 		/// </summary>
 		mutable std::map<xmlNodePtr,Context *>contexts;
+		mutable std::list<Context *>removedContexts;
 
 		/// <summary>
 		/// The evaluator for expressions.
 		/// </summary>
-		mutable Evaluator *evaluator;
+		mutable std::vector<Evaluator *>evaluator;
 
 		/// <summary>
 		/// The root context.
 		/// </summary>
 		//mutable Context *rootContext;
 		static log4cplus::Logger log;
-
+	private:
+		virtual Evaluator *getEvaluator() const;
 	public:
 		SCInstance();
 		virtual ~SCInstance();
 
-		virtual Evaluator *getEvaluator() const;
 
 		//virtual void setEvaluator(Evaluator *const evaluator);
 
@@ -89,8 +90,8 @@ namespace fsm
 		virtual void setContext(xmlNodePtr xNode, Context *const context);
 
 		void StartTimerThread();
-		void AddTimer(fsm::Timer & _timer);
-		typedef void (*TimerFunction)(std::string); 
+		void AddTimer(fsm::Timer * _timer);
+		typedef void (*TimerFunction)(const std::string &); 
 		TimerFunction timerFunction;
 	private:
 #ifdef WIN32
@@ -103,11 +104,12 @@ namespace fsm
 		
 
 		//定时器队列
-		std::list<fsm::Timer >m_timer; 
+		typedef std::priority_queue<fsm::Timer *,vector<fsm::Timer *>,fsm::TimerComp> TIMER_QUEUE;
+		TIMER_QUEUE m_timer; 
 
 		struct thread_data td;
 
-		fsm::CLock m_lock;
+		fsm::CLock m_timerLock;
 
 	};
 }

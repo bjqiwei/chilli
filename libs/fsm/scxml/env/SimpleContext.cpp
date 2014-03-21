@@ -7,27 +7,21 @@ namespace fsm
 namespace env
 {
 
-	SimpleContext::SimpleContext():parent(NULL)
+
+	SimpleContext::SimpleContext(Context * const parent):Context(NULL,parent)
 	{
 		InitializeInstanceFields();
 		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
-	SimpleContext::SimpleContext(Context *const parent):parent(NULL)
-	{
-		InitializeInstanceFields();
-		this->parent  =parent;
-		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
-	}
-
-	SimpleContext::SimpleContext(std::map<std::string,std::string>const &initialVars):parent(NULL)
+	SimpleContext::SimpleContext(std::map<std::string,std::string>const &initialVars):Context(NULL,NULL)
 	{
 		InitializeInstanceFields();
 		this->vars = initialVars;
 		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
-	SimpleContext::SimpleContext(Context *const parent, std::map<std::string,std::string>const &initialVars):parent(NULL)
+	SimpleContext::SimpleContext(Context *const parent, std::map<std::string,std::string>const &initialVars):Context(NULL,NULL)
 	{
 		InitializeInstanceFields();
 		this->parent = parent;
@@ -123,31 +117,39 @@ namespace env
 	{
 		log = log4cplus::Logger::getInstance("SimpleContext");
 	}
-	bool SimpleContext::CompileScript(const std::string script,const std::string &filename, unsigned int line)
+	bool SimpleContext::CompileScript(const std::string &script,const std::string &filename, unsigned int line,void *xmlNode)
 	{
 		LOG4CPLUS_ERROR(log, "CompileScript is not implement.");
 		return true;
 	}
 
-	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
+	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
 	{
 		return get(expr);
 	}
 
-	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)
+	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
 	{
 		if(get(expr).compare("0") ==0)
 			return false;
 		return true;
 	}
 
-	xmlNodePtr SimpleContext::evalLocation(const std::string &expr,const std::string &filename, unsigned int line)
+	xmlNodePtr SimpleContext::evalLocation(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
 	{
 		if (expr == "")
 		{
 			return NULL;
 		}
 		return NULL;
+	}
+	void SimpleContext::SetContextPrivate(void *data)
+	{
+
+	}
+	void SimpleContext::ExecuteFile(const std::string &fileName)
+	{
+
 	}
 }
 }

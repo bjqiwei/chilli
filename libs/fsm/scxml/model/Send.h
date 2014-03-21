@@ -40,7 +40,7 @@ namespace model
 	public:
 		Send(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 		std::string& getId();
-		void setId(const std::string strValue);
+		void setId(const std::string &strValue);
 		//std::string& getIdLocation();
 		std::string& getTarget();
 		std::string& getType();

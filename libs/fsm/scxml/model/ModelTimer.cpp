@@ -16,12 +16,12 @@ namespace model{
 	Timer::~Timer(){
 
 	}
-	std::string& Timer::getId()
+	const std::string& Timer::getId()
 	{
 		return id;
 	}
 
-	std::string& Timer::getIdExpr()
+	const std::string& Timer::getIdExpr()
 	{
 		return idexpr;
 	}
@@ -34,8 +34,8 @@ namespace model{
 	void Timer::execute(fsm::Context * ctx)
 	{
 
-		if (SCXMLHelper::isStringEmpty(id)){
-			id = ctx->eval(idexpr,m_strFilename,node->line);
+		if (ctx && id.empty()){
+			id = ctx->eval(idexpr,m_strFilename,node->line,node);
 		}
 	}
 }

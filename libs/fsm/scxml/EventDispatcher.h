@@ -3,7 +3,7 @@
 #define _FSM_EVENTDISPATCHER_HEADER_
 #include <string>
 #include <map>
-#include "config.h"
+#include <log4cplus/logger.h>
 
 namespace fsm
 {
@@ -19,7 +19,7 @@ namespace fsm
 	class FSM_EXPORT EventDispatcher
 	{
 	public:
-		EventDispatcher(std::string target){_target=target;}
+		EventDispatcher(const std::string &target):_target(target){}
 
 		// Receive messages module name
 		std::string _target;

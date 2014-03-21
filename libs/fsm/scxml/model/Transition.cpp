@@ -8,7 +8,7 @@ namespace model
 {
 
 	Transition::Transition(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_bCond(true),
-		m_strSession(session),m_strFilename(filename)
+		m_strSession(session),m_strFilename(filename),cx(NULL)
 	{
 
 		m_strCond = xmlHelper::getXmlNodeAttributesValue(node,"cond");
@@ -25,8 +25,8 @@ namespace model
 	}
 	bool Transition::isEnabledCondition() 
 	{
-		if (!this->getCond().empty()){
-			return cx->evalCond(this->getCond(),m_strFilename,node->line);
+		if (!this->getCond().empty() && cx){
+			return cx->evalCond(this->getCond(),m_strFilename,node->line,node);
 		}
 		return m_bCond;
 	}

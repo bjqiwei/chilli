@@ -37,7 +37,7 @@ namespace model
 	//}
 	void Data::execute(fsm::Context * ctx)
 	{
-		LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
+		//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
 		/*if (!SCXMLHelper::isStringEmpty(datum.getSrc()))
 		{
 			ctx->setLocal(datum.getId(),datum.getSrc());
@@ -53,7 +53,7 @@ namespace model
 		{
 			ctx->setLocal(getId(), "",false);
 		}
-		LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
+		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 	}
 }
 }

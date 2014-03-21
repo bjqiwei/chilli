@@ -61,7 +61,7 @@ namespace model
 		if (m_strEvent.empty()) {
 
 		} else {
-#ifdef WIN32
+#ifdef USEDREGEX
 			std::regex regPattern(m_strEvent);
 			if (!std::regex_match(strEventName,regPattern))
 			{
@@ -79,7 +79,7 @@ namespace model
 	bool Event::isEnabledCondition() 
 	{
 		if (!this->getCond().empty() && cx){
-			return cx->evalCond(this->getCond(),m_strFilename,node->line);
+			return cx->evalCond(this->getCond(),m_strFilename,node->line,node);
 		}
 		return m_bCond;
 	}

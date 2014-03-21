@@ -15,11 +15,10 @@
 
 using namespace std;
 
-fsm::StateMachine::StateMachine(const string  xml):m_xmlDocPtr(NULL),m_initState(NULL)
-	,m_currentStateNode(NULL),m_rootNode(NULL),m_scInstance(NULL)
+fsm::StateMachine::StateMachine(const string  &xml):m_strStateFile(xml),m_xmlDocPtr(NULL),m_initState(NULL)
+	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
 {
 
-	this->m_strStateFile = xml;
 	log = log4cplus::Logger::getInstance("StateMachine");
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." );
 
@@ -34,6 +33,17 @@ fsm::StateMachine::~StateMachine()
 	 LOG4CPLUS_DEBUG(log, m_strSessionID << ",destruction a smscxml object.");
 
  }
+
+
+void fsm::StateMachine::reset()
+{ 
+	//if (_ctxt) xmlClearParserCtxt(_ctxt);
+	//_ctxt = NULL;
+	if(m_scInstance)m_scInstance->removeContext(m_rootNode);
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ",reset a smscxml object.");
+
+}
+
 
 
 bool fsm::StateMachine::Init(void)
@@ -74,13 +84,13 @@ bool fsm::StateMachine::Init(void)
 	return true;
 }
 
-bool fsm::StateMachine::Init(const string xmlFile)
+bool fsm::StateMachine::Init(const string &xmlFile)
 {
 	this->m_strStateFile = xmlFile;
 	return Init();
 }
 
-void fsm::StateMachine::normalize(const xmlNodePtr smscxml)
+void fsm::StateMachine::normalize(const xmlNodePtr &smscxml)
 {
 	//检查文件内容，初始化状态机
 	LOG4CPLUS_WARN(log, "normalize fuction is not implement." );
@@ -98,47 +108,47 @@ const std::string fsm::StateMachine::getCurrentStateID(void) const
 	return xmlHelper::getXmlNodeAttributesValue(m_currentStateNode,"id");
 }
 
-inline bool fsm::StateMachine::isState(const xmlNodePtr xNode) const 
+inline bool fsm::StateMachine::isState(const xmlNodePtr &xNode) const 
 {
 	return xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("state")) ; 
 }
 
-inline bool fsm::StateMachine::isTransition(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isTransition(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("transition")); 
 }
 
-inline bool fsm::StateMachine::isLog(const xmlNodePtr xNode) 
+inline bool fsm::StateMachine::isLog(const xmlNodePtr &xNode) 
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("log")); 
 }
 
-inline bool fsm::StateMachine::isEvent(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isEvent(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("event")); 
 }
 
-inline bool fsm::StateMachine::isExit(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isExit(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("onexit")); 
 }
 
-inline bool fsm::StateMachine::isEntry(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isEntry(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("onentry")); 
 }
 
-inline bool fsm::StateMachine::isSend(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isSend(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("send")); 
 }
 
-inline bool fsm::StateMachine::isScript(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isScript(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("script")); 
 }
 
-inline bool fsm::StateMachine::isTimer(const xmlNodePtr xNode)
+inline bool fsm::StateMachine::isTimer(const xmlNodePtr &xNode)
 {
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("timer")); 
 }
@@ -162,7 +172,10 @@ void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 			if (isEvent(eventNode))
 			{
 				model::Event event(eventNode,m_strSessionID,m_strStateFile);
-				if(m_scInstance)event.execute(m_scInstance->getContext(m_rootNode));
+				if(m_scInstance)
+					event.execute(m_scInstance->getContext(m_rootNode));
+				else
+					event.execute(NULL);
 				if (event.isEnabledEvent(m_currentEvt.getEventName()) && event.isEnabledCondition())
 				{
 					foundEvent = true;
@@ -184,7 +197,7 @@ void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 	m_lock.Unlock();
 }
 fsm::StateMachine::StateMachine(const StateMachine &other):m_strStateFile(other.m_strStateFile),m_xmlDocPtr(NULL),
-	m_initState(NULL),m_currentStateNode(NULL),m_rootNode(NULL),log(other.log)
+	m_initState(NULL),m_currentStateNode(NULL),m_rootNode(NULL),log(other.log),xpathCtx(NULL)
 	,m_scInstance(other.m_scInstance)
 {
 	LOG4CPLUS_TRACE(log, m_strSessionID << ",creat a fsm object from other statemachine:" << other.getSessionId() );
@@ -244,7 +257,7 @@ void fsm::StateMachine::parse()
 	} 
 }
 
-void fsm::StateMachine::processEvent(const xmlNodePtr eventNode)const
+void fsm::StateMachine::processEvent(const xmlNodePtr &eventNode)const
 {
 	if (!eventNode){
 		return ;
@@ -256,7 +269,10 @@ void fsm::StateMachine::processEvent(const xmlNodePtr eventNode)const
 		if (isTransition(actionNode))
 		{
 			model::Transition transition(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)transition.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				transition.execute(m_scInstance->getContext(m_rootNode));
+			else
+				transition.execute(NULL);
 			if (transition.isEnabledCondition())
 			{
 				doneSomething = true;
@@ -267,7 +283,10 @@ void fsm::StateMachine::processEvent(const xmlNodePtr eventNode)const
 		else if (isLog(actionNode))
 		{
 			model::Log log(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)log.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				log.execute(m_scInstance->getContext(m_rootNode));
+			else
+				log.execute(NULL);
 			doneSomething = true;
 			continue;
 		}
@@ -282,7 +301,9 @@ void fsm::StateMachine::processEvent(const xmlNodePtr eventNode)const
 		{
 			doneSomething = true;
 			model::Script script(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)script.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				script.execute(m_scInstance->getContext(m_rootNode));
+			
 			continue;
 		}
 		else if (isTimer(actionNode))
@@ -318,13 +339,16 @@ void fsm::StateMachine::processTransition(model::Transition & trasition)const
 	}
 }
 
-void fsm::StateMachine::processSend(const xmlNodePtr Node)const
+void fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 {
 	using namespace xmlHelper;
 	if (!Node) return;
 	model::Send send(Node,m_strSessionID,m_strStateFile);
 
-	if(m_scInstance)send.execute(m_scInstance->getContext(m_rootNode));
+	if(m_scInstance)
+		send.execute(m_scInstance->getContext(m_rootNode));
+	else
+		send.execute(NULL);
 
 	std::map<std::string , EventDispatcher *>::const_iterator it = m_mapSendObject.find(send.getTarget());
 	if (it != m_mapSendObject.end()) {
@@ -338,23 +362,26 @@ void fsm::StateMachine::processSend(const xmlNodePtr Node)const
 }
 
 
-void fsm::StateMachine::processTimer(const xmlNodePtr Node)const
+void fsm::StateMachine::processTimer(const xmlNodePtr &Node)const
 {
 	if (!Node) return;
 	model::Timer timer(Node,m_strSessionID,m_strStateFile);
 
-	if(m_scInstance)timer.execute(m_scInstance->getContext(m_rootNode));
+	if(m_scInstance)
+		timer.execute(m_scInstance->getContext(m_rootNode));
+	else
+		timer.execute(NULL);
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
-	fsm::Timer _timer(timer.getInterval(),this->m_strSessionID,timer.getId());
-	LOG4CPLUS_DEBUG(log,m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
-	if(m_scInstance)m_scInstance->AddTimer(_timer);
+	fsm::Timer * newTimer = new fsm::Timer(timer.getInterval(),this->m_strSessionID,timer.getId());
+	//LOG4CPLUS_DEBUG(log,m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
+	if(m_scInstance)m_scInstance->AddTimer(newTimer);
 
 	return;
 }
 
 
-const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr currentState)const
+const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentState)const
 {
 	xmlNodePtr curState = currentState;
 	do
@@ -387,7 +414,7 @@ void fsm::StateMachine::exitStates() const
 	}
 }
 
-void fsm::StateMachine::enterStates(const xmlNodePtr stateNode) const
+void fsm::StateMachine::enterStates(const xmlNodePtr &stateNode) const
 {
 	if(isState(stateNode))
 	{
@@ -410,7 +437,7 @@ void fsm::StateMachine::enterStates(const xmlNodePtr stateNode) const
 
 
 
-void fsm::StateMachine::processExit(const xmlNodePtr exitNode) const
+void fsm::StateMachine::processExit(const xmlNodePtr &exitNode) const
 {
 	if (!exitNode) return ;
 
@@ -419,7 +446,10 @@ void fsm::StateMachine::processExit(const xmlNodePtr exitNode) const
 		if (isLog(actionNode))
 		{
 			model::Log log(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)log.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				log.execute(m_scInstance->getContext(m_rootNode));
+			else
+				log.execute(NULL);
 			continue;
 		}
 		else if (isSend(actionNode))
@@ -446,7 +476,7 @@ void fsm::StateMachine::processExit(const xmlNodePtr exitNode) const
 	return ;
 }
 
-bool fsm::StateMachine::processEntry(const xmlNodePtr node)const
+bool fsm::StateMachine::processEntry(const xmlNodePtr &node)const
 {
 	if (!node) return true;
 
@@ -455,7 +485,10 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr node)const
 		if (isLog(actionNode))
 		{
 			model::Log log(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)log.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				log.execute(m_scInstance->getContext(m_rootNode));
+			else
+				log.execute(NULL);
 			continue;
 		}
 		else if (isSend(actionNode))
@@ -472,7 +505,10 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr node)const
 		else if (isTransition(actionNode))
 		{
 			model::Transition transition(actionNode,m_strSessionID,m_strStateFile);
-			if(m_scInstance)transition.execute(m_scInstance->getContext(m_rootNode));
+			if(m_scInstance)
+				transition.execute(m_scInstance->getContext(m_rootNode));
+			else
+				transition.execute(NULL);
 			if (transition.isEnabledCondition())
 			{
 				processTransition(transition);
@@ -495,20 +531,11 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr node)const
 xmlNodePtr fsm::StateMachine::getState(const string& stateId) const
 {
 	using namespace xmlHelper;
-	string strExpression="//state[@id='"+stateId +"']";
-	CXPathContextPtr xpathCtx(NULL); 
-	CXPathObjectPtr xpathObj(NULL); 
+	string strExpression="//state[@id='"+stateId +"']"; 
+	xmlHelper::CXPathObjectPtr xpathObj(NULL); 
 
 	try{
-
-		/* Create xpath evaluation context */
-		xpathCtx = xmlXPathNewContext(m_xmlDocPtr._xDocPtr);
-
-		if(xpathCtx._xPathCtxPtr == NULL) {
-			LOG4CPLUS_ERROR(log,m_strSessionID << ": unable to create new XPath context");
-			throw std::logic_error("Error: unable to create new XPath context");
-		}
-
+		
 		/* Evaluate xpath expression */
 		xpathObj = xmlXPathEvalExpression(BAD_CAST(strExpression.c_str()), xpathCtx._xPathCtxPtr);
 		if(xpathObj._xPathObjPtr == NULL) {
@@ -542,11 +569,7 @@ const std::string & fsm::StateMachine::getSessionId()const {
 	return m_strSessionID;
 }
 
-fsm::Evaluator * fsm::StateMachine::getEvaluator()const {
-	if(m_scInstance)
-		return this->m_scInstance->getEvaluator();
-	return NULL;
-}
+
 
 fsm::Context  *  fsm::StateMachine::getRootContext() {
 	if(m_scInstance)
@@ -580,11 +603,21 @@ void fsm::StateMachine::go()
 				funmodel.execute(m_scInstance->getContext(m_rootNode));
 			}
 		}
+		/* Create xpath evaluation context */
+		if (xpathCtx._xPathCtxPtr == NULL)
+		{
+			xpathCtx = xmlXPathNewContext(m_xmlDocPtr._xDocPtr);
+		}
+		
+		if(xpathCtx._xPathCtxPtr == NULL) {
+			LOG4CPLUS_ERROR(log,m_strSessionID << ": unable to create new XPath context");
+			throw std::logic_error("Error: unable to create new XPath context");
+		}
 	}
 	enterStates(this->m_initState);
 }
 
-void fsm::StateMachine::setSessionID(std::string strSessionid)
+void fsm::StateMachine::setSessionID(const std::string &strSessionid)
 {
 	m_strSessionID = strSessionid;
 	LOG4CPLUS_DEBUG(log,"set this stateMachine sessionid=" << m_strSessionID);

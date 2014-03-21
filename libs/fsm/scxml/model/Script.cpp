@@ -20,7 +20,7 @@ namespace model
 	//}
 	void Script::execute(fsm::Context * ctx)
 	{
-		ctx->eval(this->content,m_strFilename,node->line);
+		ctx->eval(this->content,m_strFilename,node->line,node);
 	}
 }
 }

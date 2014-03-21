@@ -24,14 +24,14 @@ namespace fsm{
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const string xml = "");
+		StateMachine(const string &xml = "");
 		StateMachine(const StateMachine &other);
 		virtual ~StateMachine();
 		StateMachine & operator=(const StateMachine & other);
 		
 		//初始化状态机
 		bool Init(void);
-		bool Init(const string xmlFile);
+		bool Init(const string &xmlFile);
 		//开始进入初始化状态
 		void go();
 		const xmlNodePtr getCurrentState(void) const;
@@ -41,12 +41,12 @@ namespace fsm{
 		bool addEventDispatcher( EventDispatcher * evtDsp);
 		const std::string& getName();
 		const std::string& getSessionId()const;
-		Evaluator * getEvaluator() const;
 		Context  *  getRootContext(); 
 		xmlNodePtr getDataModel(); 
 		void setscInstance(SCInstance *);
 		void setLog(log4cplus::Logger log);
-		void setSessionID(std::string strSessionid);
+		void setSessionID(const std::string &strSessionid);
+		void reset();
 	protected:
 		std::string m_strStateFile;
 		xmlHelper::xmlDocumentPtr m_xmlDocPtr;
@@ -57,38 +57,39 @@ namespace fsm{
 		std::string m_strSessionID;
 		std::string m_strName;
 		log4cplus::Logger  log;
+		xmlHelper::CXPathContextPtr xpathCtx;
 
-		void normalize(const xmlNodePtr rootNode);
-		bool isState(const xmlNodePtr xmlNode) const;
+		void normalize(const xmlNodePtr &rootNode);
+		bool isState(const xmlNodePtr &xmlNode) const;
 	private:
 		//将文件解析成xml文档。
 		void parse();
 
-		static bool inline isTransition(const xmlNodePtr Node) throw();
-		static bool inline isLog(const xmlNodePtr Node) throw();
-		static bool inline isEvent(const xmlNodePtr Node) throw();
-		static bool inline isEntry(const xmlNodePtr Node) throw();
-		static bool inline isExit(const xmlNodePtr Node) throw();
-		static bool inline isSend(const xmlNodePtr Node) throw();
-		static bool inline isScript(const xmlNodePtr Node) throw();
-		static bool inline isTimer(const xmlNodePtr Node) throw();
+		static bool inline isTransition(const xmlNodePtr &Node) ;
+		static bool inline isLog(const xmlNodePtr &Node) ;
+		static bool inline isEvent(const xmlNodePtr &Node) ;
+		static bool inline isEntry(const xmlNodePtr &Node) ;
+		static bool inline isExit(const xmlNodePtr &Node) ;
+		static bool inline isSend(const xmlNodePtr &Node) ;
+		static bool inline isScript(const xmlNodePtr &Node) ;
+		static bool inline isTimer(const xmlNodePtr &Node) ;
 
-		void processEvent( xmlNodePtr eventNode) const;
+		void processEvent( const xmlNodePtr &eventNode) const;
 		void processTransition(model::Transition & transition) const;
-		void processExit(const xmlNodePtr node) const;
+		void processExit(const xmlNodePtr &node) const;
 
 		//处理entry节点函数，传入entry节点指针，返回值表示是否继续执行余下的entry节点。
-		bool processEntry(const xmlNodePtr node)const;
-		void processSend(const xmlNodePtr node)const;
-		void processScript(const xmlNodePtr node)const;
-		void processTimer(const xmlNodePtr node)const;
+		bool processEntry(const xmlNodePtr &node)const;
+		void processSend(const xmlNodePtr &node)const;
+		void processScript(const xmlNodePtr &node)const;
+		void processTimer(const xmlNodePtr &node)const;
 
-		void enterStates(const xmlNodePtr stateNode) const;
+		void enterStates(const xmlNodePtr &stateNode) const;
 		void exitStates() const;
 		xmlNodePtr getState(const string& stateId) const;
 
-		const ::xmlNodePtr getParentState(const xmlNodePtr currentState)const;
-		xmlNodePtr getTargetStates(const xmlNodePtr transition) const;
+		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
+		xmlNodePtr getTargetStates(const xmlNodePtr &transition) const;
 	private:
 		std::map<std::string, EventDispatcher *> m_mapSendObject;
 		SCInstance * m_scInstance;

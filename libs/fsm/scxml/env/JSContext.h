@@ -16,7 +16,7 @@ namespace env
 	#if (defined(DEBUG) && defined(__SUNPRO_CC))  || defined(JS_CPU_SPARC)
 	/* Sun compiler uses larger stack space for js_Interpret() with debug
 	   Use a bigger gMaxStackSize to make "make check" happy. */
-	#define DEFAULT_MAX_STACK_SIZE 5000000
+	#define DEFAULT_MAX_STACK_SIZE 500000
 	#else
 	#define DEFAULT_MAX_STACK_SIZE 500000
 	#endif
@@ -33,16 +33,18 @@ namespace env
 		::JSRuntime * JSrt;
 		//JS Context需要资源
 		JSAutoRequest *ar;
-		log4cplus::Logger log;
+		//JSAutoEnterCompartment *ac;
+		static log4cplus::Logger log;
 	
 		static unsigned long StackChunkSize; 
 		static size_t  gMaxStackSize;
 		static size_t gScriptStackQuota;
 	public:
 		::JSContext * ctx;
-		::JSObject * global_obj;
+		::JSObject * global;
+		::JSObject * event;
 	public:
-		JsContext(::JSRuntime * rt,Context *const parent=NULL); 
+		JsContext(::JSRuntime * rt,Evaluator * eval,Context * parent); 
 		virtual ~JsContext();
 
 		/// <summary>
@@ -85,19 +87,21 @@ namespace env
 		/// <param name="value"> The variable value </param>
 		virtual void setLocal(const std::string &name, const std::string & value, bool isDelete=true);
 
-		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line);
+		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
 
 		///<summary>
 		///计算一段boolen表达式脚本
 		///</summary>
 		///<returns>返回此表达式执行的结果。</returns>
-		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line);
-		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line);
-		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line);
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *);
+		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line,void *);
+		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void *);
 		virtual void SetContextPrivate(void *data);
+		virtual void ExecuteFile(const std::string &fileName);
 	protected:
 
-
+		static void operator delete(void *p){ delete (char *)p;};
+		friend class JSEvaluator;
 	public:
 		/// <summary>
 		/// Get the Map of all local variables in this Context.
@@ -110,14 +114,16 @@ namespace env
 		/// </summary>
 		virtual void setVars(const std::map<std::string,std::string> &varMap);
 
-		virtual JSObject * JSDefineObject (const char * name, JSClass * clasp);
-		virtual bool JSDefineProperties (JSObject *obj,  JSPropertySpec *ps);
+		//virtual JSObject * JSDefineObject (const char * name, JSClass * clasp);
+		//virtual bool JSDefineProperties (JSObject *obj,  JSPropertySpec *ps);
 		static void reportError(::JSContext *_ctx, const char *message, JSErrorReport *report);
 		static void ReportException(JSContext *cx);
 		static JSBool ShellOperationCallback(JSContext *cx);
 		
 	private:
 		void InitializeInstanceFields();
+		JSObject *getScriptObject(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
+		void clearVars();
 	};
 
 	

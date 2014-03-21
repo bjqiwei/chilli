@@ -13,10 +13,11 @@ namespace fsm{
 	/// A Context or &quot;scope&quot; for storing variables; usually tied to
 	/// a SCXML root Object.
 	/// </summary>
-	class FSM_EXPORT Context
+	class Evaluator;
+	class  Context
 	{
 	public:
-		Context(Context * _parent=NULL):parent(_parent){
+		Context(Evaluator * evl, Context * _parent):evaluator(evl),parent(_parent){
 		};
 		virtual ~Context(void){
 		};
@@ -29,7 +30,7 @@ namespace fsm{
 		/// </summary>
 		/// <param name="name"> The variable name </param>
 		/// <param name="value"> The variable value </param>
-		virtual void set(const std::string &name, const std::string & value) = 0;
+		virtual void set(const std::string & name, const std::string & value) = 0;
 
 		/// <summary>
 		/// Assigns a new value to an existing variable or creates a new one.
@@ -45,7 +46,7 @@ namespace fsm{
 		/// </summary>
 		/// <param name="name"> The name of the variable </param>
 		/// <returns> The value (or null) </returns>
-		virtual std::string get(const std::string &name) = 0;
+		virtual std::string get(const std::string & name) = 0;
 
 		/// <summary>
 		/// Check if this variable exists, delegating to parent.
@@ -82,31 +83,37 @@ namespace fsm{
 		///编译一段脚本。
 		///</summary>
 		///<returns>返回此脚本执行是否成功的结果。</returns>
-		virtual bool CompileScript(const std::string script,const std::string &filename, unsigned int line) = 0;
+		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void *) = 0;
 
 		///<summary>
 		///计算一段表达式脚本。
 		///</summary>
 		///<returns>返回此表达式执行的结果，转换为string类型。</returns>
-		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line) = 0;
+		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line,void *) = 0;
 
 		///<summary>
 		///计算一段boolen表达式脚本
 		///</summary>
 		///<returns>返回此表达式执行的结果。</returns>
-		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line) = 0;
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *) = 0;
 
 		///<summary>
 		///返回指向本xml文档内容的一个节点指针。
 		///</summary>
 		///<returns>返回指向本xml文档内容的一个节点指针。</returns>
-		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line) = 0;
+		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line,void *) = 0;
+
+		virtual void SetContextPrivate(void *data) = 0;
+		virtual Evaluator * getEvaluator(){ return evaluator; };
+		virtual void ExecuteFile(const std::string &fileName) = 0;
 
 	protected:
+		Evaluator * evaluator;
 		//父Context
 		Context *parent;
 		//上下文中的变量
 		std::map<std::string,std::string> vars;
+		std::map<void*,void*>mapObjectRoot;
 	};
 
 }

@@ -18,10 +18,10 @@ namespace fsm{
 namespace xmlHelper{
 
 
-FSM_EXPORT string  getXmlChildNodeValue(const xmlNodePtr xNode,const string strChildNodeName);
-FSM_EXPORT xmlNodePtr  getXmlChildNode(const xmlNodePtr xNode,const string strChildNodeName);
-FSM_EXPORT string  getXmlNodeAttributesValue( xmlNodePtr xNode,const string strAttributeName);
-FSM_EXPORT void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string strAttributeName,const string strValue);
+FSM_EXPORT string  getXmlChildNodeValue(const xmlNodePtr xNode,const string &strChildNodeName);
+FSM_EXPORT xmlNodePtr  getXmlChildNode(const xmlNodePtr xNode,const string &strChildNodeName);
+FSM_EXPORT string  getXmlNodeAttributesValue( xmlNodePtr xNode,const string &strAttributeName);
+FSM_EXPORT void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string &strAttributeName,const string strValue);
 FSM_EXPORT std::vector<xmlNodePtr> filterChildNodes(const string& tagName, const xmlNodePtr node);
 
 
@@ -36,7 +36,7 @@ public :
     ~XStr();
     XStr(const XStr & other);
 	XStr & operator=(const XStr & other);
-	string  strForm() const;
+	const string & strForm() const;
 private:
     std::string _strValue ;
 private:
@@ -98,13 +98,13 @@ class FSM_EXPORT CXmlDocmentHelper{
 public: 
 	CXmlDocmentHelper(void);
 	~CXmlDocmentHelper();
-	void setRootNode(std::string strRoot);
+	void setRootNode(const std::string &strRoot);
 	void setRootNode(xmlNodePtr rootNode);
-	void newRootProp(std::string  name, std::string strValue);
+	void newRootProp(const std::string  &name, const std::string &strValue);
 	xmlAttrPtr copyProp2Root(xmlAttrPtr cur);
 	void addChild(xmlNodePtr xChild);
 	void addAddChildList(xmlNodePtr xChild);
-	void addChild(std::string name,std::string  content);
+	void addChild(const std::string &name,const std::string  &content);
 	std::string getContent();
 private:
 	xmlDocumentPtr doc;
@@ -121,7 +121,7 @@ public:
 	std::string getRootName();
 	std::string getRootProp(std::string name);
 	std::string getChildContent(std::string childName);
-	void setRootAttributesValue (const std::string strAttributeName,const std::string strValue);
+	void setRootAttributesValue (const std::string &strAttributeName,const std::string &strValue);
 	std::string getContent();
 	~CXmlParseHelper(){};
 private:
