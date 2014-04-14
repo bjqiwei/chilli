@@ -4,10 +4,6 @@
 #include <jsperf.h>
 #include <list>
 #include <time.h>
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/appender.h>
-#include <log4cplus/consoleappender.h>
 
 
 
@@ -60,12 +56,12 @@ int run(JSContext *cx) {
 	jsval rval; 
 	JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 	script = "\"value=\"+x;";
-	for(long i=2000000; i>0 ; i--){
+	for(long i=200000; i>0 ; i--){
 		//JSBool status = compileAndRepeat(cx,global,script,"");
 		//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 		uint32 oldopts = JS_GetOptions(cx);
 		JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
-		JSObject * obj = JS_CompileFile(cx,global,"./test.js");
+		JSObject * obj = JS_CompileScript(cx,global,script,strlen(script),NULL,0);
 		JS_SetOptions(cx, oldopts);
 		JSBool status = JS_ExecuteScript(cx,global,obj,&rval);
 
@@ -90,17 +86,7 @@ int run(JSContext *cx) {
 	return 0;
 }
 
-log4cplus::Logger loger;
 int main(int argc, const char *argv[]) {
-	log4cplus::initialize();
-	log4cplus::SharedAppenderPtr _append(new log4cplus::ConsoleAppender());
-	_append->setName("append test");
-	std::string pattern = "%d{%m/%d/%y %H:%M:%S}  - %m [%l]%n";    
-	//log4cplus::Layout _layout(new PatternLayout(pattern));   
-	/* step 3: Attach the layout object to the appender */    
-	//_append->setLayout( _layout );   
-	loger= log4cplus::Logger::getInstance("console");
-	loger.addAppender(_append);
 
 	/* Create a JS runtime. */
 	JSRuntime *rt = JS_NewRuntime(160L * 1024L * 1024L);
