@@ -131,6 +131,7 @@
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug_Unicode|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release_Unicode|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)D</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -210,6 +211,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)appender_test.pch</PrecompiledHeaderOutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

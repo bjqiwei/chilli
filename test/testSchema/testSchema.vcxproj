@@ -67,7 +67,7 @@
       <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y scm.xsd "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
@@ -91,7 +91,7 @@ xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"<
       <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y scm.xsd "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
