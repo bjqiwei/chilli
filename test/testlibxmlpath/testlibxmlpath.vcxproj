@@ -25,7 +25,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,6 +43,7 @@
     <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -57,6 +58,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -64,7 +66,8 @@
       <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(ProjectDir)StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,6 +78,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,7 +88,8 @@
       <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(ProjectDir)StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

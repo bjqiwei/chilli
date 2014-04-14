@@ -1,0 +1,37 @@
+<scm>
+  <state id="init">
+    <event event="startservice">
+      <transition  target="play"/>
+    </event>
+  </state>
+  <state id="play">
+    <onentry>
+      <send  type="response" target="callmanager">
+        <cmddata type="text">
+          <![CDATA[<Response>
+				<Get action="handle-user-input.jsp" numdigits="1">
+				<Play>menu.wav</Play>
+				</Get>
+				<Play>sorrybye.wav</Play>
+				<Redirect>/welcome/voice?id=9999</Redirect>
+				</Response>]]>
+        </cmddata>
+      </send>
+      <send type="transfer" target="third">
+        <cmddata type="script">_event._bodydata;</cmddata>
+        <serviceid type="script">_event._serviceid;</serviceid>
+        <callid type="script">_event._sessionid;</callid>
+        <ip type="script">_event._ip</ip>
+        <port type="script">_event._port</port>
+      </send>
+    </onentry>
+    <event cond="_event._msgtype=='thirdcmd'">
+      <log type="script">"third retrun cmd, do nothing."</log>
+    </event>
+    <event event="startservice">
+      <transition  target="play"/>
+    </event>
+    <event event="handle-user-input.jsp"></event>
+    <event event="/welcome/voice"></event>
+  </state>
+</scm>
