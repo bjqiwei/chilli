@@ -1,4 +1,4 @@
-// testsmscmxl.cpp : Defines the entry point for the console application.
+// testfsm.cpp : Defines the entry point for the console application.
 //
 //#define SCXML 1
 #include "stdafx.h"
