@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include "libxml/tree.h"
+#include "config.h"
 
 
 namespace fsm{

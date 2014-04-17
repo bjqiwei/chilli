@@ -48,9 +48,6 @@
     <ClCompile Include="scxml\model\State.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
-    <ClCompile Include="scxml\model\Timer.cpp">
-      <Filter>scxml.model</Filter>
-    </ClCompile>
     <ClCompile Include="scxml\model\Transition.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
@@ -90,6 +87,9 @@
     <ClCompile Include="FSM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scxml\model\ModelTimer.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xmlHelper.h">
@@ -123,9 +123,6 @@
       <Filter>scxml.model</Filter>
     </ClInclude>
     <ClInclude Include="scxml\model\State.h">
-      <Filter>scxml.model</Filter>
-    </ClInclude>
-    <ClInclude Include="scxml\model\Timer.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
     <ClInclude Include="scxml\model\Transition.h">
@@ -172,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="FSM.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scxml\model\ModelTimer.h">
+      <Filter>scxml.model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

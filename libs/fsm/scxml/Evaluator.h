@@ -15,7 +15,7 @@ namespace fsm
 	/// evaluate the expressions within the SCXML document.
 	/// 
 	/// </summary>
-	class Evaluator
+	class  Evaluator
 	{
 
 		/// <summary>

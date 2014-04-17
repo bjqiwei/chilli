@@ -11,7 +11,7 @@ namespace fsm
 {
 namespace env
 {
-	class FSM_EXPORT SimpleContext : public Context
+	class SimpleContext : public Context
 	{
 
 	private:

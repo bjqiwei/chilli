@@ -21,7 +21,7 @@ namespace xmlHelper{
 FSM_EXPORT string  getXmlChildNodeValue(const xmlNodePtr xNode,const string &strChildNodeName);
 FSM_EXPORT xmlNodePtr  getXmlChildNode(const xmlNodePtr xNode,const string &strChildNodeName);
 FSM_EXPORT string  getXmlNodeAttributesValue( xmlNodePtr xNode,const string &strAttributeName);
-FSM_EXPORT void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string &strAttributeName,const string strValue);
+FSM_EXPORT void setXmlNodeAttributesValue (xmlNodePtr xNode ,const string &strAttributeName,const string &strValue);
 FSM_EXPORT std::vector<xmlNodePtr> filterChildNodes(const string& tagName, const xmlNodePtr node);
 
 

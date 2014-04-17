@@ -21,7 +21,7 @@ namespace env
 	/// Evaluator implementation enabling use of JS expressions 
 	/// 
 	/// </summary>
-	class FSM_EXPORT JSEvaluator : public Evaluator
+	class  JSEvaluator : public Evaluator
 	{
 
 	private:
