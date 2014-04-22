@@ -9,7 +9,7 @@ namespace model{
 Functionmodel::Functionmodel(xmlNodePtr xnode,const std::string &session, const std::string &filename):
 	node(xnode),m_strSession(session),m_strFilename(filename)
 {
-	log = log4cplus::Logger::getInstance("StateMachine.model.Functionmodel");
+	log = log4cplus::Logger::getInstance("fsm.model.Functionmodel");
 }
 
 void Functionmodel::execute(fsm::Context * ctx){

@@ -1,7 +1,5 @@
 #include "Event.h"
-#include "Script.h"
-#include "Log.h"
-#include "Transition.h"
+#include "../../xmlHelper.h"
 #ifdef WIN32
 #include <regex>
 #endif
@@ -15,6 +13,7 @@ namespace model
 		m_strSession(session),
 		m_strFilename(filename),cx(NULL)
 	{
+		log = log4cplus::Logger::getInstance("fsm.model.Event");
 		m_strCond = xmlHelper::getXmlNodeAttributesValue(node,"cond");
 		m_strEvent = xmlHelper::getXmlNodeAttributesValue(node,"event");
 		m_bCond = true;
@@ -54,7 +53,7 @@ namespace model
 		}*/
 	}
 
-	bool Event::isEnabledEvent(const string& strEventName) const 
+	bool Event::isEnabledEvent(const std::string& strEventName) const 
 	{
 		using namespace xmlHelper;
 		

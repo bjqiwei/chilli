@@ -1,5 +1,4 @@
 #include "ModelTimer.h"
-#include "../SCXMLHelper.h"
 #include "../../xmlHelper.h"
 
 namespace fsm{
@@ -8,7 +7,7 @@ namespace model{
 	Timer::Timer(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
 		m_strSession(session),m_strFilename(filename)
 	{
-		log = log4cplus::Logger::getInstance("StateMachine.model.Timer");
+		log = log4cplus::Logger::getInstance("fsm.model.Timer");
 		this->id = fsm::xmlHelper::getXmlNodeAttributesValue(node,"id");
 		this->idexpr = fsm::xmlHelper::getXmlNodeAttributesValue(node,"idexpr");
 		this->interval = fsm::xmlHelper::getXmlNodeAttributesValue(node,"interval");

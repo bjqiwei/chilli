@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include "libxml/tree.h"
-#include "config.h"
 
 
 namespace fsm{
@@ -114,7 +113,6 @@ namespace fsm{
 		Context *parent;
 		//上下文中的变量
 		std::map<std::string,std::string> vars;
-		std::map<void*,void*>mapObjectRoot;
 	};
 
 }

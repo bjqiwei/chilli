@@ -43,6 +43,8 @@ namespace env
 		::JSContext * ctx;
 		::JSObject * global;
 		::JSObject * event;
+	private:
+		std::map<void*,void*>mapObjectRoot;
 	public:
 		JsContext(::JSRuntime * rt,Evaluator * eval,Context * parent); 
 		virtual ~JsContext();

@@ -104,6 +104,8 @@
     <ClCompile Include="scxml\model\Data.cpp" />
     <ClCompile Include="scxml\model\Datamodel.cpp" />
     <ClCompile Include="scxml\model\Event.cpp" />
+    <ClCompile Include="scxml\model\Function.cpp" />
+    <ClCompile Include="scxml\model\Functionmodel.cpp" />
     <ClCompile Include="scxml\model\Log.cpp" />
     <ClCompile Include="scxml\model\ModelTimer.cpp" />
     <ClCompile Include="scxml\model\OnEntry.cpp" />
@@ -113,12 +115,12 @@
     <ClCompile Include="scxml\model\State.cpp" />
     <ClCompile Include="scxml\model\Transition.cpp" />
     <ClCompile Include="scxml\SCInstance.cpp" />
-    <ClCompile Include="scxml\SCXMLHelper.cpp" />
     <ClCompile Include="scxml\Timer.cpp" />
     <ClCompile Include="scxml\TriggerEvent.cpp" />
-    <ClCompile Include="xmlHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common\stringHelper.h" />
+    <ClInclude Include="common\xmlHelper.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="FSM.h" />
     <ClInclude Include="scxml\Context.h" />
@@ -133,6 +135,8 @@
     <ClInclude Include="scxml\model\Data.h" />
     <ClInclude Include="scxml\model\Datamodel.h" />
     <ClInclude Include="scxml\model\Event.h" />
+    <ClInclude Include="scxml\model\Function.h" />
+    <ClInclude Include="scxml\model\Functionmodel.h" />
     <ClInclude Include="scxml\model\Log.h" />
     <ClInclude Include="scxml\model\ModelTimer.h" />
     <ClInclude Include="scxml\model\OnEntry.h" />
@@ -142,10 +146,8 @@
     <ClInclude Include="scxml\model\State.h" />
     <ClInclude Include="scxml\model\Transition.h" />
     <ClInclude Include="scxml\SCInstance.h" />
-    <ClInclude Include="scxml\SCXMLHelper.h" />
     <ClInclude Include="scxml\Timer.h" />
     <ClInclude Include="scxml\TriggerEvent.h" />
-    <ClInclude Include="xmlHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

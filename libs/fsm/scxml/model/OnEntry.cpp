@@ -1,7 +1,4 @@
 #include "OnEntry.h"
-#include "Script.h"
-#include "Log.h"
-#include "Transition.h"
 
 namespace fsm{
 namespace model{

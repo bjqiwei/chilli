@@ -10,7 +10,7 @@ namespace model
 	Datamodel::Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session),
 		m_strFilename(filename)
 	{
-		log = log4cplus::Logger::getInstance("StateMachine.model.Datamodel");
+		log = log4cplus::Logger::getInstance("fsm.model.Datamodel");
 	}
 
 

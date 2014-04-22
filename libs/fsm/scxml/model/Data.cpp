@@ -13,7 +13,7 @@ namespace model
 	{
 		m_strId = xmlHelper::getXmlNodeAttributesValue(node,"id");
 		m_strExpr = xmlHelper::getXmlNodeAttributesValue(node,"expr");
-		log = log4cplus::Logger::getInstance("StateMachine.model.Data");
+		log = log4cplus::Logger::getInstance("fsm.model.Data");
 	}
 
 	const std::string & Data::getId()const

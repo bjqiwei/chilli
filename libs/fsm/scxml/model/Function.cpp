@@ -1,7 +1,6 @@
 #include "Function.h"
 #include <log4cplus/loggingmacros.h>
 #include "../../xmlHelper.h"
-#include "../SCXMLHelper.h"
 
 namespace fsm{
 namespace model{
@@ -11,7 +10,7 @@ node(xNode),m_strSession(session),m_strFileName(filename)
 {
 	m_strContent = xmlHelper::XStr(xmlNodeGetContent(node)).strForm();
 	m_fileName = xmlHelper::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
-	log = log4cplus::Logger::getInstance("StateMachine.model.Function");
+	log = log4cplus::Logger::getInstance("fsm.model.Function");
 }
 
 void Function::execute(fsm::Context * ctx)

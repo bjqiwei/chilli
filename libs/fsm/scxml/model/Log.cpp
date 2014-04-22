@@ -8,10 +8,10 @@ namespace model{
 	Log::Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename):node(xNode),m_strSession(sessionid),
 	m_strFilename(filename)
 	{
+		log = log4cplus::Logger::getInstance("fsm.model.Log");
 		m_strExpr =  XStr(xmlNodeGetContent(node)).strForm();
 		m_Type = getXmlNodeAttributesValue(node,"type");
 		m_strLevel = getXmlNodeAttributesValue(node,"level");
-		log = log4cplus::Logger::getInstance("StateMachine.Log");
 	}
 	void Log::execute(Context * ctx)
 	{

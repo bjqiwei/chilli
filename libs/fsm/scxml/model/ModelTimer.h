@@ -4,8 +4,7 @@
 
 #include <string>
 #include <log4cplus/logger.h>
-#include "../../xmlHelper.h"
-#include "../model/Action.h"
+#include "Action.h"
 
 
 

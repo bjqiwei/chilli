@@ -1,8 +1,8 @@
 #include "Send.h"
-#include "../SCXMLHelper.h"
 #include <cstring>
 #include <log4cplus/loggingmacros.h>
-#include "../../xmlHelper.h"
+#include "../../common/xmlHelper.h"
+#include "../../common/stringHelper.h"
 
 namespace fsm
 {
@@ -13,21 +13,21 @@ namespace model
 	Send::Send(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session),
 		m_strFilename(filename)
 	{
-		log = log4cplus::Logger::getInstance("StateMachine.model.Send");
+		log = log4cplus::Logger::getInstance("fsm.model.Send");
 
-		this->id = xmlHelper::getXmlNodeAttributesValue(node,"id");
-		this->idexpr = xmlHelper::getXmlNodeAttributesValue(node,"idexpr");
-		this->target = xmlHelper::getXmlNodeAttributesValue(node,"target");
-		this->targetexpr = xmlHelper::getXmlNodeAttributesValue(node,"targetexpr");
-		this->type = xmlHelper::getXmlNodeAttributesValue(node,"type");
-		this->typeexpr = xmlHelper::getXmlNodeAttributesValue(node,"typeexpr");
-		this->_event = xmlHelper::getXmlNodeAttributesValue(node,"event");
-		this->eventexpr = xmlHelper::getXmlNodeAttributesValue(node,"eventexpr");
+		this->id = helper::xml::getXmlNodeAttributesValue(node,"id");
+		this->idexpr = helper::xml::getXmlNodeAttributesValue(node,"idexpr");
+		this->target = helper::xml::getXmlNodeAttributesValue(node,"target");
+		this->targetexpr = helper::xml::getXmlNodeAttributesValue(node,"targetexpr");
+		this->type = helper::xml::getXmlNodeAttributesValue(node,"type");
+		this->typeexpr = helper::xml::getXmlNodeAttributesValue(node,"typeexpr");
+		this->_event = helper::xml::getXmlNodeAttributesValue(node,"event");
+		this->eventexpr = helper::xml::getXmlNodeAttributesValue(node,"eventexpr");
 		//this->namelist = xmlHelper::getXmlNodeAttributesValue(node,"namelist");
-		this->from = xmlHelper::getXmlNodeAttributesValue(node,"from");
-		this->fromexpr = xmlHelper::getXmlNodeAttributesValue(node,"fromexpr");
-		this->dest = xmlHelper::getXmlNodeAttributesValue(node,"dest");
-		this->destexpr = xmlHelper::getXmlNodeAttributesValue(node,"destexpr");
+		this->from = helper::xml::getXmlNodeAttributesValue(node,"from");
+		this->fromexpr = helper::xml::getXmlNodeAttributesValue(node,"fromexpr");
+		this->dest = helper::xml::getXmlNodeAttributesValue(node,"dest");
+		this->destexpr = helper::xml::getXmlNodeAttributesValue(node,"destexpr");
 	}
 
 
@@ -92,28 +92,27 @@ namespace model
 	}
 	void Send::execute(fsm::Context * ctx)
 	{
-		using namespace  xmlHelper;
-		if (ctx && SCXMLHelper::isStringEmpty(id) && !idexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(id) && !idexpr.empty()){
 			id = ctx->eval(idexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"idexpr"));
 		}
 		
-		if (ctx && SCXMLHelper::isStringEmpty(target) && !targetexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(target) && !targetexpr.empty()){
 			target = ctx->eval(targetexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"targetexpr"));
 		}
 
-		if (ctx && SCXMLHelper::isStringEmpty(type) && !typeexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(type) && !typeexpr.empty()){
 			type = ctx->eval(typeexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"typeexpr"));
 		}
 
-		if (ctx && SCXMLHelper::isStringEmpty(_event) && !eventexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(_event) && !eventexpr.empty()){
 			_event = ctx->eval(eventexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"eventexpr"));
 		}
 
-		if (ctx && SCXMLHelper::isStringEmpty(from) && !fromexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
 			from = ctx->eval(fromexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"fromexpr"));
 		}
 
-		if (ctx && SCXMLHelper::isStringEmpty(dest) && !destexpr.empty()){
+		if (ctx && helper::string::isStringEmpty(dest) && !destexpr.empty()){
 			dest = ctx->eval(destexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"destexpr"));
 		}
 
@@ -152,7 +151,7 @@ namespace model
 */
 		//Á¬½Ó·¢ËÍ×Ö·û´®
 	
-		CXmlDocmentHelper m_xmlDoc;
+		helper::xml::CXmlDocmentHelper m_xmlDoc;
 
 		m_xmlDoc.setRootNode(getType());
 		m_xmlDoc.newRootProp(getType(),getEvent());
@@ -176,7 +175,7 @@ namespace model
 				!xmlStrEqual(attrPtr->name, BAD_CAST "fromexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "destexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "eventexpr")){
-					m_xmlDoc.newRootProp((char *)attrPtr->name, XStr(xmlGetProp(node,attrPtr->name)).strForm());
+					m_xmlDoc.newRootProp((char *)attrPtr->name, helper::xml::XStr(xmlGetProp(node,attrPtr->name)).strForm());
 			}
 			attrPtr = attrPtr->next;
 		}
@@ -189,11 +188,11 @@ namespace model
 				//xmlNodePtr newNode = xmlCopyNode(childNode,0);
 				//xmlNodePtr content = xmlNewText(BAD_CAST params[(char *)newNode->name].c_str());
 				//xmlAddChild(newNode,content);
-				std::string _type = xmlHelper::getXmlNodeAttributesValue(childNode,"type");
+				std::string _type = helper::xml::getXmlNodeAttributesValue(childNode,"type");
 				if(ctx && _type.compare("script") == 0)
-					m_xmlDoc.addChild((char *)childNode->name,ctx->eval(XStr(xmlNodeGetContent(childNode)).strForm(),m_strFilename,childNode->line,childNode));
+					m_xmlDoc.addChild((char *)childNode->name,ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFilename,childNode->line,childNode));
 				else
-					m_xmlDoc.addChild((char *)childNode->name,XStr(xmlNodeGetContent(childNode)).strForm());
+					m_xmlDoc.addChild((char *)childNode->name,helper::xml::XStr(xmlNodeGetContent(childNode)).strForm());
 
 				//xmlFreeNode(newNode);
 			}

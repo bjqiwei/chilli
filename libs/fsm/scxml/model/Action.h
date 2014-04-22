@@ -1,8 +1,6 @@
 #pragma once
 #ifndef _FSM_MODEL_ACTION_HEADER_
 #define _FSM_MODEL_ACTION_HEADER_
-#include <string>
-#include "../Evaluator.h"
 #include "../Context.h"
 
 namespace fsm

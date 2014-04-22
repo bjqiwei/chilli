@@ -2,9 +2,6 @@
 #ifndef _FSM_MODEL_EVENT_HEADER_
 #define _FSM_MODEL_EVENT_HEADER_
 
-#include <string>
-#include <vector>
-#include "../../xmlHelper.h"
 #include "Action.h"
 #include <log4cplus/logger.h>
 
@@ -31,7 +28,7 @@ namespace model
 		
 	public:
 		Event(xmlNodePtr xNode,const std::string &session,const std::string &filename);
-		bool isEnabledEvent(const string& strEventName) const ;
+		bool isEnabledEvent(const std::string& strEventName) const ;
 		bool isEnabledCondition();
 		virtual void execute(fsm::Context * ctx);
 	};

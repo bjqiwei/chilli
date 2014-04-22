@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "../../xmlHelper.h"
 #include <log4cplus/logger.h>
 #include "Action.h"
 
