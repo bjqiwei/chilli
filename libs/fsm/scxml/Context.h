@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _CONTEXT_HEADER_
-#define _CONTEXT_HEADER_
+#ifndef FSM_CONTEXT_HEADER_
+#define FSM_CONTEXT_HEADER_
 #include <map>
 #include <string>
 #include "libxml/tree.h"
@@ -8,11 +8,6 @@
 
 namespace fsm{
 
-
-	/// <summary>
-	/// A Context or &quot;scope&quot; for storing variables; usually tied to
-	/// a SCXML root Object.
-	/// </summary>
 	class Evaluator;
 	class  Context
 	{
@@ -103,8 +98,20 @@ namespace fsm{
 		///<returns>返回指向本xml文档内容的一个节点指针。</returns>
 		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line,void *) = 0;
 
+		///<summary>
+		///设置私有数据。
+		///</summary>
 		virtual void SetContextPrivate(void *data) = 0;
+
+		///<summary>
+		///获取它的虚拟机。
+		///</summary>
+		///<returns>返回虚拟机指针。</returns>
 		virtual Evaluator * getEvaluator(){ return evaluator; };
+
+		///<summary>
+		///执行一段脚本。
+		///</summary>
 		virtual void ExecuteFile(const std::string &fileName) = 0;
 
 	protected:
