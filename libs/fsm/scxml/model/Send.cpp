@@ -31,7 +31,7 @@ namespace model
 	}
 
 
-	std::string& Send::getId()
+	const std::string& Send::getId()const
 	{
 		return id;
 	}
@@ -43,22 +43,22 @@ namespace model
 	//{
 	//	return idlocation;
 	//}
-	std::string& Send::getTarget()
+	const std::string& Send::getTarget()const
 	{
 		return target;
 	}
 
-	std::string& Send::getFrom()
+	const std::string& Send::getFrom()const
 	{
 		return from;
 	}
 
-	std::string& Send::getType()
+	const std::string& Send::getType()const
 	{
 		return type;
 	}
 
-	std::string& Send::getEvent()
+	const std::string& Send::getEvent()const
 	{
 		return this->_event;
 	}
@@ -67,7 +67,7 @@ namespace model
 	//	return this->eventexpr;
 	//}
 
-	std::string& Send::getDestination()
+	const std::string& Send::getDestination()const
 	{
 		return this->dest;
 	}
@@ -86,7 +86,7 @@ namespace model
 	//	return targetexpr;
 	//}
 
-	std::string& Send::getContent()
+	const std::string& Send::getContent()const
 	{
 		return content;
 	}

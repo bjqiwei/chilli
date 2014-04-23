@@ -38,18 +38,18 @@ namespace model
 		//std::map<std::string,std::string> params;
 	public:
 		Send(xmlNodePtr xNode,const std::string &session,const std::string &filename);
-		std::string& getId();
+		const std::string& getId()const;
 		void setId(const std::string &strValue);
 		//std::string& getIdLocation();
-		std::string& getTarget();
-		std::string& getType();
-		std::string& getEvent();
+		const std::string& getTarget()const;
+		const std::string& getType()const;
+		const std::string& getEvent()const;
 		//std::string& getEventExpr();
-		std::string& getFrom();
+		const std::string& getFrom()const;
 		//std::string& getNamelist();
 		//std::string& getTargetExpr();
-		std::string& getDestination();
-		std::string& getContent();
+		const std::string& getDestination()const;
+		const std::string& getContent()const;
 		//std::map<std::string, std::string>& getParams();
 		virtual  void execute(fsm::Context * ctx);
 	};
