@@ -61,7 +61,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_DEBUG;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_DEBUG;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>

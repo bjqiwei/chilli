@@ -8,7 +8,6 @@
 #	define FSM_EXPORT __declspec(dllimport)
 #endif
 #define EXPIMP_TEMPLATE
-#define  USE_LOG4CPLUS
 
 EXPIMP_TEMPLATE template class FSM_EXPORT std::allocator<char>;
 EXPIMP_TEMPLATE template class FSM_EXPORT std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
