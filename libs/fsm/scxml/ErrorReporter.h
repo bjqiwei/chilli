@@ -25,7 +25,7 @@ namespace fsm
 		/// <param name="errDetail">
 		///            human readable description </param>
 		/// <param name="errCtx">
-		///            typically an SCXML element which caused an error,
+		///            typically an fsm element which caused an error,
 		///            may be accompanied by additional information </param>
 	public:
 		virtual void onError(const std::string &errCode, const std::string &errDetail, std::string & errCtx) = 0;

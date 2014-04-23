@@ -11,8 +11,8 @@ namespace fsm
 
 
 	/// <summary>
-	/// Interface for a component that may be used by the SCXML engines to
-	/// evaluate the expressions within the SCXML document.
+	/// Interface for a component that may be used by the fsm engines to
+	/// evaluate the expressions within the fsm document.
 	/// 
 	/// </summary>
 	class  Evaluator

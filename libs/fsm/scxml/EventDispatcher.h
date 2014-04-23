@@ -8,14 +8,6 @@
 namespace fsm
 {
 
-
-	/// <summary>
-	/// The event controller interface used to send messages containing
-	/// events or other information directly to other module,
-	/// other external systems using an Event I/O Processor or to raise
-	/// events in the current SCXML session.
-	/// 
-	/// </summary>
 	class FSM_EXPORT EventDispatcher
 	{
 	public:
