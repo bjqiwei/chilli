@@ -16,8 +16,8 @@ namespace model{
 		Timer(xmlNodePtr node,const std::string &session,const std::string & filename);
 		virtual ~Timer();
 
-		const std::string& getId();
-		const std::string& getIdExpr();
+		const std::string& getId() const;
+		const std::string& getIdExpr() const;
 		unsigned int getInterval();
 
 		virtual  void execute(fsm::Context * ctx);

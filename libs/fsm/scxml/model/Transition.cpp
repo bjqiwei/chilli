@@ -1,5 +1,5 @@
 #include "Transition.h"
-#include "../../xmlHelper.h"
+#include "../../common/xmlHelper.h"
 
 
 namespace fsm
@@ -10,16 +10,16 @@ namespace model
 	Transition::Transition(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_bCond(true),
 		m_strSession(session),m_strFilename(filename),cx(NULL)
 	{
-
-		m_strCond = xmlHelper::getXmlNodeAttributesValue(node,"cond");
-		m_strTarget = xmlHelper::getXmlNodeAttributesValue(node,"target");
+		log = log4cplus::Logger::getInstance("fsm.model.Transition");
+		m_strCond = helper::xml::getXmlNodeAttributesValue(node,"cond");
+		m_strTarget = helper::xml::getXmlNodeAttributesValue(node,"target");
 	}
 
-	std::string &Transition::getCond()
+	const std::string &Transition::getCond()const
 	{
 		return m_strCond;
 	}
-	std::string &Transition::getTarget()
+	const std::string &Transition::getTarget()const
 	{
 		return m_strTarget;
 	}

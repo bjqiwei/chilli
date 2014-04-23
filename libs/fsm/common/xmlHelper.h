@@ -73,16 +73,15 @@ namespace xml{
 			}
 			return stringWriter;
 		}
-	class  XStr
+	class XStr
 	{
 	public :
 		// -----------------------------------------------------------------------
 		//  Constructors and Destructor
 		// -----------------------------------------------------------------------
-		XStr(const xmlChar * const xmlCh):_xChValue(NULL)
+		XStr(const xmlChar * const xmlCh):_xChValue(xmlCh)
 		{
 			// Call the private transcoding method
-			_xChValue = xmlCh;
 			if (_xChValue) _strValue = (char *) _xChValue;
 			else
 				_strValue = "";
@@ -145,16 +144,7 @@ static inline ::xmlNodePtr  getXmlChildNode(const ::xmlNodePtr xNode,const std::
 static inline std::string  getXmlNodeAttributesValue( xmlNodePtr xNode,const std::string &strAttributeName)
 {
 	if (!xNode) return  "";
-
-	try
-	{
-		return XStr(xmlGetProp(xNode,BAD_CAST strAttributeName.c_str())).strForm();
-	}
-	catch(...)
-	{
-		throw;
-	}
-	return "";
+	return XStr(xmlGetProp(xNode,BAD_CAST strAttributeName.c_str())).strForm();
 }
 static inline void setXmlNodeAttributesValue (xmlNodePtr xNode ,const std::string &strAttributeName,const std::string &strValue)
 {
@@ -166,6 +156,9 @@ static inline void setXmlNodeAttributesValue (xmlNodePtr xNode ,const std::strin
 static inline std::vector<xmlNodePtr> filterChildNodes(const std::string& tagName, const xmlNodePtr node)
 {
 	std::vector<xmlNodePtr> filteredChilds;
+
+	if(node == NULL) return filteredChilds;
+
 	for (xmlNodePtr  childNode = node->children; childNode != NULL; childNode = childNode->next) {
 		if (childNode->type != XML_ELEMENT_NODE ||
 			!xmlStrEqual(childNode->name, BAD_CAST(tagName.c_str())))
@@ -178,32 +171,32 @@ static inline std::vector<xmlNodePtr> filterChildNodes(const std::string& tagNam
 
 
 
-class  xmlDocumentPtr
+class  CXmlDocumentPtr
 {
 public :
 	// -----------------------------------------------------------------------
 	//  Constructors and Destructor
 	// -----------------------------------------------------------------------
-	xmlDocumentPtr(const xmlDocPtr xDoc):_xDocPtr(xDoc){}
+	CXmlDocumentPtr(const xmlDocPtr xDoc):_xDocPtr(xDoc){}
 
-	virtual ~xmlDocumentPtr() 
+	virtual ~CXmlDocumentPtr() 
 	{	
 		if (_xDocPtr) xmlFreeDoc(_xDocPtr);
 	}
-	xmlDocumentPtr(xmlDocumentPtr & other)
+	CXmlDocumentPtr(CXmlDocumentPtr & other)
 	{
 		if (_xDocPtr && _xDocPtr != other._xDocPtr)xmlFreeDoc(_xDocPtr);
 		this->_xDocPtr = other._xDocPtr;
 		other._xDocPtr = NULL;
 	}
-	xmlDocumentPtr & operator=( xmlDocumentPtr & other)
+	CXmlDocumentPtr & operator=( CXmlDocumentPtr & other)
 	{
 		if (_xDocPtr && _xDocPtr != other._xDocPtr)xmlFreeDoc(_xDocPtr);
 		this->_xDocPtr = other._xDocPtr;
 		other._xDocPtr = NULL;
 		return *this;
 	}
-	xmlDocumentPtr & operator=(const xmlDocPtr xDoc)
+	CXmlDocumentPtr & operator=(const xmlDocPtr xDoc)
 	{
 		if (_xDocPtr && _xDocPtr != xDoc)xmlFreeDoc(_xDocPtr);
 		this->_xDocPtr = xDoc;
@@ -292,7 +285,9 @@ public :
 class  CXmlDocmentHelper{
 public: 
 	CXmlDocmentHelper(void):doc(xmlNewDoc(BAD_CAST "1.0")){}
+
 	virtual ~CXmlDocmentHelper(){}
+
 	void setRootNode(const std::string &strRoot)
 	{
 		_root = xmlNewNode(NULL,BAD_CAST strRoot.c_str());
@@ -343,7 +338,7 @@ public:
 		return XStr(xmlbuff).strForm();
 	}
 private:
-	xmlDocumentPtr doc;
+	CXmlDocumentPtr doc;
 	xmlNodePtr _root;
 	CXmlDocmentHelper(CXmlDocmentHelper & other);
 	CXmlDocmentHelper & operator=( CXmlDocmentHelper & other);
@@ -408,7 +403,7 @@ public:
 	}
 	virtual ~CXmlParseHelper(){};
 private:
-	xmlDocumentPtr doc;
+	CXmlDocumentPtr doc;
 	xmlNodePtr _root;
 	CXmlParseHelper(CXmlParseHelper & other);
 	CXmlParseHelper & operator=( CXmlParseHelper & other);

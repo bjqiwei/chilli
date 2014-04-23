@@ -1,6 +1,6 @@
 #include "Function.h"
 #include <log4cplus/loggingmacros.h>
-#include "../../xmlHelper.h"
+#include "../../common/xmlHelper.h"
 
 namespace fsm{
 namespace model{
@@ -8,8 +8,8 @@ namespace model{
 Function::Function(xmlNodePtr xNode ,const std::string & session, const std::string & filename):
 node(xNode),m_strSession(session),m_strFileName(filename)
 {
-	m_strContent = xmlHelper::XStr(xmlNodeGetContent(node)).strForm();
-	m_fileName = xmlHelper::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
+	m_strContent = helper::xml::XStr(xmlNodeGetContent(node)).strForm();
+	m_fileName = helper::xml::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
 	log = log4cplus::Logger::getInstance("fsm.model.Function");
 }
 

@@ -1,6 +1,6 @@
 #ifndef _INTERPRETER_HEADER_
 #define _INTERPRETER_HEADER_
-#include "xmlHelper.h"
+#include "common/xmlHelper.h"
 #include <string>
 #include <map>
 #include "config.h"

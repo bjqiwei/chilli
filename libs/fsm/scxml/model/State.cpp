@@ -1,4 +1,5 @@
 #include "State.h"
+#include "../../common/xmlHelper.h"
 
 namespace fsm
 {
@@ -8,11 +9,12 @@ namespace model
 	State::State(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
 		m_strSession(session),m_strFilename(filename)
 	{
+		log = log4cplus::Logger::getInstance("fsm.model.State");
 		InitializeInstanceFields();
-		m_strId = xmlHelper::getXmlNodeAttributesValue(node,"id");
-		m_strName = xmlHelper::getXmlNodeAttributesValue(node,"name");
+		m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
+		m_strName = helper::xml::getXmlNodeAttributesValue(node,"name");
 		//m_strVersion = xmlHelper::getXmlNodeAttributesValue(node,"version");
-		m_strDescription = xmlHelper::getXmlNodeAttributesValue(node,"memo");
+		m_strDescription = helper::xml::getXmlNodeAttributesValue(node,"memo");
 	}
 
 
@@ -20,11 +22,11 @@ namespace model
 	{
 		
 	}
-	std::string & State::getId()
+	const std::string & State::getId()const
 	{
 		return m_strId;
 	}
-	std::string & State::getName()
+	const std::string & State::getName()const
 	{
 		return m_strName;
 	}
@@ -32,7 +34,7 @@ namespace model
 	//{
 	//	return m_strVersion;
 	//}
-	std::string & State::getDescription()
+	const std::string & State::getDescription()const
 	{
 		return m_strDescription;
 	}

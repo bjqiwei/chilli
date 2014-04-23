@@ -1,6 +1,6 @@
 #include "Data.h"
-#include "../../xmlHelper.h"
-#include "../SCXMLHelper.h"
+#include "../../common/xmlHelper.h"
+#include "../../common/stringHelper.h"
 #include <log4cplus/loggingmacros.h>
 
 namespace fsm
@@ -11,8 +11,8 @@ namespace model
 	Data::Data(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session)
 		,m_strFileName(filename)
 	{
-		m_strId = xmlHelper::getXmlNodeAttributesValue(node,"id");
-		m_strExpr = xmlHelper::getXmlNodeAttributesValue(node,"expr");
+		m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
+		m_strExpr = helper::xml::getXmlNodeAttributesValue(node,"expr");
 		log = log4cplus::Logger::getInstance("fsm.model.Data");
 	}
 
@@ -42,7 +42,7 @@ namespace model
 		{
 			ctx->setLocal(datum.getId(),datum.getSrc());
 		}
-		else */if (!SCXMLHelper::isStringEmpty(this->getExpr()))
+		else */if (!helper::string::isStringEmpty(this->getExpr()))
 		{
 			//std::string value;
 			//value = evl->eval(ctx, getExpr(),m_strFileName,node->line);

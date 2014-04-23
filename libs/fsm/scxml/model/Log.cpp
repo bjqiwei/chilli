@@ -1,8 +1,8 @@
 #include "Log.h"
-#include "../../xmlHelper.h"
+#include "../../common/xmlHelper.h"
 #include <log4cplus/loggingmacros.h>
 
-using namespace fsm::xmlHelper;
+using namespace helper::xml;
 namespace fsm{
 namespace model{
 	Log::Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename):node(xNode),m_strSession(sessionid),
@@ -41,11 +41,11 @@ namespace model{
 			LOG4CPLUS_INFO(log, m_strSession << "," << m_strExpr);
 		}
 	}
-	std::string & Log::getExpr()
+	const std::string & Log::getExpr() const
 	{
 		return m_strExpr;
 	}
-	std::string & Log::getLevel()
+	const std::string & Log::getLevel() const
 	{
 		return m_strLevel;
 	}

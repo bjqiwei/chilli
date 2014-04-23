@@ -26,8 +26,8 @@ namespace fsm
 		public:
 			Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename);
 			virtual ~Log(){};
-			std::string & getExpr();
-			std::string & getLevel();
+			const std::string & getExpr() const;
+			const std::string & getLevel() const;
 			virtual  void execute(Context * ctx);
 		};
 

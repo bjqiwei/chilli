@@ -6,6 +6,7 @@
 #include <vector>
 #include <libxml/tree.h>
 #include "Action.h"
+#include <log4cplus/logger.h>
 
 namespace fsm
 {
@@ -23,11 +24,12 @@ namespace model
 		std::string m_strSession;
 		std::string m_strFilename;
 		fsm::Context * cx;
+		log4cplus::Logger log;
 	public:
 		Transition(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 
-		std::string &getCond();
-		std::string &getTarget();
+		const std::string &getCond()const;
+		const std::string &getTarget()const;
 		bool isEnabledCondition();
 		virtual  void execute(fsm::Context * ctx);
 	};

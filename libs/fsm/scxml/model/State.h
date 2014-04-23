@@ -2,7 +2,7 @@
 #ifndef _STATE_HEADER_
 #define _STATE_HEADER_
 #include <string>
-#include "../../xmlHelper.h"
+#include <libxml/tree.h>
 #include <log4cplus/logger.h>
 
 namespace fsm
@@ -12,8 +12,8 @@ namespace model
 
 
 	/// <summary>
-	/// The class in this SCXML object model that corresponds to the
-	/// &lt;state&gt; SCXML element.
+	/// The class in this fsm object model that corresponds to the
+	/// &lt;state&gt; fsm element.
 	/// 
 	/// </summary>
 
@@ -35,10 +35,10 @@ namespace model
 	public:
 		State(xmlNodePtr xNode,const std::string &session,const std::string & filename);
 		virtual ~State(){};
-		std::string &getId();
-		std::string &getName();
+		const std::string &getId()const;
+		const std::string &getName()const;
 		//std::string &getVersion();
-		std::string &getDescription();
+		const std::string &getDescription()const;
 
 	private:
 		void InitializeInstanceFields();
