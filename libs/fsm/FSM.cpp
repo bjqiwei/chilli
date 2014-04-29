@@ -577,7 +577,7 @@ fsm::Context  *  fsm::StateMachine::getRootContext() {
 	return NULL;
 }
 
-void fsm::StateMachine::setscInstance(SCInstance * scIns)
+void fsm::StateMachine::setscInstance(SMInstance * scIns)
 {
 	m_scInstance = scIns;
 	LOG4CPLUS_DEBUG(log,"set statemachine scInstance=" << m_scInstance);

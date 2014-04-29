@@ -2,7 +2,7 @@
 #ifndef _SCXML_TRIGGEREVENT_HEADER_
 #define _SCXML_TRIGGEREVENT_HEADER_
 #include <string>
-#include "config.h"
+#include "..\config.h"
 
 namespace fsm
 {

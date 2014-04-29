@@ -117,13 +117,13 @@
     <ClCompile Include="..\scxml\model\Send.cpp" />
     <ClCompile Include="..\scxml\model\State.cpp" />
     <ClCompile Include="..\scxml\model\Transition.cpp" />
-    <ClCompile Include="..\scxml\SCInstance.cpp" />
-    <ClCompile Include="..\scxml\Timer.cpp" />
+    <ClCompile Include="..\scxml\SMInstance.cpp" />
     <ClCompile Include="..\scxml\TriggerEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\lock.h" />
     <ClInclude Include="..\common\stringHelper.h" />
+    <ClInclude Include="..\common\Timer.h" />
     <ClInclude Include="..\common\xmlHelper.h" />
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\FSM.h" />
@@ -151,8 +151,7 @@
     <ClInclude Include="..\scxml\model\Send.h" />
     <ClInclude Include="..\scxml\model\State.h" />
     <ClInclude Include="..\scxml\model\Transition.h" />
-    <ClInclude Include="..\scxml\SCInstance.h" />
-    <ClInclude Include="..\scxml\Timer.h" />
+    <ClInclude Include="..\scxml\SMInstance.h" />
     <ClInclude Include="..\scxml\TriggerEvent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

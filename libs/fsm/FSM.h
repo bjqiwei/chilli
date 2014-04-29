@@ -10,10 +10,10 @@
 #include "scxml/EventDispatcher.h"
 #include "scxml/Context.h"
 #include "scxml/Evaluator.h"
-#include "scxml/SCInstance.h"
+#include "scxml/SMInstance.h"
 #include "scxml/model/Transition.h"
 #include "scxml/model/Log.h"
-#include "scxml/lock.h"
+#include "common\lock.h"
 
 
 using namespace std;
@@ -43,13 +43,13 @@ namespace fsm{
 		const std::string& getSessionId()const;
 		Context  *  getRootContext(); 
 		xmlNodePtr getDataModel(); 
-		void setscInstance(SCInstance *);
+		void setscInstance(SMInstance *);
 		void setLog(log4cplus::Logger log);
 		void setSessionID(const std::string &strSessionid);
 		void reset();
 	protected:
 		std::string m_strStateFile;
-		xmlHelper::xmlDocumentPtr m_xmlDocPtr;
+		helper::xml::xmlDocumentPtr m_xmlDocPtr;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
 		xmlNodePtr  m_initState;
 		mutable xmlNodePtr m_currentStateNode;
@@ -92,7 +92,7 @@ namespace fsm{
 		xmlNodePtr getTargetStates(const xmlNodePtr &transition) const;
 	private:
 		std::map<std::string, EventDispatcher *> m_mapSendObject;
-		SCInstance * m_scInstance;
+		SMInstance * m_scInstance;
 		mutable fsm::CLock m_lock;
 	public:
 		mutable TriggerEvent m_currentEvt;
