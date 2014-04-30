@@ -29,62 +29,78 @@ struct thread_data {
 };
 
 namespace helper{
-	//定时器对象。
-	class  Timer{
-	public:
-		//生成一个定时器对象，时间间隔，定时器id，
-		Timer( int interval,const std::string &strTimerId):
-		  m_strTimerId(strTimerId),m_interval(interval)
-		  {
-			  ftime(&m_startTime);
-		  }
-		virtual ~Timer(){};
 
-		unsigned long long getInterval() const{
-			struct timeb currTime;
-			ftime(&currTime);
-			long long i = m_interval - ((currTime.time-m_startTime.time)*1000 + currTime.millitm-m_startTime.millitm);
-			return i > 0?i:0;
-		};
-
-	public:
-		const std::string m_strTimerId;
-	private:
-		const int m_interval;
-		struct timeb m_startTime;
-	};
-	class TimerComp{
-	public:
-		bool operator() (const Timer * const A, const Timer * const B)
-		{
-			return (A->getInterval()  > B->getInterval());
-		}
-
-	};
 
 	// 定时器
 	class TimerServer{
+	private:
+		//定时器对象。
+		class  Timer{
+		public:
+			//生成一个定时器对象，时间间隔，定时器id，
+			Timer( long interval,const std::string &strTimerId):
+			  m_strTimerId(strTimerId),m_interval(interval)
+			  {
+				  ftime(&m_startTime);
+			  }
+			  virtual ~Timer(){};
+
+			  unsigned  long getInterval() const{
+				  struct timeb currTime;
+				  ftime(&currTime);
+				  long  i = m_interval - ((currTime.time-m_startTime.time)*1000 + currTime.millitm-m_startTime.millitm);
+				  return i > 0?i:0;
+			  };
+
+		public:
+			const std::string m_strTimerId;
+		private:
+			const long m_interval;
+			struct timeb m_startTime;
+		};
+		class TimerComp{
+		public:
+			bool operator() (const Timer * const A, const Timer * const B)
+			{
+				return (A->getInterval()  > B->getInterval());
+			}
+
+		};
+	public:
+		typedef void (*TimerFunction)(const std::string &); 
+		TimerFunction timerFunction;
+	private:
+		//定时器队列
+		typedef std::priority_queue<Timer *,std::vector<Timer *>, TimerComp> TIMER_QUEUE;
+		TIMER_QUEUE m_timer; 
+		struct thread_data td;
+		helper::CLock m_timerLock;
+#ifdef WIN32
+		HANDLE sem;
+#else
+		sem_private sem;
+#endif
 	public:
 		TimerServer():timerFunction(NULL){
 #ifdef WIN32
-			timerTheradSemaphore = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+			sem = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
 #else
 			int rc;
-			timerTheradSemaphore = new sem_private_struct();
-			if((rc = pthread_mutex_init(&(timerTheradSemaphore->mutex), NULL)))
+			sem = new sem_private_struct();
+			if((rc = pthread_mutex_init(&(sem->mutex), NULL)))
 			{
-				delete timerTheradSemaphore;
+				delete sem;
 				return ;
 			}
 
-			if((rc = pthread_cond_init(&(timerTheradSemaphore->condition), NULL)))
+			if((rc = pthread_cond_init(&(sem->condition), NULL)))
 			{
-				pthread_mutex_destroy( &(timerTheradSemaphore->mutex) );
-				delete timerTheradSemaphore;
+				pthread_mutex_destroy( &(sem->mutex) );
+				delete sem;
 				return ;
 			}
 
-			timerTheradSemaphore->semCount = 0;
+			sem->semCount = 0;
 #endif
 			StartTimerThread();
 		}
@@ -92,12 +108,13 @@ namespace helper{
 		virtual ~TimerServer(){
 #ifdef WIN32
 			TerminateThread(td.thread_hnd,0);
-			CloseHandle(timerTheradSemaphore);
+			CloseHandle(sem);
 #else
 			pthread_cancel(td.thread_id);
-			pthread_mutex_destroy(&(timerTheradSemaphore->mutex));
-			pthread_cond_destroy(&(timerTheradSemaphore->condition));
-			delete timerTheradSemaphore;
+			pthread_join(td.thread_id, NULL);
+			pthread_mutex_destroy(&(sem->mutex));
+			pthread_cond_destroy(&(sem->condition));
+			delete sem;
 #endif
 		}
 	private:
@@ -110,22 +127,22 @@ namespace helper{
 		}
 #ifdef WIN32
 		static unsigned int __stdcall TimerThreadProc( void *pParam ){
+#else
+		static void *  TimerThreadProc( void *pParam ){
+#endif
+			TimerServer * This = (TimerServer *)pParam;
 
-			TimerServer * timerInstance = (TimerServer *)pParam;
-
-	#ifdef WIN32
+#ifdef WIN32
 			unsigned long millisec = INFINITE;
-			HANDLE semaphore = timerInstance->timerTheradSemaphore;
 			DWORD rv;
 			while(1)
 			{
-				rv = WaitForSingleObject(semaphore,millisec);
-	#else
-	#define  MAXLONGLONG  (0x7fffffffffffffff)
-			long long millisec = MAXLONGLONG;
+				rv = WaitForSingleObject(This->sem, millisec);
+#else
+			#define  INFINITE  (0x7fffffffffffffff)
+			long long millisec = INFINITE;
 			pthread_setcanceltype(PTHREAD_CANCEL_ENABLE,NULL);
 			pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
-			sem_private semaphore = smInstance->timerTheradSemaphore;
 			int rv;
 			while(1)
 			{
@@ -143,66 +160,63 @@ namespace helper{
 				tm.tv_sec = tp.time;
 				tm.tv_nsec = tp.millitm*1000000;
 				rv = 0;
-				pthread_mutex_lock(&(semaphore->mutex));
-				while (semaphore->semCount <= 0)
+				pthread_mutex_lock(&(This->sem->mutex));
+				while (This->sem->semCount <= 0)
 				{
-					LOG4CPLUS_DEBUG(log,"set cond_timewait . interval=" << millisec );
-					rv = pthread_cond_timedwait(&(semaphore->condition), &(semaphore->mutex), &tm);
+					rv = pthread_cond_timedwait(&(This->sem->condition), &(This->sem->mutex), &tm);
 					if (rv && (errno != EINTR) )
 						break;
 				}
-				if(rv == 0)semaphore->semCount--;
-				pthread_mutex_unlock(&(semaphore->mutex));
-				//LOG4CPLUS_TRACE(log,"pthread_cond_timewait finished.");
-	#endif
-				switch (rv) {
-	#ifdef WIN32
-					case WAIT_TIMEOUT:
-	#else// WIN32
-					case ETIMEDOUT:
-	#endif 
-					timerInstance->m_timerLock.Lock();
-					while(!timerInstance->m_timer.empty()){
-						Timer * timer = timerInstance->m_timer.top();
+				if(rv == 0)This->sem->semCount--;
+				pthread_mutex_unlock(&(This->sem->mutex));
 
-						millisec = smInstance->m_timer.top()->getInterval();
+#endif
+				switch (rv) {
+#ifdef WIN32
+					case WAIT_TIMEOUT:
+#else// WIN32
+					case ETIMEDOUT:
+#endif 
+					This->m_timerLock.Lock();
+					while(!This->m_timer.empty()){
+						Timer * timer = This->m_timer.top();
+
+						millisec = This->m_timer.top()->getInterval();
 						//LOG4CPLUS_DEBUG(log,"timer event . interval=" << millisec );
 						if (millisec > 0){
 							break;
 						}
 					
-						std::string strContent = timer->execute();
+						std::string strContent = timer->m_strTimerId;
 
-						if (timerInstance->timerFunction != NULL)
+						if (This->timerFunction != NULL)
 						{
-							timerInstance->timerFunction(strContent);
+							This->timerFunction(strContent);
 						}
-						timerInstance->m_timer.pop();
+						This->m_timer.pop();
 						delete timer;
 					}
-					timerInstance->m_timerLock.Unlock();
-	#ifdef WIN32
+					This->m_timerLock.Unlock();
+#ifdef WIN32
 				case WAIT_OBJECT_0:
-	#else// WIN32
+#else// WIN32
 				case 0:
-	#endif 
-
-					if (!timerInstance->m_timer.empty())
+#endif				
+					This->m_timerLock.Lock();
+					if (!This->m_timer.empty())
 					{
-						millisec = timerInstance->m_timer.top()->getInterval();
-						continue;
+						millisec = This->m_timer.top()->getInterval();
 					}else{
-						millisec = MAXLONGLONG;
-						continue;
+						millisec = INFINITE;
 					}
-
+					This->m_timerLock.Unlock();
 					break;
-	#ifdef WIN32
+#ifdef WIN32
 				case WAIT_FAILED:
-	#else
+#else
 				case EINVAL:
 				case EPERM:
-	#endif	
+#endif	
 					break;
 				default:
 					break;
@@ -210,36 +224,25 @@ namespace helper{
 			}
 		return NULL;
 		}
-		HANDLE timerTheradSemaphore;
-#else
-		static void *  TimerThreadProc( void *pParam );
-		sem_private timerTheradSemaphore;
-#endif
 
-		void SetTimer(Timer * _timer){
+	public:
+		void SetTimer(int interval, const std::string & strTimerId ){
+
+			Timer * _timer = new Timer(interval, strTimerId);
 			this->m_timerLock.Lock();
 			m_timer.push(_timer);
-#ifdef WIN32
-			ReleaseSemaphore(timerTheradSemaphore, 1, NULL);
-#else
-			pthread_mutex_lock(&(timerTheradSemaphore->mutex));
-			timerTheradSemaphore->semCount ++;
-			pthread_cond_signal(&(timerTheradSemaphore->condition));
-			pthread_mutex_unlock(&(timerTheradSemaphore->mutex));
-#endif
 			this->m_timerLock.Unlock();
+#ifdef WIN32
+			ReleaseSemaphore(sem, 1, NULL);
+#else
+			pthread_mutex_lock(&(sem->mutex));
+			sem->semCount ++;
+			pthread_cond_signal(&(sem->condition));
+			pthread_mutex_unlock(&(sem->mutex));
+			
+#endif
 		}
 
-		typedef void (*TimerFunction)(const std::string &); 
-		TimerFunction timerFunction;
-	private:
-		//定时器队列
-		typedef std::priority_queue<Timer *,std::vector<Timer *>, TimerComp> TIMER_QUEUE;
-		TIMER_QUEUE m_timer; 
-
-		struct thread_data td;
-
-		helper::CLock m_timerLock;
 	};
 }//end namespace helper
 #endif//end timer header
