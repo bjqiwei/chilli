@@ -9,11 +9,11 @@
 #include "scxml/TriggerEvent.h"
 #include "scxml/EventDispatcher.h"
 #include "scxml/Context.h"
-#include "scxml/Evaluator.h"
+//#include "scxml/Evaluator.h"
 #include "scxml/SMInstance.h"
 #include "scxml/model/Transition.h"
-#include "scxml/model/Log.h"
-#include "common\lock.h"
+//#include "scxml/model/Log.h"
+//#include "common/lock.h"
 
 
 using namespace std;
@@ -49,7 +49,7 @@ namespace fsm{
 		void reset();
 	protected:
 		std::string m_strStateFile;
-		helper::xml::xmlDocumentPtr m_xmlDocPtr;
+		helper::xml::CXmlDocumentPtr m_xmlDocPtr;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
 		xmlNodePtr  m_initState;
 		mutable xmlNodePtr m_currentStateNode;
@@ -57,7 +57,7 @@ namespace fsm{
 		std::string m_strSessionID;
 		std::string m_strName;
 		log4cplus::Logger  log;
-		xmlHelper::CXPathContextPtr xpathCtx;
+		helper::xml::CXPathContextPtr xpathCtx;
 
 		void normalize(const xmlNodePtr &rootNode);
 		bool isState(const xmlNodePtr &xmlNode) const;
@@ -93,7 +93,7 @@ namespace fsm{
 	private:
 		std::map<std::string, EventDispatcher *> m_mapSendObject;
 		SMInstance * m_scInstance;
-		mutable fsm::CLock m_lock;
+		//mutable helper::CLock m_lock;
 	public:
 		mutable TriggerEvent m_currentEvt;
 		

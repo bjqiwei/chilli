@@ -28,11 +28,6 @@ namespace env
 
 		SimpleContext(Context *const parent, std::map<std::string,std::string>const & initialVars);
 
-		virtual void set(const std::string &name, std::string const &value);
-
-		virtual std::string get(const std::string &name);
-
-		virtual bool has(const std::string &name);
 
 		/// <summary>
 		/// Clear this Context.
@@ -42,12 +37,12 @@ namespace env
 
 		virtual Context *getParent();
 
-		virtual void setLocal(const std::string &name, const std::string & value,bool isDelete=true);
+		virtual void setLocal(const std::string &name, const std::string & value,bool eventVar=true);
 
 		
 	protected:
 		virtual void SetEventVars(const std::map<std::string,std::string> & vars);
-
+		virtual void ClearEventVars();
 		/// <summary>
 		/// Get the Map of all local variables in this Context.
 		/// </summary>

@@ -53,7 +53,7 @@ public:
 
 	static void dumpRoot(const char *name, void *addr, JSGCRootType,void *data);
 
-	enum _eventProperty {serviceid=0,sessionid,callid,name,/*bodydata,messagetype,ip,port*/};
+	enum _eventProperty {SMName=0, sessionid, name,/*callid,bodydata,messagetype,ip,port*/};
 	
 	/*定义_event类的属性数组*/
 	static JSPropertySpec _eventProperties[];

@@ -413,13 +413,6 @@ namespace env
 
 	}
 
-	void JsContext::ReportException(JSContext *cx)
-	{
-		if (JS_IsExceptionPending(cx)) {
-			if (!JS_ReportPendingException(cx))
-				JS_ClearPendingException(cx);
-		}
-	}
 
 	/*ToStringHelper::ToStringHelper(JSContext *aCx, js::HandleValue v, bool aThrow)
 		: cx(aCx), mStr(cx, JS_ValueToString(cx, v))

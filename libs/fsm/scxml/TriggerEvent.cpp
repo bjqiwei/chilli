@@ -4,13 +4,13 @@
 namespace fsm
 {
 
-	TriggerEvent::TriggerEvent(const std::string &name, int const type):m_strEventName(name),m_ParamPtr(NULL),m_port(0)
+	TriggerEvent::TriggerEvent(const std::string &name, int const type):m_strEventName(name),m_ParamPtr(NULL)
 	{
 		this->type = type;
 	}
 
 	TriggerEvent::TriggerEvent(const std::string &name, const std::string &data,int const type):m_strEventName(name),
-		m_strData(data),m_ParamPtr(NULL),m_port(0)
+		m_strData(data),m_ParamPtr(NULL)
 	{
 		this->type = type;
 	}

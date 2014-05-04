@@ -137,7 +137,7 @@ namespace fsm
 			//delete contexts[xNode];
 
 			removedContexts.push_back(it->second);
-			it->second->reset();
+			it->second->Reset();
 			contexts.erase(it);
 			LOG4CPLUS_DEBUG(log,"remove from contexts to removedContexts,contexts size " << contexts.size() << " add  removedContexts size " << removedContexts.size());
 		}

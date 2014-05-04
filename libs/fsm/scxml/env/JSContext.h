@@ -99,7 +99,6 @@ namespace env
 		//virtual JSObject * JSDefineObject (const char * name, JSClass * clasp);
 		//virtual bool JSDefineProperties (JSObject *obj,  JSPropertySpec *ps);
 		static void reportError(::JSContext *_ctx, const char *message, JSErrorReport *report);
-		static void ReportException(JSContext *cx);
 		static JSBool ShellOperationCallback(JSContext *cx);
 		
 	private:

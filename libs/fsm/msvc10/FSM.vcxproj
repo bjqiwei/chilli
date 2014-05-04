@@ -71,7 +71,8 @@
       <AdditionalDependencies>log4cplusD.lib;libxml2.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y $(OutDir)$(ProjectName)D.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

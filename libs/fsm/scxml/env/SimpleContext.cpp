@@ -33,8 +33,6 @@ namespace env
 	}
 
 	
-
-	
 	void SimpleContext::Reset()
 	{
 		eventVars.clear();
@@ -45,9 +43,9 @@ namespace env
 		return parent;
 	}
 
-	void SimpleContext::setLocal(const std::string &name, const std::string & value,bool isDelete)
+	void SimpleContext::setLocal(const std::string &name, const std::string & value,bool eventVar)
 	{
-		if(isDelete)eventVars[name]=value;
+		if(eventVar)eventVars[name]=value;
 		LOG4CPLUS_ERROR(log, name << "=" << value);
 	}
 
@@ -61,8 +59,6 @@ namespace env
 		return eventVars;
 	}
 
-
-
 	void SimpleContext::InitializeInstanceFields()
 	{
 		log = log4cplus::Logger::getInstance("SimpleContext");
@@ -75,24 +71,14 @@ namespace env
 
 	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
 	{
-		return get(expr);
+		return "";
 	}
 
 	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
 	{
-		if(get(expr).compare("0") ==0)
-			return false;
 		return true;
 	}
 
-	xmlNodePtr SimpleContext::evalLocation(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode)
-	{
-		if (expr == "")
-		{
-			return NULL;
-		}
-		return NULL;
-	}
 	void SimpleContext::SetContextPrivate(void *data)
 	{
 
@@ -100,6 +86,10 @@ namespace env
 	void SimpleContext::ExecuteFile(const std::string &fileName)
 	{
 
+	}
+	void SimpleContext::ClearEventVars()
+	{
+		this->eventVars.clear();
 	}
 }
 }

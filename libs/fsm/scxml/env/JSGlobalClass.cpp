@@ -197,7 +197,7 @@ namespace env{
 	{
     /* The application may use `data` for anything.  In this
        example, we use it to pass the desired output file. */
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsContex.Dump");
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsContext.Dump");
 		LOG4CPLUS_TRACE(log, "There is a root named '" << name<< "' at " << addr);
 	}
 
@@ -208,9 +208,9 @@ namespace env{
 		//{"_msgtype",  messagetype,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,event_GetProperty,NULL},
 		//{"_ip",  ip,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,event_GetProperty,NULL},
 		//{"_port",  port,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,event_GetProperty,NULL},
-		{"_serviceid",  serviceid,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,NULL,NULL},
+		{"_SMName",  SMName,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,NULL,NULL},
 		{"_sessionid",  sessionid,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,NULL,NULL},
-		{"_callid",  callid,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,NULL,NULL},
+		//{"_callid",  callid,     JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT ,NULL,NULL},
 		{NULL,0,0,NULL,NULL}
 	};
 
@@ -235,7 +235,7 @@ namespace env{
 	JSBool JsGlobal::event_GetProperty (JSContext *cx, JSObject *obj, jsid id, jsval *vp)
 	{
 		fsm::StateMachine * pstateMachine = NULL;
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("TUserManager.GetProperty");
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsContext.GetProperty");
 		pstateMachine = (fsm::StateMachine *)JS_GetContextPrivate(cx);
 		if (!pstateMachine){
 			LOG4CPLUS_WARN(log,"GetContextPrivate is null.");
@@ -244,80 +244,74 @@ namespace env{
 		if (!JSID_IS_INT(id)) return JS_TRUE;
 
 		int proid = JSID_TO_INT(id);
-		
-		jsval *val = (jsval *) JS_GetPrivate(cx, obj);
-		if (val) {
-			if(JSVAL_IS_NULL(*vp) || JSVAL_IS_VOID(*vp))
-				*vp = val[proid];
-			return JS_TRUE;
-		}
-		
-		val = new jsval[4];
-		if (!val) {
-			JS_ReportOutOfMemory(cx);
-			JS_SET_RVAL(cx, vp, JSVAL_VOID);
-			return JS_TRUE;
-		}
+		if (proid == SMName || proid == sessionid)
+		{
+			jsval *val = (jsval *) JS_GetPrivate(cx, obj);
+			if (val) {
+				if(JSVAL_IS_NULL(*vp) || JSVAL_IS_VOID(*vp))
+					*vp = val[proid];
+				return JS_TRUE;
+			}
+			//else
+			val = new jsval[2];
+			if (!val) {
+				JS_ReportOutOfMemory(cx);
+				JS_SET_RVAL(cx, vp, JSVAL_VOID);
+				return JS_TRUE;
+			}
 
-		if (!JS_AddValueRoot(cx, val)) {
-			delete[] val;
-			JS_SET_RVAL(cx, vp, JSVAL_VOID);
-			return JS_TRUE;
-		}
+			if (!JS_AddValueRoot(cx, val)) {
+				delete[] val;
+				JS_SET_RVAL(cx, vp, JSVAL_VOID);
+				return JS_TRUE;
+			}
 
-		if (!JS_SetPrivate(cx, obj, (void*)val)) {
-			JS_RemoveValueRoot(cx, val);
-			delete[] val;
-			JS_SET_RVAL(cx, vp, JSVAL_VOID);
+			if (!JS_SetPrivate(cx, obj, (void*)val)) {
+				JS_RemoveValueRoot(cx, val);
+				delete[] val;
+				JS_SET_RVAL(cx, vp, JSVAL_VOID);
+				return JS_TRUE;
+			}
+			if(pstateMachine ){
+
+				//val[name] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getEventName().c_str()));
+				//val[bodydata] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getData().c_str()));
+				//val[messagetype] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getMsgType().c_str()));
+				//val[ip] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getIP().c_str()));
+				//val[port] = INT_TO_JSVAL(pstateMachine->m_currentEvt.getPort());
+				val[SMName] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getName().c_str()));
+				val[sessionid] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getSessionId().c_str()));
+				//val[callid] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getSessionId().c_str()));
+			}
+			*vp = val[proid];
 			return JS_TRUE;
 		}
+		
 
 		std::string prefix = "getting [_event] property:";
 		fsm::env::Js::IdToString idString(cx, id);
-		if(pstateMachine ){
+		
+		switch (proid) {
+		case name:
+			prefix.append("_name");
+			*vp = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getEventName().c_str()));
+			break;
 
-			val[name] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getEventName().c_str()));
-			//val[bodydata] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getData().c_str()));
-			//val[messagetype] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getMsgType().c_str()));
-			//val[ip] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->m_currentEvt.getIP().c_str()));
-			//val[port] = INT_TO_JSVAL(pstateMachine->m_currentEvt.getPort());
-			val[serviceid] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getName().c_str()));
-			val[sessionid] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getSessionId().c_str()));
-			val[callid] = STRING_TO_JSVAL(JS_NewStringCopyZ (cx,pstateMachine->getSessionId().c_str()));
+			//case from:{
+			//	vp.setInt32(pstateMachine->getFrom().c_str());
+			//	break;
+			//case Enable:
+			//	vp.setBoolean(extPtr->m_bEnable);
+			//	break;
 
-			switch (proid) {
-			case name:
-				prefix.append("_name");
-				break;
-			case serviceid:
-				prefix.append("_serviceid");
-				break;
-			case sessionid:
-				prefix.append("_sessionid");
-				break;
-			case callid:
-				prefix.append("_callid");
-				break;
-
-				//case from:{
-				//	vp.setInt32(pstateMachine->getFrom().c_str());
-				//	break;
-				//case Enable:
-				//	vp.setBoolean(extPtr->m_bEnable);
-				//	break;
-
-			default:
-				prefix.append(idString.getBytes());
-				break;
-			}
-
-		}else{
+		default:
 			prefix.append(idString.getBytes());
+			break;
 		}
 
-		fsm::env::Js::ToString valueString(cx, val[proid]);
+
+		fsm::env::Js::ToString valueString(cx, *vp);
 		//fsm::env::Js::ToString objString(cx,OBJECT_TO_JSVAL(obj));
-		*vp = val[proid];
 		LOG4CPLUS_DEBUG(log,prefix<< ",value:" << valueString.getBytes());
 
 		return JS_TRUE;

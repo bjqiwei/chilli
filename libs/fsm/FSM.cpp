@@ -9,6 +9,8 @@
 #include "scxml/model/ModelTimer.h"
 #include "scxml/model/Transition.h"
 #include "scxml/model/Functionmodel.h"
+#include "scxml/model/Datamodel.h"
+#include "scxml/model/Log.h"
 #include <stdexcept>
 #include <log4cplus/loggingmacros.h>
 
@@ -19,7 +21,7 @@ fsm::StateMachine::StateMachine(const string  &xml):m_strStateFile(xml),m_xmlDoc
 	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
 {
 
-	log = log4cplus::Logger::getInstance("StateMachine");
+	log = log4cplus::Logger::getInstance("fsm.StateMachine");
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." );
 
 	return ;
@@ -48,7 +50,7 @@ void fsm::StateMachine::reset()
 
 bool fsm::StateMachine::Init(void)
 {
-	using namespace xmlHelper;
+	using namespace helper::xml;
 	parse();
 	if (m_xmlDocPtr._xDocPtr ) {
 
@@ -61,7 +63,7 @@ bool fsm::StateMachine::Init(void)
 			 LOG4CPLUS_TRACE(log,"set rootNode=" << m_rootNode);
 			// normalize(_rootNode);
 			 m_initState = getXmlChildNode(m_rootNode,"state");
-			 LOG4CPLUS_TRACE(log,"set initState=" <<  xmlHelper::getXmlNodeAttributesValue(m_initState,"id"));
+			 LOG4CPLUS_TRACE(log,"set initState=" <<  getXmlNodeAttributesValue(m_initState,"id"));
 			 
 			// SCXMLHelper::cloneDatamodel(getXmlChildNode(_rootNode,"datamodel"),scInstance->getContext(_rootNode,logger),scInstance->getEvaluator(),logger);
 			//SCXMLHelper::cloneFunctionmodel(getXmlChildNode(_rootNode,"functionmodel"),scInstance->getContext(_rootNode,log),scInstance->getEvaluator(),log);
@@ -105,7 +107,7 @@ const xmlNodePtr fsm::StateMachine::getCurrentState(void) const
 
 const std::string fsm::StateMachine::getCurrentStateID(void) const
 {
-	return xmlHelper::getXmlNodeAttributesValue(m_currentStateNode,"id");
+	return helper::xml::getXmlNodeAttributesValue(m_currentStateNode,"id");
 }
 
 inline bool fsm::StateMachine::isState(const xmlNodePtr &xNode) const 
@@ -155,8 +157,8 @@ inline bool fsm::StateMachine::isTimer(const xmlNodePtr &xNode)
 
 void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 {
-	using namespace xmlHelper;
-	m_lock.Lock();
+	using namespace helper::xml;
+	//m_lock.Lock();
 	m_currentEvt = trigEvent;
 	bool foundEvent = false;
 	xmlNodePtr filterState = m_currentStateNode;
@@ -194,7 +196,7 @@ void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 	{
 		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
 	}
-	m_lock.Unlock();
+	//m_lock.Unlock();
 }
 fsm::StateMachine::StateMachine(const StateMachine &other):m_strStateFile(other.m_strStateFile),m_xmlDocPtr(NULL),
 	m_initState(NULL),m_currentStateNode(NULL),m_rootNode(NULL),log(other.log),xpathCtx(NULL)
@@ -208,8 +210,6 @@ fsm::StateMachine::StateMachine(const StateMachine &other):m_strStateFile(other.
 
 fsm::StateMachine & fsm::StateMachine::operator=(const fsm::StateMachine & other)
 {
-	using namespace xmlHelper;
-
 	if (&other == this)
 	{
 		return * this;
@@ -341,7 +341,7 @@ void fsm::StateMachine::processTransition(model::Transition & trasition)const
 
 void fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 {
-	using namespace xmlHelper;
+	using namespace helper::xml;
 	if (!Node) return;
 	model::Send send(Node,m_strSessionID,m_strStateFile);
 
@@ -373,9 +373,8 @@ void fsm::StateMachine::processTimer(const xmlNodePtr &Node)const
 		timer.execute(NULL);
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
-	fsm::Timer * newTimer = new fsm::Timer(timer.getInterval(),this->m_strSessionID,timer.getId());
 	//LOG4CPLUS_DEBUG(log,m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
-	if(m_scInstance)m_scInstance->AddTimer(newTimer);
+	if(m_scInstance)m_scInstance->SetTimer(timer.getInterval(), this->m_strSessionID + ":" + timer.getId());
 
 	return;
 }
@@ -530,9 +529,9 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr &node)const
 
 xmlNodePtr fsm::StateMachine::getState(const string& stateId) const
 {
-	using namespace xmlHelper;
+
 	string strExpression="//state[@id='"+stateId +"']"; 
-	xmlHelper::CXPathObjectPtr xpathObj(NULL); 
+	helper::xml::CXPathObjectPtr xpathObj(NULL); 
 
 	try{
 		

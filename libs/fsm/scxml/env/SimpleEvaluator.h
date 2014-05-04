@@ -5,8 +5,6 @@
 #include "../Context.h"
 #include "SimpleContext.h"
 #include <string>
-#include <map>
-#include <vector>
 
 
 namespace fsm

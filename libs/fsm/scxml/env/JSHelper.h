@@ -2,11 +2,16 @@
 #define _FSM_ENV_JSHELPER_HEADER_
 #include <jsatom.h>
 #include <jsapi.h>
-#include "JSContext.h"
 
 namespace fsm{
 namespace env{
 namespace Js{
+	static void ReportException(JSContext *cx){
+		if (JS_IsExceptionPending(cx)) {
+			if (!JS_ReportPendingException(cx))
+				JS_ClearPendingException(cx);
+		}
+	}
 
 class ToString {
 public:
@@ -15,7 +20,7 @@ public:
 	{
 		mStr = JS_ValueToString(cx, v);
 		if (!aThrow && !mStr)
-			fsm::env::JsContext::ReportException(cx);
+			ReportException(cx);
 		JS_AddNamedStringRoot(cx, &mStr, "Value ToString helper");
 	}
 	~ToString() {
