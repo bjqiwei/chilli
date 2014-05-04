@@ -587,6 +587,12 @@ void fsm::StateMachine::setLog(log4cplus::Logger log)
 }
 void fsm::StateMachine::go()
 {
+	fsm::Context *ctx = getRootContext();
+	/*创建JsContext私有数据指针*/
+	if(ctx){
+		ctx->SetContextPrivate(this);
+	}
+
 	if (m_rootNode)
 	{
 		for (xmlNodePtr childNode = m_rootNode->children; childNode != NULL; childNode = childNode->next )
