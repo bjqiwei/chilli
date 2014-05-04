@@ -5,10 +5,12 @@
 #include "lock.h"
 #if  defined(WIN32)
 #include <Windows.h>
+#include <process.h>
 #else
 typedef int HANDLE; 
 #include <pthread.h>
-
+#include <errno.h>
+#include <semaphore.h>
 typedef struct 
 {
 	pthread_mutex_t	mutex;

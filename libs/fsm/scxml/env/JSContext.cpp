@@ -20,60 +20,16 @@ namespace env
 	{
 		LOG4CPLUS_DEBUG(log,  "new a fsm.env.JsContext object:" << this << " parent:" << parent);
 		InitializeInstanceFields();
-		LOG4CPLUS_DEBUG(log, "new a SpiderMonkey JSContext.");
+		LOG4CPLUS_DEBUG(log, "new a fsm.env.JsContext object finish.");
 	}
 
-	void JsContext::set(const std::string &name, const std::string &value)
-	{
-		if (vars.count(name)>0) //first try to override local
-		{
-			setLocal(name, value);
-		} //then check for global
-		else if (parent != 0 && parent->has(name))
-		{
-			parent->set(name, value);
-		} //otherwise create a new local variable
-		else
-		{
-			setLocal(name, value);
-		}
-	}
 
-	std::string JsContext::get(const std::string &name)
-	{
-		if (vars.count(name)>0)
-		{
-			return eval(vars[name],"",0,NULL);
-		}
-		else if (parent != 0)
-		{
-			return parent->get(name);
-		}
-		else
-		{
-			return "";
-		}
-	}
-
-	bool JsContext::has(const std::string &name)
-	{
-		if (vars.count(name)>0)
-		{
-			return true;
-		}
-		else if (parent != 0 && parent->has(name))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	void JsContext::reset()
+	void JsContext::Reset()
 	{
 		//LOG4CPLUS_DEBUG(log, "reset ");
 
 		//js_GetClassObject(ctx,)
-		clearVars();
+		ClearEventVars();
 
 		jsval * rootedVal = (jsval *) JS_GetPrivate(ctx, event);
 		if (rootedVal) {
@@ -97,13 +53,13 @@ namespace env
 		JS_MaybeGC(ctx);
 	}
 
-	void JsContext::clearVars()
+	void JsContext::ClearEventVars()
 	{
 		JSAutoEnterCompartment ac ;
 		ac.enter(ctx, global);
 		std::string expr;
-		for (std::map<std::string,std::string>::const_iterator iter = vars.begin();
-			iter != vars.end(); ++iter)
+		for (std::map<std::string,std::string>::const_iterator iter = eventVars.begin();
+			iter != eventVars.end(); ++iter)
 		{
 			expr.append(iter->first);
 			expr.append("=null;");
@@ -116,22 +72,22 @@ namespace env
 			LOG4CPLUS_TRACE(log, "set Variable " << expr << " ok." );
 
 		expr = "";
-		if (vars.size() > 1000)
+		if (eventVars.size() > 1000)
 		{
-			std::map<std::string,std::string>::iterator iter = vars.begin();
-			while(iter != vars.end()){
+			std::map<std::string,std::string>::iterator iter = eventVars.begin();
+			while(iter != eventVars.end()){
 				expr.append("delete ");
 				expr.append(iter->first);
 				expr.append(";");
-				vars.erase(iter);
-				iter = vars.begin();
+				eventVars.erase(iter);
+				iter = eventVars.begin();
 			}
 			JSBool status = JS_EvaluateScript(ctx,global , expr.c_str(), expr.length(), NULL, 0, NULL); 
 			if (status != JS_TRUE)
 				LOG4CPLUS_ERROR(log, "delete variable " << expr << " failed.");
 			else
 				LOG4CPLUS_TRACE(log, "delete Variable " << expr << " ok." );
-			vars.clear();
+			eventVars.clear();
 		}
 		
 	}
@@ -141,13 +97,12 @@ namespace env
 		return parent;
 	}
 
-	std::map<std::string,std::string> & JsContext::getVars(){
-		return this->vars;
+	std::map<std::string,std::string> & JsContext::getEventVars(){
+		return this->eventVars;
 	}
 
-	void JsContext::setVars(const std::map<std::string,std::string> &varMap)
+	void JsContext::SetEventVars(const std::map<std::string,std::string> &varMap)
 	{
-		clearVars();
 		std::string expr;
 		for (std::map<std::string,std::string>::const_iterator iter = varMap.begin();
 			iter != varMap.end(); ++iter)
@@ -157,7 +112,7 @@ namespace env
 			expr.append("=");
 			expr.append((iter->second.empty()? "null":iter->second));
 			expr.append(";");
-			vars[iter->first];
+			eventVars[iter->first];
 		}
 		JSBool status = JS_EvaluateScript(ctx,global , expr.c_str(), expr.length(), NULL, 0, NULL); 
 		if (status != JS_TRUE)
@@ -165,7 +120,7 @@ namespace env
 		//else
 		//LOG4CPLUS_DEBUG(log, "set Variable " << name << "=" << value );
 	}
-	void JsContext::setLocal(const std::string &name, const std::string & value,bool isDelete)
+	void JsContext::setLocal(const std::string &name, const std::string & value,bool eventVar)
 	{
 		std::string expr = name + "=" + (value.empty()? "''":value) + ";";
 		JSAutoEnterCompartment ac ;
@@ -175,7 +130,7 @@ namespace env
 			LOG4CPLUS_ERROR(log, "set variable " << name << " failed.");
 		else
 			LOG4CPLUS_DEBUG(log, "set Variable " << name << "=" << value );
-		if(isDelete)vars[name];
+		if(eventVar)eventVars[name];
 	}
 
 
@@ -257,15 +212,6 @@ namespace env
 			LOG4CPLUS_ERROR(log, "unknown error.");
 		}
 		return true;
-	}
-
-	xmlNodePtr JsContext::evalLocation(const std::string &expr, const std::string & filename, unsigned int line,void *xmlNode)
-	{
-		if (expr == "")
-		{
-			return NULL;
-		}
-		return NULL;
 	}
 
 	void JsContext::InitializeInstanceFields()
@@ -409,8 +355,7 @@ namespace env
 	JsContext::~JsContext()
 	{
 		LOG4CPLUS_DEBUG(log,"destruction... a scmxl.env.JsContext object." );
-		clearVars();
-		reset();
+		Reset();
 		//if(this->ac) delete ac;
 		if (this->ar) delete ar;
 		

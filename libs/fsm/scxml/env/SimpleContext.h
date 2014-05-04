@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <log4cplus/logger.h>
-#include "../../FSM.h"
 
 namespace fsm
 {
@@ -18,7 +17,6 @@ namespace env
 
 		log4cplus::Logger log;
 
-		std::map<std::string,std::string> vars;
 	public:
 
 		SimpleContext(); 
@@ -40,7 +38,7 @@ namespace env
 		/// Clear this Context.
 		/// </summary>
 		/// <seealso cref= org.apache.commons.scxml.Context#reset() </seealso>
-		virtual void reset();
+		virtual void Reset();
 
 		virtual Context *getParent();
 
@@ -48,14 +46,14 @@ namespace env
 
 		
 	protected:
-		virtual void setVars(const std::map<std::string,std::string> & vars);
+		virtual void SetEventVars(const std::map<std::string,std::string> & vars);
 
 		/// <summary>
 		/// Get the Map of all local variables in this Context.
 		/// </summary>
 		/// <returns> Returns the vars. </returns>
 	public:
-		virtual std::map<std::string,std::string> & getVars();
+		virtual std::map<std::string,std::string> & getEventVars();
 
 		/// <summary>
 		/// Set the log used by this <code>Context</code> instance.
@@ -64,15 +62,9 @@ namespace env
 
 		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
 		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
-		virtual xmlNodePtr evalLocation(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
 		virtual void ExecuteFile(const std::string &fileName);
-		virtual void setLog(log4cplus::Logger log);
 
-		/// <summary>
-		/// Get the log used by this <code>Context</code> instance.
-		/// </summary>
-		/// <returns> Log The log being used. </returns>
-		virtual log4cplus::Logger getLog();
+
 		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void*);
 		virtual void SetContextPrivate(void *data);
 

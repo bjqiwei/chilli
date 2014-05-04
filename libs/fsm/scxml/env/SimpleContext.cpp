@@ -17,7 +17,7 @@ namespace env
 	SimpleContext::SimpleContext(std::map<std::string,std::string>const &initialVars):Context(NULL,NULL)
 	{
 		InitializeInstanceFields();
-		this->vars = initialVars;
+		this->eventVars = initialVars;
 		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 
@@ -25,61 +25,19 @@ namespace env
 	{
 		InitializeInstanceFields();
 		this->parent = parent;
-		this->vars = initialVars;
+		this->eventVars = initialVars;
 		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
 	}
 	SimpleContext::~SimpleContext(){
 		LOG4CPLUS_TRACE(log,"deconstruct a SimpleContext object.");
 	}
 
-	void SimpleContext::set(const std::string &name, const std::string &value)
-	{
-		if (vars.count(name)>0) //first try to override local
-		{
-			setLocal(name, value);
-		} //then check for global
-		else if (parent != 0 && parent->has(name))
-		{
-			parent->set(name, value);
-		} //otherwise create a new local variable
-		else
-		{
-			setLocal(name, value);
-		}
-	}
+	
 
-	std::string SimpleContext::get(const std::string &name)
+	
+	void SimpleContext::Reset()
 	{
-		if (vars.count(name)>0)
-		{
-			return vars[name];
-		}
-		else if (parent != 0)
-		{
-			return parent->get(name);
-		}
-		else
-		{
-			return "";
-		}
-	}
-
-	bool SimpleContext::has(const std::string &name)
-	{
-		if (vars.count(name)>0)
-		{
-			return true;
-		}
-		else if (parent != 0 && parent->has(name))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	void SimpleContext::reset()
-	{
-		vars.clear();
+		eventVars.clear();
 	}
 
 	Context *SimpleContext::getParent()
@@ -89,29 +47,21 @@ namespace env
 
 	void SimpleContext::setLocal(const std::string &name, const std::string & value,bool isDelete)
 	{
-		if(isDelete)vars[name]=value;
+		if(isDelete)eventVars[name]=value;
 		LOG4CPLUS_ERROR(log, name << "=" << value);
 	}
 
-	void SimpleContext::setVars(std::map<std::string,std::string>const & vars)
+	void SimpleContext::SetEventVars(std::map<std::string,std::string>const & vars)
 	{
-		this->vars = vars;
+		this->eventVars = vars;
 	}
 
-	std::map<std::string,std::string> & SimpleContext::getVars()
+	std::map<std::string,std::string> & SimpleContext::getEventVars()
 	{
-		return vars;
+		return eventVars;
 	}
 
-	void SimpleContext::setLog(log4cplus::Logger log)
-	{
-		this->log = log;
-	}
 
-	log4cplus::Logger SimpleContext::getLog()
-	{
-		return log;
-	}
 
 	void SimpleContext::InitializeInstanceFields()
 	{

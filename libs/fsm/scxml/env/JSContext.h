@@ -23,7 +23,7 @@ namespace env
 
 	#define JS_DEFAULT_SCRIPT_STACK_QUOTA   ((size_t) 0x8000000)
 	
-	//java解析器的上下文环境
+	//JavaScript解析器的上下文环境
 	class  JsContext : public Context
 	{
 
@@ -39,7 +39,7 @@ namespace env
 		static unsigned long StackChunkSize; 
 		static size_t  gMaxStackSize;
 		static size_t gScriptStackQuota;
-	public:
+	private:
 		::JSContext * ctx;
 		::JSObject * global;
 		::JSObject * event;
@@ -50,34 +50,13 @@ namespace env
 		virtual ~JsContext();
 
 		/// <summary>
-		/// Assigns a new value to an existing variable or creates a new one.
-		/// The method searches the chain of parent Contexts for variable
-		/// existence.
+		/// reset this Context.
 		/// </summary>
-		/// <param name="name"> The variable name </param>
-		/// <param name="value"> The variable value </param>
-		virtual void set(const std::string &name, std::string const &value);
+		virtual void Reset();
 
 		/// <summary>
-		/// Get the value of this variable; delegating to parent.
+		/// Get this parent Context.
 		/// </summary>
-		/// <param name="name"> The variable name </param>
-		/// <returns> Object The variable value </returns>
-		virtual std::string get(const std::string &name);
-
-		/// <summary>
-		/// Check if this variable exists, delegating to parent.
-		/// </summary>
-		/// <param name="name"> The variable name </param>
-		/// <returns> boolean true if this variable exists </returns>
-		virtual bool has(const std::string &name);
-
-		/// <summary>
-		/// Clear this Context.
-		/// </summary>
-		virtual void reset();
-
-	
 		virtual Context *getParent();
 
 		/// <summary>
@@ -87,7 +66,8 @@ namespace env
 		/// </summary>
 		/// <param name="name"> The variable name </param>
 		/// <param name="value"> The variable value </param>
-		virtual void setLocal(const std::string &name, const std::string & value, bool isDelete=true);
+		/// <param name="eventVars"> The variable is or not event var  </param>
+		virtual void setLocal(const std::string &name, const std::string & value, bool eventVars=true);
 
 		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
 
@@ -95,9 +75,8 @@ namespace env
 		///计算一段boolen表达式脚本
 		///</summary>
 		///<returns>返回此表达式执行的结果。</returns>
-		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *);
-		virtual xmlNodePtr evalLocation(const std::string &expr, const std::string &filename, unsigned int line,void *);
-		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void *);
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
+		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,void *xmlNode);
 		virtual void SetContextPrivate(void *data);
 		virtual void ExecuteFile(const std::string &fileName);
 	protected:
@@ -109,12 +88,13 @@ namespace env
 		/// Get the Map of all local variables in this Context.
 		/// </summary>
 		/// <returns> Returns the vars. </returns>
-		virtual std::map<std::string,std::string> & getVars();
+		virtual std::map<std::string,std::string> & getEventVars();
 
 		/// <summary>
 		/// Set the Map of all variables in this Context.
 		/// </summary>
-		virtual void setVars(const std::map<std::string,std::string> &varMap);
+		virtual void SetEventVars(const std::map<std::string,std::string> &varMap);
+		virtual void ClearEventVars();
 
 		//virtual JSObject * JSDefineObject (const char * name, JSClass * clasp);
 		//virtual bool JSDefineProperties (JSObject *obj,  JSPropertySpec *ps);
@@ -125,7 +105,7 @@ namespace env
 	private:
 		void InitializeInstanceFields();
 		JSObject *getScriptObject(const std::string &expr,const std::string &filename, unsigned int line,void *xmlNode);
-		void clearVars();
+
 	};
 
 	

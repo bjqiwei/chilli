@@ -16,6 +16,8 @@
 
 #include "..\config.h"
 #include "Context.h"
+#include "Evaluator.h"
+#include "..\common\Timer.h"
 
 namespace fsm
 {
@@ -27,7 +29,7 @@ namespace fsm
 	/// 
 	/// </summary>
 
-	class FSM_EXPORT SMInstance
+	class FSM_EXPORT SMInstance:public helper::TimerServer
 	{
 	private:
 		/// <summary>

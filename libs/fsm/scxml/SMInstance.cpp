@@ -3,12 +3,9 @@
 #include "env/JSEvaluator.h"
 #include <log4cplus/loggingmacros.h>
 #ifdef WIN32
-#include <process.h>
-#include <Windows.h>
+
 #else
-#include <errno.h>
-#include <semaphore.h>
-#include <sys/timeb.h>
+
 
 #endif
 
@@ -18,7 +15,6 @@ namespace fsm
 	log4cplus::Logger SMInstance::log = log4cplus::Logger::getInstance("fsm.SMInstance");
 	SMInstance::SMInstance()
 	{
-		LOG4CPLUS_DEBUG(log,"new fsm.SMInstance object...");
 		LOG4CPLUS_DEBUG(log,"new fsm.SMInstance object.");
 	}
 
