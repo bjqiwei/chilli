@@ -20,31 +20,28 @@ int main(int argc, _TCHAR* argv[])
 	try{
  		log4cplus::initialize();
  		log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
- 		log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
+ 		log4cplus::PropertyConfigurator::doConfigure(".\\log4cplus.properties");
 		
-		xmlInitParser();
-#ifdef LIBXML_READER_ENABLED
-		char szFilePath[_MAX_PATH-1];
-		::GetCurrentDirectory(_MAX_PATH, szFilePath);
-		string strStateFile("");
-		strStateFile.append("E:\\chilli\\Win32\\bin.Debug\\Anolog_User.xml");
-		fsm::StateMachine mysmscxml = StateMachine(strStateFile);
-		
- 		//mysmscxml.Init();
+		//char szFilePath[_MAX_PATH-1];
+		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
+		string strStateFile;
+		strStateFile.append(".\\scm.xml");
+		fsm::SMInstance m_smInstance;
+		fsm::StateMachine mysmscxml;
 		SendImp mySend;
-		SendImp mySend2;
-		//mysmscxml.addEventDispatcher(&mySend);
-		//mysmscxml.go();
+		mysmscxml.Init(strStateFile);
+		mysmscxml.setName("fsm");
+		mysmscxml.setscInstance(&m_smInstance);
+		mysmscxml.addEventDispatcher(&mySend);
+		mysmscxml.setSessionID("123456");
+
+		mysmscxml.go();
 		std::string strEvent;
-		string stateid;// = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
-		std::cout << stateid << endl;
 		
 		
 		while (std::cin>>strEvent && strEvent.compare("quit") != 0){
 			fsm::TriggerEvent evt(strEvent,0);
-			mySend.fireSend("");
-			mySend2.fireSend("");
-			//mysmscxml.pushEvent(evt);
+			mysmscxml.pushEvent(evt);
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
 			//std::cout << stateid << endl;
 		}
@@ -53,17 +50,15 @@ int main(int argc, _TCHAR* argv[])
 	{
 		std::cout<<e.what()<<endl;
 	}
-#endif
-	xmlCleanupParser();
 	getchar();
 
 	return 0;
 }
 
-void SendImp::fireSend(const std::string& strContent)
+void SendImp::fireSend(const std::string& strContent,void * param)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("sendimp");
-	std::cout << strContent << endl;
+	LOG4CPLUS_DEBUG(log, strContent);
 }
 //#else
 //int main(int argc, _TCHAR* argv[]){

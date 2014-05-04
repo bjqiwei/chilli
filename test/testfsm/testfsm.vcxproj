@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\log4cplus-1.1.2\lib;$(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\libs\FSM\lib;$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.Debug\;$(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\libs\FSM\msvc10\Win32\bin.Debug\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)D</TargetName>
@@ -62,8 +62,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>log4cplusD.lib;fsmd.lib;libxml2_a.lib;mozjs-25.0a.lib;Winmm.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>log4cplusD.lib;fsmd.lib;libxml2_a.lib;mozjs185-1.0.lib;Winmm.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y $(SolutionDir)libs\fsm\msvc10\Win32\bin.$(Configuration)\*.dll $(OutDir)
+xcopy /Y log4cplus.properties $(OutDir)
+xcopy /Y scm.xml $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

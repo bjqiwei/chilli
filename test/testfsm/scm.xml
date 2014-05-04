@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" ?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<scm>
+  <datamodel>
+    <data id="dialNumber" expr=""></data>
+  </datamodel>
+  <functionmodel>
+	<function >function log(var1){logging(var1);}</function>
+  </functionmodel>
+
+	<state id="init">
+		<onentry>
+			<log level = "info" expr="enter Init state."/>
+			<send target="testsend" type="cmd" idlocation="extension.number;" from="extension.ch;" dest="extension.number;" event="autoSendDialTone" delay="0">
+				<enable>1</enable>
+			</send>
+		</onentry>
+        <event event="E_CHG_HookState" cond="extension.eventData=='1'" >
+			<transition  target="offhook"/>
+		</event>
+		 <event event="E_CHG_HookState" cond="extension.eventData=='S_CALL_PICKUPED'" >
+			<transition  target="offhook"/>
+		</event>
+		<event event="E_CHG_HookState" cond="extension.eventData=='0'" >
+			<transition  target="onhook"/>
+		</event>
+		<state id="onhook">
+			<onentry>
+				<log level = "info" expr="enter onhook state."/>
+				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" dest="extension.number;" event="reloadConfig"></send>
+			</onentry>
+			<event event="E_CHG_HookState" cond="extension.eventData=='1'" >
+				<transition  target="offhook"/>
+			</event>
+		</state>
+
+		<state id="offhook">
+			<onentry>
+				<log level = "info" expr="enter offhook state."/>
+				<script> dialNumber= '';</script>
+				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
+			</onentry>
+			<event event="E_CHG_HookState" cond="extension.eventData=='0'" >
+				<transition  target="onhook"/>
+			</event>
+			 <event event="E_CHG_RcvDTMF" >
+				<script> dialNumber= dialNumber + extension.eventData; logging(dialNumber);</script>
+				<timer idexpr="dialNumber" interval="1000" > </timer>
+			</event>
+			<event event="timer"   >
+				<script>log('timer.'+extension.eventData);</script>
+			</event>
+		</state> 
+
+		<state id="stopped">
+			<onentry>
+				<log level = "info" expr="enter stopped state."/>
+			</onentry>
+			<event event="watch.start" >
+				<transition  target="running2"/>
+			</event>
+			<event event="watch.reset">
+				<transition  target="reset"/>
+			</event>
+			<state id="running2">
+				<onentry>
+					<log level = "info" expr="enter running2 state."/>
+				</onentry>
+				<event event="watch.reset"   target="reset">
+					<transition  target="stopped"/>
+				</event>
+			</state>
+		</state>
+    </state>
+</scm>
+
