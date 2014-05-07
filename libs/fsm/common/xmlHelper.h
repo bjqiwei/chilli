@@ -347,9 +347,8 @@ private:
 
 class  CXmlParseHelper{
 public: 
-	CXmlParseHelper(const std::string &str):doc(NULL),_root(NULL)
+	CXmlParseHelper(const std::string &str):doc(xmlParseMemory(str.c_str(),str.length())),_root(NULL)
 	{
-		doc = xmlParseMemory(str.c_str(),str.length());
 		if (doc._xDocPtr == NULL)
 		{
 			//LOG4CPLUS_ERROR(log,  ": Convert a string to xml error was encountered,string=" << str);
@@ -361,9 +360,8 @@ public:
 			//LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << str);
 		}
 	}
-	CXmlParseHelper(const char * xmlCh):doc(NULL),_root(NULL){
+	CXmlParseHelper(const char * xmlCh):doc(xmlParseMemory(xmlCh,strlen(xmlCh))),_root(NULL){
 
-		doc = xmlParseMemory(xmlCh,strlen(xmlCh));
 		if (doc._xDocPtr == NULL)
 		{
 			//LOG4CPLUS_ERROR(log,": Convert a string to xml error was encountered,string=" << xmlCh);
