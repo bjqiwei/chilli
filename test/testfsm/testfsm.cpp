@@ -15,6 +15,11 @@ using namespace std;
 
 //#ifdef SCXML
 using namespace fsm;
+void timerFunction(const std::string & param)
+{
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("timer");
+	LOG4CPLUS_DEBUG(log, param);
+}
 int main(int argc, _TCHAR* argv[])
 {
 	try{
@@ -27,6 +32,7 @@ int main(int argc, _TCHAR* argv[])
 		string strStateFile;
 		strStateFile.append(".\\scm.xml");
 		fsm::SMInstance m_smInstance;
+		m_smInstance.timerFunction = timerFunction;
 		fsm::StateMachine mysmscxml;
 		SendImp mySend;
 		mysmscxml.Init(strStateFile);
