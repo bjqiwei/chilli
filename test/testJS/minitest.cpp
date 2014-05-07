@@ -122,7 +122,7 @@ int main(int argc, const char *argv[]) {
 	nowtime=time(NULL);//获取日历时间??
 	std::cout<< "GC:" << nowtime<<std::endl;//输出nowtim
 
-	while(contexts.size()>0){
+	while(!contexts.empty()){
 		 nowtime=time(NULL);//获取日历时间??
 		 std::cout<< "DestroyContext"<<nowtime<<std::endl;//输出nowtim
 		 JS_DestroyContext(contexts.front());
@@ -149,7 +149,7 @@ int main(int argc, const char *argv[]) {
 	 nowtime=time(NULL);//获取日历时间??
 	 std::cout<<nowtime<<std::endl;//输出nowtim
 
-	 while(contexts.size()){
+	 while(!contexts.empty()){
 		 JS_DestroyContext(contexts.front());
 		 contexts.pop_front();
 	 }
