@@ -17,10 +17,22 @@
 -->
 <scm>
   <datamodel>
-    <data id="dialNumber" expr=""></data>
+    <data id="globalVar" expr=""></data>
   </datamodel>
   <functionmodel>
-	<function >function log(var1){logging(var1);}</function>
+	<function><![CDATA[function uuid() {
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4";  
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); 
+    s[8] = s[13] = s[18] = s[23] = "-";
+    var uuid = s.join("");
+    return uuid;}]]>
+	</function>
+	<function src="./time.js"></function>
   </functionmodel>
 
 	<state id="init">
@@ -28,7 +40,14 @@
 			<log level = "info" >enter Init state.</log>
 		</onentry>
         <event event="event1" >
+			<log level="info" type="script">globalVar;</log>
 			<transition  target="state1"/>
+		</event>
+		<event event="timer" cond="getHour()&gt;=10">
+			<transition target="timertest1"/>
+		</event>
+		<event event="timer" cond="getHour()&lt;10">
+			<transition target="timertest2"/>
 		</event>
 		<onexit>
 			<log level = "info" >exit Init state.</log>
@@ -37,13 +56,41 @@
 			<onentry>
 				<log level = "info">enter state1 state.</log>
 				<log level = "info" type="script"> new Date();</log>
-				<send target="testsend" type="cmd" idlocation="extension.number;" from="extension.number;" dest="extension.number;" ></send>
+				<send target="testsend" type="cmd" idexpr="uuid();" from="1000" destexpr="1000+1" ></send>
 			</onentry>
 			<event event="init">
+				<script>globalVar=1000;</script>
 				<transition  target="init"/>
 			</event>
+			<event event="timer">
+			<transition target="timertest1"/>
+		</event>
 		</state>
 
     </state>
+	<state id="timertest1">
+		<onentry>
+			<log level="debug">enter timertest1 state;</log>
+			<timer idexpr="uuid();" interval="1050"/>
+		</onentry>
+		<event event="init">
+			<transition target="init"/>
+		</event>
+		<event event="state11">
+			<transition target="state1"/>
+		</event>
+	</state>
+	<state id="timertest2">
+		<onentry>
+			<log level="debug">enter timertest2 state;</log>
+			<timer idexpr="uuid();" interval="10500"/>
+		</onentry>
+		<event event="init">
+			<transition target="init"/>
+		</event>
+		<event event="event1">
+			<transition target="state1"/>
+		</event>
+	</state>
 </scm>
 
