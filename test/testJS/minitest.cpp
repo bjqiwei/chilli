@@ -51,37 +51,38 @@ int run(JSContext *cx) {
 	if (!JS::RegisterPerfMeasurement(cx, global))
 		return 1 ;
 	JS_WrapObject(cx,&global);
+
 	/* Your application code here. This may include JSAPI calls to create your own custom JS objects and run scripts. */
 	const char *script = "x=(function(a, b){return a * b;})(15, 6);"; 
 	jsval rval; 
 	JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 	script = "\"value=\"+x;";
+	uint32 oldopts = JS_GetOptions(cx);
+	JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
+	JSObject * obj = JS_CompileScript(cx,global,script,strlen(script),NULL,0);
+	JS_SetOptions(cx, oldopts);
 	for(long i=200000; i>0 ; i--){
 		//JSBool status = compileAndRepeat(cx,global,script,"");
 		//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
-		uint32 oldopts = JS_GetOptions(cx);
-		JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
-		JSObject * obj = JS_CompileScript(cx,global,script,strlen(script),NULL,0);
-		JS_SetOptions(cx, oldopts);
-		JSBool status = JS_ExecuteScript(cx,global,obj,&rval);
-
+		JSString * str = JS_NewStringCopyZ(cx,"1234567890");
+		jsval val = STRING_TO_JSVAL(str);
+		JSBool status = JS_FALSE;//JS_ExecuteScript(cx,global,obj,&rval);
 
 		if (status == JS_TRUE){ 
 			JSString *d; 
 			//JS_NewExternalString(cx,);
 			d =JS_ValueToString(cx, rval); 
 			
-			int length  = JS_GetStringEncodingLength(cx,d);
 			char* bytes ;//=  new char[length+1];
 			bytes = JS_EncodeString(cx,d);
 			//JS_EncodeStringToBuffer(d,bytes,length);
 			//bytes[length] =0;
 
-			std::cout << "the result=" << i <<std::endl;
 			//delete[] bytes;
 			JS_free(cx,bytes);
 			
 		} 
+		std::cout << "the result=" << i <<std::endl;
 	}
 	return 0;
 }
@@ -98,6 +99,8 @@ int main(int argc, const char *argv[]) {
 	nowtime=time(NULL);//获取日历时间??
 	std::cout<<nowtime<<std::endl;//输出nowtim
 
+	int i;
+	std::cin >> i;
 	for (long i =0 ;i < 1; i++)
 	{
 		/* Create a context. */
@@ -156,7 +159,6 @@ int main(int argc, const char *argv[]) {
 	 nowtime=time(NULL);//获取日历时间??
 	 std::cout<<nowtime<<std::endl;//输出nowtim
 
-	 int i;
 	 std::cin >> i;
 
 	 JS_DestroyRuntime(rt);
