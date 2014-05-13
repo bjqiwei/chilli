@@ -51,9 +51,6 @@
     <ClCompile Include="..\scxml\model\Log.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
-    <ClCompile Include="..\scxml\model\ModelTimer.cpp">
-      <Filter>scxml.model</Filter>
-    </ClCompile>
     <ClCompile Include="..\scxml\model\OnEntry.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
@@ -93,6 +90,9 @@
     <ClCompile Include="..\scxml\SMInstance.cpp">
       <Filter>scxml</Filter>
     </ClCompile>
+    <ClCompile Include="..\scxml\model\Timer.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scxml\model\Action.h">
@@ -114,9 +114,6 @@
       <Filter>scxml.model</Filter>
     </ClInclude>
     <ClInclude Include="..\scxml\model\Log.h">
-      <Filter>scxml.model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\scxml\model\ModelTimer.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
     <ClInclude Include="..\scxml\model\OnEntry.h">
@@ -190,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\common\Timer.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Timer.h">
+      <Filter>scxml.model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

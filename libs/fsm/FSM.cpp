@@ -6,7 +6,7 @@
 #include "scxml/model/Event.h"
 #include "scxml/model/Script.h"
 #include "scxml/model/Send.h"
-#include "scxml/model/ModelTimer.h"
+#include "scxml/model/Timer.h"
 #include "scxml/model/Transition.h"
 #include "scxml/model/Functionmodel.h"
 #include "scxml/model/Datamodel.h"
