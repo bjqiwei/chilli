@@ -2,7 +2,7 @@
 #ifndef _CHILLI_ACDMODULE_HEADER_
 #define _CHILLI_ACDMODULE_HEADER_
 #include "../model/ProcessModule.h"
-#include "scxml/SCInstance.h"
+#include "scxml/SMInstance.h"
 #include "../model/Group.h"
 #include "../EventBuffer.h"
 
@@ -14,16 +14,15 @@ class ACDModule:public abstract::ProcessModule
 public:
 	ACDModule(void);
 	virtual ~ACDModule(void);
-	virtual bool Init(xmlNodePtr xNodePtr);
 	virtual bool Init(void);
 	virtual void Start();
 	virtual int Close(void);
 	virtual bool ParserConfig(void);
-	virtual bool reloadConfig(xmlNodePtr xNode);
+	virtual bool reloadConfig();
 	void	DisplayEventInfo ( std::string strEvent );
 
 	static chilli::EventBuffer recEvtBuffer;
-	static fsm::SCInstance scInstance;
+	static fsm::SMInstance smInstance;
 	static void addEventToBuffer(std::string strContent);
 private:
 	static std::vector<xmlNodePtr> m_DialPlanVector;

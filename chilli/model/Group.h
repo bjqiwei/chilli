@@ -5,7 +5,7 @@
 #include <FSM.h>
 #include <scxml/env/SimpleContext.h>
 #include <scxml/env/SimpleEvaluator.h>
-#include <scxml/SCInstance.h>
+#include <scxml/SMInstance.h>
 #include "AcdEventDispatcher.h"
 #include "Extension.h"
 

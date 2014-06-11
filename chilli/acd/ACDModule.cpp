@@ -6,7 +6,7 @@
 #include <process.h>
 #include <regex>
 #include <libxml/tree.h>
-#include <xmlHelper.h>
+
 
 namespace chilli{
 namespace ACD{

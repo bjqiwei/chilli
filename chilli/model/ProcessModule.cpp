@@ -7,8 +7,9 @@ namespace abstract{
 
 ProcessModule::ProcessModule(void):m_xmlConfigNodePtr(NULL)
 {
-	InitializeInstanceFields();
+	log = log4cplus::Logger::getInstance("chilli.abstract.ProcessModule");
 	LOG4CPLUS_DEBUG(log,"new a ProcessModule object");
+	InitializeInstanceFields();
 }
 
 
@@ -18,7 +19,7 @@ ProcessModule::~ProcessModule(void)
 }
 void ProcessModule::InitializeInstanceFields()
 {
-	log = log4cplus::Logger::getInstance("chilli.abstract.ProcessModule");
+	
 }
 bool ProcessModule::setConfigNode(xmlNodePtr xNodePtr)
 {
