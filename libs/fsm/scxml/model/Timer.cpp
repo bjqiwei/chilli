@@ -1,4 +1,4 @@
-#include "ModelTimer.h"
+#include "Timer.h"
 #include "../../common/xmlHelper.h"
 
 namespace fsm{
