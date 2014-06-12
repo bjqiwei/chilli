@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <log4cplus/logger.h>
+#include "..\config.h"
 
 namespace fsm
 {
