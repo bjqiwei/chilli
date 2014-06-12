@@ -5,7 +5,7 @@
 
 #include "..\model\ProcessModule.h"
 #include "..\EventBuffer.h"
-#include "scxml\SCInstance.h"
+#include "scxml\SMInstance.h"
 #include "..\model\Extension.h"
 
 namespace chilli{

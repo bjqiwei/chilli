@@ -11,15 +11,13 @@ namespace abstract{
 class ProcessModule
 {
 public:
-	ProcessModule();
-	virtual ~ProcessModule(void);
+	ProcessModule(xmlNodePtr xNodePtr);
+	virtual ~ProcessModule();
 
 	virtual bool reloadConfig() = 0;
 	virtual bool Init(void) = 0;
 	virtual void Start() = 0;
 	virtual int Close(void) = 0;
-	bool setConfigNode(xmlNodePtr xNodePtr);
-	virtual bool ParserConfig(void) = 0 ;
 
 protected:
 	xmlNodePtr m_xmlConfigNodePtr;

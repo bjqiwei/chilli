@@ -5,7 +5,7 @@ namespace chilli{
 namespace abstract{
 
 
-ProcessModule::ProcessModule(void):m_xmlConfigNodePtr(NULL)
+ProcessModule::ProcessModule(xmlNodePtr xNodePtr):m_xmlConfigNodePtr(xNodePtr)
 {
 	log = log4cplus::Logger::getInstance("chilli.abstract.ProcessModule");
 	LOG4CPLUS_DEBUG(log,"new a ProcessModule object");
@@ -21,12 +21,7 @@ void ProcessModule::InitializeInstanceFields()
 {
 	
 }
-bool ProcessModule::setConfigNode(xmlNodePtr xNodePtr)
-{
-	this->m_xmlConfigNodePtr = xNodePtr;
-	LOG4CPLUS_DEBUG(log,"set xmlConfigNode ." );
-	return true;
-}
+
 
 }
 }
