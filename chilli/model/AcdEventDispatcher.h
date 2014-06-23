@@ -11,7 +11,7 @@ class AcdEventtDispatcher:public fsm::EventDispatcher
 public:
 	AcdEventtDispatcher(void);
 	virtual ~AcdEventtDispatcher(void);
-	virtual void fireSend(const std::string &strContent);
+	virtual void fireSend(const std::string &strContent,void * param);
 private:
 	log4cplus::Logger log;
 

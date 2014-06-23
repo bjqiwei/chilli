@@ -44,7 +44,7 @@
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(IncludePath)</IncludePath>
-    <ReferencePath>$(ReferencePath)</ReferencePath>
+    <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
     <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\lib;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\log4cplus-1.1.2\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -52,7 +52,8 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.1-rc4\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\lib;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\log4cplus-1.1.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

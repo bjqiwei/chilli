@@ -16,7 +16,7 @@ public:
 	};
 	virtual ~Channel(void){};
 	virtual int Answer() = 0;
-	virtual int PlayFile(std::string file) = 0;
+	virtual int PlayFile(const std::string &fileName) = 0;
 	virtual int HangUp() = 0;
 protected: 
 	int ch;
@@ -34,7 +34,9 @@ public:
 	int getType(){return nType;}
 
 private:
-	void InitializeInstanceFields(){log = log4cplus::Logger::getInstance("chilli.abstract.Channel");}
+	void InitializeInstanceFields(){
+		log = log4cplus::Logger::getInstance("chilli.abstract.Channel");
+	}
 private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	Channel(const Channel &);
