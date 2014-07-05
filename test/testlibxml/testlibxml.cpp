@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <fstream>
 
 /********************************************************************
 
@@ -47,11 +48,11 @@ int main()
 
     //在根节点中直接创建节点
 
-    xmlNewTextChild(root_node, NULL, BAD_CAST "newNode1", BAD_CAST "newNode1 content");
+    xmlNewTextChild(root_node, NULL, BAD_CAST "newNode1", BAD_CAST "newNode1 \r\n content");
 
-    xmlNewTextChild(root_node, NULL, BAD_CAST "newNode2", BAD_CAST "newNode2 content");
+    xmlNewTextChild(root_node, NULL, BAD_CAST "newNode2", BAD_CAST "newNode2 \r\n content");
 
-    xmlNewTextChild(root_node, NULL, BAD_CAST "newNode3", BAD_CAST "newNode3 content");
+	xmlNewTextChild(root_node, NULL, BAD_CAST "newNode3", BAD_CAST "POST /2013-12-26/SubAccounts/46b60327bfcc11e389eed89d672b9690/Calls/Callback?sig=AC9B193CA9D51FF7B6E0F764FE47D418 HTTP/1.1\r\nHost:112.124.0.43:8881\r\nConnection:close\r\nContent-length:112\r\nAccept:application/xml;\r\nContent-Type:application/xml;charset=utf-8;\r\nAuthorization:NDZiNjAzMjdiZmNjMTFlMzg5ZWVkODlkNjcyYjk2OTA6MjAxNDA2MjUxNDQzNDU=\r\n\r\n<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n<CallBack>\r\n<from>18310536874</from>\r\n<to>15110162856</to>\r\n</CallBack>");
 
     //创建一个节点，设置其内容和属性，然后加入根结点
 
@@ -93,6 +94,27 @@ int main()
 
     xmlFreeDoc(doc);
 
+	doc = xmlParseFile("CreatedXml2.xml");
+	ofstream out("write.txt", ios::binary);
+	xmlNodePtr rootNode =  xmlDocGetRootElement(doc);
+	
+	
+	for (xmlNodePtr  xchildNode = rootNode->children; xchildNode != NULL; xchildNode = xchildNode->next)
+	{
+		if(xchildNode->type == XML_ELEMENT_NODE)
+		{
+			std::string str;
+			xmlChar * content = xmlNodeGetContent(xchildNode);
+			printf("%s=%s", xchildNode->name, content);
+			str.append((const char *)xchildNode->name);
+			str.append("=");
+			str.append((const char *)content);
+			out.write(str.c_str(),str.length());
+			xmlFree(content);
+		}
+	}
+	out.close();
+	getchar();
     return 1;
 
 }
