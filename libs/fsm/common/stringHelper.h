@@ -7,7 +7,7 @@
 #include<algorithm>
 #include<iostream>
 #include<cctype>
-#include <xfunctional>
+#include <functional>
 
 
 
@@ -16,7 +16,7 @@ namespace helper
 
 
 	/// <summary>
-	/// common namespace, all methods static final.
+	/// helper namespace, all methods static final.
 	/// 
 	/// </summary>
 	namespace string 
@@ -46,6 +46,17 @@ namespace helper
 				return true;
 			}
 			return false;
+		}
+
+		static std::string & replaceString(std::string& str,const std::string& old_value,const std::string& new_value){
+			for(std::string::size_type pos = 0;pos!=std::string::npos; pos+=new_value.length())   {   
+				if( (pos=str.find(old_value,pos))!=std::string::npos   )   
+					str.replace(pos,old_value.length(),new_value);   
+				else   
+					break;   
+			}   
+			return   str;  
+
 		}
 	}
 }//end namespace helper
