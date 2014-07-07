@@ -58,7 +58,6 @@ namespace fsm
 		{
 			throw;
 		}
-		return NULL;
 	}
 
 	//void SMInstance::setEvaluator(Evaluator *const evaluator)

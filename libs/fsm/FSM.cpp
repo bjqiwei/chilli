@@ -552,8 +552,6 @@ xmlNodePtr fsm::StateMachine::getState(const string& stateId) const
 		throw ;
 	}
 	/* Cleanup */
-
-	return NULL;
 }
 bool fsm::StateMachine::addEventDispatcher(EventDispatcher * evtDsp)
 {

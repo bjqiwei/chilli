@@ -47,10 +47,10 @@ namespace helper{
 			  }
 			  virtual ~Timer(){};
 
-			  unsigned  long getInterval() const{
+			  time_t getInterval() const{
 				  struct timeb currTime;
 				  ftime(&currTime);
-				  long  i = m_interval - ((currTime.time-m_startTime.time)*1000 + currTime.millitm-m_startTime.millitm);
+				  time_t  i = m_interval - ((currTime.time-m_startTime.time)*1000 + currTime.millitm-m_startTime.millitm);
 				  return i > 0?i:0;
 			  };
 
@@ -59,6 +59,7 @@ namespace helper{
 		private:
 			const long m_interval;
 			struct timeb m_startTime;
+			Timer & operator=( const Timer & ) {};
 		};
 		class TimerComp{
 		public:
@@ -135,14 +136,14 @@ namespace helper{
 			TimerServer * This = (TimerServer *)pParam;
 
 #ifdef WIN32
-			unsigned long millisec = INFINITE;
+			time_t millisec = INFINITE;
 			DWORD rv;
-			while(1)
+			while(true)
 			{
 				rv = WaitForSingleObject(This->sem, millisec);
 #else
 			#define  INFINITE  (0x7fffffffffffffff)
-			long long millisec = INFINITE;
+			time_t millisec = INFINITE;
 			pthread_setcanceltype(PTHREAD_CANCEL_ENABLE,NULL);
 			pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
 			int rv;
