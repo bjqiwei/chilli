@@ -1,5 +1,6 @@
 #include "Script.h"
 #include "../../common/xmlHelper.h"
+#include <log4cplus/loggingmacros.h>
 
 namespace fsm
 {
@@ -12,6 +13,7 @@ namespace model
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Script");
 		this->content =  helper::xml::XStr(xmlNodeGetContent(node)).strForm();
+		this->m_fileName = helper::xml::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
 	}
 
 	//std::string &Script::getContent()
@@ -20,7 +22,14 @@ namespace model
 	//}
 	void Script::execute(fsm::Context * ctx)
 	{
-		ctx->eval(this->content,m_strFilename,node->line,node);
+		if (!m_fileName.empty()){
+			LOG4CPLUS_TRACE(log,m_strSession << ",define a function script is:" << m_fileName);
+			ctx->ExecuteFile(m_fileName);
+		}
+		else if (!content.empty()){
+			LOG4CPLUS_TRACE(log,m_strSession << ",define a function script is:" << content);
+			ctx->CompileScript(content,m_strFilename,node->line,node);
+		}
 	}
 }
 }

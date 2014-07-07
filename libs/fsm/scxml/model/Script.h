@@ -19,6 +19,7 @@ namespace model
 		//TLogFile * log;
 		xmlNodePtr node;
 		std::string content;
+		std::string m_fileName;
 		std::string m_strSession;
 		std::string m_strFilename;
 		log4cplus::Logger log;
