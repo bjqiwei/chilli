@@ -10,8 +10,8 @@ namespace model
 {
 
 
-	Send::Send(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session),
-		m_strFilename(filename)
+	Send::Send(xmlNodePtr xNode,const std::string &session,const std::string &filename)
+		:Action(xNode, session,	filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Send");
 
@@ -93,27 +93,27 @@ namespace model
 	void Send::execute(fsm::Context * ctx)
 	{
 		if (ctx && helper::string::isStringEmpty(id) && !idexpr.empty()){
-			id = ctx->eval(idexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"idexpr"));
+			id = ctx->eval(idexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"idexpr"));
 		}
 		
 		if (ctx && helper::string::isStringEmpty(target) && !targetexpr.empty()){
-			target = ctx->eval(targetexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"targetexpr"));
+			target = ctx->eval(targetexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"targetexpr"));
 		}
 
 		if (ctx && helper::string::isStringEmpty(type) && !typeexpr.empty()){
-			type = ctx->eval(typeexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"typeexpr"));
+			type = ctx->eval(typeexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"typeexpr"));
 		}
 
 		if (ctx && helper::string::isStringEmpty(_event) && !eventexpr.empty()){
-			_event = ctx->eval(eventexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"eventexpr"));
+			_event = ctx->eval(eventexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"eventexpr"));
 		}
 
 		if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
-			from = ctx->eval(fromexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"fromexpr"));
+			from = ctx->eval(fromexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"fromexpr"));
 		}
 
 		if (ctx && helper::string::isStringEmpty(dest) && !destexpr.empty()){
-			dest = ctx->eval(destexpr,m_strFilename,node->line,xmlHasProp(node,BAD_CAST"destexpr"));
+			dest = ctx->eval(destexpr,m_strFileName,node->line,xmlHasProp(node,BAD_CAST"destexpr"));
 		}
 
 	/*	if (!SCXMLHelper::isStringEmpty(namelist)){
@@ -190,7 +190,7 @@ namespace model
 				//xmlAddChild(newNode,content);
 				std::string _type = helper::xml::getXmlNodeAttributesValue(childNode,"type");
 				if(ctx && _type.compare("script") == 0)
-					m_xmlDoc.addChild((char *)childNode->name,ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFilename,childNode->line,childNode));
+					m_xmlDoc.addChild((char *)childNode->name,ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFileName,childNode->line,childNode));
 				else
 					m_xmlDoc.addChild((char *)childNode->name,helper::xml::XStr(xmlNodeGetContent(childNode)).strForm());
 
@@ -201,6 +201,7 @@ namespace model
 		content = m_xmlDoc.getContent();
 		//LOG4CPLUS_TRACE(log,m_strSession << ",send content:" << content);
 	}
+
 }
 }
 

@@ -8,12 +8,11 @@ namespace fsm
 namespace model
 {
 
-	Data::Data(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session)
-		,m_strFileName(filename)
+	Data::Data(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode,session,filename)
 	{
-		m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
-		m_strExpr = helper::xml::getXmlNodeAttributesValue(node,"expr");
 		log = log4cplus::Logger::getInstance("fsm.model.Data");
+		this->m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
+		this->m_strExpr = helper::xml::getXmlNodeAttributesValue(node,"expr");
 	}
 
 	const std::string & Data::getId()const

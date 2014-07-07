@@ -6,11 +6,11 @@ namespace fsm{
 namespace model{
 
 Function::Function(xmlNodePtr xNode ,const std::string & session, const std::string & filename):
-node(xNode),m_strSession(session),m_strFileName(filename)
+Action(xNode ,session, filename)
 {
+	log = log4cplus::Logger::getInstance("fsm.model.Function");
 	m_strContent = helper::xml::XStr(xmlNodeGetContent(node)).strForm();
 	m_fileName = helper::xml::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
-	log = log4cplus::Logger::getInstance("fsm.model.Function");
 }
 
 void Function::execute(fsm::Context * ctx)

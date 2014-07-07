@@ -9,19 +9,10 @@ namespace fsm
 namespace model
 {
 
-	Event::Event(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_bCond(true),
-		m_strSession(session),
-		m_strFilename(filename),cx(NULL)
+	Event::Event(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session,filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Event");
-		m_strCond = helper::xml::getXmlNodeAttributesValue(node,"cond");
 		m_strEvent = helper::xml::getXmlNodeAttributesValue(node,"event");
-		m_bCond = true;
-	}
-
-	const std::string &Event::getCond()
-	{
-		return m_strCond;
 	}
 
 	const std::string &Event::getEvent()
@@ -31,7 +22,6 @@ namespace model
 	
 	void Event::execute(fsm::Context * ctx)
 	{
-		cx = ctx;
 		
 		/*for (xmlNodePtr exeNode = node->children ; exeNode !=  NULL; exeNode = exeNode->next)
 		{
@@ -72,14 +62,5 @@ namespace model
 		return true;
 	}
 
-
-
-	bool Event::isEnabledCondition() 
-	{
-		if (!this->getCond().empty() && cx){
-			return cx->evalCond(this->getCond(),m_strFilename,node->line,node);
-		}
-		return m_bCond;
-	}
 }
 }

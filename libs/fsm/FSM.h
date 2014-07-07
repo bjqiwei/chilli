@@ -74,15 +74,16 @@ namespace fsm{
 		static bool inline isScript(const xmlNodePtr &Node) ;
 		static bool inline isTimer(const xmlNodePtr &Node) ;
 
-		void processEvent( const xmlNodePtr &eventNode) const;
-		void processTransition(model::Transition & transition) const;
-		void processExit(const xmlNodePtr &node) const;
+		bool processEvent( const xmlNodePtr &eventNode) const;
+		bool processTransition(const xmlNodePtr &node) const;
+		bool processExit(const xmlNodePtr &node) const;
 
 		//处理entry节点函数，传入entry节点指针，返回值表示是否继续执行余下的entry节点。
 		bool processEntry(const xmlNodePtr &node)const;
-		void processSend(const xmlNodePtr &node)const;
-		void processScript(const xmlNodePtr &node)const;
-		void processTimer(const xmlNodePtr &node)const;
+		bool processSend(const xmlNodePtr &node)const;
+		bool processScript(const xmlNodePtr &node)const;
+		bool processTimer(const xmlNodePtr &node)const;
+		bool processLog(const xmlNodePtr &node) const;
 
 		void enterStates(const xmlNodePtr &stateNode) const;
 		void exitStates() const;

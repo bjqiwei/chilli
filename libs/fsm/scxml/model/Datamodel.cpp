@@ -7,8 +7,7 @@ namespace fsm
 namespace model
 {
 
-	Datamodel::Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename):node(xNode),m_strSession(session),
-		m_strFilename(filename)
+	Datamodel::Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Datamodel");
 	}
@@ -24,7 +23,7 @@ namespace model
 				!xmlStrEqual(dataNode->name, BAD_CAST("data")))
 				continue;
 			bFindData = true;
-			model::Data datum(dataNode,m_strSession,m_strFilename);
+			model::Data datum(dataNode,m_strSession,m_strFileName);
 			datum.execute(ctx);
 		}
 		if (!bFindData)

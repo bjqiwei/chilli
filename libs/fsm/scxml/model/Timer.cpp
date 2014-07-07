@@ -4,8 +4,8 @@
 namespace fsm{
 namespace model{
 
-	Timer::Timer(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
-		m_strSession(session),m_strFilename(filename)
+	Timer::Timer(xmlNodePtr xNode,const std::string &session,const std::string & filename)
+		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Timer");
 		this->id = helper::xml::getXmlNodeAttributesValue(node,"id");
@@ -32,10 +32,10 @@ namespace model{
 
 	void Timer::execute(fsm::Context * ctx)
 	{
-
 		if (ctx && id.empty()){
-			id = ctx->eval(idexpr,m_strFilename,node->line,node);
+			id = ctx->eval(idexpr,m_strFileName,node->line,node);
 		}
 	}
+
 }
 }

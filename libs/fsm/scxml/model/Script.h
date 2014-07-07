@@ -17,12 +17,9 @@ namespace model
 	{
 	private:
 		//TLogFile * log;
-		xmlNodePtr node;
 		std::string content;
 		std::string m_fileName;
-		std::string m_strSession;
-		std::string m_strFilename;
-		log4cplus::Logger log;
+
 	public:
 		Script(xmlNodePtr xNode,const std::string &session,const std::string & filename);
 		/*std::string &getContent();*/

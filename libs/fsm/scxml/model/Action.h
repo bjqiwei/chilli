@@ -2,6 +2,9 @@
 #ifndef _FSM_MODEL_ACTION_HEADER_
 #define _FSM_MODEL_ACTION_HEADER_
 #include "../Context.h"
+#include <libxml/tree.h>
+#include <log4cplus/logger.h>
+#include "../../common/xmlHelper.h"
 
 namespace fsm
 {
@@ -20,9 +23,29 @@ namespace model
 		/// </summary>
 	public:
 
-		Action(){}; //super();
+		Action(xmlNodePtr xNode,const std::string & session,const std::string &filename):node(xNode),
+			m_strSession(session),m_strFileName(filename),m_bCond(true)
+		{
+			m_strCond = helper::xml::getXmlNodeAttributesValue(node,"cond");
+		}; //super();
 		virtual~Action(){};
 		virtual void execute(fsm::Context * ctx) = 0;
+		bool isEnabledCondition(fsm::Context * ctx)
+		{
+			if (!this->getCond().empty() && ctx){
+				return ctx->evalCond(this->getCond(),m_strFileName,node->line,node);
+			}
+			return m_bCond;
+		}
+	protected:
+		xmlNodePtr node;
+		std::string m_strSession;
+		std::string m_strFileName;
+		std::string m_strCond;
+		log4cplus::Logger log;
+	private:
+		bool m_bCond;
+		const std::string &getCond(){ return this->m_strCond;}
 
 	};
 }

@@ -16,13 +16,10 @@ namespace fsm
 		class  Log :public Action
 		{
 		private:
-			xmlNodePtr node;
 			std::string m_strExpr;
 			std::string m_strLevel;
 			std::string m_Type;
-			std::string m_strSession;
-			std::string m_strFilename;
-			log4cplus::Logger log;
+
 		public:
 			Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename);
 			virtual ~Log(){};

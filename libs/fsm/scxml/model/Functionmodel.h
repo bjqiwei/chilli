@@ -18,10 +18,6 @@ public:
 	virtual ~Functionmodel(void);
 	virtual void execute(fsm::Context * ctx);
 private:
-	xmlNodePtr node;
-	log4cplus::Logger log;
-	std::string m_strSession;
-	std::string m_strFilename;
 };
 }// end namespace fsm
 }// end namespace model

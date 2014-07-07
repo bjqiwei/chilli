@@ -17,8 +17,6 @@ namespace model
 	class  Send :public Action
 	{
 	private:
-		log4cplus::Logger  log;
-		xmlNodePtr node;
 		std::string id;
 		std::string idexpr;
 		std::string target;
@@ -33,9 +31,7 @@ namespace model
 		//std::string namelist;
 		std::string eventexpr;
 		std::string content;
-		std::string m_strSession;
-		std::string m_strFilename;
-		//std::map<std::string,std::string> params;
+
 	public:
 		Send(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 		const std::string& getId()const;

@@ -7,14 +7,14 @@ namespace model{
 
 
 Functionmodel::Functionmodel(xmlNodePtr xnode,const std::string &session, const std::string &filename):
-	node(xnode),m_strSession(session),m_strFilename(filename)
+	Action(xnode, session, filename)
 {
 	log = log4cplus::Logger::getInstance("fsm.model.Functionmodel");
 }
 
 void Functionmodel::execute(fsm::Context * ctx){
 	//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
-	if (node == 0) return;
+
 	bool bFindData = false;
 	for (xmlNodePtr funNode = node->children ; funNode !=  NULL; funNode = funNode->next)
 	{
@@ -22,7 +22,7 @@ void Functionmodel::execute(fsm::Context * ctx){
 			!xmlStrEqual(funNode->name, BAD_CAST("function")))
 			continue;
 		bFindData = true;
-		model::Function fun(funNode,m_strSession,m_strFilename);
+		model::Function fun(funNode,m_strSession,m_strFileName);
 		fun.execute(ctx);
 	}
 	if (!bFindData)

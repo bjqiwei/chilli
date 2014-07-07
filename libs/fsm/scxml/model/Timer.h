@@ -21,14 +21,11 @@ namespace model{
 		unsigned int getInterval();
 
 		virtual  void execute(fsm::Context * ctx);
+
 	private:
-		log4cplus::Logger log;
-		xmlNodePtr node;
 		std::string id;
 		std::string idexpr;
 		std::string interval;
-		std::string m_strSession;
-		std::string m_strFilename;
 	};
 }
 }

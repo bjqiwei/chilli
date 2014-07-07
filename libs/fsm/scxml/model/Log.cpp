@@ -5,8 +5,8 @@
 using namespace helper::xml;
 namespace fsm{
 namespace model{
-	Log::Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename):node(xNode),m_strSession(sessionid),
-	m_strFilename(filename)
+	Log::Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename)
+		:Action(xNode, sessionid, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Log");
 		m_strExpr =  XStr(xmlNodeGetContent(node)).strForm();
@@ -15,8 +15,9 @@ namespace model{
 	}
 	void Log::execute(Context * ctx)
 	{
+
 		if(ctx && m_Type.compare("script") == 0)
-			m_strExpr = ctx->eval(m_strExpr,m_strFilename,node->line,node);
+			m_strExpr = ctx->eval(m_strExpr,m_strFileName,node->line,node);
 
 		if (m_strLevel.compare("trace") == 0){
 			LOG4CPLUS_TRACE(log, m_strSession << "," << m_strExpr);
@@ -49,5 +50,6 @@ namespace model{
 	{
 		return m_strLevel;
 	}
+
 }
 }
