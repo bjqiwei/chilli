@@ -176,7 +176,7 @@ void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 				model::Event event(eventNode,m_strSessionID,m_strStateFile);
 				
 				if (event.isEnabledEvent(m_currentEvt.getEventName()) 
-					&& (m_scInstance == NULL || event.isEnabledCondition(m_scInstance->getContext(m_rootNode))))
+					&& event.isEnabledCondition(this->getRootContext()))
 				{
 					foundEvent = true;
 					processEvent(eventNode);
@@ -306,7 +306,7 @@ bool fsm::StateMachine::processEvent(const xmlNodePtr &eventNode)const
 bool fsm::StateMachine::processTransition(const xmlNodePtr &actionNode)const
 {
 	model::Transition transition(actionNode,m_strSessionID,m_strStateFile);
-	if (m_scInstance != NULL && !transition.isEnabledCondition(m_scInstance->getContext(m_rootNode)))
+	if (!transition.isEnabledCondition(this->getRootContext()))
 		return false ;
 	if (xmlNodePtr stateNode = getState(transition.getTarget()))
 	{
@@ -323,17 +323,13 @@ bool fsm::StateMachine::processTransition(const xmlNodePtr &actionNode)const
 bool fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 {
 	using namespace helper::xml;
-	if (!Node) return false;
 	model::Send send(Node,m_strSessionID,m_strStateFile);
 
-	if(m_scInstance && !send.isEnabledCondition(m_scInstance->getContext(m_rootNode))){
-		return false;
-	}
-	else if (m_scInstance){
-		send.execute(m_scInstance->getContext(m_rootNode));
+	if (send.isEnabledCondition(this->getRootContext())){
+		send.execute(this->getRootContext());
 	}
 	else{
-		send.execute(NULL);
+		return false;
 	}
 
 	std::map<std::string , EventDispatcher *>::const_iterator it = m_mapSendObject.find(send.getTarget());
@@ -353,15 +349,14 @@ bool fsm::StateMachine::processTimer(const xmlNodePtr &Node)const
 	if (!Node) return false;
 	model::Timer timer(Node,m_strSessionID,m_strStateFile);
 
-	if(m_scInstance && !timer.isEnabledCondition(m_scInstance->getContext(m_rootNode)))
-		return false;
-	else if (m_scInstance)
+	if (timer.isEnabledCondition(this->getRootContext()))
 	{
-		timer.execute(m_scInstance->getContext(m_rootNode));
+		timer.execute(this->getRootContext());
 	}
 	else{
-		timer.execute(NULL);
+		return false;
 	}
+	
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
 	//LOG4CPLUS_DEBUG(log,m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
@@ -374,15 +369,13 @@ bool fsm::StateMachine::processLog(const xmlNodePtr &Node)const
 {
 	if (!Node) return false;
 	model::Log log(Node,m_strSessionID,m_strStateFile);
-	if(m_scInstance){ 
-		if(log.isEnabledCondition(m_scInstance->getContext(m_rootNode))){
-			log.execute(m_scInstance->getContext(m_rootNode));
-		}else{
-			return false;
-		}
+	
+	if(log.isEnabledCondition(this->getRootContext())){
+		log.execute(this->getRootContext());
 	}else{
-		log.execute(NULL);
+		return false;
 	}
+	
 	return true;
 }
 
@@ -390,10 +383,13 @@ bool fsm::StateMachine::processScript(const xmlNodePtr &node) const
 {
 	if (!node) return false;
 	model::Script script(node,m_strSessionID,m_strStateFile);
-	if(m_scInstance  && script.isEnabledCondition(m_scInstance->getContext(m_rootNode)))
-		script.execute(m_scInstance->getContext(m_rootNode));
 
-	return true;
+	if(script.isEnabledCondition(this->getRootContext())){
+		script.execute(this->getRootContext());
+		return true;
+	}
+	
+	return false;
 }
 const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentState)const
 {
@@ -565,7 +561,7 @@ const std::string & fsm::StateMachine::getSessionId()const {
 
 
 
-fsm::Context  *  fsm::StateMachine::getRootContext() {
+fsm::Context  *  fsm::StateMachine::getRootContext() const{
 	if(m_scInstance)
 		return this->m_scInstance->getContext(m_rootNode);
 	return NULL;
@@ -595,12 +591,12 @@ void fsm::StateMachine::go()
 			if(m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("datamodel")))
 			{
 				model::Datamodel datamodel(childNode,m_strSessionID,m_strStateFile);
-				datamodel.execute(m_scInstance->getContext(m_rootNode));
+				datamodel.execute(this->getRootContext());
 
 			}else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("functionmodel")))
 			{
 				model::Functionmodel funmodel(childNode,m_strSessionID,m_strStateFile);
-				funmodel.execute(m_scInstance->getContext(m_rootNode));				
+				funmodel.execute(this->getRootContext());	
 			}
 		}
 		/* Create xpath evaluation context */

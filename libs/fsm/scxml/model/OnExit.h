@@ -18,6 +18,7 @@ namespace model
 			:Action(xNode, session, filename){};
 		~OnExit(){};
 		virtual void execute(fsm::Context * ctx);
+		virtual bool isEnabledCondition(fsm::Context * ctx);
 	private: 
 
 	};

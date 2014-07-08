@@ -30,6 +30,11 @@ void Function::execute(fsm::Context * ctx)
 	}
 }
 
+bool Function::isEnabledCondition(fsm::Context * ctx)
+{
+	return true;
+}
+
 Function::~Function(void)
 {
 }

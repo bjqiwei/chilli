@@ -31,6 +31,16 @@ namespace model
 			ctx->CompileScript(content,m_strFileName,node->line,node);
 		}
 	}
+
+	bool Script::isEnabledCondition(fsm::Context * ctx)
+	{
+		if (ctx == NULL) return false;
+		
+		if (!this->getCond().empty()){
+			return ctx->evalCond(this->getCond(),m_strFileName,node->line,node);
+		}
+		return true;
+	}
 }
 }
 

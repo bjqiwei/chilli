@@ -25,5 +25,10 @@ namespace model{
 			}
 		}*/
 	}
+
+	bool OnEntry::isEnabledCondition(fsm::Context * ctx)
+	{
+		return true;
+	}
 }
 }

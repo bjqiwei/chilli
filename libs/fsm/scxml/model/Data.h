@@ -29,6 +29,7 @@ public:
 	//xmlNodePtr getNode() ;
 	//void setNode( xmlNodePtr const node);
 	virtual void execute(fsm::Context * ctx);
+	virtual bool isEnabledCondition(fsm::Context * ctx);
 
 };
 

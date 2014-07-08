@@ -21,6 +21,11 @@ namespace model{
 			}
 		}*/
 	}
+
+	bool OnExit::isEnabledCondition(fsm::Context * ctx)
+	{
+		return true;
+	}
 }
 
 }

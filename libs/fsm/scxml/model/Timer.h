@@ -3,7 +3,6 @@
 #define  _SCXML_MODEL_TIMER_HEADER_
 
 #include <string>
-#include <log4cplus/logger.h>
 #include "Action.h"
 
 

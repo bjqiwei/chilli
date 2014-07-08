@@ -32,6 +32,11 @@ namespace model
 		}
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 	}
+
+	bool Datamodel::isEnabledCondition(fsm::Context * ctx)
+	{
+		return true;
+	}
 }
 }
 

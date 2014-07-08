@@ -3,9 +3,7 @@
 #define  _FSM_MODEL_SCRIPT_HEADER_
 
 #include <string>
-#include <libxml/tree.h>
 #include "Action.h"
-#include <log4cplus/logger.h>
 
 
 namespace fsm
@@ -24,6 +22,7 @@ namespace model
 		Script(xmlNodePtr xNode,const std::string &session,const std::string & filename);
 		/*std::string &getContent();*/
 		virtual  void execute(Context * ctx);
+		virtual bool isEnabledCondition(fsm::Context * ctx);
 	};
 
 

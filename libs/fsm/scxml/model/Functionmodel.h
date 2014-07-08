@@ -2,9 +2,8 @@
 #ifndef _FSM_MODEL_FUNCTIONMODEL_HEADER_
 #define _FSM_MODEL_FUNCTIONMODEL_HEADER_
 #include "Action.h"
-#include <log4cplus/logger.h>
 #include <string>
-#include <libxml/tree.h>
+
 
 namespace fsm{
 namespace model{
@@ -17,6 +16,7 @@ public:
 	Functionmodel(xmlNodePtr node, const std::string & session, const std::string &filename);
 	virtual ~Functionmodel(void);
 	virtual void execute(fsm::Context * ctx);
+	virtual bool isEnabledCondition(fsm::Context * ctx);
 private:
 };
 }// end namespace fsm

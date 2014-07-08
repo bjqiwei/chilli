@@ -27,6 +27,7 @@ namespace model
 	public:
 		Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename);
 		virtual void execute(fsm::Context * ctx);
+		virtual bool isEnabledCondition(fsm::Context * ctx);
 	};
 }
 }

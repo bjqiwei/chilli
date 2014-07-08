@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <log4cplus/logger.h>
 #include "Action.h"
 
 

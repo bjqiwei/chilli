@@ -36,6 +36,10 @@ namespace model
 	//}
 	void Data::execute(fsm::Context * ctx)
 	{
+		if (ctx == NULL){
+			LOG4CPLUS_WARN(log,"Context is null.");
+			return ;
+		}
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
 		/*if (!SCXMLHelper::isStringEmpty(datum.getSrc()))
 		{
@@ -53,6 +57,11 @@ namespace model
 			ctx->setLocal(getId(), "",false);
 		}
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
+	}
+
+	bool Data::isEnabledCondition(fsm::Context * ctx)
+	{
+		return true;
 	}
 }
 }

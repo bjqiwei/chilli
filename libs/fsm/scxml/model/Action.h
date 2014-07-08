@@ -30,7 +30,7 @@ namespace model
 		}; //super();
 		virtual~Action(){};
 		virtual void execute(fsm::Context * ctx) = 0;
-		bool isEnabledCondition(fsm::Context * ctx)
+		virtual bool isEnabledCondition(fsm::Context * ctx)
 		{
 			if (!this->getCond().empty() && ctx){
 				return ctx->evalCond(this->getCond(),m_strFileName,node->line,node);
@@ -45,6 +45,8 @@ namespace model
 		log4cplus::Logger log;
 	private:
 		bool m_bCond;
+
+	protected:
 		const std::string &getCond(){ return this->m_strCond;}
 
 	};

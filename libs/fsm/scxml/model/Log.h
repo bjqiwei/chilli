@@ -3,10 +3,7 @@
 #define  _FSM_MODEL_LOG_HEADER_
 
 #include <string>
-#include <libxml/tree.h>
 #include "Action.h"
-#include <log4cplus/logger.h>
-
 
 namespace fsm
 {

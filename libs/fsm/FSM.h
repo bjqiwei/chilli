@@ -41,7 +41,7 @@ namespace fsm{
 		bool addEventDispatcher( EventDispatcher * evtDsp);
 		const std::string& getName();
 		const std::string& getSessionId()const;
-		Context  *  getRootContext(); 
+		Context  *  getRootContext() const; 
 		xmlNodePtr getDataModel(); 
 		void setscInstance(SMInstance *);
 		void setLog(log4cplus::Logger log);
