@@ -117,8 +117,8 @@ namespace env
 		JSBool status = JS_EvaluateScript(ctx,global , expr.c_str(), expr.length(), NULL, 0, NULL); 
 		if (status != JS_TRUE)
 			LOG4CPLUS_ERROR(log, "set variable " << expr << " failed.");
-		//else
-		//LOG4CPLUS_DEBUG(log, "set Variable " << name << "=" << value );
+		else
+			LOG4CPLUS_TRACE(log, "set Variable " << expr << " ok." );
 	}
 	void JsContext::setLocal(const std::string &name, const std::string & value,bool eventVar)
 	{

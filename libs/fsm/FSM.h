@@ -13,7 +13,7 @@
 #include "scxml/SMInstance.h"
 #include "scxml/model/Transition.h"
 //#include "scxml/model/Log.h"
-//#include "common/lock.h"
+#include "common/lock.h"
 
 
 using namespace std;
@@ -22,16 +22,20 @@ using namespace std;
 namespace fsm{
 
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
+	enum xmlType{
+		File,
+		Memory,
+	};
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const string &xml = "");
+		StateMachine(const string &xml = "", xmlType xtype = File);
 		StateMachine(const StateMachine &other);
 		virtual ~StateMachine();
 		StateMachine & operator=(const StateMachine & other);
 		
 		//初始化状态机
 		bool Init(void);
-		bool Init(const string &xmlFile);
+		bool Init(const string &xml, xmlType xtype = File);
 		//开始进入初始化状态
 		void go();
 		const xmlNodePtr getCurrentState(void) const;
@@ -94,9 +98,12 @@ namespace fsm{
 	private:
 		std::map<std::string, EventDispatcher *> m_mapSendObject;
 		SMInstance * m_scInstance;
-		//mutable helper::CLock m_lock;
+		mutable helper::CLock m_lock;
 	public:
 		mutable TriggerEvent m_currentEvt;
+	private:
+		xmlType m_xmlType;
+		std::string m_strStateContent;
 		
 	};
 }

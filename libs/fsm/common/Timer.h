@@ -190,11 +190,10 @@ namespace helper{
 							break;
 						}
 					
-						std::string strContent = timer->m_strTimerId;
 
 						if (This->timerFunction != NULL)
 						{
-							This->timerFunction(strContent);
+							This->timerFunction(timer->m_strTimerId);
 						}
 						This->m_timer.pop();
 						delete timer;

@@ -17,14 +17,21 @@
 
 using namespace std;
 
-fsm::StateMachine::StateMachine(const string  &xml):m_strStateFile(xml),m_xmlDocPtr(NULL),m_initState(NULL)
+fsm::StateMachine::StateMachine(const string  &xml, xmlType xtype):m_xmlDocPtr(NULL),m_initState(NULL)
 	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
+	,m_xmlType(xtype)
 {
 
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");
+	if (m_xmlType == File)
+	{
+		m_strStateFile = xml;
+	}else{
+		m_strStateContent = xml;
+	}
+	
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." );
 
-	return ;
 }
 
 fsm::StateMachine::~StateMachine()
@@ -86,9 +93,16 @@ bool fsm::StateMachine::Init(void)
 	return true;
 }
 
-bool fsm::StateMachine::Init(const string &xmlFile)
+bool fsm::StateMachine::Init(const string &xml, xmlType xtype)
 {
-	this->m_strStateFile = xmlFile;
+	m_xmlType = xtype;
+	if (m_xmlType == File)
+	{
+		m_strStateFile = xml;
+	}else{
+		m_strStateContent = xml;
+	}
+
 	return Init();
 }
 
@@ -158,7 +172,7 @@ inline bool fsm::StateMachine::isTimer(const xmlNodePtr &xNode)
 void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 {
 	using namespace helper::xml;
-	//m_lock.Lock();
+	m_lock.Lock();
 	m_currentEvt = trigEvent;
 	bool foundEvent = false;
 	xmlNodePtr filterState = m_currentStateNode;
@@ -194,11 +208,13 @@ void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
 	{
 		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
 	}
-	//m_lock.Unlock();
+	m_lock.Unlock();
 }
 fsm::StateMachine::StateMachine(const StateMachine &other):m_strStateFile(other.m_strStateFile),m_xmlDocPtr(NULL),
 	m_initState(NULL),m_currentStateNode(NULL),m_rootNode(NULL),log(other.log),xpathCtx(NULL)
-	,m_scInstance(other.m_scInstance)
+	,m_mapSendObject(other.m_mapSendObject),m_scInstance(other.m_scInstance)
+	,m_xmlType(other.m_xmlType),m_strStateContent(other.m_strStateContent)
+	
 {
 	LOG4CPLUS_TRACE(log, m_strSessionID << ",creat a fsm object from other statemachine:" << other.getSessionId() );
 	this->m_xmlDocPtr = xmlCopyDoc(other.m_xmlDocPtr._xDocPtr,1);
@@ -220,6 +236,9 @@ fsm::StateMachine & fsm::StateMachine::operator=(const fsm::StateMachine & other
 	this->m_xmlDocPtr = xmlCopyDoc(other.m_xmlDocPtr._xDocPtr,1);
 	this->m_rootNode =NULL;
 	this->m_scInstance =other.m_scInstance;
+	this->m_xmlType = other.m_xmlType;
+	this->m_strStateContent = other.m_strStateContent;
+	this->m_mapSendObject = other.m_mapSendObject;
 	this->Init();
 	return *this;
 }
@@ -236,13 +255,15 @@ void fsm::StateMachine::parse()
 	try{
 		/* parse the file */
 		//_docPtr = xmlCtxtReadFile(_ctxt, _strStateFile.c_str(), NULL, XML_PARSE_NOERROR);
-		if (m_strStateFile.empty())
+		if (m_xmlType == File)
 		{
-			LOG4CPLUS_ERROR(log, m_strSessionID << ",stateMachine file is empty."); 
-			return;
+			LOG4CPLUS_DEBUG(log,"Parse xml file:" << m_strStateFile);
+			m_xmlDocPtr = xmlParseFile(m_strStateFile.c_str());
+		}else
+		{
+			LOG4CPLUS_DEBUG(log,"Parse xml Content:" << m_strStateContent);
+			m_xmlDocPtr = xmlParseMemory(m_strStateContent.c_str(), m_strStateContent.length());
 		}
-		LOG4CPLUS_DEBUG(log,"Parse xml file:" << m_strStateFile);
-		m_xmlDocPtr = xmlParseFile(m_strStateFile.c_str());
 	}
 	catch(std::exception &e){ 
 		LOG4CPLUS_ERROR(log, e.what());
@@ -250,7 +271,7 @@ void fsm::StateMachine::parse()
 
 	if (NULL == m_xmlDocPtr._xDocPtr) 
 	{  
-		LOG4CPLUS_ERROR(log, m_strStateFile << m_strSessionID << ",Document not parsed successfully."); 
+		LOG4CPLUS_ERROR(log, m_strSessionID<< ":" << m_strStateFile << ",Document not parsed successfully."); 
 		//throw std::logic_error( "Document not parsed successfully."); 
 	} 
 }
@@ -334,7 +355,7 @@ bool fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 
 	std::map<std::string , EventDispatcher *>::const_iterator it = m_mapSendObject.find(send.getTarget());
 	if (it != m_mapSendObject.end()) {
-		it->second->fireSend(send.getContent(),this->m_currentEvt.getParam());
+		it->second->fireSend(send.getContent(),const_cast<StateMachine *>(this));
 	}
 	else {
 

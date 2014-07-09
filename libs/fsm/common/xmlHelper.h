@@ -7,6 +7,7 @@
 //#include <WinSock.h>
 #include <vector>
 #include <string>
+#include <string.h>
 
 namespace helper{
 namespace xml{
@@ -360,7 +361,7 @@ public:
 			//LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << str);
 		}
 	}
-	CXmlParseHelper(const char * xmlCh):doc(xmlParseMemory(xmlCh,strlen(xmlCh))),_root(NULL){
+	CXmlParseHelper(const char * xmlCh):doc(xmlParseMemory(xmlCh,::strlen(xmlCh))),_root(NULL){
 
 		if (doc._xDocPtr == NULL)
 		{

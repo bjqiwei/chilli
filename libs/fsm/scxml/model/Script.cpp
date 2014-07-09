@@ -21,6 +21,7 @@ namespace model
 	//}
 	void Script::execute(fsm::Context * ctx)
 	{
+		if (ctx == NULL) return ;
 
 		if (!m_fileName.empty()){
 			LOG4CPLUS_TRACE(log,m_strSession << ",script file is:" << m_fileName);
@@ -30,16 +31,6 @@ namespace model
 			LOG4CPLUS_TRACE(log,m_strSession << ",execute script is:" << content);
 			ctx->CompileScript(content,m_strFileName,node->line,node);
 		}
-	}
-
-	bool Script::isEnabledCondition(fsm::Context * ctx)
-	{
-		if (ctx == NULL) return false;
-		
-		if (!this->getCond().empty()){
-			return ctx->evalCond(this->getCond(),m_strFileName,node->line,node);
-		}
-		return true;
 	}
 }
 }

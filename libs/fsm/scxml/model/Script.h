@@ -22,7 +22,6 @@ namespace model
 		Script(xmlNodePtr xNode,const std::string &session,const std::string & filename);
 		/*std::string &getContent();*/
 		virtual  void execute(Context * ctx);
-		virtual bool isEnabledCondition(fsm::Context * ctx);
 	};
 
 
