@@ -133,7 +133,7 @@ namespace helper{
 #else
 		static void *  TimerThreadProc( void *pParam ){
 #endif
-			TimerServer * This = (TimerServer *)pParam;
+			TimerServer * This = static_cast<TimerServer *>(pParam);
 
 #ifdef WIN32
 			time_t millisec = INFINITE;
