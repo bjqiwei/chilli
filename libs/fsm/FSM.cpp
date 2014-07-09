@@ -287,28 +287,28 @@ bool fsm::StateMachine::processEvent(const xmlNodePtr &eventNode)const
 
 		if (isTransition(actionNode))
 		{
-			if(!doneSomething) doneSomething = processTransition(actionNode);
+			processTransition(actionNode)? doneSomething = true:NULL;
 			break;//transition 元素下的元素将不再执行
 		}
 		else if (isLog(actionNode))
 		{
-			if(!doneSomething) doneSomething = processLog(actionNode);
+			processLog(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
 
 		else if (isSend(actionNode))
 		{
-			if(!doneSomething) doneSomething = processSend(actionNode);
+			processSend(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
 		else if (isScript(actionNode))
 		{
-			if(!doneSomething) doneSomething = processScript(actionNode);
+			processScript(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
 		else if (isTimer(actionNode))
 		{
-			if(!doneSomething) doneSomething = processTimer(actionNode);
+			processTimer(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
