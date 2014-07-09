@@ -59,7 +59,7 @@ namespace helper{
 		private:
 			const long m_interval;
 			struct timeb m_startTime;
-			Timer & operator=( const Timer & ) {};
+			Timer & operator=( const Timer & );
 		};
 		class TimerComp{
 		public:
