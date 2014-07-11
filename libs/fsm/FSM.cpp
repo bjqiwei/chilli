@@ -523,11 +523,6 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr &node)const
 			processScript(actionNode);
 			continue;
 		}
-		else if (isTransition(actionNode))
-		{
-			processTransition(actionNode);
-			continue;
-		}
 		else if (isTimer(actionNode))
 		{
 			processTimer(actionNode);
