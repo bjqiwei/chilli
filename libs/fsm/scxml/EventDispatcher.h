@@ -31,7 +31,7 @@ namespace fsm
 		/// Send this message to the target.
 		/// </summary>
 	
-		virtual void fireSend(const std::string &strContent,void * param) = 0;
+		virtual void fireSend(const std::string &strContent,const void * param) = 0;
 
 	};
 }

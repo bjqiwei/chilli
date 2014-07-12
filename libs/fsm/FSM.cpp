@@ -355,7 +355,7 @@ bool fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 
 	std::map<std::string , EventDispatcher *>::const_iterator it = m_mapSendObject.find(send.getTarget());
 	if (it != m_mapSendObject.end()) {
-		it->second->fireSend(send.getContent(),const_cast<StateMachine *>(this));
+		it->second->fireSend(send.getContent(),this);
 	}
 	else {
 
