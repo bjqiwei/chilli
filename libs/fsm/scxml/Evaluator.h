@@ -53,6 +53,8 @@ namespace fsm
 		/// </summary>
 		/// <param name="parent"> parent context </param>
 		/// <returns> new child context </returns>
+		Evaluator(){};
+		virtual ~Evaluator(){};
 		virtual Context * newContext(Context * const parent) = 0;
 		virtual void deleteContext(Context * const cx) = 0;
 		virtual unsigned int getContextCount(){ return contexts.size();};
