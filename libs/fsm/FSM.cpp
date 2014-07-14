@@ -568,7 +568,7 @@ bool fsm::StateMachine::addEventDispatcher(EventDispatcher * evtDsp)
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;
 	return true;
 }
-const std::string & fsm::StateMachine::getName() {
+const std::string & fsm::StateMachine::getName() const {
 	return m_strName;
 }
 const std::string & fsm::StateMachine::getSessionId()const {

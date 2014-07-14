@@ -43,7 +43,7 @@ namespace fsm{
 		void pushEvent(TriggerEvent & Evt) const;
 		void setName(const string &strName);
 		bool addEventDispatcher( EventDispatcher * evtDsp);
-		const std::string& getName();
+		const std::string& getName() const;
 		const std::string& getSessionId()const;
 		Context  *  getRootContext() const; 
 		xmlNodePtr getDataModel(); 
