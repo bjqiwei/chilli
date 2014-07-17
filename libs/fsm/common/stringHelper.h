@@ -63,12 +63,14 @@ namespace helper
 		static inline std::string & toUpper(std::string & str)
 		{
 			transform(str.begin(), str.end(), str.begin(), ::toupper);
+			return str;
 		}
 
 		//transition a string to lower
 		static inline std::string & toLower(std::string &str)
 		{
 			transform(str.begin(), str.end(), str.begin(), ::tolower);
+			return str;
 		}
 	}
 }//end namespace helper
