@@ -174,7 +174,8 @@ namespace model
 				!xmlStrEqual(attrPtr->name, BAD_CAST "typeexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "fromexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "destexpr")&&
-				!xmlStrEqual(attrPtr->name, BAD_CAST "eventexpr")){
+				!xmlStrEqual(attrPtr->name, BAD_CAST "eventexpr")&&
+				!xmlStrEqual(attrPtr->name, BAD_CAST "cond")){
 					m_xmlDoc.newRootProp((char *)attrPtr->name, helper::xml::XStr(xmlGetProp(node,attrPtr->name)).strForm());
 			}
 			attrPtr = attrPtr->next;
