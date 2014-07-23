@@ -4,7 +4,6 @@
 
 #include <string>
 #include <algorithm>
-#include<algorithm>
 #include<iostream>
 #include<cctype>
 #include <functional>
@@ -48,7 +47,8 @@ namespace helper
 			return false;
 		}
 
-		static std::string & replaceString(std::string& str,const std::string& old_value,const std::string& new_value){
+		// relplace string content;
+		static inline std::string & replaceString(std::string& str,const std::string& old_value,const std::string& new_value){
 			for(std::string::size_type pos = 0;pos!=std::string::npos; pos+=new_value.length())   {   
 				if( (pos=str.find(old_value,pos))!=std::string::npos   )   
 					str.replace(pos,old_value.length(),new_value);   
@@ -57,6 +57,20 @@ namespace helper
 			}   
 			return   str;  
 
+		}
+
+		//transition a string to upper
+		static inline std::string & toUpper(std::string & str)
+		{
+			transform(str.begin(), str.end(), str.begin(), ::toupper);
+			return str;
+		}
+
+		//transition a string to lower
+		static inline std::string & toLower(std::string &str)
+		{
+			transform(str.begin(), str.end(), str.begin(), ::tolower);
+			return str;
 		}
 	}
 }//end namespace helper
