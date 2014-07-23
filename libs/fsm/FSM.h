@@ -7,7 +7,7 @@
 #include <log4cplus/logger.h>
 
 #include "scxml/TriggerEvent.h"
-#include "scxml/EventDispatcher.h"
+#include "scxml/SendImplement.h"
 #include "scxml/Context.h"
 //#include "scxml/Evaluator.h"
 #include "scxml/SMInstance.h"

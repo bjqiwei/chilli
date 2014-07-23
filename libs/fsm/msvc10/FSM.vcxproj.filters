@@ -161,9 +161,6 @@
     <ClInclude Include="..\scxml\Evaluator.h">
       <Filter>scxml</Filter>
     </ClInclude>
-    <ClInclude Include="..\scxml\EventDispatcher.h">
-      <Filter>scxml</Filter>
-    </ClInclude>
     <ClInclude Include="..\scxml\TriggerEvent.h">
       <Filter>scxml</Filter>
     </ClInclude>
@@ -190,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\scxml\model\Timer.h">
       <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\SendImplement.h">
+      <Filter>scxml</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
