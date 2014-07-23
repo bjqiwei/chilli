@@ -562,7 +562,7 @@ xmlNodePtr fsm::StateMachine::getState(const string& stateId) const
 	}
 	/* Cleanup */
 }
-bool fsm::StateMachine::addEventDispatcher(EventDispatcher * evtDsp)
+bool fsm::StateMachine::addSendImplement(EventDispatcher * evtDsp)
 {
 	if (m_mapSendObject.count(evtDsp->getTarget())) return false;
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;

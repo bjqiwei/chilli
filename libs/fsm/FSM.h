@@ -42,7 +42,7 @@ namespace fsm{
 		const std::string getCurrentStateID(void) const;
 		void pushEvent(TriggerEvent & Evt) const;
 		void setName(const string &strName);
-		bool addEventDispatcher( EventDispatcher * evtDsp);
+		bool addSendImplement( EventDispatcher * evtDsp);
 		const std::string& getName() const;
 		const std::string& getSessionId()const;
 		Context  *  getRootContext() const; 
