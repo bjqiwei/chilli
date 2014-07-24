@@ -9,10 +9,10 @@
 namespace fsm
 {
 
-	class FSM_EXPORT EventDispatcher
+	class FSM_EXPORT SendInterface
 	{
 	public:
-		EventDispatcher(const std::string &target):_target(target){}
+		SendInterface(const std::string &target):_target(target){}
 
 		// Receive messages module name
 		std::string _target;

@@ -353,7 +353,7 @@ bool fsm::StateMachine::processSend(const xmlNodePtr &Node)const
 		return false;
 	}
 
-	std::map<std::string , EventDispatcher *>::const_iterator it = m_mapSendObject.find(send.getTarget());
+	std::map<std::string , SendInterface *>::const_iterator it = m_mapSendObject.find(send.getTarget());
 	if (it != m_mapSendObject.end()) {
 		it->second->fireSend(send.getContent(),this);
 	}
@@ -562,7 +562,7 @@ xmlNodePtr fsm::StateMachine::getState(const string& stateId) const
 	}
 	/* Cleanup */
 }
-bool fsm::StateMachine::addSendImplement(EventDispatcher * evtDsp)
+bool fsm::StateMachine::addSendImplement(SendInterface * evtDsp)
 {
 	if (m_mapSendObject.count(evtDsp->getTarget())) return false;
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;

@@ -137,7 +137,6 @@
     <ClInclude Include="..\scxml\env\SimpleEvaluator.h" />
     <ClInclude Include="..\scxml\ErrorReporter.h" />
     <ClInclude Include="..\scxml\Evaluator.h" />
-    <ClInclude Include="..\scxml\SendImplement.h" />
     <ClInclude Include="..\scxml\model\Action.h" />
     <ClInclude Include="..\scxml\model\Data.h" />
     <ClInclude Include="..\scxml\model\Datamodel.h" />
@@ -152,6 +151,7 @@
     <ClInclude Include="..\scxml\model\State.h" />
     <ClInclude Include="..\scxml\model\Timer.h" />
     <ClInclude Include="..\scxml\model\Transition.h" />
+    <ClInclude Include="..\scxml\SendInterface.h" />
     <ClInclude Include="..\scxml\SMInstance.h" />
     <ClInclude Include="..\scxml\TriggerEvent.h" />
   </ItemGroup>

@@ -7,7 +7,7 @@
 #include <log4cplus/logger.h>
 
 #include "scxml/TriggerEvent.h"
-#include "scxml/SendImplement.h"
+#include "scxml/SendInterface.h"
 #include "scxml/Context.h"
 //#include "scxml/Evaluator.h"
 #include "scxml/SMInstance.h"
@@ -42,7 +42,7 @@ namespace fsm{
 		const std::string getCurrentStateID(void) const;
 		void pushEvent(TriggerEvent & Evt) const;
 		void setName(const string &strName);
-		bool addSendImplement( EventDispatcher * evtDsp);
+		bool addSendImplement( SendInterface * evtDsp);
 		const std::string& getName() const;
 		const std::string& getSessionId()const;
 		Context  *  getRootContext() const; 
@@ -96,7 +96,7 @@ namespace fsm{
 		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
 		xmlNodePtr getTargetStates(const xmlNodePtr &transition) const;
 	private:
-		std::map<std::string, EventDispatcher *> m_mapSendObject;
+		std::map<std::string, SendInterface *> m_mapSendObject;
 		SMInstance * m_scInstance;
 		mutable helper::CLock m_lock;
 	public:

@@ -188,7 +188,7 @@
     <ClInclude Include="..\scxml\model\Timer.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
-    <ClInclude Include="..\scxml\SendImplement.h">
+    <ClInclude Include="..\scxml\SendInterface.h">
       <Filter>scxml</Filter>
     </ClInclude>
   </ItemGroup>
