@@ -77,6 +77,7 @@ namespace fsm{
 		static bool inline isSend(const xmlNodePtr &Node) ;
 		static bool inline isScript(const xmlNodePtr &Node) ;
 		static bool inline isTimer(const xmlNodePtr &Node) ;
+		static bool inline isRaise(const xmlNodePtr &Node) ;
 		bool processEvent(const TriggerEvent &event);
 		bool processEvent( const xmlNodePtr &eventNode) const;
 		bool processTransition(const xmlNodePtr &node) const;
@@ -88,6 +89,7 @@ namespace fsm{
 		bool processScript(const xmlNodePtr &node)const;
 		bool processTimer(const xmlNodePtr &node)const;
 		bool processLog(const xmlNodePtr &node) const;
+		bool processRaise(const xmlNodePtr &node)const;
 
 		void enterStates(const xmlNodePtr &stateNode) const;
 		void exitStates() const;
@@ -104,7 +106,7 @@ namespace fsm{
 	private:
 		xmlType m_xmlType;
 		std::string m_strStateContent;
-		std::queue<TriggerEvent> m_internalQueue;
+		mutable std::queue<TriggerEvent> m_internalQueue;
 		std::queue<TriggerEvent> m_externalQueue;
 		bool m_running;
 	public:

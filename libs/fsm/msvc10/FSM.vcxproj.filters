@@ -93,6 +93,9 @@
     <ClCompile Include="..\scxml\model\Timer.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
+    <ClCompile Include="..\scxml\model\Raise.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scxml\model\Action.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="..\scxml\SendInterface.h">
       <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Raise.h">
+      <Filter>scxml.model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@
 #include "scxml/model/Functionmodel.h"
 #include "scxml/model/Datamodel.h"
 #include "scxml/model/Log.h"
+#include "scxml/model/Raise.h"
 #include <stdexcept>
 #include <log4cplus/loggingmacros.h>
 
@@ -169,6 +170,11 @@ inline bool fsm::StateMachine::isTimer(const xmlNodePtr &xNode)
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("timer")); 
 }
 
+inline bool fsm::StateMachine::isRaise(const xmlNodePtr &xNode)
+{
+	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("raise")); 
+}
+
 void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)
 {
 	m_externalQueue.push(trigEvent);
@@ -276,6 +282,11 @@ bool fsm::StateMachine::processEvent(const xmlNodePtr &eventNode)const
 			processTimer(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
+		else if (isRaise(actionNode))
+		{
+			processRaise(actionNode)? doneSomething = true:NULL;
+			continue;
+		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
 			LOG4CPLUS_ERROR(log, m_strSessionID.c_str() << ": " << actionNode->name << " process not implement.");
@@ -377,6 +388,23 @@ bool fsm::StateMachine::processScript(const xmlNodePtr &node) const
 	
 	return false;
 }
+
+bool fsm::StateMachine::processRaise(const xmlNodePtr &node)const
+{
+	if (!node) return false;
+	model::Raise raise(node,m_strSessionID,m_strStateFile);
+
+	if(raise.isEnabledCondition(this->getRootContext())){
+		TriggerEvent _raiseEvent;
+		_raiseEvent.setEventName(raise.getEvent());
+		_raiseEvent.setParam(this);
+		m_internalQueue.push(_raiseEvent);
+		return true;
+	}
+
+	return false;
+}
+
 const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentState)const
 {
 	xmlNodePtr curState = currentState;
@@ -459,6 +487,11 @@ bool fsm::StateMachine::processExit(const xmlNodePtr &exitNode) const
 			processTimer(actionNode);
 			continue;
 		}
+		else if (isRaise(actionNode))
+		{
+			processRaise(actionNode);
+			continue;
+		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
 			LOG4CPLUS_ERROR(log,m_strSessionID << ":" << actionNode->name <<"  process not implement." );
@@ -491,6 +524,11 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr &node)const
 		else if (isTimer(actionNode))
 		{
 			processTimer(actionNode);
+			continue;
+		}
+		else if (isRaise(actionNode))
+		{
+			processRaise(actionNode);
 			continue;
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
@@ -617,7 +655,7 @@ void fsm::StateMachine::mainEventLoop()
 		}
 
 		//内部事件队列循环
-		while (m_running && !m_internalQueue.empty())
+		if(m_running && !m_internalQueue.empty())
 		{
 			std::queue<TriggerEvent> excQueue;
 			// 拷贝现在内部事件队列中的事件到执行队列中
@@ -638,6 +676,11 @@ void fsm::StateMachine::mainEventLoop()
 			m_running = false;
 			break;
 		}
+		//如果外部队列和内部队列都为空，退出外部事件队列循环
+		if (m_externalQueue.empty() && m_internalQueue.empty()){
+			break;
+		}
+
 	}
 	
 }

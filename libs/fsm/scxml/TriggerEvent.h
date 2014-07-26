@@ -23,18 +23,18 @@ namespace fsm
 	private:
 		std::string m_strEventName;
 		std::string m_strData;
-		void * m_ParamPtr;
+		const void * m_ParamPtr;
 		int type;
 		
 		
 	public:
 		void setEventName(const std::string &strEventName){m_strEventName = strEventName;}
 		void setData(const std::string &strData){m_strData = strData;}
-		void setParam(void * param){m_ParamPtr = param;}
+		void setParam(const void * param){m_ParamPtr = param;}
 
 		const std::string &getEventName(){return m_strEventName;}
 		const std::string &getData(){return m_strData;}
-		void * getParam(){return m_ParamPtr;}
+		const void * getParam(){return m_ParamPtr;}
 
 		const int &getType(){return type;}
 

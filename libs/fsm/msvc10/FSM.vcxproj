@@ -113,6 +113,7 @@
     <ClCompile Include="..\scxml\model\Log.cpp" />
     <ClCompile Include="..\scxml\model\OnEntry.cpp" />
     <ClCompile Include="..\scxml\model\OnExit.cpp" />
+    <ClCompile Include="..\scxml\model\Raise.cpp" />
     <ClCompile Include="..\scxml\model\Script.cpp" />
     <ClCompile Include="..\scxml\model\Send.cpp" />
     <ClCompile Include="..\scxml\model\State.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="..\scxml\model\Log.h" />
     <ClInclude Include="..\scxml\model\OnEntry.h" />
     <ClInclude Include="..\scxml\model\OnExit.h" />
+    <ClInclude Include="..\scxml\model\Raise.h" />
     <ClInclude Include="..\scxml\model\Script.h" />
     <ClInclude Include="..\scxml\model\Send.h" />
     <ClInclude Include="..\scxml\model\State.h" />
