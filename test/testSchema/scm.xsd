@@ -67,6 +67,7 @@
       <xs:element name="send" minOccurs="0" maxOccurs="unbounded" type="sendType"/>
       <xs:element name="script" minOccurs="0" maxOccurs="unbounded" type="scriptType"/>
       <xs:element name="timer" minOccurs="0" maxOccurs="unbounded" type="timerType"/>
+	  <xs:element name="raise" minOccurs="0" maxOccurs="unbounded" type="raiseType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="onexitType">
@@ -75,6 +76,7 @@
       <xs:element name="send" minOccurs="0" maxOccurs="unbounded" type="sendType"/>
       <xs:element name="script" minOccurs="0" maxOccurs="unbounded" type="scriptType"/>
       <xs:element name="timer" minOccurs="0" maxOccurs="unbounded" type="timerType"/>
+	  <xs:element name="raise" minOccurs="0" maxOccurs="unbounded" type="raiseType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="eventType">
@@ -84,6 +86,7 @@
       <xs:element name="script" minOccurs="0" maxOccurs="unbounded" type="scriptType"/>
       <xs:element name="send" minOccurs="0" maxOccurs="unbounded" type="sendType"/>
       <xs:element name="timer" minOccurs="0" maxOccurs="unbounded" type="timerType"/>
+	  <xs:element name="raise" minOccurs="0" maxOccurs="unbounded" type="raiseType"/>
     </xs:sequence>
     <xs:attribute name="event" type="xs:string" use="optional" />
     <xs:attribute name="cond" type="xs:string" use="optional"/>
@@ -232,5 +235,9 @@
       </xs:simpleType>
     </xs:attribute>
     <xs:attribute name="cond" type="xs:string" use="optional"/>
+  </xs:complexType>
+    <xs:complexType name="raiseType">
+    <xs:attribute name="cond" type="xs:string" use="optional"/>
+    <xs:attribute name="event" type="xs:string" use="required"/>
   </xs:complexType>
 </xs:schema>
