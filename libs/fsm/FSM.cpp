@@ -19,7 +19,7 @@ using namespace std;
 
 fsm::StateMachine::StateMachine(const string  &xml, xmlType xtype):m_xmlDocPtr(NULL),m_initState(NULL)
 	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
-	,m_xmlType(xtype)
+	,m_xmlType(xtype),m_running(true)
 {
 
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");
@@ -169,51 +169,15 @@ inline bool fsm::StateMachine::isTimer(const xmlNodePtr &xNode)
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("timer")); 
 }
 
-void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)const
+void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)
 {
-	using namespace helper::xml;
-	m_lock.Lock();
-	m_currentEvt = trigEvent;
-	bool foundEvent = false;
-	xmlNodePtr filterState = m_currentStateNode;
-	//std::string strEventData = trigEvent.getData();
-	//scInstance->getRootContext()->set("_event.data",strEventData);
-	while (filterState != NULL && filterState != m_rootNode && foundEvent == false) 
-	{
-	
-		for (xmlNodePtr eventNode = filterState->children; eventNode !=NULL;
-			eventNode = eventNode->next)
-		{
-			
-			if (isEvent(eventNode))
-			{
-				model::Event event(eventNode,m_strSessionID,m_strStateFile);
-				
-				if (event.isEnabledEvent(m_currentEvt.getEventName()) 
-					&& event.isEnabledCondition(this->getRootContext()))
-				{
-					foundEvent = true;
-					processEvent(eventNode);
-					break;
-				}
-			}
-		}
-		if (!foundEvent)
-		{
-			filterState = getParentState(filterState);
-		}
-	} 
-
-	if (!foundEvent)
-	{
-		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
-	}
-	m_lock.Unlock();
+	m_externalQueue.push(trigEvent);
 }
 fsm::StateMachine::StateMachine(const StateMachine &other):m_strStateFile(other.m_strStateFile),m_xmlDocPtr(NULL),
 	m_initState(NULL),m_currentStateNode(NULL),m_rootNode(NULL),log(other.log),xpathCtx(NULL)
 	,m_mapSendObject(other.m_mapSendObject),m_scInstance(other.m_scInstance)
 	,m_xmlType(other.m_xmlType),m_strStateContent(other.m_strStateContent)
+	,m_running(true)
 	
 {
 	LOG4CPLUS_TRACE(log, m_strSessionID << ",creat a fsm object from other statemachine:" << other.getSessionId() );
@@ -239,6 +203,7 @@ fsm::StateMachine & fsm::StateMachine::operator=(const fsm::StateMachine & other
 	this->m_xmlType = other.m_xmlType;
 	this->m_strStateContent = other.m_strStateContent;
 	this->m_mapSendObject = other.m_mapSendObject;
+	this->m_running = true;
 	this->Init();
 	return *this;
 }
@@ -633,4 +598,87 @@ void fsm::StateMachine::setSessionID(const std::string &strSessionid)
 {
 	m_strSessionID = strSessionid;
 	LOG4CPLUS_DEBUG(log,"set this stateMachine sessionid=" << m_strSessionID);
+}
+
+void fsm::StateMachine::mainEventLoop()
+{
+	using namespace helper::xml;
+	helper::AutoLock autolock(&this->m_lock);
+
+	//外部事件队列循环
+	while(m_running){
+
+		//如果外部事件队列不为空，执行一个外部事件
+		TriggerEvent trigEvent;
+		if(!m_externalQueue.empty()){
+			trigEvent = m_externalQueue.front();
+			m_externalQueue.pop();
+			processEvent(trigEvent);
+		}
+
+		//内部事件队列循环
+		while (m_running && !m_internalQueue.empty())
+		{
+			std::queue<TriggerEvent> excQueue;
+			// 拷贝现在内部事件队列中的事件到执行队列中
+			while(!m_internalQueue.empty()) 
+			{
+				excQueue.push(m_internalQueue.front());
+				m_internalQueue.pop();
+			}
+			//执行当前执行队列
+			while (m_running && !excQueue.empty()){
+				TriggerEvent inEvent = excQueue.front();
+				excQueue.pop();
+				processEvent(inEvent);
+			}
+		}
+
+		if(isTerminationEvent(trigEvent)){
+			m_running = false;
+			break;
+		}
+	}
+	
+}
+
+bool fsm::StateMachine::processEvent(const TriggerEvent &event)
+{
+	using namespace helper::xml;
+	m_currentEvt = event;
+	bool foundEvent = false;
+	xmlNodePtr filterState = m_currentStateNode;
+	//std::string strEventData = trigEvent.getData();
+	//scInstance->getRootContext()->set("_event.data",strEventData);
+	while (filterState != NULL && filterState != m_rootNode && foundEvent == false) 
+	{
+
+		for (xmlNodePtr eventNode = filterState->children; eventNode !=NULL;
+			eventNode = eventNode->next)
+		{
+
+			if (isEvent(eventNode))
+			{
+				model::Event event(eventNode,m_strSessionID,m_strStateFile);
+
+				if (event.isEnabledEvent(m_currentEvt.getEventName()) 
+					&& event.isEnabledCondition(this->getRootContext()))
+				{
+					foundEvent = true;
+					processEvent(eventNode);
+					break;
+				}
+			}
+		}
+		if (!foundEvent)
+		{
+			filterState = getParentState(filterState);
+		}
+	} 
+
+	if (!foundEvent)
+	{
+		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
+	}
+	return foundEvent;
 }

@@ -24,7 +24,7 @@ public:
 	int Unlock()   { LeaveCriticalSection(&m_CriticalSection); return true;   }
 #else// POSIX - linux
 	CLock()        { pthread_mutex_init(&m_Mutex, NULL);}
-	~CLock()       { pthread_mutex_destroy(&m_Mutex);   }
+	virtual ~CLock()       { pthread_mutex_destroy(&m_Mutex);   }
 	int Lock()     { int nRetCode = pthread_mutex_lock(&m_Mutex);      return (nRetCode == 0); }
 	int Unlock()   { int nRetCode = pthread_mutex_unlock(&m_Mutex);    return (nRetCode == 0); }
 #endif
@@ -36,9 +36,25 @@ private:
 #endif
 private:
 	CLock(const CLock &);
-	void operator =(const CLock &);
+	CLock& operator =(const CLock &);
 
 };// end of lock class
 
+class AutoLock
+{
+public:
+	explicit AutoLock(CLock* lock):m_lock(lock)
+	{
+		m_lock->Lock();
+	}
+	virtual ~AutoLock()
+	{
+		m_lock->Unlock();
+	}
+private:
+	CLock * m_lock;
+	AutoLock(const AutoLock &);
+	AutoLock & operator=(const AutoLock &);
+};
 }//end namespace helper
 #endif // end header file

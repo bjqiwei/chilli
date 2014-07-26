@@ -40,17 +40,17 @@ namespace fsm{
 		void go();
 		const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
-		void pushEvent(TriggerEvent & Evt) const;
+		void pushEvent(TriggerEvent & Evt);
 		void setName(const string &strName);
 		bool addSendImplement( SendInterface * evtDsp);
 		const std::string& getName() const;
 		const std::string& getSessionId()const;
 		Context  *  getRootContext() const; 
-		xmlNodePtr getDataModel(); 
 		void setscInstance(SMInstance *);
 		void setLog(log4cplus::Logger log);
 		void setSessionID(const std::string &strSessionid);
 		void reset();
+		void mainEventLoop();
 	protected:
 		std::string m_strStateFile;
 		helper::xml::CXmlDocumentPtr m_xmlDocPtr;
@@ -77,7 +77,7 @@ namespace fsm{
 		static bool inline isSend(const xmlNodePtr &Node) ;
 		static bool inline isScript(const xmlNodePtr &Node) ;
 		static bool inline isTimer(const xmlNodePtr &Node) ;
-
+		bool processEvent(const TriggerEvent &event);
 		bool processEvent( const xmlNodePtr &eventNode) const;
 		bool processTransition(const xmlNodePtr &node) const;
 		bool processExit(const xmlNodePtr &node) const;
@@ -104,6 +104,11 @@ namespace fsm{
 	private:
 		xmlType m_xmlType;
 		std::string m_strStateContent;
+		std::queue<TriggerEvent> m_internalQueue;
+		std::queue<TriggerEvent> m_externalQueue;
+		bool m_running;
+	public:
+		virtual bool isTerminationEvent(const TriggerEvent &)const = 0;
 		
 	};
 }
