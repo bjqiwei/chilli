@@ -13,30 +13,33 @@ namespace fsm
 
 	public:
 
-		TriggerEvent():m_ParamPtr(NULL),type(-1){};
+		TriggerEvent():m_ParamPtr(NULL){};
 		//根据事件名称和事件类型生成一个事件。
-		TriggerEvent(const std::string &name, int const type); //this(name, type, nullptr);
+		TriggerEvent(const std::string &name); //this(name,nullptr);
 		//根据事件名称，数据，事件类型生成一个事件。
-		TriggerEvent(const std::string &name, const std::string &data, int const type); 
+		TriggerEvent(const std::string &name, const std::string &data); 
 
 		
 	private:
 		std::string m_strEventName;
+		std::string m_strMsgType;
 		std::string m_strData;
 		const void * m_ParamPtr;
-		int type;
+		std::map<std::string,std::string> m_eventVars;
 		
 		
 	public:
 		void setEventName(const std::string &strEventName){m_strEventName = strEventName;}
 		void setData(const std::string &strData){m_strData = strData;}
+		void setMsgType(const std::string &strMsgtype){m_strMsgType = strMsgtype;}
 		void setParam(const void * param){m_ParamPtr = param;}
+		void setVars(std::map<std::string,std::string> params);
 
-		const std::string &getEventName(){return m_strEventName;}
+		const std::string &getEventName()const{return m_strEventName;}
 		const std::string &getData(){return m_strData;}
+		const std::string &getMsgType(){return m_strMsgType;}
 		const void * getParam(){return m_ParamPtr;}
-
-		const int &getType(){return type;}
+		const std::map <std::string,std::string> &getVars() { return m_eventVars; };
 
 		virtual bool Equals(const TriggerEvent & obj);
 		virtual std::string ToString();

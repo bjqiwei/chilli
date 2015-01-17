@@ -4,21 +4,19 @@
 namespace fsm
 {
 
-	TriggerEvent::TriggerEvent(const std::string &name, int const type):m_strEventName(name),m_ParamPtr(NULL)
+	TriggerEvent::TriggerEvent(const std::string &name):m_strEventName(name),m_ParamPtr(NULL)
 	{
-		this->type = type;
 	}
 
-	TriggerEvent::TriggerEvent(const std::string &name, const std::string &data,int const type):m_strEventName(name),
+	TriggerEvent::TriggerEvent(const std::string &name, const std::string &data):m_strEventName(name),
 		m_strData(data),m_ParamPtr(NULL)
 	{
-		this->type = type;
 	}
 	
 
 	bool TriggerEvent::Equals(const TriggerEvent & obj)
 	{
-		if (type == obj.type && m_strEventName ==obj.m_strEventName && m_strData == obj.m_strData) {
+		if (m_strMsgType.compare(obj.m_strMsgType)==0 && m_strEventName ==obj.m_strEventName && m_strData == obj.m_strData) {
 			return true;
 		}
 
@@ -28,8 +26,13 @@ namespace fsm
 	std::string TriggerEvent::ToString()
 	{
 		std::stringstream ss;
-		ss <<  "TriggerEvent{name=" << m_strEventName << ",type=" << type << ",data=" << m_strData <<"}";
+		ss <<  "TriggerEvent{name=" << m_strEventName << ",msgtype=" << m_strMsgType << ",data=" << m_strData <<"}";
 		return ss.str();
+	}
+
+	void TriggerEvent::setVars(std::map<std::string,std::string> params)
+	{
+		m_eventVars  = params;
 	}
 
 }
