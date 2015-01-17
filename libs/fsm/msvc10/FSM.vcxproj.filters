@@ -75,9 +75,6 @@
     <ClCompile Include="..\scxml\env\JSEvaluator.cpp">
       <Filter>scxml.env</Filter>
     </ClCompile>
-    <ClCompile Include="..\scxml\env\JSGlobalClass.cpp">
-      <Filter>scxml.env</Filter>
-    </ClCompile>
     <ClCompile Include="..\scxml\env\SimpleContext.cpp">
       <Filter>scxml.env</Filter>
     </ClCompile>
@@ -141,12 +138,6 @@
       <Filter>scxml.env</Filter>
     </ClInclude>
     <ClInclude Include="..\scxml\env\JSEvaluator.h">
-      <Filter>scxml.env</Filter>
-    </ClInclude>
-    <ClInclude Include="..\scxml\env\JSGlobalClass.h">
-      <Filter>scxml.env</Filter>
-    </ClInclude>
-    <ClInclude Include="..\scxml\env\JSHelper.h">
       <Filter>scxml.env</Filter>
     </ClInclude>
     <ClInclude Include="..\scxml\env\SimpleContext.h">

@@ -49,12 +49,12 @@ namespace model
 		{
 			//std::string value;
 			//value = evl->eval(ctx, getExpr(),m_strFileName,node->line);
-			ctx->setLocal(getId(), this->getExpr(),false);
+			ctx->eval(getId()+"="+this->getExpr()+";" , m_strFileName, node->line, node);
 			
 		}
 		else
 		{
-			ctx->setLocal(getId(), "",false);
+			ctx->eval(getId()+";" , m_strFileName, node->line, node);
 		}
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 	}

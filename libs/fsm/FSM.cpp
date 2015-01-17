@@ -14,6 +14,7 @@
 #include "scxml/model/Raise.h"
 #include <stdexcept>
 #include <log4cplus/loggingmacros.h>
+#include "common/stringHelper.h"
 
 
 using namespace std;
@@ -39,7 +40,7 @@ fsm::StateMachine::~StateMachine()
  { 
 	 //if (_ctxt) xmlClearParserCtxt(_ctxt);
 	 //_ctxt = NULL;
-	 if(m_scInstance)m_scInstance->removeContext(m_rootNode);
+	 this->reset();
 	 LOG4CPLUS_DEBUG(log, m_strSessionID << ",destruction a smscxml object.");
 
  }
@@ -49,11 +50,19 @@ void fsm::StateMachine::reset()
 { 
 	//if (_ctxt) xmlClearParserCtxt(_ctxt);
 	//_ctxt = NULL;
+	std::map<std::string,Json::Value>::const_iterator it = m_globalVars.begin();
+	while (it != m_globalVars.end())
+	{
+		if (getRootContext())
+		{
+			getRootContext()->deleteVar("_"+it->first);
+		}
+		m_globalVars.erase(it++);
+	}
 	if(m_scInstance)m_scInstance->removeContext(m_rootNode);
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",reset a smscxml object.");
 
 }
-
 
 
 bool fsm::StateMachine::Init(void)
@@ -69,12 +78,12 @@ bool fsm::StateMachine::Init(void)
 		 {
 			 m_rootNode = rootNode;
 			 LOG4CPLUS_TRACE(log,"set rootNode=" << m_rootNode);
+
+			 m_strName =  getXmlNodeAttributesValue(m_rootNode,"name");
+			  LOG4CPLUS_TRACE(log,"set name=" <<  m_strName);
 			// normalize(_rootNode);
 			 m_initState = getXmlChildNode(m_rootNode,"state");
 			 LOG4CPLUS_TRACE(log,"set initState=" <<  getXmlNodeAttributesValue(m_initState,"id"));
-			 
-			// SCXMLHelper::cloneDatamodel(getXmlChildNode(_rootNode,"datamodel"),scInstance->getContext(_rootNode,logger),scInstance->getEvaluator(),logger);
-			//SCXMLHelper::cloneFunctionmodel(getXmlChildNode(_rootNode,"functionmodel"),scInstance->getContext(_rootNode,log),scInstance->getEvaluator(),log);
 			 
 		 }
 		 else
@@ -115,17 +124,17 @@ void fsm::StateMachine::normalize(const xmlNodePtr &smscxml)
 }
 
 
-const xmlNodePtr fsm::StateMachine::getCurrentState(void) const
-{
-	return m_currentStateNode;
-}
+//const xmlNodePtr fsm::StateMachine::getCurrentState(void) const
+//{
+//	return m_currentStateNode;
+//}
 
 const std::string fsm::StateMachine::getCurrentStateID(void) const
 {
 	return helper::xml::getXmlNodeAttributesValue(m_currentStateNode,"id");
 }
 
-inline bool fsm::StateMachine::isState(const xmlNodePtr &xNode) const 
+inline bool fsm::StateMachine::isState(const xmlNodePtr &xNode)  
 {
 	return xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("state")) ; 
 }
@@ -398,6 +407,7 @@ bool fsm::StateMachine::processRaise(const xmlNodePtr &node)const
 		TriggerEvent _raiseEvent;
 		_raiseEvent.setEventName(raise.getEvent());
 		_raiseEvent.setParam(this);
+		LOG4CPLUS_TRACE(log,"Raise a event:" << _raiseEvent.ToString());
 		m_internalQueue.push(_raiseEvent);
 		return true;
 	}
@@ -417,11 +427,11 @@ const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentSta
 	return NULL;
 }
 
-void fsm::StateMachine::setName(const string &strName)
-{
-	m_strName = strName;
-	LOG4CPLUS_DEBUG(log,"set this stateMachine name=" << m_strName);
-}
+//void fsm::StateMachine::setName(const string &strName)
+//{
+//	m_strName = strName;
+//	LOG4CPLUS_DEBUG(log,"set this stateMachine name=" << m_strName);
+//}
 
 
 void fsm::StateMachine::exitStates() const
@@ -448,7 +458,7 @@ void fsm::StateMachine::enterStates(const xmlNodePtr &stateNode) const
 		{
 			if (isEntry(entryNode))
 			{
-				if(!processEntry(entryNode)) break;
+				processEntry(entryNode);
 			}
 		}
 	}
@@ -598,11 +608,14 @@ void fsm::StateMachine::setLog(log4cplus::Logger log)
 void fsm::StateMachine::go()
 {
 	fsm::Context *ctx = getRootContext();
-	/*创建JsContext私有数据指针*/
-	if(ctx){
-		ctx->SetContextPrivate(this);
-	}
 
+	if (ctx)
+	{
+		/*创建JsContext私有数据指针*/
+		ctx->SetContextPrivate(this);
+		ctx->setVar("_name",getName());
+		ctx->setVar("_sessionid",getSessionId());
+	}
 	if (m_rootNode)
 	{
 		for (xmlNodePtr childNode = m_rootNode->children; childNode != NULL; childNode = childNode->next )
@@ -655,6 +668,7 @@ void fsm::StateMachine::mainEventLoop()
 		}
 
 		//内部事件队列循环
+		LOG4CPLUS_TRACE(log, "Internal Event Queue size:" << m_internalQueue.size());
 		if(m_running && !m_internalQueue.empty())
 		{
 			std::queue<TriggerEvent> excQueue;
@@ -688,7 +702,26 @@ void fsm::StateMachine::mainEventLoop()
 bool fsm::StateMachine::processEvent(const TriggerEvent &event)
 {
 	using namespace helper::xml;
-	m_currentEvt = event;
+	if (getRootContext()){
+		for(std::map<std::string ,std::string >::const_iterator it = m_currentEvt.getVars().begin();
+			it != m_currentEvt.getVars().end();++it)
+		{
+			getRootContext()->deleteVar("_" + it->first,fsm::eventOjbect);
+		}
+		m_currentEvt = event;
+
+		getRootContext()->setVar("_name", m_currentEvt.getEventName(), fsm::eventOjbect);
+		getRootContext()->setVar("_type", m_currentEvt.getMsgType(),fsm::eventOjbect);
+		getRootContext()->setVar("_data", m_currentEvt.getData(), fsm::eventOjbect);
+		for(std::map<std::string ,std::string >::const_iterator it = m_currentEvt.getVars().begin();
+			it != m_currentEvt.getVars().end();++it)
+		{
+			getRootContext()->setVar("_" + it->first,it->second, fsm::eventOjbect);
+		}
+	}else
+	{
+		m_currentEvt = event;
+	}
 	bool foundEvent = false;
 	xmlNodePtr filterState = m_currentStateNode;
 	//std::string strEventData = trigEvent.getData();
@@ -724,4 +757,26 @@ bool fsm::StateMachine::processEvent(const TriggerEvent &event)
 		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
 	}
 	return foundEvent;
+}
+
+bool fsm::StateMachine::setVar(const std::string &name, const Json::Value & value)
+{  
+	std::string out2 = value.toStyledString();
+	LOG4CPLUS_TRACE(log,"set " << name << "=" << helper::string::trim(out2));
+	this->m_globalVars[name] = value;
+	if (getRootContext())
+	{
+		getRootContext()->setVar("_"+name,value);
+	}
+	return true;
+}
+
+Json::Value fsm::StateMachine::getVar(const std::string &name)const
+{
+	std::map<std::string,Json::Value>::const_iterator it = m_globalVars.find(name);
+	if (it != m_globalVars.end())
+	{
+		return it->second;
+	}
+	return Json::Value();
 }

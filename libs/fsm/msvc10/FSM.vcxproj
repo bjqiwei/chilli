@@ -47,13 +47,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>$(SolutionDir)\..\..\log4cplus-1.1.2\include\;$(SolutionDir)\..\..\libxml2-2.7.7\include;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\log4cplus-1.1.2\include\;$(SolutionDir)\..\..\libxml2-2.7.7\include;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\include\;$(SolutionDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\..\..\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\..\..\log4cplus-1.1.2\msvc10\$(PlatformName)\bin.$(Configuration)\;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\..\..\log4cplus-1.1.2\include\;$(SolutionDir)\..\..\libxml2-2.7.7\include;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\log4cplus-1.1.2\include\;$(SolutionDir)\..\..\libxml2-2.7.7\include;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\include\;$(SolutionDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\..\..\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\..\..\log4cplus-1.1.2\msvc10\$(PlatformName)\bin.$(Configuration)\;$(SolutionDir)\..\..\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -102,7 +102,6 @@
     <ClCompile Include="..\FSM.cpp" />
     <ClCompile Include="..\scxml\env\JSContext.cpp" />
     <ClCompile Include="..\scxml\env\JSEvaluator.cpp" />
-    <ClCompile Include="..\scxml\env\JSGlobalClass.cpp" />
     <ClCompile Include="..\scxml\env\SimpleContext.cpp" />
     <ClCompile Include="..\scxml\env\SimpleEvaluator.cpp" />
     <ClCompile Include="..\scxml\model\Data.cpp" />
@@ -132,8 +131,6 @@
     <ClInclude Include="..\scxml\Context.h" />
     <ClInclude Include="..\scxml\env\JSContext.h" />
     <ClInclude Include="..\scxml\env\JSEvaluator.h" />
-    <ClInclude Include="..\scxml\env\JSGlobalClass.h" />
-    <ClInclude Include="..\scxml\env\JSHelper.h" />
     <ClInclude Include="..\scxml\env\SimpleContext.h" />
     <ClInclude Include="..\scxml\env\SimpleEvaluator.h" />
     <ClInclude Include="..\scxml\ErrorReporter.h" />
@@ -156,6 +153,11 @@
     <ClInclude Include="..\scxml\SendInterface.h" />
     <ClInclude Include="..\scxml\SMInstance.h" />
     <ClInclude Include="..\scxml\TriggerEvent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\jsoncpp-src-0.5.0\makefiles\vs71\lib_json.vcxproj">
+      <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
