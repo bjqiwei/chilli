@@ -10,14 +10,14 @@
 #include <list>
 #include <vector>
 
-#include <log4cplus\logger.h>
-#include <libxml\tree.h>
+#include <log4cplus/logger.h>
+#include <libxml/tree.h>
 #include <jsapi.h>
 
 #include "..\config.h"
 #include "Context.h"
 #include "Evaluator.h"
-#include "..\common\Timer.h"
+#include "../common/Timer.h"
 
 namespace fsm
 {
@@ -43,11 +43,11 @@ namespace fsm
 		/// </summary>
 		mutable std::vector<Evaluator *>evaluator;//Script ÐéÄâ»ú
 
-		static log4cplus::Logger log;
+		log4cplus::Logger log;
 	private:
 		virtual Evaluator *getEvaluator() const;
 	public:
-		SMInstance();
+		SMInstance(helper::CTimerNotify& observer);
 		virtual ~SMInstance();
 
 
