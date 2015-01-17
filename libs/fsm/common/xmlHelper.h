@@ -151,7 +151,14 @@ static inline void setXmlNodeAttributesValue (xmlNodePtr xNode ,const std::strin
 {
 	if (!xNode) return ;
 
-	xmlSetProp(xNode,BAD_CAST strAttributeName.c_str(),BAD_CAST strValue.c_str());
+	if(!(xmlHasProp(xNode, (xmlChar*)strAttributeName.c_str())))
+	{
+		xmlNewProp(xNode, (xmlChar*)strAttributeName.c_str(), (xmlChar*)strValue.c_str());	
+	}
+	else
+	{
+		xmlSetProp(xNode,BAD_CAST strAttributeName.c_str(),BAD_CAST strValue.c_str());
+	}
 	return ;
 }
 static inline std::vector<xmlNodePtr> filterChildNodes(const std::string& tagName, const xmlNodePtr node)
@@ -376,22 +383,33 @@ public:
 		}
 
 	}
+	
 	std::string getRootName()
 	{
 		return _root ? (char *)_root->name:"";
 	}
+	
 	std::string getRootProp(const std::string &name)
 	{
 		return getXmlNodeAttributesValue(_root,name);
 	}
+	
 	std::string getChildContent(const std::string &childName)
 	{
 		return getXmlChildNodeValue(_root,childName);
 	}
+	
 	void setRootAttributesValue (const std::string &strAttributeName,const std::string &strValue)
 	{
 		setXmlNodeAttributesValue(_root,strAttributeName,strValue);
 	}
+
+
+	xmlNodePtr getRootNode()
+	{
+		return _root;
+	}
+	
 	std::string getContent()
 	{
 		xmlChar *xmlbuff;

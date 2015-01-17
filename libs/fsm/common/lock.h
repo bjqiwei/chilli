@@ -21,11 +21,13 @@ public:
 	CLock()        { InitializeCriticalSection(&m_CriticalSection);           }
 	~CLock()       { DeleteCriticalSection(&m_CriticalSection);               }
 	int Lock()     { EnterCriticalSection(&m_CriticalSection); return true;   }
+	bool TryLock() { return TryEnterCriticalSection(&m_CriticalSection) == TRUE;}
 	int Unlock()   { LeaveCriticalSection(&m_CriticalSection); return true;   }
 #else// POSIX - linux
 	CLock()        { pthread_mutex_init(&m_Mutex, NULL);}
 	virtual ~CLock()       { pthread_mutex_destroy(&m_Mutex);   }
 	int Lock()     { int nRetCode = pthread_mutex_lock(&m_Mutex);      return (nRetCode == 0); }
+	bool TryLock() { return  pthread_mutex_trylock(&m_Mutex) == EBUSY;}
 	int Unlock()   { int nRetCode = pthread_mutex_unlock(&m_Mutex);    return (nRetCode == 0); }
 #endif
 private:
