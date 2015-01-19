@@ -117,7 +117,10 @@ namespace fsm{
 		std::map<std::string,Json::Value> m_globalVars;
 		bool m_running;
 	public:
-		virtual bool isTerminationEvent(const TriggerEvent &)const = 0;
+		virtual bool isTerminationEvent(const TriggerEvent & e)const
+		{
+			return e.getEventName() == "quit";
+		};
 		/****************************************************  
 		@describle   应用XML Schema模板文件验证案例文档 
 		@param schema_filename  模式文件  
