@@ -5,6 +5,7 @@
 //#ifdef SCXML 
 #include <fsm.h>
 #include "sendimp.h"
+#include <common/Timer.h>
 //#endif // SCXML
 //#include "io/SCXMLParser.h"
 #include <string>
@@ -15,11 +16,13 @@ using namespace std;
 
 //#ifdef SCXML
 using namespace fsm;
-void timerFunction(const std::string & param)
-{
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("timer");
-	LOG4CPLUS_DEBUG(log, param);
-}
+class MyTimer : public helper::CTimerNotify{
+	void OnTimerExpired(unsigned long timerId, const std::string & attr){
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("timer");
+		LOG4CPLUS_DEBUG(log, timerId << attr);
+	}
+};
+
 int main(int argc, _TCHAR* argv[])
 {
 	try{
@@ -31,14 +34,13 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\scm.xml");
-		fsm::SMInstance m_smInstance;
-		m_smInstance.timerFunction = timerFunction;
+		MyTimer mytimer;
+		fsm::SMInstance m_smInstance(mytimer);
 		fsm::StateMachine mysmscxml;
 		SendImp mySend;
 		mysmscxml.Init(strStateFile);
-		mysmscxml.setName("fsm");
 		mysmscxml.setscInstance(&m_smInstance);
-		mysmscxml.addEventDispatcher(&mySend);
+		mysmscxml.addSendImplement(&mySend);
 		mysmscxml.setSessionID("123456");
 
 		mysmscxml.go();
@@ -61,7 +63,7 @@ int main(int argc, _TCHAR* argv[])
 	return 0;
 }
 
-void SendImp::fireSend(const std::string& strContent,void * param)
+void SendImp::fireSend(const std::string& strContent, const void * param)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("sendimp");
 	LOG4CPLUS_DEBUG(log, strContent);

@@ -40,7 +40,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.Debug\;$(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\libs\FSM\msvc10\Win32\bin.Debug\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>

@@ -1,13 +1,13 @@
 #include <FSM.h>
-#include <scxml/EventDispatcher.h>
+#include <scxml/SendInterface.h>
 #include <string>
 
 
-class SendImp :public fsm::EventDispatcher
+class SendImp :public fsm::SendInterface
 {
 public:
-	SendImp():EventDispatcher("testsend"){}
+	SendImp():SendInterface("testsend"){}
 	~SendImp(){}
-	virtual void fireSend(const std::string& strContent, void * param);
+	virtual void fireSend(const std::string& strContent, const void * param);
 
 };
