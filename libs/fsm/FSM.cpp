@@ -74,7 +74,7 @@ bool fsm::StateMachine::Init(void)
 		if (m_rootNode && m_scInstance) m_scInstance->removeContext(m_rootNode);
 
 		xmlNodePtr rootNode =  xmlDocGetRootElement(m_xmlDocPtr._xDocPtr);
-		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("scm")))
+		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
 		 {
 			 m_rootNode = rootNode;
 			 LOG4CPLUS_TRACE(log,"set rootNode=" << m_rootNode);

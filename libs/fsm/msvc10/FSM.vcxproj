@@ -122,6 +122,7 @@
     <ClCompile Include="..\scxml\TriggerEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\Csemaphore.h" />
     <ClInclude Include="..\common\lock.h" />
     <ClInclude Include="..\common\stringHelper.h" />
     <ClInclude Include="..\common\Timer.h" />

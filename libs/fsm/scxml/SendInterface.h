@@ -15,10 +15,10 @@ namespace fsm
 		SendInterface(const std::string &target):_target(target){}
 
 		// Receive messages module name
-		std::string _target;
+		const std::string _target;
 
 		//get module name
-		std::string getTarget(){ return _target ;}
+		const std::string & getTarget() const { return _target ;}
 		
 	public:
 		/// <summary>

@@ -188,5 +188,8 @@
     <ClInclude Include="..\scxml\model\Raise.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\Csemaphore.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
