@@ -41,7 +41,7 @@ public:
 	static const std::vector<chilli::abstract::ExtensionPtr> & getExtVec();
 	static void addEventToBuffer(std::string strContent);
 	//State machine executer, one instance per thread
-	static fsm::SCInstance scInstance;
+	static fsm::SMInstance smInstance;
 	static chilli::EventBuffer recEvtBuffer;
 
 };

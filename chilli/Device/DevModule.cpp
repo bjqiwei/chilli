@@ -6,7 +6,7 @@
 namespace chilli{
 namespace abstract{
 
-fsm::SCInstance DevModule::scInstance;
+fsm::SCInstance DevModule::smInstance;
 std::vector<chilli::abstract::ExtensionPtr> DevModule::m_ExtensionVector;
 chilli::EventBuffer DevModule::recEvtBuffer;
 chilli::abstract::thread_data DevModule::td;
@@ -14,8 +14,8 @@ chilli::abstract::thread_data DevModule::td;
 DevModule::DevModule(void)
 {
 	log = log4cplus::Logger::getInstance("chilli.abstract.DevModule");
-	scInstance.setLog(log);
-	scInstance.addEventFunction = addEventToBuffer;
+	smInstance.setLog(log);
+	smInstance.addEventFunction = addEventToBuffer;
 	LOG4CPLUS_DEBUG(log,"new a DevModule object.");
 }
 

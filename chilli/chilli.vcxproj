@@ -43,7 +43,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
     <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
     <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\lib;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\log4cplus-1.1.2\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
@@ -52,7 +52,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\lib;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\log4cplus-1.1.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -123,10 +123,12 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ACD\ACDModule.h" />
+    <ClInclude Include="CEventBuffer.h" />
+    <ClInclude Include="Csemaphore.h" />
     <ClInclude Include="Device\DevModule.h" />
-    <ClInclude Include="EventBuffer.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
+    <ClInclude Include="lock.h" />
     <ClInclude Include="model\AcdEventDispatcher.h" />
     <ClInclude Include="model\AcdProcess.h" />
     <ClInclude Include="model\BaseObject.h" />
@@ -147,7 +149,6 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
   <ItemGroup>
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Device\DevModule.cpp" />
-    <ClCompile Include="EventBuffer.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
     <ClCompile Include="model\AcdEventDispatcher.cpp" />

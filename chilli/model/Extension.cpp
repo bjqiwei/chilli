@@ -3,11 +3,12 @@
 #include "GlobalObject.h"
 #include <scxml/env/JSContext.h>
 #include "../Device/DevModule.h"
+#include <log4cplus/loggingmacros.h>
 
 namespace chilli{
 namespace abstract{
 
-Extension::Extension(void):m_xmlConfigNodePtr(NULL),m_bEnable(false),NewConfig(false),EventDispatcher("extension"){
+Extension::Extension(void):m_xmlConfigNodePtr(NULL),m_bEnable(false),NewConfig(false),SendInterface("extension"){
 	InitializeInstanceFields();
 }
 
@@ -86,9 +87,9 @@ bool Extension::ParserConfig(void)
 		LOG4CPLUS_ERROR(log,"xmlConfigNode is null.");
 		return false;
 	}
-	this->setExtensionNumber(fsm::xmlHelper::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"ExtensionNumber"));
-	this->setStateMachineFile(fsm::xmlHelper::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"StateMachine"));
-	this->setEnable(fsm::xmlHelper::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Enable"));
+	this->setExtensionNumber(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"ExtensionNumber"));
+	this->setStateMachineFile(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"StateMachine"));
+	this->setEnable(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Enable"));
 	return true;
 }
 
@@ -103,19 +104,10 @@ bool Extension::isIdle()
 }
 bool Extension::Init(void)
 {
-	stateMachie.addEventDispatcher(this);
-	stateMachie.addEventDispatcher(&this->acdEvtDis);
+	stateMachie.addSendImplement(this);
+	stateMachie.addSendImplement(&this->acdEvtDis);
 	//stateMachie.setscInstance(&DevModule::scInstance);
 	stateMachie.Init(_stateMachieFile);
-	fsm::Context * ctx = stateMachie.getRootContext();
-	fsm::env::JsContext * jsctx = dynamic_cast<fsm::env::JsContext *>(ctx);
-	if (jsctx){
-		/*实例化extension对象*/
-		JSObject * obj = jsctx->JSDefineObject("extension", &ExtensionClass);
-		/*创建对象的属性*/
-		jsctx->JSDefineProperties (obj,Properties );
-	}
-
 	stateMachie.setName(this->m_strExtensionNumber);
 
 	return true;
@@ -145,126 +137,5 @@ bool Extension::reload(void)
 void Extension::setIsNewConfig(bool bNew){
 	NewConfig = bNew;
 }
-
- JSBool Extension::GetProperty (JSContext *cx, ::JS::HandleObject obj, JS::Handle<jsid> id, ::JS::MutableHandleValue vp)
-{
-	ExtensionPtr extPtr = NULL;
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.abstract.Extension.GetProperty");
-	/*scxml::env::ToStringHelper idString(cx, id);
-	LOG4CPLUS_INFO(log, "getting its property %s," << idString.getBytes());
-	scxml::env::ToStringHelper valueString(cx, vp);
-	LOG4CPLUS_INFO(log, " initial value %s\n", valueString.getBytes());*/
-
-	for (std::map<std::string,ExtensionPtr>::const_iterator it = Global::m_ExtMap.begin();
-		it != Global::m_ExtMap.end(); it++)
-	{
-		if (it->second){
-			fsm::Context * ctx = it->second->stateMachie.getRootContext();
-			fsm::env::JsContext * jsctx = dynamic_cast<fsm::env::JsContext *>(ctx);
-			if (jsctx && jsctx->ctx == cx){
-				extPtr = it->second;
-				break;
-			}
-		}
-	}
-
-	if (!extPtr) return JS_FALSE;
-	int nid = JSID_TO_INT(id);
-	switch (nid ) {
-	case ExtensionNumber:{
-			JSString * jss = JS_NewStringCopyZ (cx,extPtr->m_strExtensionNumber.c_str());
-			vp.setString(jss);
-		}
-		break;
-	case Channel:
-		vp.setInt32(extPtr->getChannelID());
-		break;
-	case Enable:
-		vp.setBoolean(extPtr->m_bEnable);
-		break;
-	case EventData:{
-			JSString * jss = JS_NewStringCopyZ(cx,extPtr->_event_data.c_str());
-			vp.setString(jss);
-		}
-		break;
-	case CallerId:{
-			JSString * jss = JS_NewStringCopyZ(cx,extPtr->m_CallerId.c_str());
-			vp.setString(jss);
-		}
-		break;
-	case CalleeId:{
-			JSString * jss = JS_NewStringCopyZ(cx,extPtr->m_CalleeId.c_str());
-			vp.setString(jss);
-		}
-		break;
-	case PendingReason:{
-		JSString * jss = JS_NewStringCopyZ (cx,extPtr->m_PendingReason.c_str());
-		vp.setString(jss);
-		}
-		break;
-	default:
-		break;
-	}
-	
-	return JS_TRUE;
-}
-/*定义属性的SETTER*/
-JSBool Extension::SetProperty (JSContext *cx, ::JS::HandleObject obj, ::JS::HandleId id, JSBool strict,::JS::MutableHandleValue vp)
-{
-	ExtensionPtr extPtr = NULL;
-	for (std::map<std::string,ExtensionPtr>::const_iterator it = Global::m_ExtMap.begin();
-		it != Global::m_ExtMap.end(); it++)
-	{
-		if (it->second){
-			fsm::Context * ctx = it->second->stateMachie.getRootContext();
-			fsm::env::JsContext * jsctx = dynamic_cast<fsm::env::JsContext *>(ctx);
-			if (jsctx && jsctx->ctx == cx){
-				extPtr = it->second;
-				break;
-			}
-		}
-	}
-
-	if (!extPtr) return JS_FALSE;
-
-
-	switch (JSID_TO_INT(id)) {
-	//case ExtensionNumber:
-	//		extPtr->m_strExtensionNumber = JS_EncodeString(cx,vp.toString());
-	//	break;
-	//case Channel:
-	//		extPtr->Ch = vp.toInt32();
-	//	break;
-	//case Enable:
-	//	extPtr->m_bEnable = vp.toBoolean();
-	//	break;
-	case Enable:
-	default:
-		break;
-	}
-	
-	return JS_TRUE;
-}
-
-/*定义extension类的属性数组*/
-JSPropertySpec Extension::Properties[] =
-{
-	{"number",ExtensionNumber,    JSPROP_ENUMERATE },
-	{"ch",  Channel,     JSPROP_ENUMERATE },
-	{"enable",  Enable,     JSPROP_ENUMERATE },
-	{"eventData",  EventData,     JSPROP_ENUMERATE },
-	{"Caller",  CallerId,     JSPROP_ENUMERATE },
-	{"Callee",  CalleeId,     JSPROP_ENUMERATE },
-	{"pendingReason",  PendingReason,     JSPROP_ENUMERATE },
-	{0}
-};
-/*定义extension类*/
-JSClass Extension::ExtensionClass = {
-	"extension",0,
-	JS_PropertyStub,JS_DeletePropertyStub, GetProperty, SetProperty,
-	JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, NULL
-};
-
-
 }
 }

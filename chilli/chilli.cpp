@@ -11,6 +11,7 @@
 #include "Sh/ShDevModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
+#include <log4cplus/loggingmacros.h>
 
 using namespace  std;
 using namespace log4cplus;
@@ -204,7 +205,7 @@ int main(int argc, char* argv[])
 	delete _ServiceModule;
 	return nExitCode;
 }
-fsm::xmlHelper::xmlDocumentPtr chilli::App::_docPtr = NULL;
+helper::xml::CXmlDocumentPtr chilli::App::_docPtr = NULL;
 volatile int chilli::App::running = 0;
 std::string chilli::App::strFileDir = "";
 std::string chilli::App::strFileNameNoExtension = "";

@@ -59,9 +59,6 @@
     <ClInclude Include="ServiceModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EventBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="model\Channel.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -113,15 +110,21 @@
     <ClInclude Include="model\AcdEventDispatcher.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="CEventBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Csemaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServiceModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EventBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model\Extension.cpp">

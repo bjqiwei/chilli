@@ -4,7 +4,7 @@
 #include "..\Device\DevModule.h"
 #include "shpa3api.h"
 #include "..\EventBuffer.h"
-#include "scxml\SCInstance.h"
+#include "scxml\SMInstance.h"
 #include "..\model\Extension.h"
 
 namespace chilli{

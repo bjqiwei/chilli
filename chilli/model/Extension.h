@@ -3,14 +3,14 @@
 #define _CHILLI_CTI_EXTENSION_HEADER_
 #include "BaseObject.h"
 #include <FSM.h>
-#include <scxml/EventDispatcher.h>
+#include <scxml/SendInterface.h>
 #include "AcdEventDispatcher.h"
 #include "AcdProcess.h"
 
 namespace chilli{
 namespace abstract{
 
-class Extension:public fsm::EventDispatcher,public AcdProcess,virtual public BaseObject
+class Extension:public fsm::SendInterface,public AcdProcess,virtual public BaseObject
 {
 public:
 	Extension(void);
@@ -59,10 +59,6 @@ private:
 
 	//
 	enum tagProperty {ExtensionNumber,Channel,Enable,EventData,CallerId,CalleeId,PendingReason};
-	static JSBool GetProperty (JSContext *cx, ::JS::HandleObject obj, JS::Handle<jsid> id, ::JS::MutableHandleValue vp);
-	static JSBool SetProperty (JSContext *cx, ::JS::HandleObject obj, ::JS::HandleId id, JSBool strict,::JS::MutableHandleValue vp);
-	static JSPropertySpec Properties[];
-	static JSClass ExtensionClass;
 };
 typedef Extension * ExtensionPtr;
 }

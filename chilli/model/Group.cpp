@@ -3,6 +3,7 @@
 #include <fsm.h>
 #include "..\ACD\ACDModule.h"
 #include "GlobalObject.h"
+#include <log4cplus/loggingmacros.h>
 
 
 
@@ -31,7 +32,7 @@ namespace VD{
 			for (xmlNodePtr xExtNode = m_xmlConfigNodePtr->children; xExtNode != NULL ; xExtNode = xExtNode->next)
 			{
 				if (!isExtConfigNode(xExtNode)) continue;
-				m_ExtVec.push_back(fsm::xmlHelper::XStr(xmlNodeGetContent(xExtNode)).strForm());
+				m_ExtVec.push_back(helper::xml::XStr(xmlNodeGetContent(xExtNode)).strForm());
 			}
 			return true;
 		}
@@ -39,7 +40,7 @@ namespace VD{
 	}
 	bool Group::processTransfer(std::string strCmd,std::string from)
 	{
-		using namespace fsm::xmlHelper;
+		using namespace helper::xml;
 		for(unsigned int i =0 ; this->m_ExtVec.size(); i++)
 		{
 			std::map<std::string , chilli::abstract::ExtensionPtr>::iterator it
@@ -69,7 +70,7 @@ namespace VD{
 
 	bool Group::addAcdEvent(const std::string& strEvent)
 	{
-		fsm::xmlHelper::CXmlParseHelper xmlParse(strEvent);
+		helper::xml::CXmlParseHelper xmlParse(strEvent);
 		
 		if (xmlParse.getRootName().compare("cmd") == 0){
 			this->processCmd(strEvent);
@@ -84,7 +85,7 @@ namespace VD{
 
 	int Group::processCmd(const std::string& strCmd)
 	{
-		using namespace fsm::xmlHelper;
+		using namespace helper::xml;
 		CXmlParseHelper xmlParse(strCmd);
 
 		std::string _cmd =xmlParse.getRootProp("cmd");

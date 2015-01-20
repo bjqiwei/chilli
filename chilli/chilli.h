@@ -2,7 +2,7 @@
 
 #ifndef _CHILLI_HEADER_
 #define _CHILLI_HEADER_
-#include <xmlHelper.h>
+#include <common/xmlHelper.h>
 
 
 namespace chilli
@@ -21,7 +21,7 @@ namespace chilli
 	private:
 		static bool ReadXMLConfig(void);
 		static void ConsoleLoop();
-		static fsm::xmlHelper::xmlDocumentPtr _docPtr;
+		static helper::xml::CXmlDocumentPtr _docPtr;
 		static std::string strFileDir;
 		static std::string strFileNameNoExtension;
 	};

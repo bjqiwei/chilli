@@ -3,7 +3,7 @@
 #include "..\acd\ACDModule.h"
 
 namespace chilli{
-AcdEventtDispatcher::AcdEventtDispatcher(void):EventDispatcher("acd")
+AcdEventtDispatcher::AcdEventtDispatcher(void):SendInterface("acd")
 {
 	log = log4cplus::Logger::getInstance("chilli.model.AcdEventtDispatcher");
 }
