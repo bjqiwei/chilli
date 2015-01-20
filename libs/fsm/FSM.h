@@ -119,7 +119,7 @@ namespace fsm{
 	public:
 		virtual bool isTerminationEvent(const TriggerEvent & e)const
 		{
-			return e.getEventName() == "quit";
+			return e.getEventName() == "stop";
 		};
 		/****************************************************  
 		@describle   应用XML Schema模板文件验证案例文档 
