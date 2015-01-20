@@ -40,7 +40,7 @@ namespace fsm{
 		void go();
 		//const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
-		
+		void setName(const string &strName);
 		const std::string& getName() const;
 		const std::string& getSessionId()const;
 

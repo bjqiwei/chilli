@@ -427,11 +427,11 @@ const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentSta
 	return NULL;
 }
 
-//void fsm::StateMachine::setName(const string &strName)
-//{
-//	m_strName = strName;
-//	LOG4CPLUS_DEBUG(log,"set this stateMachine name=" << m_strName);
-//}
+void fsm::StateMachine::setName(const string &strName)
+{
+	m_strName = strName;
+	LOG4CPLUS_DEBUG(log,"set this stateMachine name=" << m_strName);
+}
 
 
 void fsm::StateMachine::exitStates() const
