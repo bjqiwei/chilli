@@ -33,7 +33,7 @@ int main(int argc, _TCHAR* argv[])
 		//char szFilePath[_MAX_PATH-1];
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
-		strStateFile.append(".\\scm.xml");
+		strStateFile.append(".\\fsm.xml");
 		MyTimer mytimer;
 		fsm::SMInstance m_smInstance(mytimer);
 		fsm::StateMachine mysmscxml;
@@ -48,8 +48,9 @@ int main(int argc, _TCHAR* argv[])
 		
 		
 		while (std::cin>>strEvent && strEvent.compare("quit") != 0){
-			fsm::TriggerEvent evt(strEvent,0);
+			fsm::TriggerEvent evt(strEvent,"");
 			mysmscxml.pushEvent(evt);
+			mysmscxml.mainEventLoop();
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
 			//std::cout << stateid << endl;
 		}

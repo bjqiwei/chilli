@@ -67,7 +67,8 @@
     <PostBuildEvent>
       <Command>xcopy /Y $(SolutionDir)libs\fsm\msvc10\Win32\bin.$(Configuration)\*.dll $(OutDir)
 xcopy /Y log4cplus.properties $(OutDir)
-xcopy /Y scm.xml $(OutDir)</Command>
+xcopy /Y *.xml $(OutDir)
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
