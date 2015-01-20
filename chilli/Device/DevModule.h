@@ -34,7 +34,7 @@ private:
 protected:
 	//thread function
 	static unsigned int __stdcall ThreadProc( void *pParam );
-	static chilli::abstract::thread_data td;
+
 
 	static std::vector<chilli::abstract::ExtensionPtr> m_ExtensionVector;
 public:
@@ -42,7 +42,7 @@ public:
 	static void addEventToBuffer(std::string strContent);
 	//State machine executer, one instance per thread
 	static fsm::SMInstance smInstance;
-	static chilli::EventBuffer recEvtBuffer;
+	static helper::CEventBuffer<std::string> recEvtBuffer;
 
 };
 }

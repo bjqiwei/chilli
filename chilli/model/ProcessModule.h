@@ -11,8 +11,8 @@ namespace abstract{
 class ProcessModule
 {
 public:
-	ProcessModule(xmlNodePtr xNodePtr);
-	virtual ~ProcessModule();
+	explicit ProcessModule(xmlNodePtr xNodePtr):m_xmlConfigNodePtr(xNodePtr){};
+	virtual ~ProcessModule(){};
 
 	virtual bool reloadConfig() = 0;
 	virtual bool Init(void) = 0;
@@ -27,14 +27,7 @@ private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other);
 	ProcessModule & operator=(const ProcessModule &);
-
-	void InitializeInstanceFields();
 };
-struct thread_data {
-	HANDLE thread_hnd;
-	unsigned thread_id;
-};
-
 }
 }
 #endif //end process module header

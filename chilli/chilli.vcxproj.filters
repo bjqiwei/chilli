@@ -95,9 +95,6 @@
     <ClInclude Include="ACD\ACDModule.h">
       <Filter>ACD</Filter>
     </ClInclude>
-    <ClInclude Include="model\BaseObject.h">
-      <Filter>model</Filter>
-    </ClInclude>
     <ClInclude Include="model\Group.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -133,9 +130,6 @@
     <ClCompile Include="Sh\ShChannel.cpp">
       <Filter>Sh</Filter>
     </ClCompile>
-    <ClCompile Include="model\ProcessModule.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
     <ClCompile Include="Sh\ShDevModule.cpp">
       <Filter>Sh</Filter>
     </ClCompile>
@@ -156,9 +150,6 @@
     </ClCompile>
     <ClCompile Include="ACD\ACDModule.cpp">
       <Filter>ACD</Filter>
-    </ClCompile>
-    <ClCompile Include="model\BaseObject.cpp">
-      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\Group.cpp">
       <Filter>model</Filter>
