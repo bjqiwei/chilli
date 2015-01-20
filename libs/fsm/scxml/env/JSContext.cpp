@@ -115,12 +115,12 @@ namespace env
 
 		//js_GetClassObject(ctx,)
 
-		jsval * rootedVal = (jsval *) JS_GetPrivate(ctx, event);
+		/*jsval * rootedVal = (jsval *) JS_GetPrivate(ctx, event);
 		if (rootedVal) {
 			JS_RemoveValueRoot(ctx, rootedVal);
 			JS_SetPrivate(ctx, event, NULL);
 			delete[] rootedVal;
-		}
+		}*/
 
 		std::map<const void*,void*>::iterator it;
 		while((it = mapObjectRoot.begin())!= mapObjectRoot.end())
@@ -277,7 +277,7 @@ namespace env
 
 	bool JsContext::CompileScript(const std::string &script,const std::string &filename, unsigned int line,const void *xmlNode)
 	{
-		LOG4CPLUS_DEBUG(log, "CompileScript:" << script);
+		//LOG4CPLUS_DEBUG(log, "CompileScript:" << script);
 		JSBool status;
 		JSAutoRequest ar = JSAutoRequest(this->ctx);
 		JSAutoEnterCompartment ac ;

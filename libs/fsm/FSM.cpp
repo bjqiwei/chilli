@@ -89,7 +89,7 @@ bool fsm::StateMachine::Init(void)
 		 else
 		 {
 
-			 LOG4CPLUS_ERROR(log, m_strSessionID << " ,Cannot find root FSM element." );
+			 LOG4CPLUS_ERROR(log, m_strSessionID << " ,Cannot find root fsm element." );
 			 //throw std::logic_error( "Cannot find FSM element.");
 			 return false;
 		 }
