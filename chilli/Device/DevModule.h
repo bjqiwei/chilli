@@ -4,7 +4,7 @@
 #define _CHILLI_CTI_DEVICE_MODULE_HEADER_
 
 #include "..\model\ProcessModule.h"
-#include "..\EventBuffer.h"
+#include "..\CEventBuffer.h"
 #include "scxml\SMInstance.h"
 #include "..\model\Extension.h"
 

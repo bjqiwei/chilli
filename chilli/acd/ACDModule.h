@@ -4,7 +4,7 @@
 #include "../model/ProcessModule.h"
 #include "scxml/SMInstance.h"
 #include "../model/Group.h"
-#include "../EventBuffer.h"
+#include "../CEventBuffer.h"
 
 namespace chilli{
 namespace ACD{
@@ -21,7 +21,7 @@ public:
 	virtual bool reloadConfig();
 	void	DisplayEventInfo ( std::string strEvent );
 
-	static chilli::EventBuffer recEvtBuffer;
+	static helper::CEventBuffer<std::string> recEvtBuffer;
 	static fsm::SMInstance smInstance;
 	static void addEventToBuffer(std::string strContent);
 private:

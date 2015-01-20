@@ -6,6 +6,7 @@
 #include <process.h>
 #include <regex>
 #include <libxml/tree.h>
+#include <log4cplus/loggingmacros.h>
 
 
 namespace chilli{
@@ -15,13 +16,11 @@ std::vector<xmlNodePtr> ACDModule::m_DialPlanVector;
 
 std::vector<VD::GroupPtr> ACDModule::m_GroupVec;
 chilli::EventBuffer ACDModule::recEvtBuffer;
-fsm::SCInstance ACDModule::scInstance;
+fsm::SMInstance ACDModule::smInstance;
 
 ACDModule::ACDModule(void)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACD.ACDModule");
-	scInstance.setLog(log);
-	scInstance.addEventFunction = addEventToBuffer;
 	LOG4CPLUS_DEBUG(log,"new a ACD object.");
 }
 
@@ -42,7 +41,6 @@ ACDModule::~ACDModule(void)
 
 bool ACDModule::Init(xmlNodePtr xNode)
 {
-	setConfigNode(xNode);
 	return Init();
 }
 
@@ -103,7 +101,7 @@ bool ACDModule::ParserConfig(void)
 		xmlFreeNode( m_DialPlanVector.at(i));
 	m_DialPlanVector.clear();
 
-	xmlNodePtr xDialplanNode = fsm::xmlHelper::getXmlChildNode(m_xmlConfigNodePtr,"dialplan");
+	xmlNodePtr xDialplanNode = helper::xml::getXmlChildNode(m_xmlConfigNodePtr,"dialplan");
 	if (xDialplanNode == NULL) LOG4CPLUS_WARN(log,"DialPlan Node is null.");
 	else{
 		for(xmlNodePtr xExtNode = xDialplanNode->children; xExtNode != NULL; xExtNode=xExtNode->next)
@@ -114,8 +112,8 @@ bool ACDModule::ParserConfig(void)
 		}
 	}
 
-	xmlNodePtr xConfNode = fsm::xmlHelper::getXmlChildNode(m_xmlConfigNodePtr,"config");
-	xmlNodePtr xGroupsNode = fsm::xmlHelper::getXmlChildNode(xConfNode,"groups");
+	xmlNodePtr xConfNode = helper::xml::getXmlChildNode(m_xmlConfigNodePtr,"config");
+	xmlNodePtr xGroupsNode = helper::xml::getXmlChildNode(xConfNode,"groups");
 
 	for (std::vector<VD::GroupPtr>::const_iterator it = m_GroupVec.begin();
 		it != m_GroupVec.end(); it++)
@@ -211,24 +209,24 @@ unsigned int ACDModule::ThreadProc( void *pParam )
 }
 xmlNodePtr ACDModule::isMatched(xmlNodePtr xExtNode,std::string strEvent)
 {
-	fsm::xmlHelper::xmlDocumentPtr _xmlDocPtr = xmlParseMemory(strEvent.c_str(),strEvent.length());
+	helper::xml::CXmlDocumentPtr _xmlDocPtr = xmlParseMemory(strEvent.c_str(),strEvent.length());
 	xmlNodePtr _eventNode = xmlDocGetRootElement(_xmlDocPtr._xDocPtr);
 	if (_eventNode == NULL)
 	{
 		LOG4CPLUS_WARN(log,"recive one event,parse document error. event =" <<strEvent );
 		return NULL;
 	}
-	xmlNodePtr xCndNode = fsm::xmlHelper::getXmlChildNode(xExtNode,"condition");
+	xmlNodePtr xCndNode = helper::xml::getXmlChildNode(xExtNode,"condition");
 	if (xCndNode == NULL)
 	{
 		LOG4CPLUS_WARN(log,"recive one event,not found condition node. extension name=" 
-			<< fsm::xmlHelper::getXmlNodeAttributesValue(xExtNode,"name")  );
+			<< helper::xml::getXmlNodeAttributesValue(xExtNode,"name")  );
 		return NULL;
 	}
 
-	std::string strField = fsm::xmlHelper::getXmlNodeAttributesValue(xCndNode,"field");
-	std::string strExpression = fsm::xmlHelper::getXmlNodeAttributesValue(xCndNode,"expression");
-	std::string strExpValue = fsm::xmlHelper::getXmlNodeAttributesValue(_eventNode,strField);
+	std::string strField = helper::xml::getXmlNodeAttributesValue(xCndNode,"field");
+	std::string strExpression = helper::xml::getXmlNodeAttributesValue(xCndNode,"expression");
+	std::string strExpValue = helper::xml::getXmlNodeAttributesValue(_eventNode,strField);
 
 	if (strExpValue.empty()) return NULL;
 
@@ -242,7 +240,7 @@ xmlNodePtr ACDModule::isMatched(xmlNodePtr xExtNode,std::string strEvent)
 
 int ACDModule::processTransfer(xmlNodePtr xAppNode ,std::string strEvent)
 {
-	std::string strDestNum = fsm::xmlHelper::getXmlNodeAttributesValue(xAppNode,"data");
+	std::string strDestNum = helper::xml::getXmlNodeAttributesValue(xAppNode,"data");
 	std::map<std::string , chilli::abstract::ExtensionPtr>::iterator it 
 		= chilli::Global::m_ExtMap.find(strDestNum);
 	if (it != chilli::Global::m_ExtMap.end())
@@ -260,7 +258,7 @@ int ACDModule::EvtHandler(const std::string& strEvent)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ACD.EvtHandler");
 	
-	fsm::xmlHelper::CXmlParseHelper xmlParse(strEvent);
+	helper::xml::CXmlParseHelper xmlParse(strEvent);
 	
 
 	//std::string _event = Interpreter::getXmlNodeAttributesValue(xrootNode,"event");
@@ -286,8 +284,8 @@ int ACDModule::EvtHandler(const std::string& strEvent)
 
 int ACDModule::processActions(xmlNodePtr xCondNode,std::string strEvent)
 {
-	xmlNodePtr xActNode = fsm::xmlHelper::getXmlChildNode(xCondNode,"action");
-	std::string strApp = fsm::xmlHelper::getXmlNodeAttributesValue(xActNode,"application");
+	xmlNodePtr xActNode = helper::xml::getXmlChildNode(xCondNode,"action");
+	std::string strApp = helper::xml::getXmlNodeAttributesValue(xActNode,"application");
 
 	if (strApp.compare("transfer") == 0){
 		return processTransfer(xActNode ,strEvent);

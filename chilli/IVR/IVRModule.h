@@ -3,7 +3,7 @@
 #define _CHILLI_IVRMODULE_HEADER_
 #include <FSM.h>
 #include "IVRExtension.h"
-#include "../EventBuffer.h"
+#include "../CEventBuffer.h"
 #include "../model/ProcessModule.h"
 
 
@@ -30,7 +30,7 @@ namespace IVR
 
 	private:
 		static std::vector<IVRExtensionPtr> m_ExtensionVector;
-		static EventBuffer recEvtBuffer;
+		static helper::CEventBuffer<std::string> recEvtBuffer;
 		IVRModule(const IVRModule & other);
 		IVRModule & operator=(const IVRModule &);
 		static unsigned int __stdcall ThreadProc( void *pParam );

@@ -21,7 +21,7 @@ namespace VD{
 	}
 	bool Group::Init()
 	{
-		this->stateMachie.setscInstance(&chilli::ACD::ACDModule::scInstance);
+		this->stateMachie.setscInstance(&chilli::ACD::ACDModule::smInstance);
 		return Extension::Init();
 	}
 
