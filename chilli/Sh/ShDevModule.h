@@ -3,7 +3,6 @@
 #define _CHILLI_SHDEV_MODULE_HEADER_
 #include "..\Device\DevModule.h"
 #include "shpa3api.h"
-#include "..\EventBuffer.h"
 #include "scxml\SMInstance.h"
 #include "..\model\Extension.h"
 

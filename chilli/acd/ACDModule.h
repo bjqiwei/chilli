@@ -15,7 +15,7 @@ public:
 	ACDModule(void);
 	virtual ~ACDModule(void);
 	virtual bool Init(void);
-	virtual void Start();
+	virtual int Start();
 	virtual int Close(void);
 	virtual bool ParserConfig(void);
 	virtual bool reloadConfig();
@@ -36,7 +36,6 @@ private:
 
 	static int EvtHandler(const std::string& strEvent);
 	static unsigned int __stdcall ThreadProc( void *pParam );
-	chilli::abstract::thread_data td;
 };
 }
 }

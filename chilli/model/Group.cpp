@@ -2,7 +2,6 @@
 #include "Group.h"
 #include <fsm.h>
 #include "..\ACD\ACDModule.h"
-#include "GlobalObject.h"
 #include <log4cplus/loggingmacros.h>
 
 
@@ -14,10 +13,10 @@ namespace VD{
 	Group::Group():Extension()
 	{
 		log = log4cplus::Logger::getInstance("CTI.Group");
-		LOG4CPLUS_DEBUG(log,"new a Group object.");
+		LOG4CPLUS_TRACE(log,"new a Group object.");
 	}
 	Group::~Group(){
-		LOG4CPLUS_DEBUG(log,"destruction a extension object.");
+		LOG4CPLUS_TRACE(log,"destruction a extension object.");
 	}
 	bool Group::Init()
 	{
@@ -107,11 +106,6 @@ namespace VD{
 	{
 		LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
 		processCmd(strContent);
-	}
-
-	bool Group::isGroupConfigNode(xmlNodePtr xExtNode)
-	{
-		return xExtNode && xExtNode->type == XML_ELEMENT_NODE && xmlStrEqual(xExtNode->name,BAD_CAST("group")); 
 	}
 
 }

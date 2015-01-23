@@ -1,16 +1,14 @@
 #pragma once
 #ifndef _CHILLI_CTI_EXTENSION_HEADER_
 #define _CHILLI_CTI_EXTENSION_HEADER_
-#include "BaseObject.h"
 #include <FSM.h>
 #include <scxml/SendInterface.h>
-#include "AcdEventDispatcher.h"
 #include "AcdProcess.h"
 
 namespace chilli{
 namespace abstract{
 
-class Extension:public fsm::SendInterface,public AcdProcess,virtual public BaseObject
+class Extension:public fsm::SendInterface,public AcdProcess
 {
 public:
 	Extension(void);
@@ -24,12 +22,10 @@ public:
 	bool setStateMachineFile(std::string smFile);
 	bool isIdle();
 	void go();
-	void setIsNewConfig(bool bNew);
 	void pushEvent(fsm::TriggerEvent &evt);
 	const std::string getStateID();
 	virtual bool ParserConfig(void) = 0;
 	virtual bool Init(void) = 0;
-	static bool isExtConfigNode(xmlNodePtr xExtNode);
 
 	virtual int processCmd(const std::string& strCmd) = 0;
 	virtual int processEvent(const std::string& strEvent) = 0;
@@ -48,10 +44,6 @@ protected:
 	bool NewConfig;
 	fsm::StateMachine stateMachie;
 	bool reload();
-	AcdEventtDispatcher acdEvtDis;
-private:
-	void InitializeInstanceFields();
-	bool isNewConfig();
 private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	Extension(const Extension &);

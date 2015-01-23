@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Extension.h"
-#include "GlobalObject.h"
 #include <scxml/env/JSContext.h>
 #include "../Device/DevModule.h"
 #include <log4cplus/loggingmacros.h>
@@ -9,17 +8,15 @@ namespace chilli{
 namespace abstract{
 
 Extension::Extension(void):m_xmlConfigNodePtr(NULL),m_bEnable(false),NewConfig(false),SendInterface("extension"){
-	InitializeInstanceFields();
+	log = log4cplus::Logger::getInstance("chilli.abstract.Extension");
+	stateMachie.setLog(log);
 }
 
 
 Extension::~Extension(void){
 
 }
-void Extension::InitializeInstanceFields(){
-	log = log4cplus::Logger::getInstance("chilli.abstract.Extension");
-	stateMachie.setLog(log);
-}
+
 bool Extension::setExtensionNumber(std::string &number)
 {
 	LOG4CPLUS_DEBUG(log,"set ExtensionNumber="<<number);
@@ -77,9 +74,7 @@ bool Extension::setStateMachineFile(std::string smFile)
 	LOG4CPLUS_DEBUG(log, " state machine file="  <<smFile);
 	return true;
 }
-bool Extension::isExtConfigNode(xmlNodePtr xExtNode){
-	return xExtNode && xExtNode->type == XML_ELEMENT_NODE && xmlStrEqual(xExtNode->name,BAD_CAST("Extension")); 
-}
+
 bool Extension::ParserConfig(void)
 {
 	if (m_xmlConfigNodePtr == NULL)
@@ -113,29 +108,9 @@ bool Extension::Init(void)
 	return true;
 }
 
-bool Extension::isNewConfig(){
-	return NewConfig;
-}
-
 void Extension::go(){
 	stateMachie.go();
 }
 
-bool Extension::reload(void)
-{
-	if (isNewConfig())
-	{
-		NewConfig = false;
-		Global::m_ExtMap.erase(Global::m_ExtMap.find(this->m_strExtensionNumber));
-		this->ParserConfig();
-		this->Init();
-		Global::m_ExtMap[this->m_strExtensionNumber] = this;
-		LOG4CPLUS_DEBUG(log,"reload ok ");
-	}
-	return true;
-}
-void Extension::setIsNewConfig(bool bNew){
-	NewConfig = bNew;
-}
 }
 }

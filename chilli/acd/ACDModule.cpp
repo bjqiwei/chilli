@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "ACDModule.h"
-#include "..\model\GlobalObject.h"
 #include "..\ivr\IVRModule.h"
 #include "..\Sh\ShDevModule.h"
 #include <process.h>

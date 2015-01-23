@@ -6,7 +6,6 @@
 #include <scxml/env/SimpleContext.h>
 #include <scxml/env/SimpleEvaluator.h>
 #include <scxml/SMInstance.h>
-#include "AcdEventDispatcher.h"
 #include "Extension.h"
 
 namespace chilli
@@ -28,8 +27,6 @@ private:
 private:
 	int processCmd(const std::string& strCmd);
 	int processEvent(const std::string& strEvent);
-public:
-	static bool isGroupConfigNode(xmlNodePtr xGroupNode);
 };
 typedef Group * GroupPtr;
 

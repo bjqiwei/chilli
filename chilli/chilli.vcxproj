@@ -129,11 +129,9 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
     <ClInclude Include="lock.h" />
-    <ClInclude Include="model\AcdEventDispatcher.h" />
     <ClInclude Include="model\AcdProcess.h" />
     <ClInclude Include="model\Channel.h" />
     <ClInclude Include="model\Extension.h" />
-    <ClInclude Include="model\GlobalObject.h" />
     <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="ServiceModule.h" />
@@ -150,9 +148,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
-    <ClCompile Include="model\AcdEventDispatcher.cpp" />
     <ClCompile Include="model\Extension.cpp" />
-    <ClCompile Include="model\GlobalObject.cpp" />
     <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
