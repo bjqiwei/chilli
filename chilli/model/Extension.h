@@ -8,7 +8,7 @@
 namespace chilli{
 namespace abstract{
 
-class Extension:public fsm::SendInterface,public AcdProcess
+class Extension:public fsm::SendInterface
 {
 public:
 	Extension(void);

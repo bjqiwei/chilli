@@ -77,9 +77,6 @@
     <ClInclude Include="Sh\ShExtension.h">
       <Filter>Sh</Filter>
     </ClInclude>
-    <ClInclude Include="model\AcdProcess.h">
-      <Filter>model</Filter>
-    </ClInclude>
     <ClInclude Include="IVR\IVRModule.h">
       <Filter>IVR</Filter>
     </ClInclude>

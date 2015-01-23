@@ -2,10 +2,6 @@
 #ifndef _CHILLI_VIRTUALDEVICE_GROUP_HEADER_
 #define _CHILLI_VIRTUALDEVICE_GROUP_HEADER_
 
-#include <FSM.h>
-#include <scxml/env/SimpleContext.h>
-#include <scxml/env/SimpleEvaluator.h>
-#include <scxml/SMInstance.h>
 #include "Extension.h"
 
 namespace chilli
