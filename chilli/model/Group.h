@@ -8,7 +8,7 @@ namespace chilli
 {
 namespace VD{
 
-class Group:public abstract::Extension
+class Group:public model::Extension
 {
 public:
 	Group();

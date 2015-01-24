@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 namespace chilli{
-namespace abstract{
+namespace model{
 
 class ProcessModule
 {

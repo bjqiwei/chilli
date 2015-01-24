@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "ShExtension.h"
-#include "../model/GlobalObject.h"
 #include "ShDevModule.h"
-#include <scxml/env/JSContext.h>
 
 
 namespace chilli{

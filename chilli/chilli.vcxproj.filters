@@ -59,9 +59,6 @@
     <ClInclude Include="ServiceModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model\Channel.h">
-      <Filter>model</Filter>
-    </ClInclude>
     <ClInclude Include="model\Extension.h">
       <Filter>model</Filter>
     </ClInclude>

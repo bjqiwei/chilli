@@ -35,7 +35,6 @@ namespace IVR
 		IVRModule & operator=(const IVRModule &);
 		static unsigned int __stdcall ThreadProc( void *pParam );
 		static fsm::SMInstance smInstance;
-		abstract::thread_data td;
 	};
 
 }

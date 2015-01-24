@@ -129,7 +129,6 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
     <ClInclude Include="lock.h" />
-    <ClInclude Include="model\Channel.h" />
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />

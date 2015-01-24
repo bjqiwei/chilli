@@ -5,7 +5,7 @@
 #include <scxml/SendInterface.h>
 
 namespace chilli{
-namespace abstract{
+namespace model{
 
 class Extension
 {
@@ -22,6 +22,11 @@ public:
 	virtual bool Init(void) = 0;
 	virtual int processCmd(const std::string& strCmd) = 0;
 	virtual int processEvent(const std::string& strEvent) = 0;
+
+//media interface
+	virtual int Answer() = 0;
+	virtual int PlayFile(const std::string &fileName) = 0;
+	virtual int HangUp() = 0;
 private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	Extension(const Extension &);
