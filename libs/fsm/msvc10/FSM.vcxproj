@@ -63,7 +63,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_DEBUG;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_USE_32BIT_TIME_T;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -81,7 +81,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;NDEBUG;XP_WIN;EXPORT_JS_API;USE_LOG4CPLUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_USE_32BIT_TIME_T;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
