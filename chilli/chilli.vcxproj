@@ -146,6 +146,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
+    <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
     <ClCompile Include="Sh\ShChannel.cpp" />

@@ -3,12 +3,13 @@
 #define _CHILLI_VIRTUALDEVICE_GROUP_HEADER_
 
 #include "Extension.h"
+#include <log4cplus/logger.h>
 
 namespace chilli
 {
-namespace VD{
+namespace model{
 
-class Group:public model::Extension
+class Group:public Extension
 {
 public:
 	Group();
@@ -20,12 +21,12 @@ public:
 	virtual void fireSend(const std::string &strContent);
 private:
 	std::vector<std::string> m_ExtVec;
+	log4cplus::Logger log;
 private:
 	int processCmd(const std::string& strCmd);
 	int processEvent(const std::string& strEvent);
 };
 typedef Group * GroupPtr;
-
 
 }
 }

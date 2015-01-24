@@ -136,6 +136,9 @@
     <ClCompile Include="chilli.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="model\Group.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="log4cplus.properties">

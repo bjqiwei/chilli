@@ -10,6 +10,8 @@ namespace model{
 class Extension
 {
 public:
+	Extension();//{};
+	virtual ~Extension();//{};
 	virtual bool setExtensionNumber(const std::string & number) = 0;
 	virtual const std::string & getExtensionNumber() const = 0;
 	virtual bool setEnable(const std::string &strEnable) = 0;

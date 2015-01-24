@@ -1,14 +1,13 @@
 #include "StdAfx.h"
 #include "Group.h"
 #include <fsm.h>
-#include "..\ACD\ACDModule.h"
 #include <log4cplus/loggingmacros.h>
 
 
 
 namespace chilli
 {
-namespace VD{
+namespace model{
 	
 	Group::Group():Extension()
 	{
@@ -20,13 +19,12 @@ namespace VD{
 	}
 	bool Group::Init()
 	{
-		this->stateMachie.setscInstance(&chilli::ACD::ACDModule::smInstance);
 		return Extension::Init();
 	}
 
 	bool Group::ParserConfig(void)
 	{
-		if(chilli::abstract::Extension::ParserConfig())
+		if(chilli::model::Extension::ParserConfig())
 		{
 			for (xmlNodePtr xExtNode = m_xmlConfigNodePtr->children; xExtNode != NULL ; xExtNode = xExtNode->next)
 			{
@@ -42,9 +40,9 @@ namespace VD{
 		using namespace helper::xml;
 		for(unsigned int i =0 ; this->m_ExtVec.size(); i++)
 		{
-			std::map<std::string , chilli::abstract::ExtensionPtr>::iterator it
-			= chilli::Global::m_ExtMap.find(m_ExtVec.at(i));
-			if (it != chilli::Global::m_ExtMap.end() && it->second->isIdle())
+			/*std::map<std::string , chilli::model::ExtensionPtr>::iterator it
+			= chilli::model::m_ExtMap.find(m_ExtVec.at(i));
+			if (it != chilli::model::m_ExtMap.end() && it->second->isIdle())
 			{
 				CXmlDocmentHelper xmlDocHlp;
 
@@ -61,7 +59,7 @@ namespace VD{
 				xmlParse.setRootAttributesValue("dest",it->second->getExtensionNumber());
 				
 				return it->second->processTransfer(xmlParse.getContent(),from);
-			}
+			}*/
 		}
 
 		return true;
