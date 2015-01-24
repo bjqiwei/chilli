@@ -3,7 +3,7 @@
 #include <string>
 
 namespace chilli{
-namespace abstract{
+namespace model{
 class Channel
 {
 public:

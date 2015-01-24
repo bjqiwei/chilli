@@ -115,9 +115,6 @@
     <ClCompile Include="ServiceModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model\Extension.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
     <ClCompile Include="Sh\ShChannel.cpp">
       <Filter>Sh</Filter>
     </ClCompile>
@@ -138,9 +135,6 @@
     </ClCompile>
     <ClCompile Include="ACD\ACDModule.cpp">
       <Filter>ACD</Filter>
-    </ClCompile>
-    <ClCompile Include="model\Group.cpp">
-      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="chilli.cpp">
       <Filter>Source Files</Filter>

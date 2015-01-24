@@ -60,7 +60,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;XP_WIN;STATIC_EXPORTABLE_JS_API;JS_USE_JSID_STRUCT_TYPES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_CONSOLE;XP_WIN;STATIC_EXPORTABLE_JS_API;JS_USE_JSID_STRUCT_TYPES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -96,7 +96,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -147,8 +147,6 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
-    <ClCompile Include="model\Extension.cpp" />
-    <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
     <ClCompile Include="Sh\ShChannel.cpp" />

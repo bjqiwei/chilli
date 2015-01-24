@@ -7,7 +7,7 @@
 
 namespace chilli{
 namespace ShDev{
-class ShChannel :virtual public chilli::abstract::Channel
+class ShChannel :virtual public chilli::model::Channel
 {
 public:
 	ShChannel(void);
