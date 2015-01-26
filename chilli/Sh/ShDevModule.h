@@ -3,8 +3,6 @@
 #define _CHILLI_SHDEV_MODULE_HEADER_
 #include "..\Device\DevModule.h"
 #include "shpa3api.h"
-#include "scxml\SMInstance.h"
-#include "..\model\Extension.h"
 
 namespace chilli{
 namespace ShDev{
@@ -21,14 +19,14 @@ namespace ShDev{
 	};
 
 class ShDevModule :
-	public chilli::abstract::DevModule
+	public chilli::model::DevModule
 {
 public:
 	ShDevModule(void);
 	virtual ~ShDevModule(void);
 
 	virtual bool Init(xmlNodePtr xNode) ;
-	virtual void Start() ;
+	virtual int Start() ;
 	virtual int Close(void);
 
 
@@ -46,6 +44,8 @@ public:
 	static char *GetString_EventType ( int nEvent );
 	static char *GetString_State ( int state );
 	static char *GetString_PengdingReason(int nReason);
+private:
+	log4cplus::Logger log;
 
 };
 typedef ShDevModule * ShDevModulePtr;

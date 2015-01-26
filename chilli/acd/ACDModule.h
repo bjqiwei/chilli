@@ -9,7 +9,7 @@
 namespace chilli{
 namespace ACD{
 
-class ACDModule:public abstract::ProcessModule
+class ACDModule:public model::ProcessModule
 {
 public:
 	ACDModule(void);
@@ -26,7 +26,7 @@ public:
 	static void addEventToBuffer(std::string strContent);
 private:
 	static std::vector<xmlNodePtr> m_DialPlanVector;
-	static std::vector<VD::GroupPtr> m_GroupVec;
+	static std::vector<model::GroupPtr> m_GroupVec;
 
 	ACDModule(const ACDModule & other);
 	ACDModule & operator=(const ACDModule &);

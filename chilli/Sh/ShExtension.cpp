@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "ShExtension.h"
 #include "ShDevModule.h"
+#include <log4cplus/loggingmacros.h>
 
 
 namespace chilli{
@@ -21,9 +22,9 @@ ShExtension::~ShExtension(void)
 
 bool ShExtension::ParserConfig(void)
 {
-	if(chilli::abstract::Extension::ParserConfig())
+	if(chilli::model::Extension::ParserConfig())
 	{
-		this->setType(fsm::xmlHelper::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
+		this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
 		return true;
 	}
 	return false;
@@ -42,16 +43,16 @@ bool ShExtension::setType(std::string strType)
 }
 void ShExtension::setType(int _type)
 {
-	return ShChannel::setType(_type);
+	return ;
 }
 
 int ShExtension::getChannelID()
 {
-	return ShChannel::getChannelID();
+	return ;
 }
 bool ShExtension::Init(void)
 {
-	stateMachie.setscInstance(&chilli::abstract::DevModule::scInstance);
+	//stateMachie.setscInstance(&chilli::model::DevModule::scInstance);
 	return Extension::Init();
 }
 
@@ -65,7 +66,7 @@ void ShExtension::fireSend(const std::string &strContent)
 
 int ShExtension::processCmd(const std::string& strCmd)
 {
-	fsm::xmlHelper::xmlDocumentPtr xDocPtr = xmlParseMemory(strCmd.c_str(),strCmd.length());
+	helper::xml::CXmlDocumentPtr xDocPtr = xmlParseMemory(strCmd.c_str(),strCmd.length());
 	if (xDocPtr._xDocPtr == NULL)
 	{
 		LOG4CPLUS_ERROR(log," Convert a string to xml error was encountered,string="<<strCmd);
@@ -73,10 +74,10 @@ int ShExtension::processCmd(const std::string& strCmd)
 	}
 	xmlNodePtr xrootNode = xmlDocGetRootElement(xDocPtr._xDocPtr);
 	//xmlNodePtr xCttNode = Interpreter::getXmlChildNode(xrootNode,"content");
-	std::string _cmd = fsm::xmlHelper::getXmlNodeAttributesValue(xrootNode,"cmd");
+	std::string _cmd = helper::xml::getXmlNodeAttributesValue(xrootNode,"cmd");
 	if (_cmd.compare("autoSendDialTone") == 0)
 	{
-		std::string strParaValue = fsm::xmlHelper::getXmlChildNodeValue(xrootNode,"enable");
+		std::string strParaValue = helper::xml::getXmlChildNodeValue(xrootNode,"enable");
 		this->AutoSendDialTone(atoi(strParaValue.c_str()));
 	}else if (_cmd.compare("reloadConfig") == 0)
 	{
@@ -88,7 +89,7 @@ int ShExtension::processCmd(const std::string& strCmd)
 	}
 	else if (_cmd.compare("playFile") == 0)
 	{
-		this->PlayFile(fsm::xmlHelper::getXmlChildNodeValue(xrootNode,"file"));
+		this->PlayFile(helper::xml::getXmlChildNodeValue(xrootNode,"file"));
 	}
 	else if (_cmd.compare("hangUp") == 0)
 	{
@@ -99,7 +100,7 @@ int ShExtension::processCmd(const std::string& strCmd)
 
 int ShExtension::processEvent(const std::string& strEvent)
 {
-	fsm::xmlHelper::xmlDocumentPtr xDocPtr = xmlParseMemory(strEvent.c_str(),strEvent.length());
+	helper::xml::CXmlDocumentPtr xDocPtr = xmlParseMemory(strEvent.c_str(),strEvent.length());
 	if (xDocPtr._xDocPtr == NULL)
 	{
 		LOG4CPLUS_ERROR(log," Convert a string to xml error was encountered,string="<<strEvent);
@@ -111,8 +112,8 @@ int ShExtension::processEvent(const std::string& strEvent)
 		return -1;
 	}
 
-	std::string _event = fsm::xmlHelper::getXmlNodeAttributesValue(xrootNode,"event");
-	this->_event_data = fsm::xmlHelper::getXmlNodeAttributesValue(xrootNode,"from");
+	std::string _event = helper::xml::getXmlNodeAttributesValue(xrootNode,"event");
+	this->_event_data = helper::xml::getXmlNodeAttributesValue(xrootNode,"from");
 	fsm::TriggerEvent evt(_event,this->_event_data,0);
 	LOG4CPLUS_INFO(log,  " Recived a event,"<<"from " <<  this->_event_data << "event=" << evt.ToString());
 	stateMachie.pushEvent(evt);
@@ -121,15 +122,26 @@ int ShExtension::processEvent(const std::string& strEvent)
 
 bool ShExtension::processTransfer(std::string strEvent,std::string from)
 {
-	abstract::DevModule::recEvtBuffer.addData(strEvent);
+	model::DevModule::recEvtBuffer.addData(strEvent);
 	return true;
 }
 
 bool ShExtension::addAcdEvent(const std::string& strEvent)
 {
-	abstract::DevModule::recEvtBuffer.addData(strEvent);
+	model::DevModule::recEvtBuffer.addData(strEvent);
 	return true;
 }
 
+int ShExtension::Answer()
+{
+	return SsmPickup(ch);
+}
+int ShExtension::PlayFile(std::string file)
+{
+	return SsmPlayFile(ch,file.c_str(),-1,0,0xFFFFFFFF);
+}
+int ShExtension::HangUp(){
+	return SsmHangup(ch);
+}
 }
 }

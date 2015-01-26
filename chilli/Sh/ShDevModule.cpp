@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ShDevModule.h"
 #include "ShExtension.h"
-#include <process.h>
-#include <xmlHelper.h>
+#include <common/xmlHelper.h>
+#include <log4cplus/loggingmacros.h>
 
 namespace chilli{
 namespace ShDev{
@@ -12,7 +12,6 @@ namespace ShDev{
 ShDevModule::ShDevModule(void):DevModule()
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule");
-	this->scInstance.setLog(log);
 	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
 }
 
@@ -28,7 +27,7 @@ ShDevModule::~ShDevModule(void)
 
 bool ShDevModule::Init(xmlNodePtr xNode)
 {
-	setConfigNode(xNode);
+	//setConfigNode(xNode);
 	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
 	{
 		CHAR ErrMsg[400];
@@ -45,11 +44,11 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 	int nTotCh = SsmGetMaxCh();
 	for(int i=0; i<nTotCh; i++)
 	{
-		chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
-		extPtr->setEnable(false);
-		extPtr->setType(SsmGetChType(i));
-		extPtr->setChannelID(i);
-		m_ExtensionVector.push_back(extPtr);
+		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
+		//extPtr->setEnable(false);
+		//extPtr->setType(SsmGetChType(i));
+		//extPtr->setChannelID(i);
+		//m_ExtensionVector.push_back(extPtr);
 	}
 
 	if(DevModule::Init())
@@ -62,7 +61,6 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 
 int ShDevModule::Close(void)
 {
-	CloseHandle(td.thread_hnd);
 	LOG4CPLUS_DEBUG(log,"Close a Sanhuid device");
 	if(SsmCloseCti() == -1)									 
 	{
@@ -93,7 +91,7 @@ int ShDevModule::EvtHandler(PSSM_EVENT pEvent)
 	unsigned int evtCh = pEvent->nReference;
 	if (evtCh < m_ExtensionVector.size())
 	{
-		abstract::ExtensionPtr extPtr = m_ExtensionVector.at(evtCh);
+		model::ExtensionPtr extPtr = m_ExtensionVector.at(evtCh);
 		recEvtBuffer.addData(TransferEvtToXmlEvent(pEvent,extPtr->getExtensionNumber()));
 	}
 	else
@@ -103,7 +101,7 @@ int ShDevModule::EvtHandler(PSSM_EVENT pEvent)
 	return 0;
 }
 
-void ShDevModule::Start()
+int ShDevModule::Start()
 {
 	//for (unsigned int i = 0; i< m_ExtensionVector.size(); i++)
 	//{
@@ -125,20 +123,21 @@ void ShDevModule::Start()
 	}
 
 
-	td.thread_hnd = (HANDLE)_beginthreadex(NULL,0,ThreadProc,NULL,0,&td.thread_id);
+	//td.thread_hnd = (HANDLE)_beginthreadex(NULL,0,ThreadProc,NULL,0,&td.thread_id);
 
-	if (!td.thread_hnd){
+	/*if (!td.thread_hnd){
 		LOG4CPLUS_ERROR(log,"_beginthreadex() failed;error no.=" << GetLastError());
 	}else{
 		LOG4CPLUS_INFO(log,"_beginthreadex() ok;thread_id=" << td.thread_id);
-	}
+	}*/
+	return 0;
 }
 
 std::string ShDevModule::TransferEvtToXmlEvent(PSSM_EVENT pEvent,std::string extNum){
 	
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 
-	fsm::xmlHelper::CXmlDocmentHelper xmlHelper;
+	helper::xml::CXmlDocmentHelper xmlHelper;
 	std::stringstream ss;
 	ss << pEvent->nReference;
 	xmlHelper.setRootNode("event");

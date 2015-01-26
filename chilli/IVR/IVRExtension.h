@@ -7,7 +7,7 @@
 namespace chilli{
 namespace IVR{
 
-class IVRExtension:public abstract::Extension{
+class IVRExtension:public model::Extension{
 public:
 	IVRExtension();
 	virtual ~IVRExtension();

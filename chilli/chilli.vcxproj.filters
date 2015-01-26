@@ -62,9 +62,6 @@
     <ClInclude Include="model\Extension.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="Sh\ShChannel.h">
-      <Filter>Sh</Filter>
-    </ClInclude>
     <ClInclude Include="model\ProcessModule.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
     </ClInclude>
     <ClInclude Include="Sh\ShExtension.h">
       <Filter>Sh</Filter>
-    </ClInclude>
-    <ClInclude Include="IVR\IVRModule.h">
-      <Filter>IVR</Filter>
     </ClInclude>
     <ClInclude Include="Device\DevModule.h">
       <Filter>Device</Filter>
@@ -112,17 +106,11 @@
     <ClCompile Include="ServiceModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sh\ShChannel.cpp">
-      <Filter>Sh</Filter>
-    </ClCompile>
     <ClCompile Include="Sh\ShDevModule.cpp">
       <Filter>Sh</Filter>
     </ClCompile>
     <ClCompile Include="Sh\ShExtension.cpp">
       <Filter>Sh</Filter>
-    </ClCompile>
-    <ClCompile Include="IVR\IVRModule.cpp">
-      <Filter>IVR</Filter>
     </ClCompile>
     <ClCompile Include="Device\DevModule.cpp">
       <Filter>Device</Filter>

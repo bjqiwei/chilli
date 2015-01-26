@@ -6,7 +6,6 @@
 #include "ServiceModule.h"
 #include "chilli.h"
 #include "signal.h"
-#include "ivr/IVRModule.h"
 #include "ACD\ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include <log4cplus/helpers/loglog.h>

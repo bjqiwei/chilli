@@ -24,7 +24,7 @@ namespace model{
 
 	bool Group::ParserConfig(void)
 	{
-		if(chilli::model::Extension::ParserConfig())
+		/*if(chilli::model::Extension::ParserConfig())
 		{
 			for (xmlNodePtr xExtNode = m_xmlConfigNodePtr->children; xExtNode != NULL ; xExtNode = xExtNode->next)
 			{
@@ -32,7 +32,7 @@ namespace model{
 				m_ExtVec.push_back(helper::xml::XStr(xmlNodeGetContent(xExtNode)).strForm());
 			}
 			return true;
-		}
+		}*/
 		return false;
 	}
 	bool Group::processTransfer(std::string strCmd,std::string from)

@@ -9,7 +9,7 @@
 #include "..\model\Extension.h"
 
 namespace chilli{
-namespace abstract{
+namespace model{
 
 
 class DevModule :
@@ -36,9 +36,9 @@ protected:
 	static unsigned int __stdcall ThreadProc( void *pParam );
 
 
-	static std::vector<chilli::abstract::ExtensionPtr> m_ExtensionVector;
+	static std::vector<chilli::model::ExtensionPtr> m_ExtensionVector;
 public:
-	static const std::vector<chilli::abstract::ExtensionPtr> & getExtVec();
+	static const std::vector<chilli::model::ExtensionPtr> & getExtVec();
 	static void addEventToBuffer(std::string strContent);
 	//State machine executer, one instance per thread
 	static fsm::SMInstance smInstance;

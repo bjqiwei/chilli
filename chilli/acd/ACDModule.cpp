@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "ACDModule.h"
-#include "..\ivr\IVRModule.h"
 #include "..\Sh\ShDevModule.h"
 #include <process.h>
 #include <regex>
@@ -105,7 +104,7 @@ bool ACDModule::ParserConfig(void)
 	else{
 		for(xmlNodePtr xExtNode = xDialplanNode->children; xExtNode != NULL; xExtNode=xExtNode->next)
 		{
-			if (!abstract::Extension::isExtConfigNode(xExtNode)) continue;
+			if (!model::Extension::isExtConfigNode(xExtNode)) continue;
 			xmlNodePtr xNode = xmlCopyNode(xExtNode,1);
 			m_DialPlanVector.push_back(xNode);
 		}

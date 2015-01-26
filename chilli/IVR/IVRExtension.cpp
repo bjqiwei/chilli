@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "IVRExtension.h"
-#include "IVRModule.h"
 #include <xmlHelper.h>
 
 namespace chilli{
