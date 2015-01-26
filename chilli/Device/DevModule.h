@@ -6,7 +6,6 @@
 #include "..\model\ProcessModule.h"
 #include "..\CEventBuffer.h"
 #include "scxml\SMInstance.h"
-#include "..\model\Extension.h"
 
 namespace chilli{
 namespace model{
