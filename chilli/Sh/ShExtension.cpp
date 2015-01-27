@@ -24,7 +24,7 @@ bool ShExtension::ParserConfig(void)
 {
 	if(chilli::model::Extension::ParserConfig())
 	{
-		this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
+		//this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
 		return true;
 	}
 	return false;
@@ -32,12 +32,12 @@ bool ShExtension::ParserConfig(void)
 
 bool ShExtension::setType(std::string strType)
 {
-	if (this->nType != ShDevModule::getDeviceTypeByName(strType))
+	/*if (this->nType != ShDevModule::getDeviceTypeByName(strType))
 	{
 		LOG4CPLUS_ERROR(log,"the type set not match the device type:"<<strType << ",set UnEnable.");
 		this->m_bEnable = false;
 		return false;
-	}
+	}*/
 	LOG4CPLUS_DEBUG(log,"set type="<<strType);
 	return true;
 }
@@ -48,7 +48,7 @@ void ShExtension::setType(int _type)
 
 int ShExtension::getChannelID()
 {
-	return ;
+	return -1;
 }
 bool ShExtension::Init(void)
 {
@@ -78,10 +78,10 @@ int ShExtension::processCmd(const std::string& strCmd)
 	if (_cmd.compare("autoSendDialTone") == 0)
 	{
 		std::string strParaValue = helper::xml::getXmlChildNodeValue(xrootNode,"enable");
-		this->AutoSendDialTone(atoi(strParaValue.c_str()));
+		//this->AutoSendDialTone(atoi(strParaValue.c_str()));
 	}else if (_cmd.compare("reloadConfig") == 0)
 	{
-		this->reload();
+		//this->reload();
 	}
 	else if (_cmd.compare("answer") == 0)
 	{
@@ -113,10 +113,10 @@ int ShExtension::processEvent(const std::string& strEvent)
 	}
 
 	std::string _event = helper::xml::getXmlNodeAttributesValue(xrootNode,"event");
-	this->_event_data = helper::xml::getXmlNodeAttributesValue(xrootNode,"from");
-	fsm::TriggerEvent evt(_event,this->_event_data,0);
-	LOG4CPLUS_INFO(log,  " Recived a event,"<<"from " <<  this->_event_data << "event=" << evt.ToString());
-	stateMachie.pushEvent(evt);
+	//this->_event_data = helper::xml::getXmlNodeAttributesValue(xrootNode,"from");
+	//fsm::TriggerEvent evt(_event,this->_event_data,0);
+	//LOG4CPLUS_INFO(log,  " Recived a event,"<<"from " <<  this->_event_data << "event=" << evt.ToString());
+	//stateMachie.pushEvent(evt);
 	return 0;
 }
 

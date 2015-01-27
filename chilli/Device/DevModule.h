@@ -6,6 +6,7 @@
 #include "..\model\ProcessModule.h"
 #include "..\CEventBuffer.h"
 #include "scxml\SMInstance.h"
+#include <log4cplus\logger.h>
 
 namespace chilli{
 namespace model{
@@ -30,14 +31,8 @@ private:
 	DevModule(const DevModule & other);
 	DevModule & operator=(const DevModule &);
 
-protected:
-	//thread function
-	static unsigned int __stdcall ThreadProc( void *pParam );
-
-
-	static std::vector<chilli::model::ExtensionPtr> m_ExtensionVector;
+	log4cplus::Logger log;
 public:
-	static const std::vector<chilli::model::ExtensionPtr> & getExtVec();
 	static void addEventToBuffer(std::string strContent);
 	//State machine executer, one instance per thread
 	static fsm::SMInstance smInstance;

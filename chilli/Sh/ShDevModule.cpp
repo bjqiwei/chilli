@@ -19,9 +19,6 @@ ShDevModule::ShDevModule(void):DevModule()
 ShDevModule::~ShDevModule(void)
 {
 	recEvtBuffer.addData("quit");
-	for (unsigned int i =0; i < m_ExtensionVector.size(); i++){
-		delete m_ExtensionVector.at(i);
-	}
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 }
 
@@ -35,11 +32,7 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
 		return false ;
 	}
-	for (unsigned int i =0; i < m_ExtensionVector.size(); i++)
-	{
-		delete m_ExtensionVector.at(i);
-	}
-	m_ExtensionVector.clear();
+
 
 	int nTotCh = SsmGetMaxCh();
 	for(int i=0; i<nTotCh; i++)
@@ -59,7 +52,7 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 	return true;
 }
 
-int ShDevModule::Close(void)
+int ShDevModule::Stop()
 {
 	LOG4CPLUS_DEBUG(log,"Close a Sanhuid device");
 	if(SsmCloseCti() == -1)									 
@@ -89,15 +82,15 @@ int ShDevModule::EvtHandler(PSSM_EVENT pEvent)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 	unsigned int evtCh = pEvent->nReference;
-	if (evtCh < m_ExtensionVector.size())
+	/*if (evtCh < m_ExtensionVector.size())
 	{
-		model::ExtensionPtr extPtr = m_ExtensionVector.at(evtCh);
-		recEvtBuffer.addData(TransferEvtToXmlEvent(pEvent,extPtr->getExtensionNumber()));
+	model::ExtensionPtr extPtr = m_ExtensionVector.at(evtCh);
+	recEvtBuffer.addData(TransferEvtToXmlEvent(pEvent,extPtr->getExtensionNumber()));
 	}
 	else
 	{
-		LOG4CPLUS_WARN(log,"recive one event,ch is Out of range. event ch=" << evtCh);
-	}
+	LOG4CPLUS_WARN(log,"recive one event,ch is Out of range. event ch=" << evtCh);
+	}*/
 	return 0;
 }
 
@@ -108,9 +101,9 @@ int ShDevModule::Start()
 	//	if (m_ExtensionVector.at(i)->getType() == Anolog_User) SsmSetASDT(i,1);
 	//}
 
-	for(unsigned int i =0; i < m_ExtensionVector.size(); i++){
+	/*for(unsigned int i =0; i < m_ExtensionVector.size(); i++){
 		m_ExtensionVector.at(i)->go();
-	}
+	}*/
 	EVENT_SET_INFO EventMode;
 	EventMode.dwWorkMode = EVENT_CALLBACKA;
 	EventMode.lpHandlerParam = EvtHandler;
@@ -133,6 +126,10 @@ int ShDevModule::Start()
 	return 0;
 }
 
+bool ShDevModule::reloadConfig()
+{
+	return false;
+}
 std::string ShDevModule::TransferEvtToXmlEvent(PSSM_EVENT pEvent,std::string extNum){
 	
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");

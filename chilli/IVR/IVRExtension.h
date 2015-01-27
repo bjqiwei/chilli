@@ -22,7 +22,8 @@ public:
 	virtual void fireSend(const std::string &strContent);
 	virtual bool processTransfer(std::string strEvent,std::string from);
 	virtual bool addAcdEvent(const std::string& strEvent);
-	friend class IVRModule;
+private:
+	log4cplus::Logger log;
 
 };
 typedef IVRExtension *  IVRExtensionPtr;

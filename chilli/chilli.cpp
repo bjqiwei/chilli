@@ -18,8 +18,7 @@ using namespace log4cplus;
 
 chilli::ServiceModule * _ServiceModule =NULL;
 chilli::ShDev::ShDevModule _deviceSH;
-chilli::IVR::IVRModule _IVR;
-chilli::ACD::ACDModule _ACD;
+chilli::model::ACDModule _ACD;
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -271,10 +270,8 @@ bool chilli::App::ReadXMLConfig(void)
 int chilli::App::Run(void)
 {
 	_deviceSH.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
-	_IVR.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
-	_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
+	//_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
 	_deviceSH.Start();
-	_IVR.Start();
 	_ACD.Start();
 	chilli::App::running = 1;
 	return 0;
@@ -288,7 +285,7 @@ void chilli::App::ConsoleLoop()
 		if (strCmd.compare("reloadxml") == 0)
 		{
 			CoreInit();
-			_deviceSH.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
+			//_deviceSH.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
 			//_IVR.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
 			//_ACD.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
 		}
@@ -297,9 +294,8 @@ void chilli::App::ConsoleLoop()
 			LOG4CPLUS_WARN(log,"Unrecognized command:" <<strCmd);
 		}
 	}
-	_deviceSH.Close();
-	_IVR.Close();
-	_ACD.Close();
+	_deviceSH.Stop();
+	_ACD.Stop();
 
 }
 

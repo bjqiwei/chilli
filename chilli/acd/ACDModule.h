@@ -2,12 +2,11 @@
 #ifndef _CHILLI_ACDMODULE_HEADER_
 #define _CHILLI_ACDMODULE_HEADER_
 #include "../model/ProcessModule.h"
-#include "scxml/SMInstance.h"
-#include "../model/Group.h"
 #include "../CEventBuffer.h"
+#include <log4cplus/logger.h>
 
 namespace chilli{
-namespace ACD{
+namespace model{
 
 class ACDModule:public model::ProcessModule
 {
@@ -16,26 +15,19 @@ public:
 	virtual ~ACDModule(void);
 	virtual bool Init(void);
 	virtual int Start();
-	virtual int Close(void);
+	virtual int Stop(void);
 	virtual bool ParserConfig(void);
 	virtual bool reloadConfig();
-	void	DisplayEventInfo ( std::string strEvent );
-
-	static helper::CEventBuffer<std::string> recEvtBuffer;
-	static fsm::SMInstance smInstance;
+public:
 	static void addEventToBuffer(std::string strContent);
 private:
-	static std::vector<xmlNodePtr> m_DialPlanVector;
-	static std::vector<model::GroupPtr> m_GroupVec;
-
+	void DisplayEventInfo(const std::string &) const;
+private:
 	ACDModule(const ACDModule & other);
 	ACDModule & operator=(const ACDModule &);
-	xmlNodePtr  isMatched(xmlNodePtr xExtNode,std::string strEvent);
-	int processActions(xmlNodePtr xCondNode,std::string strEvent);
-	int processTransfer(xmlNodePtr xAppNode ,std::string strEvent);
-
-	static int EvtHandler(const std::string& strEvent);
-	static unsigned int __stdcall ThreadProc( void *pParam );
+	log4cplus::Logger log;
+private:
+	static helper::CEventBuffer<std::string> recEvtBuffer;
 };
 }
 }
