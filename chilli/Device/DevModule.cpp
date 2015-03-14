@@ -8,6 +8,7 @@
 namespace chilli{
 namespace model{
 
+helper::CEventBuffer<std::string> DevModule::recEvtBuffer;
 
 DevModule::DevModule(void):ProcessModule(NULL)
 {

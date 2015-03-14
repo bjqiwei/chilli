@@ -156,6 +156,9 @@
     <ClInclude Include="..\scxml\TriggerEvent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\jsoncpp-src-0.5.0\makefiles\vs2010\lib_json.vcxproj">
+      <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\jsoncpp-src-0.5.0\makefiles\vs71\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>

@@ -61,7 +61,7 @@ int run(JSContext *cx) {
 	JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
 	JSObject * obj = JS_CompileScript(cx,global,script,strlen(script),NULL,0);
 	JS_SetOptions(cx, oldopts);
-	for(long i=200000; i>0 ; i--){
+	for(long i=20000; i>0 ; i--){
 		//JSBool status = compileAndRepeat(cx,global,script,"");
 		//JSBool status = JS_EvaluateScript(cx, global, script, strlen(script), NULL, 0, &rval); 
 		JSString * str = JS_NewStringCopyZ(cx,"1234567890");

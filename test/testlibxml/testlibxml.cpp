@@ -94,7 +94,7 @@ int main()
 
     xmlFreeDoc(doc);
 
-	doc = xmlParseFile("CreatedXml2.xml");
+	doc = xmlParseFile("CreatedXml.xml");
 	ofstream out("write.txt", ios::binary);
 	xmlNodePtr rootNode =  xmlDocGetRootElement(doc);
 	
