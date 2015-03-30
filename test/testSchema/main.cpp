@@ -67,5 +67,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	return is_valid(argv[1],argv[2]);
+	int ret = is_valid(argv[1],argv[2]);
+	getchar();
+	return ret;
 }

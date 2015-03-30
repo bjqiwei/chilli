@@ -65,6 +65,7 @@ main(int argc, char **argv) {
      * this is to debug memory for regression tests
      */
     xmlMemoryDump();
+	getchar();
     return 0;
 }
 
