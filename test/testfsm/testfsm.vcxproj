@@ -113,8 +113,8 @@ xcopy /Y *.js $(OutDir)</Command>
     <ProjectReference Include="..\..\libs\fsm\msvc10\FSM.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc10\log4cplusS.vcxproj">
-      <Project>{bec0cd2f-60cd-40e2-a89b-ab10e902f1d5}</Project>
+    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc10\log4cplus.vcxproj">
+      <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

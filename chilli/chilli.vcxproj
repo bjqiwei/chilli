@@ -157,9 +157,6 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ProjectReference Include="..\libs\fsm\msvc10\FSM.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libs\log4cplus-1.1.2\msvc10\log4cplusS.vcxproj">
-      <Project>{bec0cd2f-60cd-40e2-a89b-ab10e902f1d5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

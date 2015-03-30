@@ -78,6 +78,7 @@ main()
     }
 
     log4cplus::tcout << "Exiting main()..." << endl;
+	getchar();
     return 0;
 }
 
