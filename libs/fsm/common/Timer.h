@@ -29,7 +29,7 @@ namespace helper{
 	};
 
 	// 定时器
-	class TimerServer{
+	class FSM_EXPORT TimerServer{
 	private:
 		//定时器对象。
 		class  Timer{

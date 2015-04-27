@@ -22,7 +22,7 @@ ShExtension::~ShExtension(void)
 
 bool ShExtension::ParserConfig(void)
 {
-	if(chilli::model::Extension::ParserConfig())
+	if(chilli::model::Extension::LoadConfig())
 	{
 		//this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
 		return true;

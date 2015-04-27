@@ -16,9 +16,9 @@ IVRExtension::~IVRExtension(){
 	LOG4CPLUS_DEBUG(log,"destruction a IVR extension object.");
 }
 
-bool IVRExtension::ParserConfig(void)
+bool IVRExtension::LoadConfig(void)
 {
-	return Extension::ParserConfig();
+	return Extension::LoadConfig();
 }
 
 bool IVRExtension::Init(void)

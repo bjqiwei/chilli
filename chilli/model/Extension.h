@@ -20,7 +20,7 @@ public:
 	virtual bool isIdle() = 0;
 	virtual void go() = 0;
 	virtual void pushEvent(fsm::TriggerEvent &evt) = 0;
-	virtual bool ParserConfig(void) = 0;
+	virtual bool LoadConfig(void) = 0;
 	virtual bool Init(void) = 0;
 	virtual int processCmd(const std::string& strCmd) = 0;
 	virtual int processEvent(const std::string& strEvent) = 0;

@@ -18,7 +18,7 @@ private:
 public:
 	virtual bool Init(void);
 	int EvtHandler(std::string strEvent);
-	virtual bool ParserConfig(void);
+	virtual bool LoadConfig(void);
 	virtual void fireSend(const std::string &strContent);
 	virtual bool processTransfer(std::string strEvent,std::string from);
 	virtual bool addAcdEvent(const std::string& strEvent);
