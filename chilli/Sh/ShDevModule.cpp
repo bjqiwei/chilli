@@ -44,10 +44,6 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 		//m_ExtensionVector.push_back(extPtr);
 	}
 
-	if(DevModule::Init())
-		LOG4CPLUS_INFO(log,"init Sanhuid device ok.");
-	else
-		LOG4CPLUS_INFO(log,"init Sanhuid device failed.");
 
 	return true;
 }
@@ -126,7 +122,7 @@ int ShDevModule::Start()
 	return 0;
 }
 
-bool ShDevModule::reloadConfig()
+bool ShDevModule::LoadConfig()
 {
 	return false;
 }

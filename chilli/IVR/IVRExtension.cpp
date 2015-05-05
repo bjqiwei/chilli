@@ -18,13 +18,13 @@ IVRExtension::~IVRExtension(){
 
 bool IVRExtension::LoadConfig(void)
 {
-	return Extension::LoadConfig();
+	return true;
 }
 
 bool IVRExtension::Init(void)
 {
 	//stateMachie.setscInstance(&IVRModule::scInstance);
-	return Extension::Init();
+	return true;
 }
 int IVRExtension::EvtHandler(std::string strEvent)
 {

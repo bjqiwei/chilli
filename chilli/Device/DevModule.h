@@ -19,11 +19,7 @@ public:
 	DevModule(void);
 	virtual ~DevModule(void);
 
-	virtual bool ParserConfig(void) ;
-	virtual bool reloadConfig(xmlNodePtr xNode) ;
-	
-protected:
-	virtual bool Init(void);
+	virtual bool LoadConfig() ;
 	
 private:
 

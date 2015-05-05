@@ -8,10 +8,10 @@ namespace chilli{
 	
 	ServiceModule::ServiceModule(void)
 		: m_bService(false)
-		, ThreadID(0)
 	{
 		log = log4cplus::Logger::getInstance("chilli.ServiceModule");
 		lstrcpy(m_szServiceName,SERVICENAME_DEFAULT);
+		Init();
 		LOG4CPLUS_DEBUG(log,"constructor.");
 	}
 
@@ -22,14 +22,10 @@ namespace chilli{
 	}
 
 
-	void ServiceModule::Init(char sServiceName[])
+	void ServiceModule::Init()
 	{		
 		
 		LOG4CPLUS_TRACE(log,"Init fuction starting...");
-		if (lstrlen(sServiceName) != 0)
-		{
-			lstrcpy(m_szServiceName,sServiceName);
-		}
 		// set up the initial service status 
 		m_hServiceStatus = NULL;
 		m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
@@ -147,7 +143,7 @@ namespace chilli{
 		TCHAR szFilePath[_MAX_PATH];
 		::GetModuleFileName(NULL, szFilePath, _MAX_PATH);
 
-		strcat_s(szFilePath," -startservice");
+		strcat_s(szFilePath,WINSERVERPARAMETER);
 		
 		LOG4CPLUS_TRACE(log, "servicename (" << m_szServiceName << ")" << std::endl);
 		LOG4CPLUS_TRACE(log," FilePath (" << szFilePath << ")" << std::endl);
@@ -199,7 +195,7 @@ char * chilli::ServiceModule::GetServiceStatusStrName(unsigned long dwState)
 		case SERVICE_CONTINUE_PENDING:return "SERVICE_CONTINUE_PENDING" ;
 		case SERVICE_PAUSE_PENDING:return "SERVICE_PAUSE_PENDING" ;
 		case SERVICE_PAUSED:return "SERVICE_PAUSED" ;
-		default:return"UNKNOW";
+		default:return"UNKNOWN";
 	}
 	return NULL;
 

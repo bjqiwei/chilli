@@ -11,6 +11,7 @@ namespace chilli{
 
 	#define SERVICENAME_DEFAULT _T("chilli")
 	#define SERVICEDESCRIPTION _T("The chilli service.")
+	#define  WINSERVERPARAMETER _T("-startservice")
 
 	class ServiceModule
 	{
@@ -18,15 +19,14 @@ namespace chilli{
 		ServiceModule(void);
 		~ServiceModule(void);
 		bool m_bService;
-		unsigned int ThreadID;
 		char m_szServiceName[256];
 		SERVICE_STATUS_HANDLE m_hServiceStatus;
 		SERVICE_STATUS m_status;
 	
 	private: 
 		log4cplus::Logger log ;
+		void Init();
 	public:
-		void Init(char sServiceName[]);
 
 		long UnregisterServer(void);
 

@@ -13,19 +13,17 @@ class ACDModule:public model::ProcessModule
 public:
 	ACDModule(void);
 	virtual ~ACDModule(void);
-	virtual bool Init(void);
 	virtual int Start();
-	virtual int Stop(void);
-	virtual bool ParserConfig(void);
-	virtual bool reloadConfig();
+	virtual int Stop();
+	virtual bool LoadConfig();
+private:
+	log4cplus::Logger log;
+
 public:
 	static void addEventToBuffer(std::string strContent);
 private:
 	void DisplayEventInfo(const std::string &) const;
-private:
-	ACDModule(const ACDModule & other);
-	ACDModule & operator=(const ACDModule &);
-	log4cplus::Logger log;
+
 private:
 	static helper::CEventBuffer<std::string> recEvtBuffer;
 };

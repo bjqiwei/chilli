@@ -10,7 +10,7 @@ namespace model{
 
 helper::CEventBuffer<std::string> DevModule::recEvtBuffer;
 
-DevModule::DevModule(void):ProcessModule(NULL)
+DevModule::DevModule(void)
 {
 	log = log4cplus::Logger::getInstance("chilli.abstract.DevModule");
 	LOG4CPLUS_DEBUG(log,"new a DevModule object.");
@@ -21,76 +21,12 @@ DevModule::~DevModule(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a DevModule object.");
 }
-bool DevModule::Init(void)
+
+
+
+
+bool DevModule::LoadConfig()
 {
-	this->ParserConfig();
-
-	/*for (unsigned int i =0 ; i< m_ExtensionVector.size(); i++){
-		if (m_ExtensionVector.at(i)){
-			m_ExtensionVector.at(i)->ParserConfig();
-		}
-	}*/
-
-	/*for (unsigned int i =0 ; i< m_ExtensionVector.size(); i++){
-		if (m_ExtensionVector.at(i)){
-			m_ExtensionVector.at(i)->Init();
-		}
-	}*/
-	return true;
-}
-
-
-bool DevModule::ParserConfig(void)
-{
-	if (this->m_xmlConfigNodePtr == NULL){
-		LOG4CPLUS_WARN(log,"xmlConfigNode is null.");
-		return false;
-	}
-
-	xmlNodePtr xConfigNode = helper::xml::getXmlChildNode(m_xmlConfigNodePtr,"config");
-	if (xConfigNode == NULL){
-		LOG4CPLUS_WARN(log,"xmlConfigNode is null.");
-		return false;
-	}
-
-	xmlNodePtr xExtsNode = helper::xml::getXmlChildNode(xConfigNode,"Extensions");
-	if(xExtsNode)
-	{
-		for(xmlNodePtr xExtNode = xExtsNode->children; xExtNode != NULL; xExtNode=xExtNode->next)
-		{
-			//if (!Extension::isExtConfigNode(xExtNode)) continue;
-			std::string strChannelID = helper::xml::getXmlNodeAttributesValue(xExtNode,"ChannelID");
-			chilli::model::ExtensionPtr ptrExt = NULL;
-			if (!strChannelID.empty())
-			{
-				//if ((unsigned int)atoi(strChannelID.c_str()) < m_ExtensionVector.size()) ptrExt = m_ExtensionVector.at(atoi(strChannelID.c_str()));
-			}
-
-			if (ptrExt ==NULL)
-			{
-				LOG4CPLUS_WARN(log,"Extension:"
-					<<helper::xml::getXmlNodeAttributesValue(xExtNode,"ChannelID")
-					<<" not in device system.");
-				continue;
-			}
-			ptrExt->setXmlConfigNode(xExtNode);	
-		}
-	}
-	return true;
-}
-
-
-
-bool DevModule::reloadConfig(xmlNodePtr xNode)
-{
-	//setConfigNode(xNode);
-
-	//for (unsigned int i =0 ; i< m_ExtensionVector.size(); i++)
-	//{
-	//	m_ExtensionVector.at(i)->setIsNewConfig(true);
-	//	//m_ExtensionVector.at(i)->m_bEnable = false;
-	//}
-	this->ParserConfig();
 	return true;
 }
 

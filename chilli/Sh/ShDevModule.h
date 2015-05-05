@@ -28,7 +28,7 @@ public:
 	virtual bool Init(xmlNodePtr xNode) ;
 	virtual int Start() ;
 	virtual int Stop();
-	virtual bool reloadConfig();
+	virtual bool LoadConfig();
 
 
 private:

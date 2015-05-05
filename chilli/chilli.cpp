@@ -31,10 +31,9 @@ BOOL WINAPI ConsoleHandler(DWORD msgType)
 	case CTRL_CLOSE_EVENT:
 	case CTRL_SHUTDOWN_EVENT:
 	case CTRL_LOGOFF_EVENT:
-		chilli::App::CoreDestroy();
-		chilli::App::running = 0;
-	return FALSE;
-	default: return TRUE;
+		//chilli::App::CoreDestroy();
+	return TRUE;
+	default: return FALSE;
 	}
 }
 void SignalHandler(int  sig)
@@ -46,8 +45,7 @@ void SignalHandler(int  sig)
 	case SIGILL:
 	case SIGINT:
 	case SIGTERM:
-		chilli::App::CoreDestroy();
-		chilli::App::running = 0;
+		//chilli::App::CoreDestroy();
 	default:break;
 	}
 }
@@ -58,8 +56,7 @@ void WINAPI ServiceCtrlHandler(DWORD  dwOpcode)
 	{
 	case SERVICE_CONTROL_STOP:
 		_ServiceModule->SetServiceStatus(SERVICE_STOP_PENDING);
-		chilli::App::CoreDestroy();
-		chilli::App::running = 0;
+		//chilli::App::CoreDestroy();
 		_ServiceModule->SetServiceStatus(SERVICE_STOPPED);
 		break;
 	case SERVICE_CONTROL_PAUSE:
@@ -82,7 +79,7 @@ void WINAPI ServiceMain(DWORD  dwArgc, LPTSTR* lpszArgv)
 	_ServiceModule->m_hServiceStatus = RegisterServiceCtrlHandler(_ServiceModule->m_szServiceName, ServiceCtrlHandler);
 	if (_ServiceModule->m_hServiceStatus == NULL)
 	{
-		LOG4CPLUS_ERROR(log,"Handler not installed");
+		LOG4CPLUS_ERROR(log,"ServiceCtrlHandler not installed");
 		return;
 	}
 	_ServiceModule->SetServiceStatus(SERVICE_START_PENDING);
@@ -92,16 +89,10 @@ void WINAPI ServiceMain(DWORD  dwArgc, LPTSTR* lpszArgv)
 	_ServiceModule->m_status.dwWaitHint = 0;
 
 	//执行你自己的代码
-	if (chilli::App::CoreInit())
-	{
-		_ServiceModule->SetServiceStatus(SERVICE_RUNNING);
-		chilli::App::Run();
-	}
-	else
-	{
-		_ServiceModule->SetServiceStatus(SERVICE_STOPPED);
-		LOG4CPLUS_ERROR(log,"Service stopped");
-	}
+	
+	_ServiceModule->SetServiceStatus(SERVICE_RUNNING);
+	chilli::App::Run();
+	
 	LOG4CPLUS_INFO(log,"Service stopped");
 }
 int main(int argc, char* argv[])
@@ -155,7 +146,7 @@ int main(int argc, char* argv[])
 				LOG4CPLUS_INFO(log,"Command parameter is uninstall,unregister server begin...");
 				return _ServiceModule->UnregisterServer();
 			}
-			else if (x == 1 && !strcmp(local_argv[x], "-startservice")) {
+			else if (x == 1 && !strcmp(local_argv[x], WINSERVERPARAMETER)) {
 				/*startup by service manager*/
 				LOG4CPLUS_INFO(log,"Command parameter is startservice,start server begin...");
 				_ServiceModule->m_bService = true;
@@ -168,7 +159,6 @@ int main(int argc, char* argv[])
 		if (_ServiceModule->m_bService)
 		{
 			// 如果是以服务程序启动
-			_ServiceModule->Init(_T("chilli"));
 
 			SERVICE_TABLE_ENTRY st[] =
 			{
@@ -186,7 +176,7 @@ int main(int argc, char* argv[])
 
 		//在控制台方式下运行
 		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
-		chilli::App::CoreInit();
+		//chilli::App::CoreInit();
 		chilli::App::Run();
 		chilli::App::CoreRuntimeLoop(0);
 
@@ -204,7 +194,6 @@ int main(int argc, char* argv[])
 	return nExitCode;
 }
 helper::xml::CXmlDocumentPtr chilli::App::_docPtr = NULL;
-volatile int chilli::App::running = 0;
 std::string chilli::App::strFileDir = "";
 std::string chilli::App::strFileNameNoExtension = "";
 chilli::App::App()
@@ -214,18 +203,6 @@ chilli::App::App()
 
 chilli::App::~App()
 {
-}
-
-bool chilli::App::CoreInit(void)
-{
-	return chilli::App::ReadXMLConfig();
-}
-
-
-void chilli::App::CoreDestroy(void)
-{
-	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	LOG4CPLUS_WARN(log,"chilli::App::CoreDestroy");
 }
 
 
@@ -273,7 +250,6 @@ int chilli::App::Run(void)
 	//_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
 	_deviceSH.Start();
 	_ACD.Start();
-	chilli::App::running = 1;
 	return 0;
 }
 
@@ -281,10 +257,11 @@ void chilli::App::ConsoleLoop()
 {
 	std::string strCmd;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ConsoleLoop");
-	while (running && std::cin>>strCmd && strCmd.compare("quit") != 0){
+	while ( std::cin>>strCmd && strCmd.compare("quit") != 0){
+		LOG4CPLUS_TRACE(log, "msg");
 		if (strCmd.compare("reloadxml") == 0)
 		{
-			CoreInit();
+			//CoreInit();
 			//_deviceSH.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
 			//_IVR.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
 			//_ACD.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));

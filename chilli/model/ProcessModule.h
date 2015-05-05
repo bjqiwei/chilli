@@ -11,15 +11,12 @@ namespace model{
 class ProcessModule
 {
 public:
-	explicit ProcessModule(xmlNodePtr xNodePtr):m_xmlConfigNodePtr(xNodePtr){};
+	explicit ProcessModule(){};
 	virtual ~ProcessModule(){};
 
-	virtual bool reloadConfig() = 0;
+	virtual bool LoadConfig() = 0;
 	virtual int Start() = 0;
-	virtual int Stop(void) = 0;
-
-protected:
-	xmlNodePtr m_xmlConfigNodePtr;
+	virtual int Stop() = 0;
 
 private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled

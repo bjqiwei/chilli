@@ -12,12 +12,9 @@ namespace chilli
 	public:
 		App(void);
 		virtual ~App(void);
-		static bool CoreInit(void);
-		static void CoreDestroy(void);
 		static void AppInit(void);
 		static int Run(void);
 		static void CoreRuntimeLoop(int bg);
-		static volatile int running;	
 	private:
 		static bool ReadXMLConfig(void);
 		static void ConsoleLoop();

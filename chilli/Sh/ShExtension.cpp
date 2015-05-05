@@ -22,11 +22,11 @@ ShExtension::~ShExtension(void)
 
 bool ShExtension::ParserConfig(void)
 {
-	if(chilli::model::Extension::LoadConfig())
-	{
-		//this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
-		return true;
-	}
+	//if(chilli::model::Extension::LoadConfig())
+	//{
+	//	//this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
+	//	return true;
+	//}
 	return false;
 }
 
@@ -53,7 +53,7 @@ int ShExtension::getChannelID()
 bool ShExtension::Init(void)
 {
 	//stateMachie.setscInstance(&chilli::model::DevModule::scInstance);
-	return Extension::Init();
+	return false;
 }
 
 

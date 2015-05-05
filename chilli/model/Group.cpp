@@ -19,7 +19,7 @@ namespace model{
 	}
 	bool Group::Init()
 	{
-		return Extension::Init();
+		return false;
 	}
 
 	bool Group::ParserConfig(void)
