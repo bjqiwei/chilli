@@ -12,14 +12,14 @@ helper::CEventBuffer<std::string> ACDModule::recEvtBuffer;
 ACDModule::ACDModule(void)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACDModule");
-	LOG4CPLUS_DEBUG(log,"new a ACD object.");
+	LOG4CPLUS_DEBUG(log,"Constuction a ACD object.");
 }
 
 
 ACDModule::~ACDModule(void)
 {
 	recEvtBuffer.addData("quit");
-	LOG4CPLUS_DEBUG(log,"destruction a ACD object.");
+	LOG4CPLUS_DEBUG(log,"Destruction a ACD object.");
 }
 
 
