@@ -13,9 +13,11 @@ namespace chilli
 		App(void);
 		virtual ~App(void);
 		static void AppInit(void);
-		static int Run(void);
+		static void Start();
+		static void Stop();
 		static void CoreRuntimeLoop(int bg);
 	private:
+		static int Run(void);
 		static bool ReadXMLConfig(void);
 		static void ConsoleLoop();
 		static helper::xml::CXmlDocumentPtr _docPtr;
@@ -27,7 +29,6 @@ namespace chilli
 
 BOOL WINAPI ConsoleHandler(DWORD msgType);
 void SignalHandler(int  sig);
-void WINAPI ServiceCtrlHandler(DWORD  dwOpcode);
-void WINAPI ServiceMain(DWORD  dwArgc, LPTSTR* lpszArgv);
+
 #endif
 

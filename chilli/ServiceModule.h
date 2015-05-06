@@ -9,39 +9,39 @@
 
 namespace chilli{
 
-	#define SERVICENAME_DEFAULT _T("chilli")
-	#define SERVICEDESCRIPTION _T("The chilli service.")
-	#define  WINSERVERPARAMETER _T("-startservice")
+	#define SERVICENAME_DEFAULT ("chilli")
+	#define SERVICEDESCRIPTION ("The chilli service.")
+	#define  WINSERVERPARAMETER ("-startservice")
 
 	class ServiceModule
 	{
 	public:
-		ServiceModule(void);
-		~ServiceModule(void);
-		bool m_bService;
-		char m_szServiceName[256];
-		SERVICE_STATUS_HANDLE m_hServiceStatus;
-		SERVICE_STATUS m_status;
+		ServiceModule(void){};
+		~ServiceModule(void){};
+		static bool m_bService;
+		static char m_szServiceName[256];
+		static SERVICE_STATUS_HANDLE m_hServiceStatus;
+		static SERVICE_STATUS m_status;
 	
 	private: 
-		log4cplus::Logger log ;
-		void Init();
-	public:
-
-		long UnregisterServer(void);
-
-
-		long RegisterServer(bool bService);
-
-		bool Uninstall(void);
-		bool IsInstalled(void);
-		bool Install(void);
-
+		static log4cplus::Logger log ;
+		static HANDLE stopEvent;
 
 	public:
-		void SetServiceStatus(DWORD dwState);
+		static void Init();
 
+		static long UnregisterServer(void);
+		static long RegisterServer(bool bService);
+
+		static void SetServiceStatus(DWORD dwState);
 		static char * GetServiceStatusStrName(unsigned long dwState);
+		static void WINAPI Start(DWORD  dwArgc, LPTSTR* lpszArgv);
+		static void Stop();
+		static void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode);
+	private:
+		static bool Uninstall(void);
+		static bool IsInstalled(void);
+		static bool Install(void);
 	};
 
 }//end namespace chilli
