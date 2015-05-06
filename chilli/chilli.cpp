@@ -12,8 +12,6 @@
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
 
-using namespace  std;
-using namespace log4cplus;
 
 
 chilli::ShDev::ShDevModule _deviceSH;
@@ -30,8 +28,11 @@ BOOL WINAPI ConsoleHandler(DWORD msgType)
 	case CTRL_CLOSE_EVENT:
 	case CTRL_SHUTDOWN_EVENT:
 	case CTRL_LOGOFF_EVENT:
-		chilli::App::Stop();
-	return TRUE;
+		{
+		// 会使std::cin 返回false;
+		//chilli::App::Stop();
+		return TRUE;
+		};
 	default: return FALSE;
 	}
 }
@@ -60,10 +61,9 @@ int main(int argc, char* argv[])
 	log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 
+	LOG4CPLUS_INFO(log,"Entering main()...");
 	try
 	{
-		
-		LOG4CPLUS_INFO(log,"Entering main()...");
 		
 		int  x;
 
@@ -127,14 +127,16 @@ int main(int argc, char* argv[])
 				chilli::ServiceModule::m_bService = FALSE;
 			}
 			LOG4CPLUS_DEBUG(log,"Service Exiting...");
-			return 0;
 		}
+		else{
 
-		//在控制台方式下运行
-		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
-		//chilli::App::CoreInit();
-		chilli::App::Start();
-		chilli::App::CoreRuntimeLoop(0);
+			//在控制台方式下运行
+			SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+			chilli::App::Start();
+			CoreRuntimeLoop(0);
+			chilli::App::Stop();
+			
+		}
 
 	}
 	catch (std::exception & e)
@@ -151,14 +153,6 @@ int main(int argc, char* argv[])
 helper::xml::CXmlDocumentPtr chilli::App::_docPtr = NULL;
 std::string chilli::App::strFileDir = "";
 std::string chilli::App::strFileNameNoExtension = "";
-chilli::App::App()
-{
-}
-
-
-chilli::App::~App()
-{
-}
 
 
 void chilli::App::AppInit(void)
@@ -186,7 +180,7 @@ bool chilli::App::ReadXMLConfig(void)
 		if (!_docPtr._xDocPtr)
 		{
 			LOG4CPLUS_ERROR(log, "Document not parsed successfully."); 
-			throw exception( "Document not parsed successfully."); 
+			throw std::exception( "Document not parsed successfully."); 
 		}
 	}
 	catch (...)
@@ -199,47 +193,47 @@ bool chilli::App::ReadXMLConfig(void)
 }
 
 
-int chilli::App::Run(void)
-{
-	_deviceSH.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
-	//_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
-	_deviceSH.Start();
-	_ACD.Start();
-	return 0;
-}
-
-void chilli::App::ConsoleLoop()
+void ConsoleLoop()
 {
 	std::string strCmd;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ConsoleLoop");
-	while ( std::cin>>strCmd && strCmd.compare("quit") != 0){
-		LOG4CPLUS_TRACE(log, "msg");
-		if (strCmd.compare("reloadxml") == 0)
-		{
-			//CoreInit();
-			//_deviceSH.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
-			//_IVR.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
-			//_ACD.reloadConfig(xmlDocGetRootElement(_docPtr._xDocPtr));
+	while ( std::cin>>strCmd ){
+		LOG4CPLUS_TRACE(log, "command:" << strCmd);
+		if (strCmd == "quit"){
+			break;
 		}
-		else
-		{
+		else if (strCmd == "loadconfig"){
+
+		}
+		else{
 			LOG4CPLUS_WARN(log,"Unrecognized command:" <<strCmd);
 		}
 	}
-
 }
 
-void chilli::App::CoreRuntimeLoop(int bg)
+void CoreRuntimeLoop(int bg)
 {
 	ConsoleLoop();
 }
 
 void chilli::App::Start()
 {
-	Run();
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
+	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
+	_deviceSH.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
+	//_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
+	_deviceSH.Start();
+	_ACD.Start();
+	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
+
 }
 
 void chilli::App::Stop()
 {
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
+	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
+	_deviceSH.Stop();
+	_ACD.Stop();
+	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }
