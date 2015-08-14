@@ -93,6 +93,9 @@
     <ClCompile Include="..\scxml\model\Raise.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
+    <ClCompile Include="..\scxml\model\Sleep.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scxml\model\Action.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="..\common\Csemaphore.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Sleep.h">
+      <Filter>scxml.model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

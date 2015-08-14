@@ -81,6 +81,7 @@ namespace fsm{
 		static bool isScript(const xmlNodePtr &Node) ;
 		static bool isTimer(const xmlNodePtr &Node) ;
 		static bool isRaise(const xmlNodePtr &Node) ;
+		static bool isSleep(const xmlNodePtr &Node);
 
 		bool processEvent(const TriggerEvent &event);
 
@@ -95,6 +96,7 @@ namespace fsm{
 		bool processTimer(const xmlNodePtr &node)const;
 		bool processLog(const xmlNodePtr &node) const;
 		bool processRaise(const xmlNodePtr &node)const;
+		bool processSleep(const xmlNodePtr &node)const;
 
 		void enterStates(const xmlNodePtr &stateNode) const;
 		void exitStates() const;

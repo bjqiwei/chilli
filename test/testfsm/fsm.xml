@@ -52,6 +52,9 @@
 		<event event="raise">
 			<raise event="timer"></raise>
 		</event>
+		<event event="sleep">
+			<sleep interval="19999"></sleep>
+		</event>
 		<onexit>
 			<log level = "info" >exit Init state.</log>
 		</onexit>

@@ -12,6 +12,7 @@
 #include "scxml/model/Datamodel.h"
 #include "scxml/model/Log.h"
 #include "scxml/model/Raise.h"
+#include "scxml/model/Sleep.h"
 #include <stdexcept>
 #include <log4cplus/loggingmacros.h>
 #include "common/stringHelper.h"
@@ -184,6 +185,11 @@ inline bool fsm::StateMachine::isRaise(const xmlNodePtr &xNode)
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("raise")); 
 }
 
+inline bool fsm::StateMachine::isSleep(const xmlNodePtr &xNode)
+{
+	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("sleep")); 
+}
+
 void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)
 {
 	m_externalQueue.push(trigEvent);
@@ -294,6 +300,11 @@ bool fsm::StateMachine::processEvent(const xmlNodePtr &eventNode)const
 		else if (isRaise(actionNode))
 		{
 			processRaise(actionNode)? doneSomething = true:NULL;
+			continue;
+		}
+		else if (isSleep(actionNode))
+		{
+			processSleep(actionNode)? doneSomething = true:NULL;
 			continue;
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
@@ -415,6 +426,19 @@ bool fsm::StateMachine::processRaise(const xmlNodePtr &node)const
 	return false;
 }
 
+bool fsm::StateMachine::processSleep(const xmlNodePtr &node)const
+{
+	if (!node) return false;
+	model::Sleep sleep(node,m_strSessionID,m_strStateFile);
+
+	if(sleep.isEnabledCondition(this->getRootContext())){
+		sleep.execute(this->getRootContext());
+		return true;
+	}
+
+	return false;
+}
+
 const xmlNodePtr fsm::StateMachine::getParentState( const xmlNodePtr &currentState)const
 {
 	xmlNodePtr curState = currentState;
@@ -502,6 +526,11 @@ bool fsm::StateMachine::processExit(const xmlNodePtr &exitNode) const
 			processRaise(actionNode);
 			continue;
 		}
+		else if (isSleep(actionNode))
+		{
+			processSleep(actionNode);
+			continue;
+		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
 			LOG4CPLUS_ERROR(log,m_strSessionID << ":" << actionNode->name <<"  process not implement." );
@@ -539,6 +568,11 @@ bool fsm::StateMachine::processEntry(const xmlNodePtr &node)const
 		else if (isRaise(actionNode))
 		{
 			processRaise(actionNode);
+			continue;
+		}
+		else if (isSleep(actionNode))
+		{
+			processSleep(actionNode);
 			continue;
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
