@@ -190,7 +190,7 @@ namespace chilli{
 
 
 
-char * chilli::ServiceModule::GetServiceStatusStrName(unsigned long dwState)
+const char * chilli::ServiceModule::GetServiceStatusStrName(unsigned long dwState)
 {
 	switch(dwState)
 	{
@@ -219,18 +219,21 @@ void WINAPI chilli::ServiceModule::Start(DWORD  dwArgc, LPTSTR* lpszArgv)
 	}
 	chilli::ServiceModule::SetServiceStatus(SERVICE_START_PENDING);
 	//执行你自己的代码
-	stopEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+	stopEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
 	chilli::App::Start();
 
 	chilli::ServiceModule::SetServiceStatus(SERVICE_RUNNING);
 	WaitForSingleObject(stopEvent,INFINITE);
-	CloseHandle(stopEvent);
+	chilli::App::Stop();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
+	SetEvent(stopEvent);
 }
 
 void chilli::ServiceModule::Stop()
 {
 	SetEvent(stopEvent);
+	WaitForSingleObject(stopEvent,INFINITE);
+	CloseHandle(stopEvent);
 }
 
 void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode)
@@ -241,7 +244,6 @@ void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode)
 	case SERVICE_CONTROL_STOP:
 	case SERVICE_CONTROL_SHUTDOWN:
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOP_PENDING);
-		chilli::App::Stop();
 		Stop();
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOPPED);
 		break;

@@ -34,7 +34,7 @@ namespace chilli{
 		static long RegisterServer(bool bService);
 
 		static void SetServiceStatus(DWORD dwState);
-		static char * GetServiceStatusStrName(unsigned long dwState);
+		static const char * GetServiceStatusStrName(unsigned long dwState);
 		static void WINAPI Start(DWORD  dwArgc, LPTSTR* lpszArgv);
 		static void Stop();
 		static void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode);
