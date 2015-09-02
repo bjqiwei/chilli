@@ -18,8 +18,6 @@ class DevModule :
 public:
 	DevModule(void);
 	virtual ~DevModule(void);
-
-	virtual bool LoadConfig() ;
 	
 private:
 

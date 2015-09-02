@@ -23,13 +23,6 @@ DevModule::~DevModule(void)
 }
 
 
-
-
-bool DevModule::LoadConfig()
-{
-	return true;
-}
-
 void DevModule::addEventToBuffer(std::string strContent)
 {
 	recEvtBuffer.addData(strContent);

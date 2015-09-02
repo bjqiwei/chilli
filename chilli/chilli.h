@@ -13,9 +13,9 @@ namespace chilli
 		static void AppInit(void);
 		static void Start();
 		static void Stop();
+		static bool LoadConfig(void);
 	private:
-		static bool ReadXMLConfig(void);
-		static helper::xml::CXmlDocumentPtr _docPtr;
+		static std::string strConfigFile;
 		static std::string strFileDir;
 		static std::string strFileNameNoExtension;
 	};

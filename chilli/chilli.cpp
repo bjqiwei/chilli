@@ -150,9 +150,9 @@ int main(int argc, char* argv[])
 	int nExitCode = 0;
 	return nExitCode;
 }
-helper::xml::CXmlDocumentPtr chilli::App::_docPtr = NULL;
-std::string chilli::App::strFileDir = "";
-std::string chilli::App::strFileNameNoExtension = "";
+std::string chilli::App::strConfigFile;
+std::string chilli::App::strFileDir;
+std::string chilli::App::strFileNameNoExtension;
 
 
 void chilli::App::AppInit(void)
@@ -168,27 +168,14 @@ void chilli::App::AppInit(void)
 }
 
 
-bool chilli::App::ReadXMLConfig(void)
+bool chilli::App::LoadConfig(void)
 {
 	bool bResult = true;
-	std::string strXmlFile;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	try
-	{
-		strXmlFile = strFileNameNoExtension+".xml";
-		_docPtr = xmlParseFile(strXmlFile.c_str());
-		if (!_docPtr._xDocPtr)
-		{
-			LOG4CPLUS_ERROR(log, "Document not parsed successfully."); 
-			throw std::exception( "Document not parsed successfully."); 
-		}
-	}
-	catch (...)
-	{
-		LOG4CPLUS_ERROR(log, "An error occurred during parsing\n ");
-		throw ;
-	}
-	LOG4CPLUS_INFO(log," read xml config "<< strXmlFile << "  is finished.");
+	strConfigFile = strFileNameNoExtension+".xml";
+	_deviceSH.LoadConfig();
+	_ACD.LoadConfig();
+	LOG4CPLUS_INFO(log,"config file: "<< strConfigFile);
 	return bResult;
 }
 
@@ -203,7 +190,7 @@ void ConsoleLoop()
 			break;
 		}
 		else if (strCmd == "loadconfig"){
-
+			chilli::App::LoadConfig();
 		}
 		else{
 			LOG4CPLUS_WARN(log,"Unrecognized command:" <<strCmd);
@@ -220,8 +207,7 @@ void chilli::App::Start()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	_deviceSH.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
-	//_ACD.Init(xmlDocGetRootElement(_docPtr._xDocPtr));
+	LoadConfig();
 	_deviceSH.Start();
 	_ACD.Start();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
