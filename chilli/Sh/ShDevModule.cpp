@@ -22,31 +22,31 @@ ShDevModule::~ShDevModule(void)
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 }
 
-bool ShDevModule::Init(xmlNodePtr xNode)
-{
-	//setConfigNode(xNode);
-	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
-	{
-		CHAR ErrMsg[400];
-		SsmGetLastErrMsg(ErrMsg);
-		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
-		return false ;
-	}
-
-
-	int nTotCh = SsmGetMaxCh();
-	for(int i=0; i<nTotCh; i++)
-	{
-		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
-		//extPtr->setEnable(false);
-		//extPtr->setType(SsmGetChType(i));
-		//extPtr->setChannelID(i);
-		//m_ExtensionVector.push_back(extPtr);
-	}
-
-
-	return true;
-}
+//bool ShDevModule::Init(xmlNodePtr xNode)
+//{
+//	//setConfigNode(xNode);
+//	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
+//	{
+//		CHAR ErrMsg[400];
+//		SsmGetLastErrMsg(ErrMsg);
+//		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
+//		return false ;
+//	}
+//
+//
+//	int nTotCh = SsmGetMaxCh();
+//	for(int i=0; i<nTotCh; i++)
+//	{
+//		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
+//		//extPtr->setEnable(false);
+//		//extPtr->setType(SsmGetChType(i));
+//		//extPtr->setChannelID(i);
+//		//m_ExtensionVector.push_back(extPtr);
+//	}
+//
+//
+//	return true;
+//}
 
 int ShDevModule::Stop()
 {
@@ -92,6 +92,7 @@ int ShDevModule::EvtHandler(PSSM_EVENT pEvent)
 
 int ShDevModule::Start()
 {
+	LoadConfig();
 	//for (unsigned int i = 0; i< m_ExtensionVector.size(); i++)
 	//{
 	//	if (m_ExtensionVector.at(i)->getType() == Anolog_User) SsmSetASDT(i,1);

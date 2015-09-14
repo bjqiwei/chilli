@@ -25,7 +25,6 @@ public:
 	ShDevModule(void);
 	virtual ~ShDevModule(void);
 
-	virtual bool Init(xmlNodePtr xNode) ;
 	virtual int Start() ;
 	virtual int Stop();
 	virtual bool LoadConfig();

@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <iostream>
 #include <tchar.h>
 #include "ServiceModule.h"
 #include "chilli.h"

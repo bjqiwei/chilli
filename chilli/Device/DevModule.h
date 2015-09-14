@@ -5,7 +5,6 @@
 
 #include "..\model\ProcessModule.h"
 #include "..\CEventBuffer.h"
-#include "scxml\SMInstance.h"
 #include <log4cplus\logger.h>
 
 namespace chilli{
@@ -27,10 +26,9 @@ private:
 
 	log4cplus::Logger log;
 public:
-	static void addEventToBuffer(std::string strContent);
+	static void addEventToBuffer(const std::string & strContent);
 	//State machine executer, one instance per thread
-	static fsm::SMInstance smInstance;
-	static helper::CEventBuffer<std::string> recEvtBuffer;
+	static helper::CEventBuffer<const std::string> recEvtBuffer;
 
 };
 }

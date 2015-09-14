@@ -1,14 +1,11 @@
 #include "StdAfx.h"
 #include "DevModule.h"
-#include <process.h>
 #include <log4cplus/loggingmacros.h>
-#include <common/xmlHelper.h>
-#include "../model/Extension.h"
 
 namespace chilli{
 namespace model{
 
-helper::CEventBuffer<std::string> DevModule::recEvtBuffer;
+helper::CEventBuffer<const std::string> DevModule::recEvtBuffer;
 
 DevModule::DevModule(void)
 {
@@ -23,7 +20,7 @@ DevModule::~DevModule(void)
 }
 
 
-void DevModule::addEventToBuffer(std::string strContent)
+void DevModule::addEventToBuffer(const std::string & strContent)
 {
 	recEvtBuffer.addData(strContent);
 }

@@ -1,7 +1,6 @@
 #pragma once
 #ifndef _CHILLI_CTI_PROCESS_MODULE_HEADER_
 #define _CHILLI_CTI_PROCESS_MODULE_HEADER_
-#include <libxml/tree.h>
 #include <log4cplus/logger.h>
 #include <Windows.h>
 
