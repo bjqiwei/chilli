@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="scxml.model">
+      <UniqueIdentifier>{3362b269-2939-4128-8310-60709733f9e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scxml.io">
+      <UniqueIdentifier>{77a365f4-8fbb-4ee4-8269-9999ebe28c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scxml.env">
+      <UniqueIdentifier>{64446462-b37e-45d4-ae23-b31c32dc1e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scxml">
+      <UniqueIdentifier>{0945517a-4f77-488a-b3d4-ad86ac55f99c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{60a52a0d-a4df-40b4-84c6-421d2d2249ef}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\FSM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Data.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Datamodel.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Event.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Function.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Functionmodel.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Log.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\OnEntry.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\OnExit.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Script.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Send.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\State.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Transition.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\env\JSContext.cpp">
+      <Filter>scxml.env</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\env\JSEvaluator.cpp">
+      <Filter>scxml.env</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\env\SimpleContext.cpp">
+      <Filter>scxml.env</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\env\SimpleEvaluator.cpp">
+      <Filter>scxml.env</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\TriggerEvent.cpp">
+      <Filter>scxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\SMInstance.cpp">
+      <Filter>scxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Timer.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Raise.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scxml\model\Sleep.cpp">
+      <Filter>scxml.model</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\scxml\model\Action.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Data.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Datamodel.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Event.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Function.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Functionmodel.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Log.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\OnEntry.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\OnExit.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Script.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Send.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\State.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Transition.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\env\JSContext.h">
+      <Filter>scxml.env</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\env\JSEvaluator.h">
+      <Filter>scxml.env</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\env\SimpleContext.h">
+      <Filter>scxml.env</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\env\SimpleEvaluator.h">
+      <Filter>scxml.env</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\Context.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\ErrorReporter.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\Evaluator.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\TriggerEvent.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\lock.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\stringHelper.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\xmlHelper.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\SMInstance.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Timer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Timer.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\SendInterface.h">
+      <Filter>scxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Raise.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Csemaphore.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scxml\model\Sleep.h">
+      <Filter>scxml.model</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
