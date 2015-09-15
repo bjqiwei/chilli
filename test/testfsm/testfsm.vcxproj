@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -21,12 +21,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -69,7 +71,9 @@
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)
+xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,7 +95,9 @@ xcopy /Y *.js $(OutDir)</Command>
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)
+xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -110,10 +116,10 @@ xcopy /Y *.js $(OutDir)</Command>
     <ClCompile Include="testfsm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\fsm\msvc10\FSM.vcxproj">
+    <ProjectReference Include="..\..\libs\fsm\msvc12\FSM.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc10\log4cplus.vcxproj">
+    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>
