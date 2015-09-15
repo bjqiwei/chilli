@@ -65,6 +65,7 @@
       </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_USE_32BIT_TIME_T;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;LOG4CPLUS_BUILD_DLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -83,6 +84,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;_USE_32BIT_TIME_T;XP_WIN;EXPORT_JS_API;JS_USE_JSID_STRUCT_TYPES;USE_LOG4CPLUS;LOG4CPLUS_BUILD_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
