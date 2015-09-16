@@ -77,11 +77,9 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y chilli.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7.win32\bin\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\iconv-1.9.2.win32\bin\iconv.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\zlib-1.2.5\bin\zlib1.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\SpiderMonkey-1.8.5\bin\mozjs-25.0a.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(TargetName).xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Sh\ShIndex.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Sh\ShConfig.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
@@ -109,8 +107,22 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <AdditionalDependencies>SHP_A3.lib;libxml2.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(TargetName).xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Sh\ShIndex.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Sh\ShConfig.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="log4cplus.properties">
