@@ -36,14 +36,14 @@ private:
 	ShDevModule(const ShDevModule & other);
 	ShDevModule & operator=(const ShDevModule &);
 
-public:
+private:
 	//sanhuid event callback function
-	static int CALLBACK EvtHandler(PSSM_EVENT pEvent);
-	static int getDeviceTypeByName(std::string strType);
-	static std::string TransferEvtToXmlEvent(PSSM_EVENT pEvent,std::string extNum);
-	static char *GetString_EventType ( int nEvent );
-	static char *GetString_State ( int state );
-	static char *GetString_PengdingReason(int nReason);
+	static int CALLBACK EvtHandler(const PSSM_EVENT const pEvent);
+	static int getDeviceTypeByName(const std::string & strType);
+	static std::string TransferEvtToXmlEvent(PSSM_EVENT pEvent, const std::string & extNum);
+	static const char *GetString_EventType ( int nEvent );
+	static const char *GetString_State ( int state );
+	static const char *GetString_PengdingReason(int nReason);
 private:
 	log4cplus::Logger log;
 

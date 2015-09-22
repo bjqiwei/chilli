@@ -11,14 +11,13 @@ namespace ShDev{
 
 ShDevModule::ShDevModule(void):DevModule()
 {
-	log =log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule");
+	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
 	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
 }
 
 
 ShDevModule::~ShDevModule(void)
 {
-	recEvtBuffer.addData("quit");
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 }
 
@@ -61,20 +60,20 @@ int ShDevModule::Stop()
 	return 0;
 }
 
-int ShDevModule::getDeviceTypeByName(std::string strChType)
+int ShDevModule::getDeviceTypeByName(const std::string & strChType)
 {
-	if (strChType.compare("Analog_Trunk") == 0) return Analog_Trunk;
-	else if (strChType.compare("Anolog_User") == 0) return Anolog_User;
-	else if (strChType.compare("Anolog_Record") == 0) return Anolog_Record;
-	else if (strChType.compare("Anolog_MicroPhone") == 0) return Anolog_MicroPhone;
-	else if (strChType.compare("Anolog_Nothing") == 0) return Anolog_Nothing;
-	else if (strChType.compare("ISDN_User") == 0) return ISDN_User;
-	else if (strChType.compare("ISND_Trunk") == 0) return ISND_Trunk;
-	else if (strChType.compare("IVR") == 0) return IVR_Extension;
+	if (strChType == "Analog_Trunk") return Analog_Trunk;
+	else if (strChType == "Anolog_User") return Anolog_User;
+	else if (strChType == "Anolog_Record") return Anolog_Record;
+	else if (strChType == "Anolog_MicroPhone") return Anolog_MicroPhone;
+	else if (strChType == "Anolog_Nothing") return Anolog_Nothing;
+	else if (strChType == "ISDN_User") return ISDN_User;
+	else if (strChType == "ISND_Trunk") return ISND_Trunk;
+	else if (strChType == "IVR") return IVR_Extension;
 	else return -1;
 }
 
-int ShDevModule::EvtHandler(PSSM_EVENT pEvent)
+int ShDevModule::EvtHandler(const PSSM_EVENT const pEvent)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 	unsigned int evtCh = pEvent->nReference;
@@ -127,7 +126,7 @@ bool ShDevModule::LoadConfig()
 {
 	return false;
 }
-std::string ShDevModule::TransferEvtToXmlEvent(PSSM_EVENT pEvent,std::string extNum){
+std::string ShDevModule::TransferEvtToXmlEvent(const PSSM_EVENT const pEvent, const std::string & extNum){
 	
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 
@@ -205,7 +204,7 @@ std::string ShDevModule::TransferEvtToXmlEvent(PSSM_EVENT pEvent,std::string ext
 	return xmlHelper.getContent();
 }
 
-char * ShDevModule::GetString_EventType( int nEvent )
+const char * ShDevModule::GetString_EventType( int nEvent )
 {
 	switch ( nEvent )
 	{
@@ -331,7 +330,7 @@ char * ShDevModule::GetString_EventType( int nEvent )
 	}
 }
 
-char * ShDevModule::GetString_State( int nState )
+const char * ShDevModule::GetString_State( int nState )
 {
 	switch ( nState )
 	{
@@ -477,7 +476,7 @@ char * ShDevModule::GetString_State( int nState )
 	}
 }
 
-char *ShDevModule::GetString_PengdingReason(int nReason)
+const char *ShDevModule::GetString_PengdingReason(int nReason)
 {
 	switch(nReason){
 		case ANALOGOUT_NO_DIALTONE				:return "ANALOGOUT_NO_DIALTONE";//	= 0,	// analog trunk channel: no dial tone detected

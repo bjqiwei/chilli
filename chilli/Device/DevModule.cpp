@@ -9,7 +9,7 @@ helper::CEventBuffer<const std::string> DevModule::recEvtBuffer;
 
 DevModule::DevModule(void)
 {
-	log = log4cplus::Logger::getInstance("chilli.abstract.DevModule");
+	log = log4cplus::Logger::getInstance("chilli.DevModule");
 	LOG4CPLUS_DEBUG(log,"new a DevModule object.");
 }
 
