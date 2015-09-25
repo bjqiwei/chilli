@@ -18,14 +18,8 @@ public:
 	virtual bool LoadConfig();
 private:
 	log4cplus::Logger log;
-
-public:
-	static void addEventToBuffer(std::string strContent);
-private:
 	void DisplayEventInfo(const std::string &) const;
 
-private:
-	static helper::CEventBuffer<std::string> recEvtBuffer;
 };
 }
 }

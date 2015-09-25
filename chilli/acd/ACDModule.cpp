@@ -7,7 +7,6 @@
 namespace chilli{
 namespace model{
 
-helper::CEventBuffer<std::string> ACDModule::recEvtBuffer;
 
 ACDModule::ACDModule(void)
 {
@@ -18,7 +17,6 @@ ACDModule::ACDModule(void)
 
 ACDModule::~ACDModule(void)
 {
-	recEvtBuffer.addData("quit");
 	LOG4CPLUS_DEBUG(log,"Destruction a ACD object.");
 }
 
@@ -30,7 +28,6 @@ void ACDModule::DisplayEventInfo (const std::string &strEvent )const
 
 int ACDModule::Stop(void)
 {
-	recEvtBuffer.addData("quit");
 	LOG4CPLUS_DEBUG(log,"Close a ACD device");
 	return 0;
 }
@@ -44,9 +41,5 @@ bool ACDModule::LoadConfig()
 	return false;
 }
 
-void ACDModule::addEventToBuffer(std::string strContent)
-{
-	recEvtBuffer.addData(strContent);
-}
 }
 }

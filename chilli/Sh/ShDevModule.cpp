@@ -56,7 +56,6 @@ int ShDevModule::Stop()
 		SsmGetLastErrMsg(ErrMsg);
 		LOG4CPLUS_ERROR(log,ErrMsg);
 	}
-	recEvtBuffer.addData("quit");
 	return 0;
 }
 

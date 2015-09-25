@@ -4,7 +4,6 @@
 #define _CHILLI_CTI_DEVICE_MODULE_HEADER_
 
 #include "..\model\ProcessModule.h"
-#include "..\CEventBuffer.h"
 #include <log4cplus\logger.h>
 
 namespace chilli{
@@ -25,10 +24,7 @@ private:
 	DevModule & operator=(const DevModule &);
 
 	log4cplus::Logger log;
-public:
-	static void addEventToBuffer(const std::string & strContent);
-	//State machine executer, one instance per thread
-	static helper::CEventBuffer<const std::string> recEvtBuffer;
+
 
 };
 }
