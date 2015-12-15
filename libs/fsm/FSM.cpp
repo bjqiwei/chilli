@@ -83,7 +83,13 @@ bool fsm::StateMachine::Init(void)
 			 m_strName =  getXmlNodeAttributesValue(m_rootNode,"name");
 			  LOG4CPLUS_TRACE(log,"set name=" <<  m_strName);
 			// normalize(_rootNode);
-			 m_initState = getXmlChildNode(m_rootNode,"state");
+			 string strInitState = getXmlNodeAttributesValue(m_rootNode,"initial");
+			 if (m_initState = getState(strInitState)){
+			 }
+			 else{ 
+				m_initState = getXmlChildNode(m_rootNode,"state");
+			 }
+
 			 LOG4CPLUS_TRACE(log,"set initState=" <<  getXmlNodeAttributesValue(m_initState,"id"));
 			 
 		 }
