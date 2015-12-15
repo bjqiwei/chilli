@@ -42,10 +42,7 @@
     <ClCompile Include="..\scxml\model\Event.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
-    <ClCompile Include="..\scxml\model\Function.cpp">
-      <Filter>scxml.model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\scxml\model\Functionmodel.cpp">
+    <ClCompile Include="..\scxml\model\Scriptmodel.cpp">
       <Filter>scxml.model</Filter>
     </ClCompile>
     <ClCompile Include="..\scxml\model\Log.cpp">
@@ -110,10 +107,7 @@
     <ClInclude Include="..\scxml\model\Event.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
-    <ClInclude Include="..\scxml\model\Function.h">
-      <Filter>scxml.model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\scxml\model\Functionmodel.h">
+    <ClInclude Include="..\scxml\model\Scriptmodel.h">
       <Filter>scxml.model</Filter>
     </ClInclude>
     <ClInclude Include="..\scxml\model\Log.h">

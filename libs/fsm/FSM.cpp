@@ -8,7 +8,7 @@
 #include "scxml/model/Send.h"
 #include "scxml/model/Timer.h"
 #include "scxml/model/Transition.h"
-#include "scxml/model/Functionmodel.h"
+#include "scxml/model/Scriptmodel.h"
 #include "scxml/model/Datamodel.h"
 #include "scxml/model/Log.h"
 #include "scxml/model/Raise.h"
@@ -665,10 +665,10 @@ void fsm::StateMachine::go()
 				model::Datamodel datamodel(childNode,m_strSessionID,m_strStateFile);
 				datamodel.execute(this->getRootContext());
 
-			}else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("functionmodel")))
+			}else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("scriptmodel")))
 			{
-				model::Functionmodel funmodel(childNode,m_strSessionID,m_strStateFile);
-				funmodel.execute(this->getRootContext());	
+				model::Scriptmodel scriptmodel(childNode,m_strSessionID,m_strStateFile);
+				scriptmodel.execute(this->getRootContext());	
 			}
 		}
 		/* Create xpath evaluation context */

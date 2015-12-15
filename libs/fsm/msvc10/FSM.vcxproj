@@ -102,8 +102,7 @@
     <ClCompile Include="..\scxml\model\Data.cpp" />
     <ClCompile Include="..\scxml\model\Datamodel.cpp" />
     <ClCompile Include="..\scxml\model\Event.cpp" />
-    <ClCompile Include="..\scxml\model\Function.cpp" />
-    <ClCompile Include="..\scxml\model\Functionmodel.cpp" />
+    <ClCompile Include="..\scxml\model\Scriptmodel.cpp" />
     <ClCompile Include="..\scxml\model\Log.cpp" />
     <ClCompile Include="..\scxml\model\OnEntry.cpp" />
     <ClCompile Include="..\scxml\model\OnExit.cpp" />
@@ -136,8 +135,7 @@
     <ClInclude Include="..\scxml\model\Data.h" />
     <ClInclude Include="..\scxml\model\Datamodel.h" />
     <ClInclude Include="..\scxml\model\Event.h" />
-    <ClInclude Include="..\scxml\model\Function.h" />
-    <ClInclude Include="..\scxml\model\Functionmodel.h" />
+    <ClInclude Include="..\scxml\model\Scriptmodel.h" />
     <ClInclude Include="..\scxml\model\Log.h" />
     <ClInclude Include="..\scxml\model\OnEntry.h" />
     <ClInclude Include="..\scxml\model\OnExit.h" />
