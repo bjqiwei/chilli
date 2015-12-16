@@ -82,6 +82,17 @@ bool fsm::StateMachine::Init(void)
 
 			 m_strName =  getXmlNodeAttributesValue(m_rootNode,"name");
 			  LOG4CPLUS_TRACE(log,"set name=" <<  m_strName);
+
+			  /* Create xpath evaluation context */
+			  if (xpathCtx._xPathCtxPtr == NULL)
+			  {
+				  xpathCtx = xmlXPathNewContext(m_xmlDocPtr._xDocPtr);
+			  }
+
+			  if (xpathCtx._xPathCtxPtr == NULL) {
+				  LOG4CPLUS_ERROR(log, m_strSessionID << ": unable to create new XPath context");
+				  throw std::logic_error("Error: unable to create new XPath context");
+			  }
 			// normalize(_rootNode);
 			 string strInitState = getXmlNodeAttributesValue(m_rootNode,"initial");
 			 if (m_initState = getState(strInitState)){
@@ -670,16 +681,6 @@ void fsm::StateMachine::go()
 				model::Scriptmodel scriptmodel(childNode,m_strSessionID,m_strStateFile);
 				scriptmodel.execute(this->getRootContext());	
 			}
-		}
-		/* Create xpath evaluation context */
-		if (xpathCtx._xPathCtxPtr == NULL)
-		{
-			xpathCtx = xmlXPathNewContext(m_xmlDocPtr._xDocPtr);
-		}
-		
-		if(xpathCtx._xPathCtxPtr == NULL) {
-			LOG4CPLUS_ERROR(log,m_strSessionID << ": unable to create new XPath context");
-			throw std::logic_error("Error: unable to create new XPath context");
 		}
 	}
 	enterStates(this->m_initState);

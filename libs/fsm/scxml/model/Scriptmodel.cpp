@@ -19,7 +19,7 @@ void Scriptmodel::execute(fsm::Context * ctx){
 	for (xmlNodePtr funNode = node->children ; funNode !=  NULL; funNode = funNode->next)
 	{
 		if(funNode->type != XML_ELEMENT_NODE ||
-			!xmlStrEqual(funNode->name, BAD_CAST("function")))
+			!xmlStrEqual(funNode->name, BAD_CAST("script")))
 			continue;
 		bFindData = true;
 		model::Script script(funNode,m_strSession,m_strFileName);
