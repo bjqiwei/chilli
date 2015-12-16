@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<fsm name="testfsm">
+<fsm name="testfsm" initial="state1">
   <datamodel>
     <data id="globalVar" expr=""></data>
   </datamodel>
-  <functionmodel>
-	<function><![CDATA[function uuid() {
+  <scriptmodel>
+	<script><![CDATA[function uuid() {
     var s = [];
     var hexDigits = "0123456789abcdef";
     for (var i = 0; i < 36; i++) {
@@ -31,9 +31,9 @@
     s[8] = s[13] = s[18] = s[23] = "-";
     var uuid = s.join("");
     return uuid;}]]>
-	</function>
-	<function src="./time.js"></function>
-  </functionmodel>
+	</script>
+	<script src="./time.js"></script>
+  </scriptmodel>
 
 	<state id="init">
 		<onentry>

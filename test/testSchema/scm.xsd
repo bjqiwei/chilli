@@ -6,7 +6,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="datamodel" minOccurs="0" type="datamodelType" />
-        <xs:element name="functionmodel" minOccurs="0" type="functionmodelType" />
+        <xs:element name="scriptmodel" minOccurs="0" type="scriptmodelType" />
         <xs:element name="state" minOccurs="1" maxOccurs="unbounded" type="stateType" />
       </xs:sequence>
       <xs:attribute name="name" use="optional" type="xs:string"/>
@@ -34,9 +34,9 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="functionmodelType">
+  <xs:complexType name="scriptmodelType">
     <xs:sequence>
-      <xs:element name="function" minOccurs ="0" maxOccurs="unbounded" >
+      <xs:element name="script" minOccurs ="0" maxOccurs="unbounded" >
         <xs:complexType>
           <xs:simpleContent>
             <xs:extension base="xs:string">
