@@ -15,7 +15,8 @@ public:
 	virtual ~ACDModule(void);
 	virtual int Start();
 	virtual int Stop();
-	virtual bool LoadConfig();
+	virtual bool LoadConfig(const std::string & configFile);
+	virtual std::vector<ExtensionPtr> GetExtension();
 private:
 	log4cplus::Logger log;
 	void DisplayEventInfo(const std::string &) const;

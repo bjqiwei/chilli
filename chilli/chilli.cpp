@@ -174,8 +174,8 @@ bool chilli::App::LoadConfig(void)
 	bool bResult = true;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	strConfigFile = strFileNameNoExtension+".xml";
-	_deviceSH.LoadConfig();
-	_ACD.LoadConfig();
+	_deviceSH.LoadConfig(strConfigFile);
+	_ACD.LoadConfig(strConfigFile);
 	LOG4CPLUS_INFO(log,"config file: "<< strConfigFile);
 	return bResult;
 }

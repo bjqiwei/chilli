@@ -122,13 +122,13 @@ int ShExtension::processEvent(const std::string& strEvent)
 
 bool ShExtension::processTransfer(std::string strEvent,std::string from)
 {
-	recEvtBuffer.addData(strEvent);
+	//recEvtBuffer.addData(strEvent);
 	return true;
 }
 
 bool ShExtension::addAcdEvent(const std::string& strEvent)
 {
-	recEvtBuffer.addData(strEvent);
+	//recEvtBuffer.addData(strEvent);
 	return true;
 }
 

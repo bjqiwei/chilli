@@ -15,7 +15,6 @@ namespace ShDev{
 		Anolog_Nothing = 20,
 		ISDN_User = 7,
 		ISND_Trunk = 8,
-		IVR_Extension = 9,
 	};
 
 class ShDevModule :
@@ -27,8 +26,8 @@ public:
 
 	virtual int Start() ;
 	virtual int Stop();
-	virtual bool LoadConfig();
-
+	virtual bool LoadConfig(const std::string & configFile);
+	virtual std::vector<chilli::model::ExtensionPtr> GetExtension();
 
 private:
 

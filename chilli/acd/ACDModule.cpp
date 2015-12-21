@@ -36,10 +36,14 @@ int ACDModule::Start()
 {
 	return 0;
 }
-bool ACDModule::LoadConfig()
+bool ACDModule::LoadConfig(const std::string & configFile)
 {
 	return false;
 }
 
+std::vector<ExtensionPtr> ACDModule::GetExtension()
+{
+	return std::vector <ExtensionPtr >();
+}
 }
 }

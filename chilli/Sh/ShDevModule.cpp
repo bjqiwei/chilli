@@ -21,31 +21,31 @@ ShDevModule::~ShDevModule(void)
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 }
 
-//bool ShDevModule::Init(xmlNodePtr xNode)
-//{
-//	//setConfigNode(xNode);
-//	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
-//	{
-//		CHAR ErrMsg[400];
-//		SsmGetLastErrMsg(ErrMsg);
-//		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
-//		return false ;
-//	}
-//
-//
-//	int nTotCh = SsmGetMaxCh();
-//	for(int i=0; i<nTotCh; i++)
-//	{
-//		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
-//		//extPtr->setEnable(false);
-//		//extPtr->setType(SsmGetChType(i));
-//		//extPtr->setChannelID(i);
-//		//m_ExtensionVector.push_back(extPtr);
-//	}
-//
-//
-//	return true;
-//}
+bool ShDevModule::Init(xmlNodePtr xNode)
+{
+	setConfigNode(xNode);
+	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
+	{
+		CHAR ErrMsg[400];
+		SsmGetLastErrMsg(ErrMsg);
+		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
+		return false ;
+	}
+
+
+	int nTotCh = SsmGetMaxCh();
+	for(int i=0; i<nTotCh; i++)
+	{
+		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
+		//extPtr->setEnable(false);
+		//extPtr->setType(SsmGetChType(i));
+		//extPtr->setChannelID(i);
+		//m_ExtensionVector.push_back(extPtr);
+	}
+
+
+	return true;
+}
 
 int ShDevModule::Stop()
 {
@@ -59,6 +59,12 @@ int ShDevModule::Stop()
 	return 0;
 }
 
+
+std::vector<chilli::model::ExtensionPtr> ShDevModule::GetExtension()
+{
+	return std::vector <chilli::model::ExtensionPtr>();
+}
+
 int ShDevModule::getDeviceTypeByName(const std::string & strChType)
 {
 	if (strChType == "Analog_Trunk") return Analog_Trunk;
@@ -68,7 +74,6 @@ int ShDevModule::getDeviceTypeByName(const std::string & strChType)
 	else if (strChType == "Anolog_Nothing") return Anolog_Nothing;
 	else if (strChType == "ISDN_User") return ISDN_User;
 	else if (strChType == "ISND_Trunk") return ISND_Trunk;
-	else if (strChType == "IVR") return IVR_Extension;
 	else return -1;
 }
 
@@ -90,7 +95,6 @@ int ShDevModule::EvtHandler(const PSSM_EVENT const pEvent)
 
 int ShDevModule::Start()
 {
-	LoadConfig();
 	//for (unsigned int i = 0; i< m_ExtensionVector.size(); i++)
 	//{
 	//	if (m_ExtensionVector.at(i)->getType() == Anolog_User) SsmSetASDT(i,1);
@@ -121,7 +125,7 @@ int ShDevModule::Start()
 	return 0;
 }
 
-bool ShDevModule::LoadConfig()
+bool ShDevModule::LoadConfig(const std::string & configFile)
 {
 	return false;
 }
