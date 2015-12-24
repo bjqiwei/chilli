@@ -3,11 +3,18 @@
 #include "ShExtension.h"
 #include <common/xmlHelper.h>
 #include <log4cplus/loggingmacros.h>
+#include <thread>
 
 namespace chilli{
 namespace ShDev{
 
 
+static std::string GetSsmLastErrMsg()
+{
+	char Err[600];
+	SsmGetLastErrMsg(Err); //Get error message
+	return Err;
+}
 
 ShDevModule::ShDevModule(void):DevModule()
 {
@@ -21,20 +28,20 @@ ShDevModule::~ShDevModule(void)
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 }
 
-bool ShDevModule::Init(xmlNodePtr xNode)
+bool ShDevModule::Init()
 {
-	setConfigNode(xNode);
-	if(SsmStartCti("ShConfig.ini", "ShIndex.ini") != 0) 
+
+	//load configuration file and initialize system
+	if (SsmStartCti("ShConfig.ini", "ShIndex.ini") == -1)
 	{
-		CHAR ErrMsg[400];
-		SsmGetLastErrMsg(ErrMsg);
-		LOG4CPLUS_ERROR(log,"Open device failed. "<<ErrMsg);
-		return false ;
+		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
+		return false;
 	}
 
 
 	int nTotCh = SsmGetMaxCh();
-	for(int i=0; i<nTotCh; i++)
+	LOG4CPLUS_INFO(log, "MaxCh:" << nTotCh);
+	for (int i = 0; i < nTotCh; i++)
 	{
 		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
 		//extPtr->setEnable(false);
@@ -47,14 +54,32 @@ bool ShDevModule::Init(xmlNodePtr xNode)
 	return true;
 }
 
+int ShDevModule::Start()
+{
+	if (!Init())
+		return -1;
+
+	EVENT_SET_INFO EventMode;
+	EventMode.dwWorkMode = EVENT_CALLBACKA;
+	EventMode.lpHandlerParam = EvtHandler;
+
+	if (SsmSetEvent(0xffff, -1, true, &EventMode) != 0)
+	{
+		LOG4CPLUS_ERROR(log, "set CallBack fuction failed. " << GetSsmLastErrMsg());
+	}
+
+
+	//td.thread_hnd = (HANDLE)_beginthreadex(NULL,0,ThreadProc,NULL,0,&td.thread_id);
+
+	return 0;
+}
+
 int ShDevModule::Stop()
 {
 	LOG4CPLUS_DEBUG(log,"Close a Sanhuid device");
 	if(SsmCloseCti() == -1)									 
 	{
-		CHAR ErrMsg[400];
-		SsmGetLastErrMsg(ErrMsg);
-		LOG4CPLUS_ERROR(log,ErrMsg);
+		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
 	}
 	return 0;
 }
@@ -93,37 +118,6 @@ int ShDevModule::EvtHandler(const PSSM_EVENT const pEvent)
 	return 0;
 }
 
-int ShDevModule::Start()
-{
-	//for (unsigned int i = 0; i< m_ExtensionVector.size(); i++)
-	//{
-	//	if (m_ExtensionVector.at(i)->getType() == Anolog_User) SsmSetASDT(i,1);
-	//}
-
-	/*for(unsigned int i =0; i < m_ExtensionVector.size(); i++){
-		m_ExtensionVector.at(i)->go();
-	}*/
-	EVENT_SET_INFO EventMode;
-	EventMode.dwWorkMode = EVENT_CALLBACKA;
-	EventMode.lpHandlerParam = EvtHandler;
-
-	if (SsmSetEvent(0xffff,-1, true,&EventMode) != 0)
-	{
-		CHAR ErrMsg[400];
-		SsmGetLastErrMsg(ErrMsg);
-		LOG4CPLUS_ERROR(log,"set CallBack fuction failed. "<<ErrMsg);
-	}
-
-
-	//td.thread_hnd = (HANDLE)_beginthreadex(NULL,0,ThreadProc,NULL,0,&td.thread_id);
-
-	/*if (!td.thread_hnd){
-		LOG4CPLUS_ERROR(log,"_beginthreadex() failed;error no.=" << GetLastError());
-	}else{
-		LOG4CPLUS_INFO(log,"_beginthreadex() ok;thread_id=" << td.thread_id);
-	}*/
-	return 0;
-}
 
 bool ShDevModule::LoadConfig(const std::string & configFile)
 {

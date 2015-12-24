@@ -36,6 +36,8 @@ private:
 	ShDevModule & operator=(const ShDevModule &);
 
 private:
+
+	bool Init();
 	//sanhuid event callback function
 	static int CALLBACK EvtHandler(const PSSM_EVENT const pEvent);
 	static int getDeviceTypeByName(const std::string & strType);
