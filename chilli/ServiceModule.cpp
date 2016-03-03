@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "ServiceModule.h"
 #include "chilli.h"
 #include <log4cplus/loggingmacros.h>

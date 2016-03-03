@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "ShExtension.h"
 #include "ShDevModule.h"
 #include <log4cplus/loggingmacros.h>

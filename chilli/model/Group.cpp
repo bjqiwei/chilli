@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "Group.h"
 #include <fsm.h>
 #include <log4cplus/loggingmacros.h>

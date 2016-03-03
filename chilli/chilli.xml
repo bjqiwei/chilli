@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ShCTI>
-  <config>
+<Config>
+    <ACDs>
+	  <ACD ExtensionNumber="0001" StateMachine="./ACD.xml"></ACD>
+	</ACDs>
     <Extensions>
       <Extension ExtensionNumber="1000" ChannelID="0" Type="Analog_Trunk" Enable="1" StateMachine="./Analog_Trunk.xml"></Extension>
       <Extension ExtensionNumber="1001" ChannelID="1" Type="Anolog_User" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
@@ -68,4 +70,4 @@
       </condition>
     </extension>
   </dialplan>
-</ShCTI>
+</Config>

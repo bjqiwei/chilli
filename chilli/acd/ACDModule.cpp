@@ -1,7 +1,7 @@
-#include "StdAfx.h"
 #include "ACDModule.h"
 #include <regex>
 #include <log4cplus/loggingmacros.h>
+#include "../tinyxml2/tinyxml2.h"
 
 
 namespace chilli{
@@ -38,7 +38,31 @@ int ACDModule::Start()
 }
 bool ACDModule::LoadConfig(const std::string & configFile)
 {
-	return false;
+	using namespace tinyxml2;
+	tinyxml2::XMLDocument config;
+	if(config.LoadFile(configFile.c_str()) != XMLError::XML_SUCCESS)
+	{ 
+		LOG4CPLUS_ERROR(log, "load config file error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		return false;
+	}
+	if (tinyxml2::XMLElement *eConfig  = config.FirstChildElement("Config")){
+		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("ACDs"))
+		{
+			for (XMLElement *child = eACD->FirstChildElement("ACD"); child != nullptr; child = child->NextSiblingElement("ACD")){
+
+			}
+		}
+		else {
+			LOG4CPLUS_ERROR(log, "config file missing ACDs element.");
+			return false;
+		}
+
+	}
+	else {
+		LOG4CPLUS_ERROR(log, "config file missing Config element.");
+		return false;
+	}
+	return true;
 }
 
 std::vector<ExtensionPtr> ACDModule::GetExtension()

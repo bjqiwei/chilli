@@ -4,7 +4,6 @@
 #define _CHILLI_CTI_DEVICE_MODULE_HEADER_
 
 #include "..\model\ProcessModule.h"
-#include <log4cplus\logger.h>
 
 namespace chilli{
 namespace model{
@@ -22,8 +21,6 @@ private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	DevModule(const DevModule & other);
 	DevModule & operator=(const DevModule &);
-
-	log4cplus::Logger log;
 
 
 };

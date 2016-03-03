@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "ShDevModule.h"
 #include "ShExtension.h"
 #include <common/xmlHelper.h>
