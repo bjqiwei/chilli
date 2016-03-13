@@ -1,11 +1,11 @@
 #include "ACDModule.h"
-#include <regex>
+#include "ACDExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 
 
 namespace chilli{
-namespace model{
+namespace ACD{
 
 
 ACDModule::ACDModule(void)
@@ -49,7 +49,9 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("ACDs"))
 		{
 			for (XMLElement *child = eACD->FirstChildElement("ACD"); child != nullptr; child = child->NextSiblingElement("ACD")){
-
+				const char * num = child->Attribute("ExtensionNumber");
+				const char * sm = child->Attribute("StateMachine");
+				model::ExtensionPtr ext = new ACDExtension();
 			}
 		}
 		else {
@@ -65,9 +67,9 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 	return true;
 }
 
-std::vector<ExtensionPtr> ACDModule::GetExtension()
+std::vector<model::ExtensionPtr> ACDModule::GetExtension()
 {
-	return std::vector <ExtensionPtr >();
+	return std::vector <model::ExtensionPtr >();
 }
 }
 }

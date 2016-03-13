@@ -86,6 +86,7 @@ xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y ACD.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -121,6 +122,7 @@ xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
+xcopy /Y ACD.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
 xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -136,6 +138,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <None Include="welcome.wav" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="acd\ACDExtension.h" />
     <ClInclude Include="ACD\ACDModule.h" />
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Csemaphore.h" />
@@ -154,6 +157,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="tinyxml2\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="acd\ACDExtension.cpp" />
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
@@ -171,6 +175,10 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ProjectReference Include="..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="ACD.xml" />
+    <Xml Include="chilli.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

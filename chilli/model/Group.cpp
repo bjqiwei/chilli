@@ -16,10 +16,6 @@ namespace model{
 	Group::~Group(){
 		LOG4CPLUS_TRACE(log,"destruction a extension object.");
 	}
-	bool Group::Init()
-	{
-		return false;
-	}
 
 	bool Group::ParserConfig(void)
 	{
@@ -64,45 +60,9 @@ namespace model{
 		return true;
 	}
 
-	bool Group::addAcdEvent(const std::string& strEvent)
-	{
-		helper::xml::CXmlParseHelper xmlParse(strEvent);
-		
-		if (xmlParse.getRootName().compare("cmd") == 0){
-			this->processCmd(strEvent);
-		}else if (xmlParse.getRootName().compare("event") == 0)
-		{
-			this->processEvent(strEvent);
-		}else{
-			LOG4CPLUS_ERROR(log,"not distinguish this msg name:" << xmlParse.getRootName());
-		}
-		return true;
-	}
-
-	int Group::processCmd(const std::string& strCmd)
-	{
-		using namespace helper::xml;
-		CXmlParseHelper xmlParse(strCmd);
-
-		std::string _cmd =xmlParse.getRootProp("cmd");
-		std::string from = xmlParse.getRootProp("from");
-		if (_cmd.compare("transfer") == 0)
-		{
-			return processTransfer(strCmd,from);
-		}
-		return 1;
-	}
-	int Group::processEvent(const std::string& strEvent)
-	{
-		LOG4CPLUS_WARN(log, "this fuction processEvent not implement. ");
-		return -1;
-	}
-
-
 	void Group::fireSend(const std::string &strContent)
 	{
 		LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
-		processCmd(strContent);
 	}
 
 }

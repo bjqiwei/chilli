@@ -5,7 +5,7 @@
 #include <log4cplus/logger.h>
 
 namespace chilli{
-namespace model{
+namespace ACD{
 
 class ACDModule:public model::ProcessModule
 {
@@ -15,7 +15,7 @@ public:
 	virtual int Start();
 	virtual int Stop();
 	virtual bool LoadConfig(const std::string & configFile);
-	virtual std::vector<ExtensionPtr> GetExtension();
+	virtual std::vector<model::ExtensionPtr> GetExtension();
 private:
 	log4cplus::Logger log;
 	void DisplayEventInfo(const std::string &) const;

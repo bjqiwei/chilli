@@ -15,7 +15,7 @@
 
 
 chilli::ShDev::ShDevModule _deviceSH;
-chilli::model::ACDModule _ACD;
+chilli::ACD::ACDModule _ACD;
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {

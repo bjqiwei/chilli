@@ -19,9 +19,6 @@ public:
 	virtual bool ParserConfig(void);
 	virtual bool processTransfer(std::string strEvent,std::string from);
 	virtual bool addAcdEvent(const std::string& strEvent) ;
-	virtual int processCmd(const std::string& strCmd);
-	virtual int processEvent(const std::string& strEvent);
-	virtual bool Init(void);
 	virtual int getChannelID();
 	bool setType(std::string strType);
 	void setType(int _type);

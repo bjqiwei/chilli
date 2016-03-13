@@ -62,7 +62,6 @@
         <Extension>5010</Extension>
     </group>
     </groups>
-  </config>
   <dialplan>
     <extension name="IVR">
       <condition field="CalledNumber" expression="8079">

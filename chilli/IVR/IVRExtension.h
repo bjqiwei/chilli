@@ -11,17 +11,12 @@ class IVRExtension:public model::Extension{
 public:
 	IVRExtension();
 	virtual ~IVRExtension();
-private:
-	int processCmd(const std::string& strCmd);
-	int processEvent(const std::string& strEvent);
 
 public:
-	virtual bool Init(void);
 	int EvtHandler(std::string strEvent);
 	virtual bool LoadConfig(void);
 	virtual void fireSend(const std::string &strContent);
 	virtual bool processTransfer(std::string strEvent,std::string from);
-	virtual bool addAcdEvent(const std::string& strEvent);
 private:
 	log4cplus::Logger log;
 
