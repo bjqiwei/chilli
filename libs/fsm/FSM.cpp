@@ -1,22 +1,6 @@
 #include "FSM.h"
 #include "FSMimp.h"
-#include <string>
-#include <ObjBase.h>
-#include <cstdio>
-#include "scxml/model/Script.h"
-#include "scxml/model/Event.h"
-#include "scxml/model/Script.h"
-#include "scxml/model/Send.h"
-#include "scxml/model/Timer.h"
-#include "scxml/model/Transition.h"
-#include "scxml/model/Scriptmodel.h"
-#include "scxml/model/Datamodel.h"
-#include "scxml/model/Log.h"
-#include "scxml/model/Raise.h"
-#include "scxml/model/Sleep.h"
-#include <stdexcept>
-#include <log4cplus/loggingmacros.h>
-#include "common/stringHelper.h"
+
 
 
 using namespace std;
@@ -48,7 +32,7 @@ const std::string fsm::StateMachine::getCurrentStateID(void) const
 	return imp->getCurrentStateID();
 }
 
-void fsm::StateMachine::pushEvent( TriggerEvent & trigEvent)
+void fsm::StateMachine::pushEvent(const TriggerEvent & trigEvent)
 {
 	return imp->pushEvent(trigEvent);
 }

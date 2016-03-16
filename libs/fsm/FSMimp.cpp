@@ -212,7 +212,7 @@ inline bool fsm::StateMachineimp::isSleep(const xmlNodePtr &xNode)
 	return  xNode && xNode->type == XML_ELEMENT_NODE && xmlStrEqual(xNode->name,BAD_CAST("sleep")); 
 }
 
-void fsm::StateMachineimp::pushEvent(TriggerEvent & trigEvent)
+void fsm::StateMachineimp::pushEvent(const TriggerEvent & trigEvent)
 {
 	m_externalQueue.push(trigEvent);
 }

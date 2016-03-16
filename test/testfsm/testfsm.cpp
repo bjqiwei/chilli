@@ -3,8 +3,9 @@
 //#define SCXML 1
 #include "stdafx.h"
 //#ifdef SCXML 
-#include <fsm.h>
 #include "sendimp.h"
+#include <fsm.h>
+#include <scxml/SMInstance.h>
 #include <common/Timer.h>
 //#endif // SCXML
 //#include "io/SCXMLParser.h"

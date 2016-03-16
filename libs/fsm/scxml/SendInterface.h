@@ -1,10 +1,8 @@
 #pragma once
 #ifndef _FSM_SENDINTERFACE_HEADER_
 #define _FSM_SENDINTERFACE_HEADER_
-#include <string>
-#include <map>
-#include <log4cplus/logger.h>
 #include "..\config.h"
+#include <string>
 
 namespace fsm
 {

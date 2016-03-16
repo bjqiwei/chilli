@@ -1,4 +1,3 @@
-#include <FSM.h>
 #include <scxml/SendInterface.h>
 #include <string>
 

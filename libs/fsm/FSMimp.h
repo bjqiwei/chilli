@@ -47,7 +47,7 @@ namespace fsm{
 		void setscInstance(SMInstance *);
 		void setLog(log4cplus::Logger log);
 
-		void pushEvent(TriggerEvent & Evt);
+		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
 	protected:
 		std::string m_strStateFile;

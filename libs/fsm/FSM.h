@@ -1,13 +1,11 @@
 #ifndef _INTERPRETER_HEADER_
 #define _INTERPRETER_HEADER_
 
-#include <string>
 #include "config.h"
-
+#include <string>
+#include <json/json.h>
 #include "scxml/TriggerEvent.h"
 #include "scxml/SendInterface.h"
-#include "scxml/SMInstance.h"
-
 
 
 using namespace std;
@@ -16,6 +14,7 @@ using namespace std;
 namespace fsm{
 
 	class StateMachineimp;
+	class SMInstance;
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
 	enum xmlType{
 		File,
@@ -48,7 +47,7 @@ namespace fsm{
 		bool addSendImplement( SendInterface * evtDsp);
 		void setscInstance(SMInstance *);
 
-		void pushEvent(TriggerEvent & Evt);
+		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
 
 	private:

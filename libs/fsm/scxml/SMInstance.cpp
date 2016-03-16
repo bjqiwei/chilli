@@ -87,10 +87,10 @@ namespace fsm
 	//	this->rootContext = context;
 	//}
 
-	Context *SMInstance::getContext(xmlNodePtr xNode)const
+	Context *SMInstance::getContext(ContextKey xNode)const
 	{
 		Context *context =NULL ; 
-		std::map<xmlNodePtr,Context *>::iterator it = contexts.find(xNode);
+		std::map<ContextKey, Context *>::iterator it = contexts.find(xNode);
 		if (it != contexts.end())
 		{
 			context = it->second;
@@ -128,9 +128,9 @@ namespace fsm
 		}
 		return context;
 	}
-	void SMInstance::removeContext(xmlNodePtr xNode)
+	void SMInstance::removeContext(ContextKey xNode)
 	{
-		std::map<xmlNodePtr,Context *>::iterator it = contexts.find(xNode);
+		std::map<ContextKey, Context *>::iterator it = contexts.find(xNode);
 		if (it != contexts.end())
 		{
 			LOG4CPLUS_DEBUG(log,"removeing context " << it->second);
@@ -144,7 +144,7 @@ namespace fsm
 		
 		LOG4CPLUS_DEBUG(log,"context size:" << contexts.size());
 	}
-	Context *SMInstance::lookupContext(xmlNodePtr xNode)
+	Context *SMInstance::lookupContext(ContextKey xNode)
 	{
 		if (contexts.count(xNode) > 0)
 		{
@@ -153,7 +153,7 @@ namespace fsm
 		return NULL;
 	}
 
-	void SMInstance::setContext(xmlNodePtr xNode, Context *const context)
+	void SMInstance::setContext(ContextKey xNode, Context *const context)
 	{
 		if (contexts[xNode] != NULL)
 		{

@@ -1,8 +1,8 @@
 #pragma once
 #ifndef _SCXML_TRIGGEREVENT_HEADER_
 #define _SCXML_TRIGGEREVENT_HEADER_
-#include <string>
 #include "..\config.h"
+#include <string>
 
 namespace fsm
 {
