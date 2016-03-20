@@ -14,9 +14,6 @@ class Group:public Extension
 public:
 	Group();
 	virtual ~Group();
-	virtual bool ParserConfig(void);
-	virtual bool processTransfer(std::string strEvent,std::string from);
-	virtual void fireSend(const std::string &strContent);
 private:
 	std::vector<std::string> m_ExtVec;
 	log4cplus::Logger log;

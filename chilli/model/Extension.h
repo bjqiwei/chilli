@@ -1,8 +1,7 @@
 #pragma once
 #ifndef _CHILLI_CTI_EXTENSION_HEADER_
 #define _CHILLI_CTI_EXTENSION_HEADER_
-#include <FSM.h>
-#include <scxml/SendInterface.h>
+#include <string>
 
 namespace chilli{
 namespace model{
@@ -16,7 +15,7 @@ public:
 	virtual const std::string & getExtensionNumber() const = 0;
 	virtual bool isIdle() = 0;
 	virtual void go() = 0;
-	virtual void pushEvent(fsm::TriggerEvent &evt) = 0;
+	virtual void pushEvent(const std::string &evt) = 0;
 
 //media interface
 	virtual int Answer() = 0;
