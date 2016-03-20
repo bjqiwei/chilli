@@ -2,6 +2,7 @@
 #ifndef _CHILLI_SHDEV_MODULE_HEADER_
 #define _CHILLI_SHDEV_MODULE_HEADER_
 #include "..\Device\DevModule.h"
+#include <log4cplus\logger.h>
 #include "shpa3api.h"
 
 namespace chilli{

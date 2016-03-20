@@ -2,6 +2,7 @@
 #ifndef _CHILLI_IVR_EXTENSION_HEADER_
 #define _CHILLI_IVR_EXTENSION_HEADER_
 #include "..\model\extension.h"
+#include <log4cplus\logger.h>
 
 
 namespace chilli{

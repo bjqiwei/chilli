@@ -2,20 +2,23 @@
 #ifndef _CHILLI_CTI_EXTENSION_HEADER_
 #define _CHILLI_CTI_EXTENSION_HEADER_
 #include <string>
+#include <scxml/SendInterface.h>
 
 namespace chilli{
 namespace model{
 
-class Extension
+class Extension: public fsm::SendInterface
 {
 public:
-	Extension(){};
+	Extension():SendInterface("this"){};
 	virtual ~Extension(){};
-	virtual bool setExtensionNumber(const std::string & number) = 0;
 	virtual const std::string & getExtensionNumber() const = 0;
 	virtual bool isIdle() = 0;
 	virtual void go() = 0;
-	virtual void pushEvent(const std::string &evt) = 0;
+	virtual int pushEvent(const std::string &evt) = 0;
+
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) = 0;
 
 //media interface
 	virtual int Answer() = 0;

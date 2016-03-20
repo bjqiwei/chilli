@@ -2,6 +2,8 @@
 #ifndef _CHILLI_ACD_EXTENSION_HEADER_
 #define _CHILLI_ACD_EXTENSION_HEADER_
 #include "..\model\extension.h"
+#include <log4cplus\logger.h>
+#include <FSM.h>
 
 
 namespace chilli{
@@ -11,18 +13,24 @@ class ACDExtension:public model::Extension{
 public:
 	ACDExtension();
 	virtual ~ACDExtension();
-private:
-	int processEvent(const std::string& strEvent);
 
 public:
-	virtual bool Init(void);
-	int EvtHandler(std::string strEvent);
-	virtual bool LoadConfig(void);
-	virtual void fireSend(const std::string &strContent);
-	virtual bool processTransfer(std::string strEvent,std::string from);
-	virtual bool addAcdEvent(const std::string& strEvent);
+	virtual const std::string & getExtensionNumber() const;
+	virtual bool isIdle();
+	virtual void go();
+
+	virtual void fireSend(const std::string &strContent, const void * param);
+	virtual int pushEvent(const std::string &evt);
+
+	//media interface
+	virtual int Answer();
+	virtual int PlayFile(const std::string &fileName);
+	virtual int HangUp();
+
 private:
 	log4cplus::Logger log;
+	fsm::StateMachine  m_SM;
+	std::string m_ExtNumber;
 
 };
 typedef ACDExtension *  ACDExtensionPtr;

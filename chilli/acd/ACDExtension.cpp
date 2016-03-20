@@ -8,42 +8,54 @@ namespace ACD{
 
 ACDExtension::ACDExtension() :chilli::model::Extension()
 {
-	log = log4cplus::Logger::getInstance("chilli.IVR.Extension");
-	LOG4CPLUS_DEBUG(log,"new a IVR extension object.");
+	log = log4cplus::Logger::getInstance("chilli.ACD.Extension");
+	LOG4CPLUS_DEBUG(log,"new a ACD extension object.");
+	m_SM.addSendImplement(this);
 }
 ACDExtension::~ACDExtension(){
-	LOG4CPLUS_DEBUG(log,"destruction a IVR extension object.");
+	LOG4CPLUS_DEBUG(log,"destruction a ACD extension object.");
 }
 
-bool ACDExtension::LoadConfig(void)
+
+const std::string & ACDExtension::getExtensionNumber() const
 {
-	return true;
+	return m_ExtNumber;
 }
 
-bool ACDExtension::Init(void)
+bool ACDExtension::isIdle()
 {
-	//stateMachie.setscInstance(&IVRModule::scInstance);
-	return true;
+	return m_SM.getCurrentStateID() == "Idle";
 }
-int ACDExtension::EvtHandler(std::string strEvent)
+
+void ACDExtension::go()
 {
-	/*if (!m_bEnable)
-	{
-		LOG4CPLUS_WARN(log, " ch="<< this->getChannelID()<<", is disable.");
-		return 0;
-	}*/
-	fsm::TriggerEvent evt(strEvent,0);
-	//stateMachie.pushEvent(evt);
+	m_SM.go();
+}
+
+int ACDExtension::Answer()
+{
+	LOG4CPLUS_WARN(log, "not implement.");
 	return 0;
 }
 
+int ACDExtension::PlayFile(const std::string &fileName)
+{
+	LOG4CPLUS_WARN(log, "not implement.");
+	return 0;
+}
 
-void ACDExtension::fireSend(const std::string & strContent)
+int ACDExtension::HangUp()
+{
+	LOG4CPLUS_WARN(log, "not implement.");
+	return 0;
+}
+
+void ACDExtension::fireSend(const std::string & strContent,const void * param)
 {
 	LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
 }
 
-int ACDExtension::processEvent(const std::string& strEvent)
+int ACDExtension::pushEvent(const std::string& strEvent)
 {
 	helper::xml::CXmlDocumentPtr xDocPtr = xmlParseMemory(strEvent.c_str(),strEvent.length());
 	if (xDocPtr._xDocPtr == NULL)
@@ -58,25 +70,13 @@ int ACDExtension::processEvent(const std::string& strEvent)
 		return -1;
 	}		
 
-	//std::string _event = fsm::xmlHelper::getXmlNodeAttributesValue(xrootNode,"event");
-	//this->_event_data = fsm::xmlHelper::getXmlNodeAttributesValue(xrootNode,"from");
-	//fsm::TriggerEvent evt(_event,this->_event_data,0);
-	//LOG4CPLUS_INFO(log, " Recived a event,"<< "from " <<  this->_event_data << "event=" << evt.ToString());
-	//stateMachie.pushEvent(evt);
+	std::string _event = helper::xml::getXmlNodeAttributesValue(xrootNode,"event");
+	std::string _from = helper::xml::getXmlNodeAttributesValue(xrootNode,"from");
+	fsm::TriggerEvent evt(_event, _from);
+	LOG4CPLUS_INFO(log, " Recived a event," << "from " << _from << "event=" << evt.ToString());
+	m_SM.pushEvent(evt);
 
 	return 0;
-}
-
-bool ACDExtension::processTransfer(std::string strEvent, std::string from)
-{
-//	IVRModule::recEvtBuffer.addData(strEvent);
-	return true;
-}
-
-bool ACDExtension::addAcdEvent(const std::string& strEvent)
-{
-	//IVRModule::recEvtBuffer.addData(strEvent);
-	return true;
 }
 
 }
