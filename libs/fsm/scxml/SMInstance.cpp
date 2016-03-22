@@ -13,7 +13,7 @@ namespace fsm
 {
 
 	
-	SMInstance::SMInstance(helper::CTimerNotify& observer):TimerServer(observer)
+	SMInstance::SMInstance(helper::CTimerNotify* observer):TimerServer(observer)
 	{
 		log = log4cplus::Logger::getInstance("fsm.SMInstance");
 		LOG4CPLUS_DEBUG(log,"new fsm.SMInstance object.");

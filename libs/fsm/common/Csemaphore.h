@@ -111,9 +111,8 @@ namespace helper{
 #else // POSIX - linux
 		sem_private sem;
 #endif
-	private:
-		CSemaphore(const CSemaphore &);
-		CSemaphore& operator =(const CSemaphore &);
+		CSemaphore(const CSemaphore &) = delete;
+		CSemaphore& operator =(const CSemaphore &) = delete;
 
 	};// end of CSemaphore class
 

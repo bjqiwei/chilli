@@ -36,9 +36,8 @@ private:
 #else
 	pthread_mutex_t m_Mutex;
 #endif
-private:
-	CLock(const CLock &);
-	CLock& operator =(const CLock &);
+	CLock(const CLock &) = delete;
+	CLock& operator =(const CLock &) = delete;
 
 };// end of lock class
 
@@ -55,8 +54,9 @@ public:
 	}
 private:
 	CLock * m_lock;
-	AutoLock(const AutoLock &);
-	AutoLock & operator=(const AutoLock &);
+public:
+	AutoLock(const AutoLock &) = delete;
+	AutoLock & operator=(const AutoLock &) = delete;
 };
 }//end namespace helper
 #endif // end header file

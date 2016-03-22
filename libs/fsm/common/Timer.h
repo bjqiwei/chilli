@@ -55,7 +55,7 @@ namespace helper{
 			const std::string m_attr;
 			const unsigned long m_interval;
 			struct timeb m_startTime;
-			Timer & operator=( const Timer & );
+			Timer & operator=( const Timer & ) = delete;
 		};
 		class TimerComp{
 		public:
@@ -72,9 +72,9 @@ namespace helper{
 		struct thread_data td;
 		helper::CLock m_timerLock;
 		helper::CSemaphore m_semaphore;
-		CTimerNotify& m_Observer;
+		CTimerNotify* m_Observer;
 	public:
-		TimerServer(CTimerNotify& observer): m_Observer(observer){
+		TimerServer(CTimerNotify* observer): m_Observer(observer){
 			StartTimerThread();
 		}
 
@@ -132,7 +132,7 @@ namespace helper{
 							break;
 						}
 
-						This->m_Observer.OnTimerExpired(timer->getTimerId(), timer->getAttr());
+						This->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr());
 						
 						This->m_timer.pop();
 						delete timer;

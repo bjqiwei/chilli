@@ -36,7 +36,7 @@ int main(int argc, _TCHAR* argv[])
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
 		MyTimer mytimer;
-		fsm::SMInstance m_smInstance(mytimer);
+		fsm::SMInstance m_smInstance(&mytimer);
 		fsm::StateMachine mysmscxml;
 		SendImp mySend;
 		mysmscxml.Init(strStateFile);

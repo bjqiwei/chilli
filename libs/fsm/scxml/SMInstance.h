@@ -41,7 +41,7 @@ namespace fsm
 	private:
 		virtual Evaluator *getEvaluator() const;
 	public:
-		SMInstance(helper::CTimerNotify& observer);
+		SMInstance(helper::CTimerNotify* observer);
 		virtual ~SMInstance();
 
 
