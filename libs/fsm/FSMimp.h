@@ -20,15 +20,12 @@ namespace fsm{
 
 	class  StateMachineimp {
 	public:
-		StateMachineimp(const string &xml = "", int xtype = 0);
+		StateMachineimp(const string &xml, int xtype);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;
 		StateMachineimp & operator=(const StateMachineimp & other) = delete;
-		
-		//初始化状态机
-		bool Init(void);
-		bool Init(const string &xml, int xtype = 0);
+
 		//开始进入初始化状态
 		void go();
 		//const xmlNodePtr getCurrentState(void) const;
@@ -62,10 +59,12 @@ namespace fsm{
 		helper::xml::CXPathContextPtr xpathCtx;
 
 	private:
+		//加载状态机
+		bool Init(void);
 		void normalize(const xmlNodePtr &rootNode);
 		void reset();
 		//将文件解析成xml文档。
-		void parse();
+		bool parse();
 
 		static bool isState(const xmlNodePtr &xmlNode) ;
 		static bool isTransition(const xmlNodePtr &Node) ;

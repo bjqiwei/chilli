@@ -37,9 +37,8 @@ int main(int argc, _TCHAR* argv[])
 		strStateFile.append(".\\fsm.xml");
 		MyTimer mytimer;
 		fsm::SMInstance m_smInstance(&mytimer);
-		fsm::StateMachine mysmscxml;
+		fsm::StateMachine mysmscxml(strStateFile);
 		SendImp mySend;
-		mysmscxml.Init(strStateFile);
 		mysmscxml.setscInstance(&m_smInstance);
 		mysmscxml.addSendImplement(&mySend);
 		mysmscxml.setSessionID("123456");

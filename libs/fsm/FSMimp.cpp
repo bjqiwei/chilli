@@ -74,8 +74,7 @@ void fsm::StateMachineimp::reset()
 bool fsm::StateMachineimp::Init(void)
 {
 	using namespace helper::xml;
-	parse();
-	if (m_xmlDocPtr._xDocPtr ) {
+	if (parse()) {
 
 		if (m_rootNode && m_scInstance) m_scInstance->removeContext(m_rootNode);
 
@@ -126,18 +125,6 @@ bool fsm::StateMachineimp::Init(void)
 	return true;
 }
 
-bool fsm::StateMachineimp::Init(const string &xml, int xtype)
-{
-	m_xmlType = xtype;
-	if (m_xmlType == File)
-	{
-		m_strStateFile = xml;
-	}else{
-		m_strStateContent = xml;
-	}
-
-	return Init();
-}
 
 void fsm::StateMachineimp::normalize(const xmlNodePtr &smscxml)
 {
@@ -219,12 +206,12 @@ void fsm::StateMachineimp::pushEvent(const TriggerEvent & trigEvent)
 
 
 //将文件解析成xml文档。
-void fsm::StateMachineimp::parse()
+bool fsm::StateMachineimp::parse()
 {
 
 	if (NULL != m_xmlDocPtr._xDocPtr) {
 		LOG4CPLUS_WARN(log,"xmldocument is not empty , there not Parse file:" << this->m_strStateFile);
-		return;
+		return true;
 	}
 
 	try{
@@ -242,13 +229,16 @@ void fsm::StateMachineimp::parse()
 	}
 	catch(std::exception &e){ 
 		LOG4CPLUS_ERROR(log, e.what());
+		return false;
 	}
 
 	if (NULL == m_xmlDocPtr._xDocPtr) 
 	{  
 		LOG4CPLUS_ERROR(log, m_strSessionID<< ":" << m_strStateFile << ",Document not parsed successfully."); 
 		//throw std::logic_error( "Document not parsed successfully."); 
+		return false;
 	} 
+	return true;
 }
 
 bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
@@ -630,32 +620,35 @@ void fsm::StateMachineimp::setLog(log4cplus::Logger log)
 }
 void fsm::StateMachineimp::go()
 {
-	fsm::Context *ctx = getRootContext();
+	if (Init()){
+		fsm::Context *ctx = getRootContext();
 
-	if (ctx)
-	{
-		/*创建JsContext私有数据指针*/
-		ctx->SetContextPrivate(this);
-		ctx->setVar("_name",getName());
-		ctx->setVar("_sessionid",getSessionId());
-	}
-	if (m_rootNode)
-	{
-		for (xmlNodePtr childNode = m_rootNode->children; childNode != NULL; childNode = childNode->next )
+		if (ctx)
 		{
-			if(m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("datamodel")))
+			/*创建JsContext私有数据指针*/
+			ctx->SetContextPrivate(this);
+			ctx->setVar("_name", getName());
+			ctx->setVar("_sessionid", getSessionId());
+		}
+		if (m_rootNode)
+		{
+			for (xmlNodePtr childNode = m_rootNode->children; childNode != NULL; childNode = childNode->next)
 			{
-				model::Datamodel datamodel(childNode,m_strSessionID,m_strStateFile);
-				datamodel.execute(this->getRootContext());
+				if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("datamodel")))
+				{
+					model::Datamodel datamodel(childNode, m_strSessionID, m_strStateFile);
+					datamodel.execute(this->getRootContext());
 
-			}else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name,BAD_CAST("scriptmodel")))
-			{
-				model::Scriptmodel scriptmodel(childNode,m_strSessionID,m_strStateFile);
-				scriptmodel.execute(this->getRootContext());	
+				}
+				else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("scriptmodel")))
+				{
+					model::Scriptmodel scriptmodel(childNode, m_strSessionID, m_strStateFile);
+					scriptmodel.execute(this->getRootContext());
+				}
 			}
 		}
+		enterStates(this->m_initState);
 	}
-	enterStates(this->m_initState);
 }
 
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)

@@ -27,9 +27,6 @@ namespace fsm{
 		StateMachine(const StateMachine &other) = delete;
 		StateMachine & operator=(const StateMachine & other) = delete;
 		
-		//初始化状态机
-		bool Init(void);
-		bool Init(const string &xml, xmlType xtype = xmlType::File);
 		//开始进入初始化状态
 		void go();
 

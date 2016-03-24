@@ -15,18 +15,6 @@ fsm::StateMachine::~StateMachine()
 	 delete imp;
  }
 
-
-bool fsm::StateMachine::Init(void)
-{
-	return imp->Init();
-}
-
-bool fsm::StateMachine::Init(const string &xml, xmlType xtype)
-{
-	return imp->Init(xml, xtype);
-}
-
-
 const std::string fsm::StateMachine::getCurrentStateID(void) const
 {
 	return imp->getCurrentStateID();
