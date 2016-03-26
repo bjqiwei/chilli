@@ -27,7 +27,7 @@ enum xmlType{
 
 fsm::StateMachineimp::StateMachineimp(const string  &xml, int xtype) :m_xmlDocPtr(NULL), m_initState(NULL)
 	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
-	,m_xmlType(xtype),m_running(true)
+	,m_xmlType(xtype),m_running(false)
 {
 
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");
@@ -647,10 +647,17 @@ void fsm::StateMachineimp::go()
 				}
 			}
 		}
+		m_running = true;
+		LOG4CPLUS_INFO(log, m_strSessionID << ":go");
 		enterStates(this->m_initState);
 	}
 }
 
+void fsm::StateMachineimp::termination()
+{
+	LOG4CPLUS_INFO(log, m_strSessionID << ":termination");
+	m_running = false;
+}
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
 {
 	m_strSessionID = strSessionid;
@@ -692,10 +699,6 @@ void fsm::StateMachineimp::mainEventLoop()
 			}
 		}
 
-		if(isTerminationEvent(trigEvent)){
-			m_running = false;
-			break;
-		}
 		//如果外部队列和内部队列都为空，退出外部事件队列循环
 		if (m_externalQueue.empty() && m_internalQueue.empty()){
 			break;

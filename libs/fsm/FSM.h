@@ -29,6 +29,8 @@ namespace fsm{
 		
 		//开始进入初始化状态
 		void go();
+		//停止运行
+		void termination();
 
 		const std::string getCurrentStateID(void) const;
 

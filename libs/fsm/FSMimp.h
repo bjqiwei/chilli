@@ -28,6 +28,8 @@ namespace fsm{
 
 		//开始进入初始化状态
 		void go();
+		//停止运行
+		void termination();
 		//const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
 
@@ -112,12 +114,8 @@ namespace fsm{
 		mutable std::queue<TriggerEvent> m_internalQueue;
 		std::queue<TriggerEvent> m_externalQueue;
 		std::map<std::string,Json::Value> m_globalVars;
-		bool m_running;
+		volatile bool m_running;
 	public:
-		virtual bool isTerminationEvent(const TriggerEvent & e)const
-		{
-			return e.getEventName() == "stop";
-		};
 		/****************************************************  
 		@describle   应用XML Schema模板文件验证案例文档 
 		@param schema_filename  模式文件  

@@ -54,6 +54,11 @@ void fsm::StateMachine::go()
 	return imp->go();
 }
 
+void fsm::StateMachine::termination()
+{
+	return imp->termination();
+}
+
 void fsm::StateMachine::setSessionID(const std::string &strSessionid)
 {
 	return imp->setSessionID(strSessionid);
