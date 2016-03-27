@@ -4,6 +4,7 @@
 #include "config.h"
 #include <string>
 #include <json/json.h>
+#include <log4cplus/logger.h>
 #include "scxml/TriggerEvent.h"
 #include "scxml/SendInterface.h"
 
@@ -22,7 +23,8 @@ namespace fsm{
 	};
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const string &xml = "", xmlType xtype = xmlType::File);
+		StateMachine(const string &xml, xmlType xtype = xmlType::File);
+		StateMachine(const string &xml, log4cplus::Logger log, xmlType xtype = xmlType::File);
 		virtual ~StateMachine();
 		StateMachine(const StateMachine &other) = delete;
 		StateMachine & operator=(const StateMachine & other) = delete;
@@ -34,7 +36,7 @@ namespace fsm{
 
 		const std::string getCurrentStateID(void) const;
 
-		void setName(const string &strName);
+		//void setName(const string &strName);
 		const std::string& getName() const;
 
 		void setSessionID(const std::string &strSessionid);

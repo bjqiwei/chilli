@@ -21,6 +21,7 @@ namespace fsm{
 	class  StateMachineimp {
 	public:
 		StateMachineimp(const string &xml, int xtype);
+		StateMachineimp(const string &xml, int xtype, log4cplus::Logger log);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;
@@ -33,7 +34,7 @@ namespace fsm{
 		//const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
 
-		void setName(const string &strName);
+		//void setName(const string &strName);
 		const std::string& getName() const;
 
 		void setSessionID(const std::string &strSessionid);

@@ -10,6 +10,11 @@ fsm::StateMachine::StateMachine(const string  &xml, xmlType xtype) :imp(nullptr)
 	imp = new fsm::StateMachineimp(xml, xtype);
 }
 
+fsm::StateMachine::StateMachine(const string &xml, log4cplus::Logger log, xmlType xtype) : imp(nullptr)
+{
+	imp = new fsm::StateMachineimp(xml, xtype, log);
+}
+
 fsm::StateMachine::~StateMachine()
  { 
 	 delete imp;
@@ -25,10 +30,10 @@ void fsm::StateMachine::pushEvent(const TriggerEvent & trigEvent)
 	return imp->pushEvent(trigEvent);
 }
 
-void fsm::StateMachine::setName(const string &strName)
-{
-	return imp->setName(strName);
-}
+//void fsm::StateMachine::setName(const string &strName)
+//{
+//	return imp->setName(strName);
+//}
 
 
 bool fsm::StateMachine::addSendImplement(SendInterface * evtDsp)
