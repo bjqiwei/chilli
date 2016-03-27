@@ -28,7 +28,7 @@ public:
 	virtual int Start() ;
 	virtual int Stop();
 	virtual bool LoadConfig(const std::string & configFile);
-	virtual std::vector<chilli::model::ExtensionPtr> GetExtension();
+	virtual const std::map<std::string, chilli::model::ExtensionPtr> GetExtension();
 
 private:
 
@@ -42,7 +42,7 @@ private:
 	//sanhuid event callback function
 	static int CALLBACK EvtHandler(const PSSM_EVENT const pEvent);
 	static int getDeviceTypeByName(const std::string & strType);
-	static std::string TransferEvtToXmlEvent(PSSM_EVENT pEvent, const std::string & extNum);
+	static std::string TransferEvtToJsonEvent(PSSM_EVENT pEvent, const std::string & extNum);
 	static const char *GetString_EventType ( int nEvent );
 	static const char *GetString_State ( int state );
 	static const char *GetString_PengdingReason(int nReason);

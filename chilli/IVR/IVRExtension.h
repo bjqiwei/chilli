@@ -22,7 +22,7 @@ private:
 	log4cplus::Logger log;
 
 };
-typedef IVRExtension *  IVRExtensionPtr;
+typedef std::shared_ptr<IVRExtension>  IVRExtensionPtr;
 }
 }
 #endif // end ivr extension header

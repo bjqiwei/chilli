@@ -1,5 +1,4 @@
 #include "IVRExtension.h"
-#include <common/xmlHelper.h>
 #include <log4cplus/loggingmacros.h>
 #include <scxml/TriggerEvent.h>
 

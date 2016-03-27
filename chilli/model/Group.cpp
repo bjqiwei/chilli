@@ -8,7 +8,7 @@ namespace chilli
 {
 namespace model{
 	
-	Group::Group():Extension()
+	Group::Group()
 	{
 		log = log4cplus::Logger::getInstance("chilli.model.Group");
 		LOG4CPLUS_TRACE(log,"new a Group object.");

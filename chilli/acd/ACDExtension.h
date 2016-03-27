@@ -9,18 +9,22 @@
 namespace chilli{
 namespace ACD{
 
-class ACDExtension:public model::Extension{
+class ACDExtension :public model::Extension, public fsm::SendInterface{
 public:
-	ACDExtension();
+	ACDExtension(const std::string &ext, const std::string &smFileName, fsm::SMInstance * smInstance);
 	virtual ~ACDExtension();
 
 public:
 	virtual const std::string & getExtensionNumber() const;
 	virtual bool isIdle();
 	virtual void go();
-
-	virtual void fireSend(const std::string &strContent, const void * param);
+	virtual void run();
+	virtual void termination();
+	virtual void setSessionId(const std::string & sessinId);
 	virtual int pushEvent(const std::string &evt);
+
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param);
 
 	//media interface
 	virtual int Answer();
@@ -29,11 +33,12 @@ public:
 
 private:
 	log4cplus::Logger log;
-	fsm::StateMachine  m_SM;
 	std::string m_ExtNumber;
-
+	std::string m_SessionId;
+	fsm::SMInstance *m_smInstance;
+	fsm::StateMachine * m_SM;
 };
-typedef ACDExtension *  ACDExtensionPtr;
+typedef std::shared_ptr<ACDExtension>  ACDExtensionPtr;
 }
 }
 #endif // end ACD extension header

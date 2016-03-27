@@ -31,7 +31,7 @@ private:
 	int ch;
 		
 };
-	typedef ShExtension * ShExtensionPtr;
+typedef std::shared_ptr<ShExtension> ShExtensionPtr;
 }
 }
 #endif //end shextension header

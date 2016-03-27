@@ -2,7 +2,6 @@
 
 #ifndef _CHILLI_HEADER_
 #define _CHILLI_HEADER_
-#include <common/xmlHelper.h>
 
 
 namespace chilli

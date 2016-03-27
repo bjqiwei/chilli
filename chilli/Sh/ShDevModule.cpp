@@ -1,8 +1,8 @@
 #include "ShDevModule.h"
 #include "ShExtension.h"
-#include <common/xmlHelper.h>
 #include <log4cplus/loggingmacros.h>
 #include <thread>
+#include <json/json.h>
 
 namespace chilli{
 namespace ShDev{
@@ -84,9 +84,9 @@ int ShDevModule::Stop()
 }
 
 
-std::vector<chilli::model::ExtensionPtr> ShDevModule::GetExtension()
+const std::map<std::string, chilli::model::ExtensionPtr> ShDevModule::GetExtension()
 {
-	return std::vector <chilli::model::ExtensionPtr>();
+	return std::map <std::string, chilli::model::ExtensionPtr>();
 }
 
 int ShDevModule::getDeviceTypeByName(const std::string & strChType)
@@ -122,49 +122,42 @@ bool ShDevModule::LoadConfig(const std::string & configFile)
 {
 	return false;
 }
-std::string ShDevModule::TransferEvtToXmlEvent(const PSSM_EVENT const pEvent, const std::string & extNum){
+std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT const pEvent, const std::string & extNum){
 	
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 
-	helper::xml::CXmlDocmentHelper xmlHelper;
+	Json::Value jsonEvent;
+
 	std::stringstream ss;
 	ss << pEvent->nReference;
-	xmlHelper.setRootNode("event");
-	xmlHelper.newRootProp("from",ss.str());
-	xmlHelper.newRootProp("dest",extNum);
-	xmlHelper.newRootProp("event",ShDevModule::GetString_EventType(pEvent->wEventCode));
-	ss.str("");
+	jsonEvent["event"] = ShDevModule::GetString_EventType(pEvent->wEventCode);
+	jsonEvent["from"] = ss.str();
+	jsonEvent["dest"] = extNum;
 
 	switch(pEvent->wEventCode)
 	{
 	case E_CHG_RcvDTMF:
 		{
-			std::stringstream ss;
 			char dtmf =(pEvent->dwParam & 0x00FF);
-			ss << dtmf;
-			xmlHelper.addChild("data",ss.str());
+			jsonEvent["data"]  = dtmf;
 		}
 		break;
 
 	case E_CHG_HookState:
 		{
-			std::stringstream ss;
-			ss <<  (pEvent->dwParam); 
-			xmlHelper.addChild("data",ss.str());
+			long reason = pEvent->dwParam;
+			jsonEvent["data"] = reason;
 		}
 		break;
 	case E_CHG_RingCount:
 		{
-			std::stringstream ss;
-			ss <<  (pEvent->dwParam); 
-			xmlHelper.addChild("data",ss.str());
+			long reason = pEvent->dwParam;
+			jsonEvent["data"] = reason;
 		}
 		break;
 	case E_CHG_ChState:
 		{
-			std::stringstream ss;
-			ss <<  ShDevModule::GetString_State(pEvent->dwParam & 0xFFFF); 
-			xmlHelper.addChild("data",ss.str());
+			jsonEvent["data"] = ShDevModule::GetString_State(pEvent->dwParam & 0xFFFF);
 			switch(pEvent->dwParam)
 			{
 			case S_CALL_RINGING:{
@@ -172,32 +165,33 @@ std::string ShDevModule::TransferEvtToXmlEvent(const PSSM_EVENT const pEvent, co
 				/*this->m_CallerId = SsmGetCallerIdA(this->Ch) == NULL ? "":SsmGetCallerIdA(this->Ch);
 				this->m_CalleeId = SsmGetPhoNumStrA(this->Ch) == NULL ? "":SsmGetPhoNumStrA(this->Ch);*/
 				SsmGetCallerId(pEvent->nReference,buf);
-				xmlHelper.addChild("Caller",buf);
+				jsonEvent["Caller"] = buf;
 				SsmGetPhoNumStr(pEvent->nReference,buf);
-				xmlHelper.addChild("Callee", buf);
-				}
-				break;
+				jsonEvent["Callee"] = buf;
+			}
+			break;
 			case S_CALL_STANDBY:
 				break; 
 			case S_CALL_PENDING:
-				xmlHelper.addChild("reason",ShDevModule::GetString_PengdingReason(SsmGetPendingReason(pEvent->nReference)));
+				jsonEvent["reason"]  = ShDevModule::GetString_PengdingReason(SsmGetPendingReason(pEvent->nReference));
 				break;
 			}
 		}
 		break;
 	case E_PROC_PlayEnd:
 		{
-			std::stringstream ss;
-			ss <<  (pEvent->dwParam); 
-			xmlHelper.addChild("data",ss.str());
+			long reason = pEvent->dwParam;
+			jsonEvent["data"] = reason;
 		}
 		break;
 	default:
 		break;
 	}
 	
-	LOG4CPLUS_TRACE(log,"ch=" << pEvent->nReference << ",Recive a event,event=" << xmlHelper.getContent());
-	return xmlHelper.getContent();
+	Json::FastWriter writer;
+	std::string strEvent = writer.write(jsonEvent);
+	LOG4CPLUS_TRACE(log,"ch=" << pEvent->nReference << ",Recive a event,event=" << strEvent);
+	return strEvent;
 }
 
 const char * ShDevModule::GetString_EventType( int nEvent )

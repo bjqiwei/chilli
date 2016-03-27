@@ -3,7 +3,7 @@
 #define _CHILLI_CTI_PROCESS_MODULE_HEADER_
 #include "..\CEventBuffer.h"
 #include "Extension.h"
-#include <vector>
+#include <map>
 
 namespace chilli{
 namespace model{
@@ -21,11 +21,12 @@ public:
 	{
 		m_recEvtBuffer.addData(event);
 	};
-	virtual std::vector<ExtensionPtr>GetExtension() = 0;
+	virtual const std::map<std::string, ExtensionPtr>GetExtension() = 0;
 private:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other);
 	ProcessModule & operator=(const ProcessModule &);
+protected:
 	helper::CEventBuffer<std::string> m_recEvtBuffer;
 };
 }

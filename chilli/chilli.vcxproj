@@ -45,17 +45,17 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
     <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
-    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\ShCti\lib\;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\ShCti\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -63,12 +63,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SHP_A3.lib;libxml2.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SHP_A3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -98,14 +98,14 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SHP_A3.lib;libxml2.lib;mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SHP_A3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -171,6 +171,9 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
   <ItemGroup>
     <ProjectReference Include="..\libs\fsm\msvc12\FSM.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2013\lib_json.vcxproj">
+      <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
