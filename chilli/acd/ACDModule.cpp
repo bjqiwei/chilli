@@ -77,9 +77,9 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 		return false;
 	}
 	if (tinyxml2::XMLElement *eConfig  = config.FirstChildElement("Config")){
-		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("ACDs"))
+		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("ACD"))
 		{
-			for (XMLElement *child = eACD->FirstChildElement("ACD"); child != nullptr; child = child->NextSiblingElement("ACD")){
+			for (XMLElement *child = eACD->FirstChildElement("Extension"); child != nullptr; child = child->NextSiblingElement("Extension")){
 				const char * num = child->Attribute("ExtensionNumber");
 				const char * sm = child->Attribute("StateMachine");
 				if (this->m_Extension.find(num) == this->m_Extension.end())
@@ -94,7 +94,7 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 			}
 		}
 		else {
-			LOG4CPLUS_ERROR(log, "config file missing ACDs element.");
+			LOG4CPLUS_ERROR(log, "config file missing ACD element.");
 			return false;
 		}
 
@@ -182,11 +182,10 @@ void ACDModule::run()
 				{
 					extptr->pushEvent(strEvent);
 					extptr->run();
-				}
-
-				if (eventName == "hangup")
-				{
-					RemoveSession(sessionId);
+					if (eventName == "hangup")
+					{
+						RemoveSession(sessionId);
+					}
 				}
 				else{
 					LOG4CPLUS_ERROR(log, " not find extension by event:" << strEvent);
