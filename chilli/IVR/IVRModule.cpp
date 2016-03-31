@@ -12,7 +12,7 @@ namespace IVR{
 IVRModule::IVRModule(void) :SMInstance(this), bRunning(false)
 {
 	log =log4cplus::Logger::getInstance("chilli.IVRModule");
-	LOG4CPLUS_DEBUG(log,"Constuction a IVR object.");
+	LOG4CPLUS_DEBUG(log,"Constuction a IVR module.");
 }
 
 
@@ -22,12 +22,12 @@ IVRModule::~IVRModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log,"Destruction a IVR object.");
+	LOG4CPLUS_DEBUG(log,"Destruction a IVR module.");
 }
 
 int IVRModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log,"Stop  IVR device");
+	LOG4CPLUS_DEBUG(log,"Stop  IVR module");
 	bRunning = false;
 	for (auto it: m_Extension)
 	{
@@ -47,7 +47,7 @@ int IVRModule::Stop(void)
 
 int IVRModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, "Start  IVR device");
+	LOG4CPLUS_DEBUG(log, "Start  IVR module");
 	while (!bRunning)
 	{
 		bRunning = true;

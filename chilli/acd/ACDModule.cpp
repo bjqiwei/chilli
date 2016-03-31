@@ -12,7 +12,7 @@ namespace ACD{
 ACDModule::ACDModule(void) :SMInstance(this), bRunning(false)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACDModule");
-	LOG4CPLUS_DEBUG(log,"Constuction a ACD object.");
+	LOG4CPLUS_DEBUG(log,"Constuction a ACD module.");
 }
 
 
@@ -22,12 +22,12 @@ ACDModule::~ACDModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log,"Destruction a ACD object.");
+	LOG4CPLUS_DEBUG(log,"Destruction a ACD module.");
 }
 
 int ACDModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log,"Stop  ACD device");
+	LOG4CPLUS_DEBUG(log,"Stop  ACD module");
 	bRunning = false;
 	for (auto it: m_Session)
 	{
@@ -47,7 +47,7 @@ int ACDModule::Stop(void)
 
 int ACDModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, "Start  ACD device");
+	LOG4CPLUS_DEBUG(log, "Start  ACD module");
 	while (!bRunning)
 	{
 		bRunning = true;
