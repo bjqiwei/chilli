@@ -144,6 +144,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="Csemaphore.h" />
     <ClInclude Include="Device\DevModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
+    <ClInclude Include="IVR\IVRModule.h" />
     <ClInclude Include="lock.h" />
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\Group.h" />
@@ -161,6 +162,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
+    <ClCompile Include="IVR\IVRModule.cpp" />
     <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />

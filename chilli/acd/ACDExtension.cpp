@@ -34,6 +34,11 @@ void ACDExtension::setSessionId(const std::string & sessinId)
 	this->m_SessionId = sessinId;
 }
 
+const std::string & ACDExtension::getSessionId()
+{
+	return this->m_SessionId;
+}
+
 void ACDExtension::go()
 {
 	m_SM->setSessionID(m_SessionId);

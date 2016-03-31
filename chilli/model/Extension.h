@@ -19,6 +19,7 @@ public:
 	virtual void termination() = 0;
 	virtual int pushEvent(const std::string &evt) = 0;
 	virtual void setSessionId(const std::string & sessinId) = 0;
+	virtual const std::string & getSessionId() = 0;
 
 //media interface
 	virtual int Answer() = 0;

@@ -102,6 +102,9 @@
     <ClInclude Include="acd\ACDExtension.h">
       <Filter>ACD</Filter>
     </ClInclude>
+    <ClInclude Include="IVR\IVRModule.h">
+      <Filter>IVR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="acd\ACDExtension.cpp">
       <Filter>ACD</Filter>
+    </ClCompile>
+    <ClCompile Include="IVR\IVRModule.cpp">
+      <Filter>IVR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

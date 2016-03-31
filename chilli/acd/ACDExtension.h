@@ -21,6 +21,7 @@ public:
 	virtual void run();
 	virtual void termination();
 	virtual void setSessionId(const std::string & sessinId);
+	virtual const std::string & getSessionId();
 	virtual int pushEvent(const std::string &evt);
 
 	//inherit from SendInterface

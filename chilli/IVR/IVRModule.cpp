@@ -1,35 +1,35 @@
-#include "ACDModule.h"
-#include "ACDExtension.h"
+#include "IVRModule.h"
+#include "IVRExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
 
 
 namespace chilli{
-namespace ACD{
+namespace IVR{
 
 
-ACDModule::ACDModule(void) :SMInstance(this), bRunning(false)
+IVRModule::IVRModule(void) :SMInstance(this), bRunning(false)
 {
-	log =log4cplus::Logger::getInstance("chilli.ACDModule");
-	LOG4CPLUS_DEBUG(log,"Constuction a ACD object.");
+	log =log4cplus::Logger::getInstance("chilli.IVRModule");
+	LOG4CPLUS_DEBUG(log,"Constuction a IVR object.");
 }
 
 
-ACDModule::~ACDModule(void)
+IVRModule::~IVRModule(void)
 {
 	if (bRunning){
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log,"Destruction a ACD object.");
+	LOG4CPLUS_DEBUG(log,"Destruction a IVR object.");
 }
 
-int ACDModule::Stop(void)
+int IVRModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log,"Stop  ACD device");
+	LOG4CPLUS_DEBUG(log,"Stop  IVR device");
 	bRunning = false;
-	for (auto it: m_Session)
+	for (auto it: m_Extension)
 	{
 		it.second->termination();
 	}
@@ -45,22 +45,22 @@ int ACDModule::Stop(void)
 	return result;
 }
 
-int ACDModule::Start()
+int IVRModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, "Start  ACD device");
+	LOG4CPLUS_DEBUG(log, "Start  IVR device");
 	while (!bRunning)
 	{
 		bRunning = true;
 		for (int i = 0; i < 10; i++)
 		{
-			std::shared_ptr<std::thread> th(new std::thread(&ACDModule::run, this));
+			shared_ptr<std::thread> th(new std::thread(&IVRModule::run, this));
 			m_Thread.push_back(th);
 		}
 	}
 	return m_Thread.size();
 }
 
-bool ACDModule::LoadConfig(const std::string & configFile)
+bool IVRModule::LoadConfig(const std::string & configFile)
 {
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument config;
@@ -70,16 +70,16 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 		return false;
 	}
 	if (tinyxml2::XMLElement *eConfig  = config.FirstChildElement("Config")){
-		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("ACD"))
+		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("IVR"))
 		{
 			for (XMLElement *child = eACD->FirstChildElement("Extension"); child != nullptr; child = child->NextSiblingElement("Extension")){
 				const char * num = child->Attribute("ExtensionNumber");
 				const char * sm = child->Attribute("StateMachine");
 				if (this->m_Extension.find(num) == this->m_Extension.end())
 				{
-					model::ExtensionPtr ext(new ACDExtension(num, sm, this));
+					model::ExtensionPtr ext(new IVRExtension(num, sm, this));
 					this->m_Extension[num] = ext;
-					this->m_SMFile[num] = sm;
+					ext->go();
 				}
 				else{
 					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -87,7 +87,7 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 			}
 		}
 		else {
-			LOG4CPLUS_ERROR(log, "config file missing ACD element.");
+			LOG4CPLUS_ERROR(log, "config file missing IVR element.");
 			return false;
 		}
 
@@ -99,42 +99,13 @@ bool ACDModule::LoadConfig(const std::string & configFile)
 	return true;
 }
 
-const std::map<std::string, model::ExtensionPtr> ACDModule::GetExtension()
+const std::map<std::string, model::ExtensionPtr> IVRModule::GetExtension()
 {
 	return m_Extension;
 }
 
-std::shared_ptr<model::Extension> ACDModule::GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext)
-{
-	std::lock_guard<std::mutex> lcx(m_SessionLock);
-	auto it = m_Session.find(sessionid);
-	if (it != m_Session.end())
-	{
-		return it->second;
-	}
-	else{
-		if (eventName == "timer"){
-			LOG4CPLUS_ERROR(log, "timer event session id not find, abandon this event.");
-		}
-		else{
 
-			std::shared_ptr<model::Extension> extPtr(new ACDExtension(ext, this->m_SMFile[ext], this));
-			m_Session.insert(std::make_pair(sessionid, extPtr));
-			extPtr->setSessionId(sessionid);
-			extPtr->go();
-			return extPtr;
-		}
-	}
-	return nullptr;
-}
-
-void ACDModule::RemoveSession(const std::string & sessionId)
-{
-	std::lock_guard<std::mutex> lcx(m_SessionLock);
-	m_Session.erase(sessionId);
-}
-
-void ACDModule::OnTimerExpired(unsigned long timerId, const std::string & attr)
+void IVRModule::OnTimerExpired(unsigned long timerId, const std::string & attr)
 {
 	LOG4CPLUS_DEBUG(log, __FUNCTION__ "," << timerId << ":" << attr);
 	Json::Value jsonEvent;
@@ -142,10 +113,12 @@ void ACDModule::OnTimerExpired(unsigned long timerId, const std::string & attr)
 	std::string sessionId  = attr.substr(0, attr.find_first_of(":"));
 	jsonEvent["sessionid"] = sessionId;
 
+	jsonEvent["extension"] = attr.substr(attr.find_first_of(":") + 1);
+
 	this->PushEvent(jsonEvent.toStyledString());
 }
 
-void ACDModule::run()
+void IVRModule::run()
 {
 	while (bRunning)
 	{
@@ -170,15 +143,13 @@ void ACDModule::run()
 					ext = jsonEvent["extension"].asString();
 				}
 
-				std::shared_ptr<model::Extension> extptr = nullptr;
-				if (extptr = GetSession(sessionId,eventName, ext))
+				auto it = m_Extension.find(ext);
+
+				if (it != m_Extension.end())
 				{
-					extptr->pushEvent(strEvent);
-					extptr->run();
-					if (eventName == "hangup")
-					{
-						RemoveSession(sessionId);
-					}
+					it->second->setSessionId(sessionId);
+					it->second->pushEvent(strEvent);
+					it->second->run();
 				}
 				else{
 					LOG4CPLUS_ERROR(log, " not find extension by event:" << strEvent);

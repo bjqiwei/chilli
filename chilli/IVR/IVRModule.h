@@ -1,23 +1,20 @@
 #pragma once
-#ifndef _CHILLI_ACDMODULE_HEADER_
-#define _CHILLI_ACDMODULE_HEADER_
+#ifndef _CHILLI_IVRMODULE_HEADER_
+#define _CHILLI_IVRMODULE_HEADER_
 #include "../model/ProcessModule.h"
 #include <log4cplus/logger.h>
 #include <scxml/SMInstance.h>
 #include <common/Timer.h>
 #include <thread>
-#include <map>
-#include <mutex>
-#include <memory>
 
 namespace chilli{
-namespace ACD{
+namespace IVR{
 
-class ACDModule :public model::ProcessModule, public fsm::SMInstance, public helper::CTimerNotify
+class IVRModule :public model::ProcessModule, public fsm::SMInstance, public helper::CTimerNotify
 {
 public:
-	ACDModule();
-	virtual ~ACDModule(void);
+	IVRModule();
+	virtual ~IVRModule(void);
 	virtual int Start();
 	virtual int Stop();
 	virtual bool LoadConfig(const std::string & configFile);
@@ -28,15 +25,10 @@ private:
 	log4cplus::Logger log;
 	std::vector<std::shared_ptr<std::thread>> m_Thread;
 	std::map<std::string, model::ExtensionPtr> m_Extension;
-	std::map<std::string, std::string>m_SMFile;
-	std::map<std::string, model::ExtensionPtr> m_Session;
-	std::mutex m_SessionLock;
-	model::ExtensionPtr GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext);
-	void RemoveSession(const std::string & sessionId);
 	std::atomic<bool> bRunning;
 	void run();
 };
 }
 }
-#endif // end acd header
+#endif // end ivr header
 
