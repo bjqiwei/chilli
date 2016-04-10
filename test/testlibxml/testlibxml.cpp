@@ -27,7 +27,7 @@
 #include <libxml/parser.h>
 
 #include <libxml/tree.h>
-#include <WinSock.h>
+#include <WinSock2.h>
 #include<iostream>
 #pragma comment(lib,"ws2_32.lib")
 

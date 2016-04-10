@@ -31,6 +31,9 @@
     <Filter Include="tinyxml2">
       <UniqueIdentifier>{59e57e29-dcb0-4bd6-ae84-2e2b10e033e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Agent">
+      <UniqueIdentifier>{43240dc7-8fc2-4190-b19a-a20c865e7ec9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -105,6 +108,12 @@
     <ClInclude Include="IVR\IVRModule.h">
       <Filter>IVR</Filter>
     </ClInclude>
+    <ClInclude Include="Agent\Agent.h">
+      <Filter>Agent</Filter>
+    </ClInclude>
+    <ClInclude Include="Agent\AgentModule.h">
+      <Filter>Agent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -140,6 +149,12 @@
     <ClCompile Include="IVR\IVRModule.cpp">
       <Filter>IVR</Filter>
     </ClCompile>
+    <ClCompile Include="Agent\Agent.cpp">
+      <Filter>Agent</Filter>
+    </ClCompile>
+    <ClCompile Include="Agent\AgentModule.cpp">
+      <Filter>Agent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="log4cplus.properties">
@@ -151,6 +166,9 @@
       <Filter>Resource Files</Filter>
     </Xml>
     <Xml Include="ACD.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="Agent.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

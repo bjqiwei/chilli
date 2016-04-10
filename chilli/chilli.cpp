@@ -6,8 +6,10 @@
 #include "ServiceModule.h"
 #include "chilli.h"
 #include "signal.h"
-#include "ACD\ACDModule.h"
+#include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
+#include "Agent/AgentModule.h"
+#include "IVR/IVRModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
@@ -16,6 +18,8 @@
 
 chilli::ShDev::ShDevModule _deviceSH;
 chilli::ACD::ACDModule _ACD;
+chilli::IVR::IVRModule _IVR;
+chilli::Agent::AgentModule _Agent;
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -173,9 +177,11 @@ bool chilli::App::LoadConfig(void)
 	bool bResult = true;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	strConfigFile = strFileNameNoExtension+".xml";
+	LOG4CPLUS_INFO(log, "config file: " << strConfigFile);
 	_deviceSH.LoadConfig(strConfigFile);
 	_ACD.LoadConfig(strConfigFile);
-	LOG4CPLUS_INFO(log,"config file: "<< strConfigFile);
+	_IVR.LoadConfig(strConfigFile);
+	_Agent.LoadConfig(strConfigFile);
 	return bResult;
 }
 
@@ -210,6 +216,8 @@ void chilli::App::Start()
 	LoadConfig();
 	_deviceSH.Start();
 	_ACD.Start();
+	_IVR.Start();
+	_Agent.Start();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }
@@ -220,6 +228,8 @@ void chilli::App::Stop()
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	_deviceSH.Stop();
 	_ACD.Stop();
+	_IVR.Stop();
+	_Agent.Stop();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }

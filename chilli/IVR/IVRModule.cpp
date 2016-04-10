@@ -70,9 +70,9 @@ bool IVRModule::LoadConfig(const std::string & configFile)
 		return false;
 	}
 	if (tinyxml2::XMLElement *eConfig  = config.FirstChildElement("Config")){
-		if(tinyxml2::XMLElement *eACD = eConfig->FirstChildElement("IVR"))
+		if(tinyxml2::XMLElement *eIVR = eConfig->FirstChildElement("IVR"))
 		{
-			for (XMLElement *child = eACD->FirstChildElement("Extension"); child != nullptr; child = child->NextSiblingElement("Extension")){
+			for (XMLElement *child = eIVR->FirstChildElement("Extension"); child != nullptr; child = child->NextSiblingElement("Extension")){
 				const char * num = child->Attribute("ExtensionNumber");
 				const char * sm = child->Attribute("StateMachine");
 				if (this->m_Extension.find(num) == this->m_Extension.end())
