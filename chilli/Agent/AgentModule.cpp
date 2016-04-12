@@ -262,6 +262,9 @@ bool AgentModule::listenTCP(int port)const
 
 	if (!base) {
 		LOG4CPLUS_ERROR(log, "Could not initialize libevent!");
+#ifdef WIN32
+		WSACleanup();
+#endif
 		return false;
 	}
 
@@ -277,6 +280,9 @@ bool AgentModule::listenTCP(int port)const
 
 	if (!listener) {
 		LOG4CPLUS_ERROR(log, "Could not create a listener!");
+#ifdef WIN32
+		WSACleanup();
+#endif
 		return false;
 	}
 
@@ -288,7 +294,9 @@ bool AgentModule::listenTCP(int port)const
 
 	evconnlistener_free(listener);
 	event_base_free(base);
+#ifdef WIN32
 	WSACleanup();
+#endif
 	return true;
 }
 }
