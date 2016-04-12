@@ -17,7 +17,7 @@
 namespace chilli{
 namespace Agent{
 
-AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1), m_libeventbase(nullptr)
+AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a Agent module.");
@@ -33,13 +33,6 @@ AgentModule::~AgentModule(void)
 	LOG4CPLUS_DEBUG(log, "Destruction a Agent module.");
 }
 
-static const char MESSAGE[] = "Hello, World!\n";
-
-
-static void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
-static void conn_writecb(struct bufferevent *, void *);
-static void conn_eventcb(struct bufferevent *, short, void *);
-
 int AgentModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log, "Stop  Agent module");
@@ -48,12 +41,6 @@ int AgentModule::Stop(void)
 	for (auto it : m_Agents)
 	{
 		it.second->termination();
-	}
-
-	if (m_libeventbase)
-	{
-		int result = event_base_loopbreak(m_libeventbase);
-		result = 0;
 	}
 
 	int result = m_Thread.size();
@@ -88,54 +75,6 @@ int AgentModule::Start()
 	}
 	return m_Thread.size();
 }
-
-static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd,
-struct sockaddr *sa, int socklen, void *user_data)
-{
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcplistener_cb");
-
-	struct event_base *base = reinterpret_cast<event_base*>(user_data);
-	struct bufferevent *bev;
-
-	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
-	if (!bev) {
-		LOG4CPLUS_ERROR(log, "Error constructing bufferevent!");
-		event_base_loopbreak(base);
-		return;
-	}
-	bufferevent_setcb(bev, NULL, conn_writecb, conn_eventcb, NULL);
-	bufferevent_enable(bev, EV_WRITE);
-	bufferevent_disable(bev, EV_READ);
-
-	bufferevent_write(bev, MESSAGE, strlen(MESSAGE));
-}
-
-static void conn_writecb(struct bufferevent *bev, void *user_data)
-{
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_writecb");
-
-	struct evbuffer *output = bufferevent_get_output(bev);
-	if (evbuffer_get_length(output) == 0) {
-		LOG4CPLUS_DEBUG(log, "flushed answer\n");
-		bufferevent_free(bev);
-	}
-}
-
-static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
-{
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_eventcb");
-
-	if (events & BEV_EVENT_EOF) {
-		LOG4CPLUS_DEBUG(log, "Connection closed.");
-	}
-	else if (events & BEV_EVENT_ERROR) {
-		LOG4CPLUS_ERROR(log, "Got an error on the connection:" << errno );/*XXX win32*/
-	}
-	/* None of the other events can happen here, since we haven't enabled
-	* timeouts */
-	bufferevent_free(bev);
-}
-
 
 bool AgentModule::LoadConfig(const std::string & configFile)
 {
@@ -243,6 +182,71 @@ void AgentModule::run()
 
 }
 
+static const char MESSAGE[] = "Hello, World!\n";
+
+
+static void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
+static void conn_read_cb(struct bufferevent *bev, void *ctx);
+static void conn_writecb(struct bufferevent *, void *);
+static void conn_eventcb(struct bufferevent *, short, void *);
+
+static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *sa, int socklen, void *user_data)
+{
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcplistener_cb");
+
+	struct event_base *base = reinterpret_cast<event_base*>(user_data);
+	struct bufferevent *bev;
+
+	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+	if (!bev) {
+		LOG4CPLUS_ERROR(log, "Error constructing bufferevent!");
+		event_base_loopbreak(base);
+		return;
+	}
+	bufferevent_setcb(bev, conn_read_cb, conn_writecb, conn_eventcb, NULL);
+	bufferevent_enable(bev, EV_WRITE | EV_READ);
+
+	bufferevent_write(bev, MESSAGE, strlen(MESSAGE));
+}
+
+static void conn_read_cb(struct bufferevent *bev, void *ctx)
+{
+	/* 获取bufferevent中的读和写的指针 */
+	/* This callback is invoked when there is data to read on bev. */
+	struct evbuffer *input = bufferevent_get_input(bev);
+	struct evbuffer *output = bufferevent_get_output(bev);
+	/* 把读入的数据全部复制到写内存中 */
+	/* Copy all the data from the input buffer to the output buffer. */
+	evbuffer_add_buffer(output, input);
+}
+
+static void conn_writecb(struct bufferevent *bev, void *user_data)
+{
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_writecb");
+
+	struct evbuffer *output = bufferevent_get_output(bev);
+	if (evbuffer_get_length(output) == 0) {
+		LOG4CPLUS_DEBUG(log, "flushed answer\n");
+		bufferevent_free(bev);
+	}
+}
+
+static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
+{
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_eventcb");
+
+	if (events & BEV_EVENT_EOF) {
+		LOG4CPLUS_DEBUG(log, "Connection closed.");
+	}
+	else if (events & BEV_EVENT_ERROR) {
+		LOG4CPLUS_ERROR(log, "Got an error on the connection:" << errno);/*XXX win32*/
+	}
+	/* None of the other events can happen here, since we haven't enabled
+	* timeouts */
+	bufferevent_free(bev);
+}
+
+
 bool AgentModule::listenTCP(int port)const
 {
 	struct evconnlistener *listener;
@@ -253,8 +257,10 @@ bool AgentModule::listenTCP(int port)const
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
 #endif
 
-	m_libeventbase = event_base_new();
-	if (!m_libeventbase) {
+	struct event_base *base = event_base_new();
+	LOG4CPLUS_INFO(log, __FUNCTION__",libevent method:" <<  event_base_get_method(base));
+
+	if (!base) {
 		LOG4CPLUS_ERROR(log, "Could not initialize libevent!");
 		return false;
 	}
@@ -264,7 +270,7 @@ bool AgentModule::listenTCP(int port)const
 	sin.sin_addr.s_addr = htonl(0);
 	sin.sin_port = htons(port);
 
-	listener = evconnlistener_new_bind(m_libeventbase, listener_cb, (void *)m_libeventbase,
+	listener = evconnlistener_new_bind(base, listener_cb, (void *)base,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
 		(struct sockaddr*)&sin,
 		sizeof(sin));
@@ -274,13 +280,14 @@ bool AgentModule::listenTCP(int port)const
 		return false;
 	}
 
+	
 	while (bRunning)
 	{
-		event_base_dispatch(m_libeventbase);
+		event_base_dispatch(base);
 	}
 
 	evconnlistener_free(listener);
-	event_base_free(m_libeventbase);
+	event_base_free(base);
 	WSACleanup();
 	return true;
 }

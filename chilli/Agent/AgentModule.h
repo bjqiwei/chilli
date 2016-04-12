@@ -31,7 +31,7 @@ private:
 
 	int m_tcpPort;
 	int m_wsPort;
-	mutable struct event_base *m_libeventbase;
+
 	bool listenTCP(int port) const;
 
 };
