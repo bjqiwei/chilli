@@ -3,6 +3,7 @@
 #include <event2/listener.h>
 #include <event2/util.h>
 #include <event2/event.h>
+#include <event2/event_struct.h>
 #include <signal.h>
 
 #pragma comment(lib,"ws2_32.lib")
@@ -17,7 +18,7 @@
 namespace chilli{
 namespace Agent{
 
-AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1)
+AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1), base(nullptr)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a Agent module.");
@@ -182,8 +183,6 @@ void AgentModule::run()
 
 }
 
-static const char MESSAGE[] = "Hello, World!\n";
-
 
 static void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
 static void conn_read_cb(struct bufferevent *bev, void *ctx);
@@ -203,19 +202,21 @@ static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, str
 		event_base_loopbreak(base);
 		return;
 	}
+
 	bufferevent_setcb(bev, conn_read_cb, conn_writecb, conn_eventcb, NULL);
 	bufferevent_enable(bev, EV_WRITE | EV_READ);
+	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
 
-	bufferevent_write(bev, MESSAGE, strlen(MESSAGE));
 }
 
 static void conn_read_cb(struct bufferevent *bev, void *ctx)
 {
-	/* 获取bufferevent中的读和写的指针 */
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_read_cb");
+	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
 	/* This callback is invoked when there is data to read on bev. */
 	struct evbuffer *input = bufferevent_get_input(bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
-	/* 把读入的数据全部复制到写内存中 */
+
 	/* Copy all the data from the input buffer to the output buffer. */
 	evbuffer_add_buffer(output, input);
 }
@@ -224,40 +225,65 @@ static void conn_writecb(struct bufferevent *bev, void *user_data)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_writecb");
 
+	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
-	if (evbuffer_get_length(output) == 0) {
-		LOG4CPLUS_DEBUG(log, "flushed answer\n");
-		bufferevent_free(bev);
-	}
+	
 }
 
 static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_eventcb");
 
-	if (events & BEV_EVENT_EOF) {
-		LOG4CPLUS_DEBUG(log, "Connection closed.");
+	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
+	if (events & BEV_EVENT_ERROR)
+		LOG4CPLUS_DEBUG(log, "Error from bufferevent");
+	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
+		LOG4CPLUS_DEBUG(log, "Connection closed." << bev);
+		bufferevent_free(bev);
 	}
-	else if (events & BEV_EVENT_ERROR) {
-		LOG4CPLUS_ERROR(log, "Got an error on the connection:" << errno);/*XXX win32*/
-	}
-	/* None of the other events can happen here, since we haven't enabled
-	* timeouts */
-	bufferevent_free(bev);
 }
 
+static void timeout_cb(evutil_socket_t fd, short event, void *arg)
+{
+	struct timeval newtime, difference;
+	AgentModule * This = reinterpret_cast<AgentModule*>(arg);
+
+	if (!This->bRunning)
+	{
+		event_base_loopexit(This->base, NULL);
+	}
+
+}
+
+static void accept_error_cb(struct evconnlistener *listener, void *ctx)
+{
+	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpaccept_error_cb");
+
+	struct event_base *base = evconnlistener_get_base(listener);
+	int err = EVUTIL_SOCKET_ERROR();
+	LOG4CPLUS_DEBUG(log, "Got an error" << err << "(" << evutil_socket_error_to_string(err) 
+		<< ") on the listener.Shutting down.");
+
+	event_base_loopexit(base, NULL);
+}
 
 bool AgentModule::listenTCP(int port)const
 {
 	struct evconnlistener *listener;
-
+	struct event timeout;
+	struct timeval tv;
 	struct sockaddr_in sin;
 #ifdef WIN32
 	WSADATA wsa_data;
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
 #endif
 
-	struct event_base *base = event_base_new();
+	const char ** methods = event_get_supported_methods();
+	for (int i = 0; methods[i] != NULL; ++i) {
+		LOG4CPLUS_INFO(log, __FUNCTION__",libevent supported method:" << methods[i]);
+	}
+
+	base = event_base_new();
 	LOG4CPLUS_INFO(log, __FUNCTION__",libevent method:" <<  event_base_get_method(base));
 
 	if (!base) {
@@ -286,7 +312,14 @@ bool AgentModule::listenTCP(int port)const
 		return false;
 	}
 
+	event_assign(&timeout, base, -1, EV_PERSIST, timeout_cb,(void*)this);
+
+	evutil_timerclear(&tv);
+	tv.tv_sec = 1;
+	event_add(&timeout, &tv);
 	
+	LOG4CPLUS_INFO(log, __FUNCTION__",start listen port:" << port);
+
 	while (bRunning)
 	{
 		event_base_dispatch(base);
