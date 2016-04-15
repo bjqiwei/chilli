@@ -56,6 +56,8 @@ endif()
 set(LWS_USE_BUNDLED_ZLIB_DEFAULT OFF)
 if(WIN32)
 	set(LWS_USE_BUNDLED_ZLIB_DEFAULT ON)
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 endif()
 
 option(LWS_WITH_STATIC "Build the static version of the library" ON)

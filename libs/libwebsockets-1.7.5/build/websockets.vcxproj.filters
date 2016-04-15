@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\base64-decode.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\libwebsockets.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\service.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\pollfd.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\output.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\parsers.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\context.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\alloc.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\header.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\client.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\client-handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\client-parser.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\sha-1.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\lws-plat-win.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\server.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\server-handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\extension.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\extension-permessage-deflate.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\private-libwebsockets.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\extension-permessage-deflate.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\lib\libwebsockets.h">
+      <Filter>Headers Public</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\build\lws_config.h">
+      <Filter>Headers Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\qiwei\chilli\libs\libwebsockets-1.7.5\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers Private">
+      <UniqueIdentifier>{8CDF0E68-B24C-3DEE-8E6A-7252F7E81F36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers Public">
+      <UniqueIdentifier>{7F517EE0-C980-3C04-96A0-01E1AD84677C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{A9B195FD-FF09-3FB4-B253-9A71330D2784}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
