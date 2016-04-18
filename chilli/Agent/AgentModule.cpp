@@ -13,6 +13,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
+#include "../websocket/websocket.h"
 
 
 namespace chilli{
@@ -65,6 +66,12 @@ int AgentModule::Start()
 		if (this->m_tcpPort !=-1)
 		{
 			std::shared_ptr<std::thread> th(new std::thread(&AgentModule::listenTCP, this, this->m_tcpPort));
+			m_Thread.push_back(th);
+		}
+
+		if (this->m_wsPort != -1)
+		{
+			std::shared_ptr<std::thread> th(new std::thread(&AgentModule::listenWS, this, this->m_wsPort));
 			m_Thread.push_back(th);
 		}
 
@@ -245,7 +252,7 @@ static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
 
 static void timeout_cb(evutil_socket_t fd, short event, void *arg)
 {
-	struct timeval newtime, difference;
+
 	AgentModule * This = reinterpret_cast<AgentModule*>(arg);
 
 	if (!This->bRunning)
@@ -299,6 +306,8 @@ bool AgentModule::listenTCP(int port)const
 	sin.sin_addr.s_addr = htonl(0);
 	sin.sin_port = htons(port);
 
+	LOG4CPLUS_DEBUG(log, __FUNCTION__",port:" << port);
+
 	listener = evconnlistener_new_bind(base, listener_cb, (void *)base,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
 		(struct sockaddr*)&sin,
@@ -331,6 +340,20 @@ bool AgentModule::listenTCP(int port)const
 	WSACleanup();
 #endif
 	return true;
+}
+
+bool AgentModule::listenWS(int port)const
+{
+	bool result = true;
+	WebSocket::websocketserver wsserver(port);
+	LOG4CPLUS_INFO(log, __FUNCTION__",start listen port:" << port);
+	wsserver.InitInstance();
+
+	while (bRunning){
+		wsserver.Loop(1000);
+	}
+	wsserver.UnInitInstance();
+	return result;
 }
 }
 }

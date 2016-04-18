@@ -6,6 +6,22 @@
 #include <libwebsockets.h>
 
 namespace WebSocket{
+	class websocketserver{
+	public:
+		explicit websocketserver(int port = CONTEXT_PORT_NO_LISTEN);
+		virtual~websocketserver();
+	private:
+		struct lws_context_creation_info info;
+		struct lws_context *context;
+		bool bInit;
+		int m_port;
+		log4cplus::Logger log;
+	public:
+		bool InitInstance();
+		bool UnInitInstance();
+		struct lws_context * GetContext();
+		void Loop(int timeout_ms);
+	};
 
 	typedef enum {
 		CONNECTING	= 0,// 	The connection is not yet open.
@@ -16,7 +32,9 @@ namespace WebSocket{
 	class websocketclient
 	{
 	public:
-		websocketclient(const std::string & ws);
+		explicit websocketclient(const std::string & ws, struct lws_context *ctx);
+		explicit websocketclient(struct lws_context *context);
+		explicit websocketclient(struct lws *);
 		virtual ~websocketclient();
 
 		void Open();
@@ -41,10 +59,10 @@ namespace WebSocket{
 			void *user, void *in, size_t len);
 	private:
 		log4cplus::Logger log;
+		struct lws_context *context;
 		struct lws_client_connect_info con_info;
 		struct lws *wsi;
 		std::string m_url;
-		char m_urlbuff[1024];
 		std::vector<unsigned char> m_sendBuf;
 	};
 }

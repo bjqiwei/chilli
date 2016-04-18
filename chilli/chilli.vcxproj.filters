@@ -34,6 +34,9 @@
     <Filter Include="Agent">
       <UniqueIdentifier>{43240dc7-8fc2-4190-b19a-a20c865e7ec9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="websocket">
+      <UniqueIdentifier>{966d4dc4-729f-4d54-945a-f4b31c140fb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -114,6 +117,9 @@
     <ClInclude Include="Agent\AgentModule.h">
       <Filter>Agent</Filter>
     </ClInclude>
+    <ClInclude Include="websocket\websocket.h">
+      <Filter>websocket</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -154,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="Agent\AgentModule.cpp">
       <Filter>Agent</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\websocket.cpp">
+      <Filter>websocket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

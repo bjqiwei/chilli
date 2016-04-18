@@ -35,6 +35,7 @@ private:
 	int m_wsPort;
 
 	bool listenTCP(int port) const;
+	bool listenWS(int port)const;
 	friend void timeout_cb(evutil_socket_t fd, short event, void *arg);
 
 };

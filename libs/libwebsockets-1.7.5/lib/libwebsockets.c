@@ -1131,6 +1131,12 @@ lws_wsi_user(struct lws *wsi)
 	return wsi->user_space;
 }
 
+LWS_VISIBLE LWS_EXTERN void 
+lws_wsi_set_user(struct lws *wsi, void * userdata)
+{
+	wsi->user_space = userdata;
+}
+
 LWS_VISIBLE LWS_EXTERN void
 lws_close_reason(struct lws *wsi, enum lws_close_status status,
 		 unsigned char *buf, size_t len)

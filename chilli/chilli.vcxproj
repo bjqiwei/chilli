@@ -45,17 +45,17 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(IncludePath)</IncludePath>
     <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
-    <LibraryPath>$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\ShCti\lib\;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -70,6 +70,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SHP_A3.lib;libevent_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -107,6 +108,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>SHP_A3.lib;libevent_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -160,6 +162,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="Sh\shpa3api.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
+    <ClInclude Include="websocket\websocket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="acd\ACDExtension.cpp" />
@@ -175,6 +178,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="Sh\ShDevModule.cpp" />
     <ClCompile Include="Sh\ShExtension.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="websocket\websocket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libs\fsm\msvc12\FSM.vcxproj">
@@ -182,6 +186,9 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     </ProjectReference>
     <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2013\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\libwebsockets-1.7.5\build\websockets.vcxproj">
+      <Project>{30832379-d211-33d7-b072-16fb0791af75}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>

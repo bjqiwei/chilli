@@ -1527,6 +1527,9 @@ lws_context_user(struct lws_context *context);
 LWS_VISIBLE LWS_EXTERN void *
 lws_wsi_user(struct lws *wsi);
 
+LWS_VISIBLE LWS_EXTERN void 
+lws_wsi_set_user(struct lws *wsi, void * userdata);
+
 /*
  * NOTE: These public enums are part of the abi.  If you want to add one,
  * add it at where specified so existing users are unaffected.
