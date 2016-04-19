@@ -122,7 +122,7 @@ namespace WebSocket{
 				int bufLen = wsclient->m_sendBuf.size() - LWS_PRE;
 				if (bufLen > 0)
 				{
-					int len = lws_write(wsi, wsclient->m_sendBuf.data() + LWS_PRE, bufLen, LWS_WRITE_BINARY);
+					int len = lws_write(wsi, wsclient->m_sendBuf.data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 					if (len > 0)
 					{
 						wsclient->m_sendBuf.erase(wsclient->m_sendBuf.begin() + LWS_PRE, wsclient->m_sendBuf.begin() + LWS_PRE + len);
@@ -298,6 +298,7 @@ namespace WebSocket{
 			info.protocols = protocols;
 			info.gid = -1;
 			info.uid = -1;
+			info.timeout_secs = 5;
 			context = lws_create_context(&info);
 			if (context == NULL) {
 				LOG4CPLUS_ERROR(log, "Creating libwebsocket context failed\n");
@@ -436,7 +437,7 @@ namespace WebSocket{
 		if (WSClientSet.find(this) != WSClientSet.end())
 		{
 			lws_callback_on_writable(this->wsi);
-			lws_cancel_service(context);
+			//lws_cancel_service(context);
 		}
 		
 		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end");

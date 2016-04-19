@@ -227,6 +227,7 @@ lws_plat_service_tsi(struct lws_context *context, int timeout_ms, int tsi)
 	}
 
 	pfd->revents = (short)networkevents.lNetworkEvents;
+	lwsl_notice("WSAWaitForMultipleEvents, event:%d,flag:%x, %d\n", pt->events[ev], networkevents.lNetworkEvents, __LINE__);
 
 	if (pfd->revents & LWS_POLLOUT) {
 		wsi = wsi_from_fd(context, pfd->fd);
@@ -395,8 +396,10 @@ lws_plat_insert_socket_into_fds(struct lws_context *context, struct lws *wsi)
 
 	pt->fds[pt->fds_count++].revents = 0;
 	pt->events[pt->fds_count] = WSACreateEvent();
+	lwsl_notice("Socket:%d, CreateEvent:%d,%d\n", wsi->sock,pt->events[pt->fds_count],__LINE__);
 	WSAEventSelect(wsi->sock, pt->events[pt->fds_count],
 		       LWS_POLLIN | LWS_POLLHUP);
+	lwsl_notice("EventSelect Socket:%d, event:%d,flag:%x, %d\n", wsi->sock, pt->events[pt->fds_count], LWS_POLLIN | LWS_POLLHUP, __LINE__);
 }
 
 LWS_VISIBLE void
@@ -427,6 +430,7 @@ lws_plat_change_pollfd(struct lws_context *context,
 	if ((pfd->events & LWS_POLLOUT))
 		networkevents |= LWS_POLLOUT;
 
+	lwsl_notice("EventSelect Socket:%d, event:%d,flag:%x, %d\n", wsi->sock, pt->events[wsi->position_in_fds_table + 1], networkevents, __LINE__);
 	if (WSAEventSelect(wsi->sock,
 			pt->events[wsi->position_in_fds_table + 1],
 					       networkevents) != SOCKET_ERROR)
@@ -584,6 +588,7 @@ lws_plat_init(struct lws_context *context,
 
 		pt->fds_count = 0;
 		pt->events[0] = WSACreateEvent();
+		lwsl_notice("CreateEvent[0]:%d,%d\n", pt->events[0], __LINE__);
 
 		pt++;
 	}
