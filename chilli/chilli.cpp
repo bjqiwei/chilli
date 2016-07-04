@@ -56,7 +56,7 @@ void SignalHandler(int  sig)
 
 
 
-int main2(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	chilli::App::AppInit();
 

@@ -3,7 +3,7 @@
 #include <event2/listener.h>
 #include <event2/util.h>
 #include <event2/event.h>
-#include <event2/event_struct.h>
+#include <event2/thread.h>
 #include <signal.h>
 
 #pragma comment(lib,"ws2_32.lib")
@@ -19,7 +19,7 @@
 namespace chilli{
 namespace Agent{
 
-AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1), base(nullptr)
+AgentModule::AgentModule(void) :SMInstance(this), bRunning(false), m_tcpPort(-1), m_wsPort(-1), m_Base(nullptr)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a Agent module.");
@@ -40,6 +40,7 @@ int AgentModule::Stop(void)
 	LOG4CPLUS_DEBUG(log, "Stop  Agent module");
 
 	bRunning = false;
+	event_base_loopexit(m_Base, nullptr);
 	for (auto it : m_Agents)
 	{
 		it.second->termination();
@@ -203,7 +204,7 @@ static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, str
 	struct event_base *base = reinterpret_cast<event_base*>(user_data);
 	struct bufferevent *bev;
 
-	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 	if (!bev) {
 		LOG4CPLUS_ERROR(log, "Error constructing bufferevent!");
 		event_base_loopbreak(base);
@@ -212,7 +213,7 @@ static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, str
 
 	bufferevent_setcb(bev, conn_read_cb, conn_writecb, conn_eventcb, NULL);
 	bufferevent_enable(bev, EV_WRITE | EV_READ);
-	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
+	LOG4CPLUS_DEBUG(log, "accept client:" << bev);
 
 }
 
@@ -232,7 +233,7 @@ static void conn_writecb(struct bufferevent *bev, void *user_data)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpconn_writecb");
 
-	LOG4CPLUS_DEBUG(log, __FUNCTION__":" << bev);
+	LOG4CPLUS_DEBUG(log, "write:" << bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
 	
 }
@@ -250,39 +251,17 @@ static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
 	}
 }
 
-static void timeout_cb(evutil_socket_t fd, short event, void *arg)
-{
-
-	AgentModule * This = reinterpret_cast<AgentModule*>(arg);
-
-	if (!This->bRunning)
-	{
-		event_base_loopexit(This->base, NULL);
-	}
-
-}
-
-static void accept_error_cb(struct evconnlistener *listener, void *ctx)
-{
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("tcpaccept_error_cb");
-
-	struct event_base *base = evconnlistener_get_base(listener);
-	int err = EVUTIL_SOCKET_ERROR();
-	LOG4CPLUS_DEBUG(log, "Got an error" << err << "(" << evutil_socket_error_to_string(err) 
-		<< ") on the listener.Shutting down.");
-
-	event_base_loopexit(base, NULL);
-}
-
 bool AgentModule::listenTCP(int port)const
 {
-	struct evconnlistener *listener;
-	struct event timeout;
-	struct timeval tv;
 	struct sockaddr_in sin;
+	struct evconnlistener *listener;
+	struct event * timer;
 #ifdef WIN32
+	evthread_use_windows_threads();
 	WSADATA wsa_data;
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
+#else
+	evthread_use_pthreads();
 #endif
 
 	const char ** methods = event_get_supported_methods();
@@ -290,15 +269,12 @@ bool AgentModule::listenTCP(int port)const
 		LOG4CPLUS_INFO(log, __FUNCTION__",libevent supported method:" << methods[i]);
 	}
 
-	base = event_base_new();
-	LOG4CPLUS_INFO(log, __FUNCTION__",libevent method:" <<  event_base_get_method(base));
+	m_Base = event_base_new();
+	LOG4CPLUS_INFO(log, __FUNCTION__",libevent current method:" <<  event_base_get_method(m_Base));
 
-	if (!base) {
+	if (!m_Base) {
 		LOG4CPLUS_ERROR(log, "Could not initialize libevent!");
-#ifdef WIN32
-		WSACleanup();
-#endif
-		return false;
+		goto done;
 	}
 
 	memset(&sin, 0, sizeof(sin));
@@ -306,36 +282,33 @@ bool AgentModule::listenTCP(int port)const
 	sin.sin_addr.s_addr = htonl(0);
 	sin.sin_port = htons(port);
 
-	LOG4CPLUS_DEBUG(log, __FUNCTION__",port:" << port);
-
-	listener = evconnlistener_new_bind(base, listener_cb, (void *)base,
-		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
+	listener = evconnlistener_new_bind(m_Base, listener_cb, m_Base,
+		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_THREADSAFE, -1,
 		(struct sockaddr*)&sin,
 		sizeof(sin));
 
 	if (!listener) {
 		LOG4CPLUS_ERROR(log, "Could not create a listener!");
-#ifdef WIN32
-		WSACleanup();
-#endif
-		return false;
+		goto done;
 	}
 
-	event_assign(&timeout, base, -1, EV_PERSIST, timeout_cb,(void*)this);
+	LOG4CPLUS_INFO(log, __FUNCTION__",start listen tcp port:" << port);
 
-	evutil_timerclear(&tv);
-	tv.tv_sec = 1;
-	event_add(&timeout, &tv);
+	while (bRunning){
+		event_base_dispatch(m_Base);
+	}
+
+done:
+	if (listener){
+		evconnlistener_free(listener);
+		listener = nullptr;
+	}
 	
-	LOG4CPLUS_INFO(log, __FUNCTION__",start listen port:" << port);
-
-	while (bRunning)
-	{
-		event_base_dispatch(base);
+	if (m_Base){
+		event_base_free(m_Base);
+		m_Base = nullptr;
 	}
-
-	evconnlistener_free(listener);
-	event_base_free(base);
+	
 #ifdef WIN32
 	WSACleanup();
 #endif

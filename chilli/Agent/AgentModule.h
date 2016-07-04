@@ -7,7 +7,6 @@
 #include <common/Timer.h>
 #include <thread>
 #include <map>
-#include <event2/util.h>
 
 namespace chilli{
 namespace Agent{
@@ -30,13 +29,12 @@ private:
 	std::atomic<bool> bRunning;
 	void run();
 
-	mutable struct event_base *base;
+	mutable struct event_base * m_Base;
 	int m_tcpPort;
 	int m_wsPort;
 
 	bool listenTCP(int port) const;
 	bool listenWS(int port)const;
-	friend void timeout_cb(evutil_socket_t fd, short event, void *arg);
 
 };
 }
