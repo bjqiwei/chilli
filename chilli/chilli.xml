@@ -67,4 +67,6 @@
         <Extension>5010</Extension>
     </group>
     </groups>
+	<FreeSwitch host="127.0.0.1" port ="8021" password="ClueCon">
+	</FreeSwitch>
 </Config>

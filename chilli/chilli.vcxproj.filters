@@ -123,6 +123,9 @@
     <ClInclude Include="websocket\websocket.h">
       <Filter>websocket</Filter>
     </ClInclude>
+    <ClInclude Include="freeswitch\FreeSwitchModule.h">
+      <Filter>freeswitch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">

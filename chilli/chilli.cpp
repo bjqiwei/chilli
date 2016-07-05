@@ -9,10 +9,12 @@
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
+#include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
+#include "tinyxml2/tinyxml2.h"
 
 
 
@@ -154,9 +156,10 @@ int main(int argc, char* argv[])
 	int nExitCode = 0;
 	return nExitCode;
 }
-std::string chilli::App::strConfigFile;
+
 std::string chilli::App::strFileDir;
 std::string chilli::App::strFileNameNoExtension;
+std::vector<chilli::model::ProcessModulePtr> chilli::App::m_Modules;
 
 
 void chilli::App::AppInit(void)
@@ -172,16 +175,47 @@ void chilli::App::AppInit(void)
 }
 
 
-bool chilli::App::LoadConfig(void)
+bool chilli::App::LoadConfig(const std::string & strConfigFile)
 {
 	bool bResult = true;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	strConfigFile = strFileNameNoExtension+".xml";
 	LOG4CPLUS_INFO(log, "config file: " << strConfigFile);
 	_deviceSH.LoadConfig(strConfigFile);
 	_ACD.LoadConfig(strConfigFile);
 	_IVR.LoadConfig(strConfigFile);
 	_Agent.LoadConfig(strConfigFile);
+
+	using namespace tinyxml2;
+	tinyxml2::XMLDocument config;
+	if (config.LoadFile(strConfigFile.c_str()) != XMLError::XML_SUCCESS)
+	{
+		LOG4CPLUS_ERROR(log, "load config file error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		return false;
+	}
+	if (tinyxml2::XMLElement *eConfig = config.FirstChildElement("Config")){
+		tinyxml2::XMLElement * e = eConfig->FirstChildElement();
+		while( e != nullptr)
+		{
+#define  FREESWITCHNODE "FreeSwitch"
+			std::string nodeName = e->Value() ? e->Value() : "";
+			if (nodeName == FREESWITCHNODE){
+				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule());
+				XMLPrinter printer;
+				e->Accept(&printer);
+				freeswtich->LoadConfig(printer.CStr());
+				m_Modules.push_back(freeswtich);
+			}
+		
+			e = e->NextSiblingElement();
+		}
+#undef FREESWITCHNODE
+
+	}
+	else {
+		LOG4CPLUS_ERROR(log, "config file missing Config element.");
+		return false;
+	}
+
 	return bResult;
 }
 
@@ -196,7 +230,8 @@ void ConsoleLoop()
 			break;
 		}
 		else if (strCmd == "loadconfig"){
-			chilli::App::LoadConfig();
+			//std::string strConfigFile = chilli::App::strFileNameNoExtension + ".xml";
+			//chilli::App::LoadConfig(strConfigFile);
 		}
 		else{
 			LOG4CPLUS_WARN(log,"Unrecognized command:" <<strCmd);
@@ -213,11 +248,15 @@ void chilli::App::Start()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	LoadConfig();
+	std::string strConfigFile = strFileNameNoExtension + ".xml";
+	LoadConfig(strConfigFile);
 	_deviceSH.Start();
 	_ACD.Start();
 	_IVR.Start();
 	_Agent.Start();
+	for (auto it:m_Modules){
+		it->Start();
+	}
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }
@@ -230,6 +269,10 @@ void chilli::App::Stop()
 	_ACD.Stop();
 	_IVR.Stop();
 	_Agent.Stop();
+	for (auto it : m_Modules){
+		it->Stop();
+	}
+	m_Modules.clear();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }

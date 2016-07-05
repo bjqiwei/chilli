@@ -29,6 +29,7 @@ private:
 protected:
 	helper::CEventBuffer<std::string> m_recEvtBuffer;
 };
+typedef std::shared_ptr<model::ProcessModule> ProcessModulePtr;
 }
 }
 #endif //end process module header

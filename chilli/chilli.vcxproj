@@ -149,6 +149,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Csemaphore.h" />
     <ClInclude Include="Device\DevModule.h" />
+    <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
     <ClInclude Include="lock.h" />
