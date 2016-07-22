@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
@@ -52,7 +52,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -121,7 +121,7 @@ xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll 
     <ProjectReference Include="..\..\libs\fsm\msvc12\FSM.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
+    <ProjectReference Include="..\..\libs\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>

@@ -49,13 +49,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>$(ProjectDir)\..\..\log4cplus-1.1.2\include\;$(ProjectDir)\..\..\libxml2-2.7.7\include;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\include\;$(ProjectDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\log4cplus-1.2.0\include\;$(ProjectDir)\..\..\libxml2-2.7.7\include;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\include\;$(ProjectDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(ProjectDir)\..\..\log4cplus-1.1.2\include\;$(ProjectDir)\..\..\libxml2-2.7.7\include;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\include\;$(ProjectDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\log4cplus-1.2.0\include\;$(ProjectDir)\..\..\libxml2-2.7.7\include;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\include\;$(ProjectDir)\..\..\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\libxml2-2.7.7\$(PlatformName)\bin.msvc\;$(ProjectDir)\..\..\js-1.8.5\js\src\dist\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -158,7 +158,7 @@
     <ProjectReference Include="..\..\jsoncpp-src-0.5.0\makefiles\vs2013\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
+    <ProjectReference Include="..\..\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>

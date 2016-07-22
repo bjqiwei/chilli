@@ -45,7 +45,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
     <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
     <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
@@ -54,7 +54,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.1.2\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -195,7 +195,7 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ProjectReference Include="..\libs\libwebsockets-1.7.5\build\websockets.vcxproj">
       <Project>{30832379-d211-33d7-b072-16fb0791af75}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
+    <ProjectReference Include="..\libs\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>

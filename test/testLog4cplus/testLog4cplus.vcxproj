@@ -73,10 +73,10 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\include\;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\libs\log4cplus-1.2.0\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\libs\log4cplus-1.2.0\msvc10\Win32\bin.$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)D</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,7 +108,7 @@
       <OutputFile>$(IntDir)appender_test.bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>::xcopy /Y $(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\log4cplus*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>::xcopy /Y $(SolutionDir)\libs\log4cplus-1.2.0\msvc10\Win32\bin.$(Configuration)\log4cplus*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -173,7 +173,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>::xcopy /Y $(SolutionDir)\libs\log4cplus-1.1.2\msvc10\Win32\bin.$(Configuration)\log4cplus*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>::xcopy /Y $(SolutionDir)\libs\log4cplus-1.2.0\msvc10\Win32\bin.$(Configuration)\log4cplus*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -216,7 +216,7 @@
     <ClCompile Include="testlog4cplus.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\log4cplus-1.1.2\msvc12\log4cplus.vcxproj">
+    <ProjectReference Include="..\..\libs\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>
