@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\lib\base64-decode.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\libwebsockets.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\service.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\pollfd.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\output.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\parsers.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\context.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\alloc.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\header.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\client.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\client-handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\client-parser.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\sha-1.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\lws-plat-win.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\server.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\server-handshake.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\extension.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\lib\extension-permessage-deflate.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\win32port\win32helpers\gettimeofday.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\lib\private-libwebsockets.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include=".\lib\extension-permessage-deflate.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include=".\win32port\win32helpers\gettimeofday.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include=".\lib\libwebsockets.h">
+      <Filter>Headers Public</Filter>
+    </ClInclude>
+    <ClInclude Include=".\lws_config.h">
+      <Filter>Headers Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers Private">
+      <UniqueIdentifier>{199CE322-6EF4-3A9A-B7BA-BC2E506EFC77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers Public">
+      <UniqueIdentifier>{0B97E949-593D-3170-8750-867352CD8289}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{F9D3C082-FE83-36CD-B381-DE90BFE91556}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

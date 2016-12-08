@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server-http.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server-dumb-increment.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server-mirror.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server-status.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\test-server\test-server-echogen.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\win32port\win32helpers\getopt.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\win32port\win32helpers\getopt_long.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\win32port\win32helpers\gettimeofday.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\win32port\win32helpers\getopt.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\win32port\win32helpers\gettimeofday.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\cloopen\CC\CCSforAvaya\libs\libwebsockets-2.1.0\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers Private">
+      <UniqueIdentifier>{199CE322-6EF4-3A9A-B7BA-BC2E506EFC77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{F9D3C082-FE83-36CD-B381-DE90BFE91556}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
