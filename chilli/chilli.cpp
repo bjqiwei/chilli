@@ -197,7 +197,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 		while( e != nullptr)
 		{
 #define  FREESWITCHNODE "FreeSwitch"
-			std::string nodeName = e->Value() ? e->Value() : "";
+			std::string nodeName = e->Name() ? e->Name() : "";
 			if (nodeName == FREESWITCHNODE){
 				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule());
 				XMLPrinter printer;

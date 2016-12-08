@@ -28,7 +28,7 @@ FreeSwtichModule::~FreeSwtichModule(void)
 
 int FreeSwtichModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log, "Stop  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
 	bRunning = false;
 
 	int result = m_Thread.size();
@@ -44,13 +44,13 @@ int FreeSwtichModule::Stop(void)
 
 int FreeSwtichModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, "Start  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "Start...  FreeSwitch module");
 	while (!bRunning)
 	{
 		bRunning = true;
 		for (int i = 0; i < 1; i++)
 		{
-			std::shared_ptr<std::thread> th(new std::thread(&FreeSwtichModule::Listen, this));
+			std::shared_ptr<std::thread> th(new std::thread(&FreeSwtichModule::ConnectFS, this));
 			m_Thread.push_back(th);
 		}
 	}
@@ -92,33 +92,40 @@ void FreeSwtichModule::OnTimerExpired(unsigned long timerId, const std::string &
 	this->PushEvent(jsonEvent.toStyledString());
 }
 
-void FreeSwtichModule::Listen()
+void FreeSwtichModule::ConnectFS()
 {
+	LOG4CPLUS_DEBUG(log, "Run  FreeSwitch module");
 	while (bRunning)
 	{
 		esl_handle_t handle = { { 0 } };
 
-		esl_status_t status = esl_connect_timeout(&handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),30*1000);
+		esl_status_t status = esl_connect_timeout(&handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),10*1000);
 
 		if (!handle.connected){
 			LOG4CPLUS_ERROR(log, "connect freeswitch error");
+			continue;
 		}
 
-		esl_send_recv(&handle, "api status\n\n");
+		LOG4CPLUS_INFO(log, "Connected to FreeSWITCH");
+		esl_events(&handle, ESL_EVENT_TYPE_JSON, "all");
+		LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
 
-		while (esl_recv(&handle) != ESL_FAIL){
-			if (handle.last_sr_event && handle.last_sr_event->body) {
-				LOG4CPLUS_DEBUG(log, handle.last_sr_event->body);
+		while (bRunning){
+			esl_status_t status = esl_recv_timed(&handle, 1000);
+			if (status == ESL_SUCCESS){
+				if (handle.last_event && handle.last_event->body) {
+					LOG4CPLUS_DEBUG(log, handle.last_event->body);
+				}
 			}
-			else {
-				// this is unlikely to happen with api or bgapi (which is hardcoded above) but prefix but may be true for other commands
-				LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
-			}
+			else if (status == ESL_BREAK)
+				continue;
+			else
+				break;
 		}
 
 		esl_disconnect(&handle);
 	}
-
+	LOG4CPLUS_DEBUG(log, "Stoped  FreeSwitch module");
 }
 }
 }

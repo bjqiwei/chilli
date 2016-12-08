@@ -30,7 +30,7 @@ namespace FreeSwitch{
 		int m_Port;
 		std::string m_User;
 		std::string m_Password;
-		void Listen();
+		void ConnectFS();
 	};
 
 }
