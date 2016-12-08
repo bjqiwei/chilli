@@ -2509,6 +2509,7 @@ fi
 ## Main body of script. ##
 ## -------------------- ##
 
+CPPFLAGS=-std=gnu++0x
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16134,7 +16135,7 @@ if test "${enable_shared+set}" = set; then :
       ;;
     esac
 else
-  enable_shared=yes
+  enable_shared=no
 fi
 
 
