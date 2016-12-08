@@ -189,8 +189,8 @@ InternalLoggingEvent::setLoggingEvent (const log4cplus::tstring & logger,
         function.clear ();
 
     line = fline;
-    threadCached = false;
-    thread2Cached = false;
+    //threadCached = false;
+    //thread2Cached = false;
     ndcCached = false;
     mdcCached = false;
 }
