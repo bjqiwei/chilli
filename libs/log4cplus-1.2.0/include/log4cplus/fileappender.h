@@ -302,13 +302,14 @@ namespace log4cplus
      *
      * </dl>
      */
-    class LOG4CPLUS_EXPORT DailyRollingFileAppender : public FileAppender {
+    class LOG4CPLUS_EXPORT DailyRollingFileAppender : public FileAppenderBase {
     public:
       // Ctors
         DailyRollingFileAppender(const log4cplus::tstring& filename,
                                  std::ios_base::openmode mode = std::ios_base::trunc,
                                  DailyRollingFileSchedule schedule = DAILY,
                                  bool immediateFlush = true,
+								 long maxFileSize = 10 * 1024 * 1024, // 10 MB
                                  int maxBackupIndex = 10,
                                  bool createDirs = false,
                                  bool rollOnClose = true,
@@ -324,6 +325,7 @@ namespace log4cplus
     protected:
         virtual void append(const spi::InternalLoggingEvent& event);
         void rollover(bool alreadyLocked = false);
+		int getRolloverPeriodDuration() const;
         log4cplus::helpers::Time calculateNextRolloverTime(const log4cplus::helpers::Time& t) const;
         log4cplus::tstring getFilename(const log4cplus::helpers::Time& t) const;
 
@@ -331,6 +333,7 @@ namespace log4cplus
         DailyRollingFileSchedule schedule;
         log4cplus::tstring scheduledFilename;
         log4cplus::helpers::Time nextRolloverTime;
+		long maxFileSize;
         int maxBackupIndex;
         bool rollOnClose;
         log4cplus::tstring datePattern;
