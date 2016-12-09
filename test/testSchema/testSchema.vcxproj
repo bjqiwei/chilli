@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -12,22 +12,22 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79889EE7-9228-4629-A943-CC5363B03E73}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
     <RootNamespace>testSchema</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -44,15 +44,13 @@
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)D</TargetName>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.9.3\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\libxml2-2.7.7\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\libxml2-2.9.3\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -67,12 +65,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y scm.xsd "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y scm.xsd $(OutDir)
+xcopy /Y StateMachine.xml $(OutDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,12 +88,10 @@ xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"<
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y scm.xsd "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y scm.xsd $(OutDir)
+xcopy /Y StateMachine.xml $(OutDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -110,6 +104,11 @@ xcopy /Y StateMachine.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"<
   </ItemGroup>
   <ItemGroup>
     <Xsd Include="scm.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\libxml2-2.9.3\win32\VC14\libxml2.vcxproj">
+      <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
