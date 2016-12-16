@@ -4,7 +4,7 @@ namespace fsm{
 namespace model{
 	void OnEntry::execute(fsm::Context * ctx)
 	{
-		if (node == NULL) return;
+		if (m_node == NULL) return;
 
 		/*for (xmlNodePtr exeNode = _node->children ; exeNode !=  NULL; exeNode = exeNode->next)
 		{

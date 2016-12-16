@@ -1,8 +1,6 @@
 #include "Event.h"
 #include "../../common/xmlHelper.h"
-#ifdef WIN32
 #include <regex>
-#endif
 
 namespace fsm
 {
@@ -12,7 +10,7 @@ namespace model
 	Event::Event(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session,filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Event");
-		m_strEvent = helper::xml::getXmlNodeAttributesValue(node,"event");
+		m_strEvent = helper::xml::getXmlNodeAttributesValue(m_node,"event");
 	}
 
 	const std::string &Event::getEvent()
@@ -49,15 +47,11 @@ namespace model
 		if (m_strEvent.empty()) {
 
 		} else {
-#ifdef USEDREGEX
 			std::regex regPattern(m_strEvent);
 			if (!std::regex_match(strEventName,regPattern))
 			{
 				return false;
 			}
-#else
-			return strEventName.find(m_strEvent) != std::string::npos;
-#endif
 		}
 		return true;
 	}

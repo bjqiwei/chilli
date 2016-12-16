@@ -2,22 +2,16 @@
 #define _COMMON_TIMER_HEADER_
 #include <queue>
 #include <sys/timeb.h>
-#include "lock.h"
-#include "Csemaphore.h"
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include <atomic>
 
 #ifndef INFINITE
 #define  INFINITE  (0x7fffffffffffffff)
 #endif
 
 //thread data Including thread handle and thread id
-struct thread_data {
-	HANDLE thread_hnd;
-#ifdef WIN32 
-	unsigned thread_id;
-#else
-	pthread_t thread_id;
-#endif
-};
 
 namespace helper{
 
@@ -25,18 +19,18 @@ namespace helper{
 	class CTimerNotify
 	{
 	public:
-		virtual void OnTimerExpired(unsigned long timerId, const std::string & attr) = 0;
+		virtual void OnTimerExpired(unsigned long timerId, const std::string & attr, void * userdata) = 0;
 	};
 
 	// 定时器
-	class FSM_EXPORT TimerServer{
+	class TimerServer{
 	private:
 		//定时器对象。
 		class  Timer{
 		public:
 			//生成一个定时器对象，时间间隔，定时器id，
-			Timer( unsigned long timerId, unsigned long interval, const std::string & attr):
-			  m_nTimerId(timerId),m_interval(interval),m_attr(attr)
+			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, void * userdata) :
+				m_nTimerId(timerId), m_interval(interval), m_attr(attr), m_userdata(userdata)
 			  {
 				  ftime(&m_startTime);
 			  }
@@ -50,11 +44,13 @@ namespace helper{
 			  };
 			unsigned long getTimerId(){return m_nTimerId;};
 			const std::string & getAttr(){ return m_attr;};
+			void * getUserData() { return m_userdata; };
 		private:
 			const unsigned long m_nTimerId;
 			const std::string m_attr;
 			const unsigned long m_interval;
 			struct timeb m_startTime;
+			void * m_userdata;
 			Timer & operator=( const Timer & ) = delete;
 		};
 		class TimerComp{
@@ -69,31 +65,34 @@ namespace helper{
 		//定时器队列
 		typedef std::priority_queue<Timer *,std::vector<Timer *>, TimerComp> TIMER_QUEUE;
 		TIMER_QUEUE m_timer; 
-		struct thread_data td;
-		helper::CLock m_timerLock;
-		helper::CSemaphore m_semaphore;
+
+		std::mutex m_mtx;
+		std::atomic_bool m_Running = false;
+		std::condition_variable m_cv;
+		std::thread m_thread;
 		CTimerNotify* m_Observer;
 	public:
 		TimerServer(CTimerNotify* observer): m_Observer(observer){
-			StartTimerThread();
+			
 		}
 
+		void Start()
+		{
+			m_Running = true;
+			this->m_thread = std::thread(&TimerServer::run, this);
+		}
+
+		void Stop() {
+			m_Running = false;
+			if (m_thread.joinable()) {
+				m_cv.notify_one();
+				m_thread.join();
+			}
+		}
 		virtual ~TimerServer(){
-#ifdef WIN32
-			TerminateThread(td.thread_hnd,0);
-#else
-			pthread_cancel(td.thread_id);
-			pthread_join(td.thread_id, NULL);
-#endif
+			Stop();
 		}
 	private:
-		void StartTimerThread(){
-#ifdef WIN32
-			td.thread_hnd = (HANDLE)_beginthreadex(NULL,0,TimerThreadProc,this,0,&td.thread_id);
-#else
-			td.thread_hnd = pthread_create(&td.thread_id,NULL,(void*(*)(void*))TimerThreadProc,this);
-#endif
-		}
 
 		unsigned long GenerateTimerID()
 		{
@@ -104,72 +103,56 @@ namespace helper{
 			return index;
 		}
 
-#ifdef WIN32
-		static unsigned int __stdcall TimerThreadProc( void *pParam ){
-#else
-		static void *  TimerThreadProc( void *pParam ){
-#endif
-			TimerServer * This = static_cast<TimerServer *>(pParam);
+		void run(){
 			time_t millisec = INFINITE;
-#ifndef WIN32
-			pthread_setcanceltype(PTHREAD_CANCEL_ENABLE,NULL);
-			pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
-#endif
 
-			while(1)
+			while(m_Running)
 			{
-				bool wResult = This->m_semaphore.Wait(millisec);
+				std::unique_lock<std::mutex> lck(m_mtx);
 
-				if (!wResult)
-				{
-					This->m_timerLock.Lock();
-					while(!This->m_timer.empty()){
-						Timer * timer = This->m_timer.top();
+				std::cv_status stauts = this->m_cv.wait_for(lck, std::chrono::milliseconds(millisec));
 
-						millisec = This->m_timer.top()->getInterval();
+				if (stauts == std::cv_status::timeout) {
+					while (!this->m_timer.empty()) {
+						Timer * timer = this->m_timer.top();
+
+						millisec = this->m_timer.top()->getInterval();
 						//LOG4CPLUS_DEBUG(log,"timer event . interval=" << millisec );
-						if (millisec > 0){
+						if (millisec > 0) {
 							break;
 						}
 
-						This->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr());
-						
-						This->m_timer.pop();
+						this->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+
+						this->m_timer.pop();
 						delete timer;
 					}
-					This->m_timerLock.Unlock();
 				}
-				else{
-			
-					This->m_timerLock.Lock();
-					if (!This->m_timer.empty())
-					{
-						millisec = This->m_timer.top()->getInterval();
-					}else{
+				else {
+					if (!this->m_timer.empty()){
+						millisec = this->m_timer.top()->getInterval();
+					}
+					else {
 						millisec = INFINITE;
 					}
-					This->m_timerLock.Unlock();
 				}
-
 			}
-		return NULL;
 		}
 
 	public:
-		unsigned long SetTimer(unsigned long delay, const std::string & attr){
+		unsigned long SetTimer(unsigned long delay, const std::string & attr, void * userdata){
 
 			unsigned long timerId = GenerateTimerID();
-			Timer * _timer = new Timer(timerId, delay,attr);
-			this->m_timerLock.Lock();
+			Timer * _timer = new Timer(timerId, delay, attr, userdata);
+			std::unique_lock<std::mutex> lck(m_mtx);
 			m_timer.push(_timer);
-			this->m_timerLock.Unlock();
-			m_semaphore.Post();
+			m_cv.notify_one();
 			return timerId;
 		}
 
 		void RemoveTimer(unsigned long timerID){
 
-			helper::AutoLock auLock(&m_timerLock);
+			std::unique_lock<std::mutex> lck(m_mtx);
 			TIMER_QUEUE temp;
 			m_timer.swap(temp);
 			while(!temp.empty()){
@@ -179,9 +162,9 @@ namespace helper{
 					m_timer.push(timer);
 				}
 			}
-			m_semaphore.Post();
+			m_cv.notify_one();
 		}
-
 	};
+
 }//end namespace helper
 #endif//end timer header

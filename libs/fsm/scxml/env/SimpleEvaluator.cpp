@@ -1,4 +1,5 @@
 #include "SimpleEvaluator.h"
+#include "SimpleContext.h"
 
 
 namespace fsm
@@ -13,34 +14,30 @@ namespace env
 	{
 	}
 	SimpleEvaluator::~SimpleEvaluator(){
-		while(!contexts.empty())
+		while(!m_contexts.empty())
 		{
-			delete contexts.front();
-			contexts.pop_front();
+			delete m_contexts.front();
+			m_contexts.pop_front();
 		}
 	}
 
 
-	Context * SimpleEvaluator::newContext(Context *const parent)
+	Context * SimpleEvaluator::newContext(const std::string &sessionid, Context *const parent)
 	{
 		Context * cx = new SimpleContext(parent);
-		contexts.push_back(cx);
+		m_contexts.push_back(cx);
 		return cx;
 	}
 
 	void SimpleEvaluator::deleteContext(Context * const cx){
-		contexts.remove(cx);
+		m_contexts.remove(cx);
 		delete cx;
 	}
 
 	bool SimpleEvaluator::hasContext()
 	{
-		return true;
+		return !m_contexts.empty();
 	}
 
-	env::SimpleContext  *getEffectiveContext(env::SimpleContext *const nodeCtx)
-	{
-		return NULL;
-	}
 }
 }

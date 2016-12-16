@@ -1,14 +1,14 @@
 #ifndef _INTERPRETERIMP_HEADER_
 #define _INTERPRETERIMP_HEADER_
 #include "common/xmlHelper.h"
+#include "common/CEventBuffer.h"
 #include <string>
 #include <map>
+#include <queue>
 #include <log4cplus/logger.h>
 #include "scxml/TriggerEvent.h"
 #include "scxml/SendInterface.h"
-#include "scxml/SMInstance.h"
 #include "scxml/model/Transition.h"
-#include "common/lock.h"
 
 
 using namespace std;
@@ -17,11 +17,12 @@ using namespace std;
 namespace fsm{
 
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
-
+	class Context;
 	class  StateMachineimp {
-	public:
-		StateMachineimp(const string &xml, int xtype);
-		StateMachineimp(const string &xml, int xtype, log4cplus::Logger log);
+		friend class StateMachine;
+		friend class MyTimer;
+	protected:
+		StateMachineimp(const std::string &sessionid, const string &xml, int xtype);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;
@@ -44,28 +45,37 @@ namespace fsm{
 		Json::Value getVar(const std::string &name) const;
 
 		bool addSendImplement( SendInterface * evtDsp);
-		void setscInstance(SMInstance *);
 		void setLog(log4cplus::Logger log);
 
 		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
-	protected:
+	private:
 		std::string m_strStateFile;
-		helper::xml::CXmlDocumentPtr m_xmlDocPtr;
+		std::string m_strStateContent;
+		uint32_t m_xmlType = 0;
+		helper::xml::CXmlDocumentPtr m_xmlDocPtr = nullptr;
+		helper::xml::CXPathContextPtr xpathCtx = nullptr;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
-		xmlNodePtr  m_initState;
-		mutable xmlNodePtr m_currentStateNode;
-		xmlNodePtr m_rootNode;
+		xmlNodePtr  m_initState = nullptr;
+		xmlNodePtr m_currentStateNode = nullptr;
+		xmlNodePtr m_rootNode = nullptr;
+		Context *  m_Context = nullptr;
 		std::string m_strSessionID;
 		std::string m_strName;
-		log4cplus::Logger  log;
-		helper::xml::CXPathContextPtr xpathCtx;
 
+	private:
+		TriggerEvent m_currentEvt;
+
+		std::atomic_bool m_Running = false;
+		std::queue<TriggerEvent> m_internalQueue;
+		helper::CEventBuffer<TriggerEvent> m_externalQueue;
+		std::map<std::string, Json::Value> m_globalVars;
+		std::map<std::string, SendInterface *> m_mapSendObject;
+		log4cplus::Logger  log;
 	private:
 		//加载状态机
 		bool Init(void);
 		void normalize(const xmlNodePtr &rootNode);
-		void reset();
 		//将文件解析成xml文档。
 		bool parse();
 
@@ -99,23 +109,10 @@ namespace fsm{
 		void enterStates(const xmlNodePtr &stateNode) const;
 		void exitStates() const;
 
-		Context  *  getRootContext() const; 
+		Context * getRootContext() const; 
 		xmlNodePtr getState(const string& stateId) const;
 		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
-		xmlNodePtr getTargetStates(const xmlNodePtr &transition) const;
-	private:
-		std::map<std::string, SendInterface *> m_mapSendObject;
-		SMInstance * m_scInstance;
-		mutable helper::CLock m_lock;
-	protected:
-		mutable TriggerEvent m_currentEvt;
-	private:
-		int m_xmlType;
-		std::string m_strStateContent;
-		mutable std::queue<TriggerEvent> m_internalQueue;
-		std::queue<TriggerEvent> m_externalQueue;
-		std::map<std::string,Json::Value> m_globalVars;
-		volatile bool m_running;
+
 	public:
 		/****************************************************  
 		@describle   应用XML Schema模板文件验证案例文档 

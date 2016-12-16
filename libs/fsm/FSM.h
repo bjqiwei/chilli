@@ -15,7 +15,6 @@ using namespace std;
 namespace fsm{
 
 	class StateMachineimp;
-	class SMInstance;
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
 	enum xmlType{
 		File,
@@ -23,8 +22,7 @@ namespace fsm{
 	};
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const string &xml, xmlType xtype = xmlType::File);
-		StateMachine(const string &xml, log4cplus::Logger log, xmlType xtype = xmlType::File);
+		StateMachine(const std::string &sessionid, const string &xml, xmlType xtype = xmlType::File);
 		virtual ~StateMachine();
 		StateMachine(const StateMachine &other) = delete;
 		StateMachine & operator=(const StateMachine & other) = delete;
@@ -46,7 +44,6 @@ namespace fsm{
 		Json::Value getVar(const std::string &name) const;
 
 		bool addSendImplement( SendInterface * evtDsp);
-		void setscInstance(SMInstance *);
 
 		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();

@@ -8,7 +8,7 @@ namespace env
 {
 
 
-	SimpleContext::SimpleContext(Context * const parent):Context(NULL,parent)
+	SimpleContext::SimpleContext(Context * const parent):Context(nullptr,parent)
 	{
 		InitializeInstanceFields();
 		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
@@ -30,9 +30,6 @@ namespace env
 	{
 	}
 
-	void SimpleContext::Reset()
-	{
-	}
 
 	Context *SimpleContext::getParent()
 	{
@@ -45,18 +42,14 @@ namespace env
 	{
 		log = log4cplus::Logger::getInstance("SimpleContext");
 	}
-	bool SimpleContext::CompileScript(const std::string &script,const std::string &filename, unsigned int line,const void *xmlNode)
-	{
-		LOG4CPLUS_ERROR(log, "CompileScript is not implement.");
-		return true;
-	}
 
-	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line,const void *xmlNode)
+
+	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 		return "";
 	}
 
-	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line,const void *xmlNode)
+	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 		return true;
 	}
@@ -66,8 +59,5 @@ namespace env
 
 	}
 
-	void SimpleContext::SetContextPrivate(void *data){
-
-	}
 }
 }

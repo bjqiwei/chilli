@@ -1,7 +1,5 @@
 #include "FSMimp.h"
-#include <string>
-#include <ObjBase.h>
-#include <cstdio>
+#include "scxml/env/JSEvaluator.h"
 #include "scxml/model/Script.h"
 #include "scxml/model/Event.h"
 #include "scxml/model/Script.h"
@@ -13,9 +11,9 @@
 #include "scxml/model/Log.h"
 #include "scxml/model/Raise.h"
 #include "scxml/model/Sleep.h"
-#include <stdexcept>
 #include <log4cplus/loggingmacros.h>
 #include "common/stringHelper.h"
+#include "common/Timer.h"
 
 
 using namespace std;
@@ -24,30 +22,52 @@ enum xmlType{
 	File,
 	Memory,
 };
-
-fsm::StateMachineimp::StateMachineimp(const string  &xml, int xtype) :m_xmlDocPtr(NULL), m_initState(NULL)
-	,m_currentStateNode(NULL),m_rootNode(NULL),xpathCtx(NULL),m_scInstance(NULL)
-	,m_xmlType(xtype),m_running(false)
-{
-
-	log = log4cplus::Logger::getInstance("fsm.StateMachine");
-	if (m_xmlType == File)
-	{
-		m_strStateFile = xml;
-	}else{
-		m_strStateContent = xml;
-	}
-	
-	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." << this );
-
+namespace fsm {
+	static std::atomic_ulong g_StateMachineReferce = 0;
+	static Evaluator * g_Evaluator = nullptr;
+	static std::map<StateMachineimp*, StateMachineimp*>g_StateMachines;
+	static std::mutex g_StateMtx;
 }
 
-fsm::StateMachineimp::StateMachineimp(const string  &xml, int xtype, log4cplus::Logger log) :m_xmlDocPtr(NULL), m_initState(NULL)
-, m_currentStateNode(NULL), m_rootNode(NULL), xpathCtx(NULL), m_scInstance(NULL)
-, m_xmlType(xtype), m_running(false)
-{
+namespace fsm {
+	class MyTimer : public helper::CTimerNotify {
+	public:
+		MyTimer(){
+			this->log = log4cplus::Logger::getInstance("fsm.TServer");
+		}
 
-	this->log = log;
+		void OnTimerExpired(unsigned long timerId, const std::string & attr, void * userdata) override
+		{
+			StateMachineimp * stateMachine = reinterpret_cast<StateMachineimp*>(userdata);
+			
+			std::unique_lock<std::mutex> lck(g_StateMtx);
+			if (g_StateMachines.find(stateMachine) != g_StateMachines.end())
+			{
+				TriggerEvent evt;
+				evt.setEventName("timer");
+				Json::Value jsonAttr;
+				Json::Reader jsonReader;
+				if (jsonReader.parse(attr, jsonAttr)) {
+					for (auto & it : jsonAttr.getMemberNames()) {
+						evt.addVars(it, jsonAttr[it]);
+					}
+				}
+				stateMachine->pushEvent(evt);
+			}
+		}
+	private:
+		log4cplus::Logger log;
+	};
+
+	static MyTimer * g_myTimer = nullptr;
+	static helper::TimerServer * g_TimerServer  = nullptr;
+}
+
+fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype) 
+	:m_xmlType(xtype),m_strSessionID(sessionid)
+{
+	log = log4cplus::Logger::getInstance("fsm.StateMachine");
+
 	if (m_xmlType == File)
 	{
 		m_strStateFile = xml;
@@ -56,7 +76,17 @@ fsm::StateMachineimp::StateMachineimp(const string  &xml, int xtype, log4cplus::
 		m_strStateContent = xml;
 	}
 
+	if (g_StateMachineReferce.fetch_add(1) == 0) {
+		g_Evaluator = new fsm::env::JSEvaluator();
+
+		g_myTimer = new MyTimer();
+		g_TimerServer = new helper::TimerServer(g_myTimer);
+		g_TimerServer->Start();
+	}
+
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." << this);
+	std::unique_lock<std::mutex> lck(g_StateMtx);
+	g_StateMachines.insert(std::make_pair(this, this));
 
 }
 
@@ -64,37 +94,28 @@ fsm::StateMachineimp::~StateMachineimp()
  { 
 	 //if (_ctxt) xmlClearParserCtxt(_ctxt);
 	 //_ctxt = NULL;
-	 this->reset();
-	 LOG4CPLUS_DEBUG(log, m_strSessionID << ",destruction a smscxml object." << this);
+	std::unique_lock<std::mutex> lck(g_StateMtx);
+	g_StateMachines.erase(this);
 
- }
+	if (g_StateMachineReferce.fetch_sub(1) == 1) {
+		delete g_Evaluator;
+		g_Evaluator = nullptr;
 
+		g_TimerServer->Stop();
+		delete g_TimerServer;
+		g_TimerServer = nullptr;
 
-void fsm::StateMachineimp::reset()
-{ 
-	//if (_ctxt) xmlClearParserCtxt(_ctxt);
-	//_ctxt = NULL;
-	std::map<std::string,Json::Value>::const_iterator it = m_globalVars.begin();
-	while (it != m_globalVars.end())
-	{
-		if (getRootContext())
-		{
-			getRootContext()->deleteVar("_"+it->first);
-		}
-		m_globalVars.erase(it++);
+		delete g_myTimer;
+		g_myTimer = nullptr;
 	}
-	if(m_scInstance)m_scInstance->removeContext(m_rootNode);
-	LOG4CPLUS_DEBUG(log, m_strSessionID << ",reset a smscxml object.");
-
-}
-
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ",destruction a smscxml object." << this);
+ }
 
 bool fsm::StateMachineimp::Init(void)
 {
 	using namespace helper::xml;
 	if (parse()) {
 
-		if (m_rootNode && m_scInstance) m_scInstance->removeContext(m_rootNode);
 
 		xmlNodePtr rootNode =  xmlDocGetRootElement(m_xmlDocPtr._xDocPtr);
 		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
@@ -219,7 +240,7 @@ inline bool fsm::StateMachineimp::isSleep(const xmlNodePtr &xNode)
 
 void fsm::StateMachineimp::pushEvent(const TriggerEvent & trigEvent)
 {
-	m_externalQueue.push(trigEvent);
+	m_externalQueue.Put(trigEvent);
 }
 
 
@@ -373,8 +394,11 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
-	//LOG4CPLUS_DEBUG(log,m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
-	if(m_scInstance)m_scInstance->SetTimer(timer.getInterval(), this->m_strSessionID + ":" + timer.getId());
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
+	Json::Value vars;
+	vars["sessionId"] = this->m_strSessionID;
+	vars["timerId"] = timer.getId();
+	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), const_cast<StateMachineimp *>(this));
 
 	return true;
 }
@@ -416,7 +440,7 @@ bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 		_raiseEvent.setEventName(raise.getEvent());
 		_raiseEvent.setParam(this);
 		LOG4CPLUS_TRACE(log, m_strSessionID << ", Raise a event:" << _raiseEvent.ToString());
-		m_internalQueue.push(_raiseEvent);
+		const_cast<StateMachineimp*>(this)->m_internalQueue.push(_raiseEvent);
 		return true;
 	}
 
@@ -473,7 +497,7 @@ void fsm::StateMachineimp::enterStates(const xmlNodePtr &stateNode) const
 {
 	if(isState(stateNode))
 	{
-		m_currentStateNode = stateNode;
+		const_cast<StateMachineimp*>(this)->m_currentStateNode = stateNode;
 		LOG4CPLUS_DEBUG(log, m_strSessionID << ", enter state:" << getCurrentStateID());
 		for (xmlNodePtr  entryNode = stateNode->children; entryNode != NULL; entryNode = entryNode->next)
 		{
@@ -608,8 +632,10 @@ xmlNodePtr fsm::StateMachineimp::getState(const string& stateId) const
 }
 bool fsm::StateMachineimp::addSendImplement(SendInterface * evtDsp)
 {
-	if (m_mapSendObject.count(evtDsp->getTarget())) return false;
+	if (m_mapSendObject.count(evtDsp->getTarget())) 
+		return false;
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ",addSendImplement:" << evtDsp->getTarget());
 	return true;
 }
 const std::string & fsm::StateMachineimp::getName() const {
@@ -622,16 +648,12 @@ const std::string & fsm::StateMachineimp::getSessionId()const {
 
 
 fsm::Context  *  fsm::StateMachineimp::getRootContext() const{
-	if(m_scInstance)
-		return this->m_scInstance->getContext(m_rootNode);
-	return NULL;
+	if (m_Context == nullptr)
+		const_cast<StateMachineimp*>(this)->m_Context = g_Evaluator->newContext(m_strSessionID, nullptr);
+
+	return m_Context;
 }
 
-void fsm::StateMachineimp::setscInstance(SMInstance * scIns)
-{
-	m_scInstance = scIns;
-	LOG4CPLUS_DEBUG(log, m_strSessionID << ",set statemachine scInstance=" << m_scInstance);
-}
 void fsm::StateMachineimp::setLog(log4cplus::Logger log)
 {
 	this->log = log;
@@ -644,7 +666,7 @@ void fsm::StateMachineimp::go()
 		if (ctx)
 		{
 			/*创建JsContext私有数据指针*/
-			ctx->SetContextPrivate(this);
+			//ctx->SetContextPrivate(this);
 			ctx->setVar("_name", getName());
 			ctx->setVar("_sessionid", getSessionId());
 		}
@@ -652,29 +674,34 @@ void fsm::StateMachineimp::go()
 		{
 			for (xmlNodePtr childNode = m_rootNode->children; childNode != NULL; childNode = childNode->next)
 			{
-				if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("datamodel")))
+				if (childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("datamodel")))
 				{
 					model::Datamodel datamodel(childNode, m_strSessionID, m_strStateFile);
 					datamodel.execute(this->getRootContext());
 
 				}
-				else if (m_scInstance && childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("scriptmodel")))
+				else if (childNode->type == XML_ELEMENT_NODE && xmlStrEqual(childNode->name, BAD_CAST("scriptmodel")))
 				{
 					model::Scriptmodel scriptmodel(childNode, m_strSessionID, m_strStateFile);
 					scriptmodel.execute(this->getRootContext());
 				}
 			}
 		}
-		m_running = true;
+		m_Running = true;
 		LOG4CPLUS_INFO(log, m_strSessionID << ",go");
 		enterStates(this->m_initState);
+	}
+	else{
+		throw std::exception("Error: unable init statemachine.");
 	}
 }
 
 void fsm::StateMachineimp::termination()
 {
 	LOG4CPLUS_INFO(log, m_strSessionID << ",termination");
-	m_running = false;
+	m_Running = false;
+	TriggerEvent trigEvent;
+	pushEvent(trigEvent);
 }
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
 {
@@ -684,66 +711,52 @@ void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
 
 void fsm::StateMachineimp::mainEventLoop()
 {
-	using namespace helper::xml;
-	helper::AutoLock autolock(&this->m_lock);
 
 	//外部事件队列循环
-	while(m_running){
+	while(m_Running){
 
 		//如果外部事件队列不为空，执行一个外部事件
 		TriggerEvent trigEvent;
-		if(!m_externalQueue.empty()){
-			trigEvent = m_externalQueue.front();
-			m_externalQueue.pop();
+		if(m_externalQueue.Get(trigEvent) && !trigEvent.getEventName().empty()){
 			processEvent(trigEvent);
 		}
 
 		//内部事件队列循环
 		LOG4CPLUS_TRACE(log, m_strSessionID << ", Internal Event Queue size:" << m_internalQueue.size());
-		if(m_running && !m_internalQueue.empty())
+		if(m_Running && !m_internalQueue.empty())
 		{
 			std::queue<TriggerEvent> excQueue;
 			// 拷贝现在内部事件队列中的事件到执行队列中
-			while(!m_internalQueue.empty()) 
-			{
-				excQueue.push(m_internalQueue.front());
-				m_internalQueue.pop();
-			}
+			excQueue.swap(m_internalQueue);
+
 			//执行当前执行队列
-			while (m_running && !excQueue.empty()){
+			while (m_Running && !excQueue.empty()){
 				TriggerEvent inEvent = excQueue.front();
 				excQueue.pop();
 				processEvent(inEvent);
 			}
 		}
-
-		//如果外部队列和内部队列都为空，退出外部事件队列循环
-		if (m_externalQueue.empty() && m_internalQueue.empty()){
-			break;
-		}
-
 	}
-	
+	g_Evaluator->deleteContext(m_Context);
+	m_Context = nullptr;
 }
 
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 {
 	using namespace helper::xml;
 	if (getRootContext()){
-		for(std::map<std::string ,std::string >::const_iterator it = m_currentEvt.getVars().begin();
-			it != m_currentEvt.getVars().end();++it)
+		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->deleteVar("_" + it->first,fsm::eventOjbect);
+			getRootContext()->deleteVar("_" + it.first,fsm::eventOjbect);
 		}
 		m_currentEvt = event;
 
 		getRootContext()->setVar("_name", m_currentEvt.getEventName(), fsm::eventOjbect);
 		getRootContext()->setVar("_type", m_currentEvt.getMsgType(),fsm::eventOjbect);
 		getRootContext()->setVar("_data", m_currentEvt.getData(), fsm::eventOjbect);
-		for(std::map<std::string ,std::string >::const_iterator it = m_currentEvt.getVars().begin();
-			it != m_currentEvt.getVars().end();++it)
+		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->setVar("_" + it->first,it->second, fsm::eventOjbect);
+			getRootContext()->setVar("_" + it.first, it.second, fsm::eventOjbect);
 		}
 	}else
 	{

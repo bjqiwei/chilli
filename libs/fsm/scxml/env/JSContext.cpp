@@ -1,463 +1,396 @@
 #include "JSContext.h"
-#include <sstream>
-#include <log4cplus/loggingmacros.h>
-#include <jsdbgapi.h>
+#include <js/Initialization.h>
+#include <mozilla/Maybe.h>
+#include <jswrapper.h>
+#include <js/Conversions.h>
 #include <jsperf.h>
 #include "../../common/stringHelper.h"
+#include <log4cplus/loggingmacros.h>
 
 
 namespace fsm
 {
 namespace env
 {
+	static std::atomic_ulong g_JSContextReferce = 0;
+#if defined(DEBUG)
+	static const size_t gMaxStackSize = 2 * 128 * sizeof(size_t) * 1024;
+#else
+	static const size_t gMaxStackSize = 128 * sizeof(size_t) * 1024;
+#endif
 
-	//global class
-	JSClass JsContext::global_class = { 
-		"global",JSCLASS_NEW_RESOLVE | JSCLASS_GLOBAL_FLAGS ,
-		JS_PropertyStub,JS_PropertyStub,
-		JS_PropertyStub,JS_StrictPropertyStub,
-		JS_EnumerateStub,JS_ResolveStub,
-		JS_ConvertStub,JS_FinalizeStub,
-		JSCLASS_NO_OPTIONAL_MEMBERS
-	};
+	static const size_t gMaxHeapSize = JS::DefaultHeapMaxBytes;
+	static const size_t gStackChunkSize = 8192;
 
-	/*定义_event类*/
-	JSClass JsContext::_eventClass = {
-		"_event",JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE | JSCLASS_HAS_PRIVATE,
-		JS_PropertyStub,JS_PropertyStub,
-		JS_PropertyStub, JS_StrictPropertyStub,
-		JS_EnumerateStub,JS_ResolveStub,
-		JS_ConvertStub,JS_FinalizeStub,
-		JSCLASS_NO_OPTIONAL_MEMBERS
-	};
+	static void reportError(::JSContext *cx, const char *message, JSErrorReport *report);
 
-	static JSBool logging(JSContext *cx,unsigned int argc, jsval *vp){ 
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsContex.Log");
-		uintN i;
-
-		std::stringstream ss;
-		//::JS::CallArgs args = CallArgsFromVp(argc, vp);
-		jsval *argv = JS_ARGV(cx,vp);
-		for (i = 0; i < argc; i++) {
-			ToString toString(cx, argv[i]);
-			ss << (i ? " " : "") << toString.getBytes();
-		}
-
-		LOG4CPLUS_DEBUG(log,ss.str());
-		JS_SET_RVAL(cx, vp, JSVAL_VOID);
-		return JS_TRUE; 
-	}
-
-
-	unsigned long JsContext::StackChunkSize = 8*1024;
-	size_t JsContext::gMaxStackSize = DEFAULT_MAX_STACK_SIZE;
-	size_t JsContext::gScriptStackQuota = JS_DEFAULT_SCRIPT_STACK_QUOTA;
-	
-
-	JsContext::JsContext(::JSRuntime * rt,Evaluator * eval,Context * _parent):Context(eval,_parent),
-		JSrt(rt),ctx(NULL),global(NULL)
+	JsContext::JsContext(const std::string &sessionid, Evaluator * eval,Context * _parent)
+		:m_strSessionID(sessionid),Context(eval,_parent)
 	{
 		log =  log4cplus::Logger::getInstance("fsm.JsContext");
-		LOG4CPLUS_DEBUG(log,  "new a fsm.env.JsContext object:" << this << " parent:" << parent);
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
+		if (g_JSContextReferce.fetch_add(1) == 0) {
+			if (!JS_Init()) {
+				LOG4CPLUS_ERROR(log, m_strSessionID << ",JS_Init error.");
+				throw std::exception("JS_Init error.");
+			}
+		}
 		InitializeInstanceFields();
-		LOG4CPLUS_DEBUG(log, "new a fsm.env.JsContext object finish.");
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object finish.");
 	}
 
 	void JsContext::setVar(const std::string & name, const Json::Value & value, ValueContext va )
 	{
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
-		jsval val = JsonValueToJsval(value);
-		JSObject * obj = (va==fsm::globalObject ? this->global:this->event);
+		JSAutoRequest ar(this->m_jsctx);
+		
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
 
-		std::string out2 = value.toStyledString();
-		helper::string::trim(out2);
-		LOG4CPLUS_TRACE(log, "set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out2);
-		if (!JS_DefineProperty(ctx,obj,name.c_str(), val, NULL,NULL, JSPROP_READONLY | JSPROP_ENUMERATE | JSPROP_PERMANENT)){
-			LOG4CPLUS_WARN(log,"define global property " << name << " failed.");
+		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value));
+
+		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global:this->m_event));
+
+		std::string out = value.toStyledString();
+		helper::string::trim(out);
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
+
+		if (!JS_DefineProperty(m_jsctx, obj, name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
+			LOG4CPLUS_WARN(log, m_strSessionID << ",define " << (va == fsm::globalObject ? "global." : "_event.") << " property " << name << " failed.");
 		}
+
 	}
 
 	Json::Value JsContext::getVar(const std::string &name, ValueContext va)
 	{
-		jsval rval; 
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
+		JS::RootedValue rval(this->m_jsctx);
+		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global : this->m_event));
 
-		JSBool status;
-		JSObject * obj = (va==fsm::globalObject ? this->global:this->event);
-		status = JS_EvaluateScript(ctx,obj , name.c_str(), name.length(), NULL, 0, &rval); 
-		if (status == JS_TRUE ){ 
-			return JsvalToJsonValue(rval);
-			
+		bool has = false;
+		if (JS_AlreadyHasOwnProperty(m_jsctx, obj, name.c_str(), &has) && has) {
+			bool status = JS_GetProperty(m_jsctx, obj, name.c_str(), &rval);
+			if (status == true) {
+				return JsvalToJsonValue(rval);
+
+			}
 		}
 		return Json::Value();
 	}
+
 	void JsContext::deleteVar(const std::string & name, ValueContext va)
 	{
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
-		JSObject * obj = (va==fsm::globalObject ? this->global:this->event);
-		LOG4CPLUS_TRACE(log, "delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
-		JS_DefineProperty(ctx,obj,name.c_str(), JSVAL_NULL, NULL,NULL, JSPROP_ENUMERATE );
-		if(!JS_DeleteProperty(ctx, obj, name.c_str())){
-			LOG4CPLUS_ERROR(log," delete Var failed.");
+		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+
+		JS::RootedObject obj (this->m_jsctx, (va==fsm::globalObject ? this->m_global:this->m_event));
+
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
+
+		if(!JS_DeleteProperty(m_jsctx, obj, name.c_str())){
+			LOG4CPLUS_ERROR(log, m_strSessionID << ", delete " << (va == fsm::globalObject ? "global." : "_event.") << "Var failed.");
 		}
 	
 	}
 
-	void JsContext::Reset()
-	{
-		//LOG4CPLUS_DEBUG(log, "reset ");
 
-		//js_GetClassObject(ctx,)
-
-		/*jsval * rootedVal = (jsval *) JS_GetPrivate(ctx, event);
-		if (rootedVal) {
-			JS_RemoveValueRoot(ctx, rootedVal);
-			JS_SetPrivate(ctx, event, NULL);
-			delete[] rootedVal;
-		}*/
-
-		std::map<const void*,void*>::iterator it;
-		while((it = mapObjectRoot.begin())!= mapObjectRoot.end())
-		{
-			JSObject ** jsObj = (JSObject **)it->second;
-			JS_RemoveObjectRoot(ctx, jsObj);  /* scriptObj becomes unreachable
-                                             and will eventually be collected. */
-			delete jsObj;
-			mapObjectRoot.erase(it);
-		}
-		
-		JS_SetContextPrivate(ctx, NULL);
-
-		JS_MaybeGC(ctx);
-	}
-
-
-	
 	Context *JsContext::getParent()
 	{
-		LOG4CPLUS_DEBUG(log, "getParent:" << parent);
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",getParent:" << parent);
 		return parent;
 	}
 
 
-	std::string JsContext::eval(const std::string &expr,const std::string &filename, unsigned int line,const void *xmlNode)
+	std::string JsContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 		//JS_DumpNamedRoots(JS_GetRuntime(ctx), JsGlobal::dumpRoot, NULL);
 		
+		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
 
-		jsval rval; 
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
+		JS::CompileOptions options(this->m_jsctx);
+		options.setFileAndLine(filename.c_str(), line);
 
-		JSBool status;
-		JSObject * scriptObj = getScriptObject(expr,filename,line,xmlNode);
-		if (scriptObj == NULL)
-		{
-			status = JS_EvaluateScript(ctx,global , expr.c_str(), expr.length(), filename.c_str(), line, &rval); 
-		}else{
-			status = JS_ExecuteScript(ctx,global ,scriptObj , &rval); 
+		JS::RootedValue rv(this->m_jsctx);
+		if (JS::Evaluate(this->m_jsctx, options, expr.c_str(), expr.length(), &rv)) {
+			JSString *str = JS::ToString(this->m_jsctx,rv);
+			if (str) {
+				JSAutoByteString bytes(this->m_jsctx, str);
+				if (bytes.ptr()){
+					return bytes.ptr();
+				}
+			}
 		}
-
-		std::stringstream ss;
-
-		if (status == JS_TRUE && !JSVAL_IS_VOID(rval) && !JSVAL_IS_NULL(rval)){ 
-				
-			fsm::env::ToString valueString(ctx,rval);
-			ss << valueString.getBytes();
-			
-		}
-		//JS_RemoveValueRoot(jsctx->ctx,&rval);
-		//JS_MaybeGC(ctx);
-		return ss.str();
-
+		return std::string();
 	}
 
-	bool JsContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line,const void *xmlNode)
+	bool JsContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 
-		jsval rval; 
-		JSBool status;
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
+		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
 
-		JSObject * scriptObj = getScriptObject(expr,filename,line,xmlNode);
-		if (scriptObj == NULL)
-		{
-			status = JS_EvaluateScript(ctx,global , expr.c_str(), expr.length(), filename.c_str(), line, &rval); 
-		}else{
-			status = JS_ExecuteScript(ctx,global ,scriptObj , &rval); 
+		JS::CompileOptions options(this->m_jsctx);
+		options.setFileAndLine(filename.c_str(), line);
+
+		JS::RootedValue rv(this->m_jsctx);
+		if (JS::Evaluate(this->m_jsctx, options, expr.c_str(), expr.length(), &rv)) {
+			return JS::ToBoolean(rv);
 		}
-			
-		//JS_MaybeGC(ctx);
-		//JSString *jsstr =NULL;
-		if (status == JS_TRUE && JSVAL_IS_BOOLEAN(rval)){ 
-			return JSVAL_TO_BOOLEAN(rval) == JS_TRUE;
-		} 
-
+		
 		return false;
 	}
 
-	void JsContext::InitializeInstanceFields()
+	void JsContext::ExecuteFile(const std::string &fileName)
 	{
-		ctx = JS_NewContext(JSrt,StackChunkSize);
-		if (ctx == NULL){
-			LOG4CPLUS_ERROR(log,"JS_NewContext error.");
+		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+
+		JS::CompileOptions options(this->m_jsctx);
+
+		JS::RootedValue rv(this->m_jsctx);
+		if (JS::Evaluate(this->m_jsctx, options,fileName.c_str(), &rv)) {
 			return ;
 		}
-		JS_SetErrorReporter(ctx, reportError);
-		JS_SetVersion(ctx, JSVERSION_LATEST);
-
-		//JS_SetNativeStackQuota(ctx, gMaxStackSize);
-		//JS_SetScriptStackQuota(ctx, gScriptStackQuota);
-		//JS_SetOperationCallback(ctx, ShellOperationCallback);
-		//JS_ToggleOptions(ctx, JSOPTION_JIT);
-		//JS_ToggleOptions(ctx, JSOPTION_METHODJIT);
-
-		JS_SetOptions(ctx,JSOPTION_VAROBJFIX);
-		//LOG4CPLUS_DEBUG(log, "set JSContext options:JSOPTION_VAROBJFIX" );
-
-		//JS_SetGCParameterForThread(ctx, JSGC_MAX_CODE_CACHE_BYTES, 16 * 1024 * 1024);
-
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-
-		this->global = JS_NewCompartmentAndGlobalObject(this->ctx, &global_class,NULL);
-		//this->global = JS_NewGlobalObject(this->ctx,&JsGlobal::global_class);
-		if (global == NULL){
-			LOG4CPLUS_ERROR(log, "JS_NewCompartmentAndGlobalObject error.");
-			return ;
-		}
-
-		
-		//RootedObject glob(this->ctx,global);
-
-		JSAutoEnterCompartment ac ;
-		if (ac.enter(ctx, global)){
-			LOG4CPLUS_TRACE(log," new the  JSAutoCompartment ok." );
-		}else{
-			LOG4CPLUS_ERROR(log, " new the  JSAutoCompartment failed." );
-			return;
-		}
-
-		JS_SetGlobalObject(this->ctx, global);
-
-		if (!JS_InitStandardClasses(this->ctx, global))
-		{
-			LOG4CPLUS_ERROR(log, "JS_InitStandardClasses error.");
-			return ;
-		}else{
-			LOG4CPLUS_TRACE(log, "JS_InitStandardClasses ok.");
-		}
-
-		
-		if (!JS::RegisterPerfMeasurement(ctx, global))
-			return ;
-
-		JS_DefineFunction(ctx,global,"logging",logging,0,JSPROP_ENUMERATE |JSPROP_PERMANENT);
-		JS_WrapObject(ctx, &global);
-		
-
-		/*实例化_event对象*/
-		LOG4CPLUS_DEBUG(log, "JSDefineObject object:_event" );
-		event = JS_DefineObject(ctx,global,"_event",&_eventClass,NULL,0);	
-		
+		return ;
+	}
+	static bool
+		global_enumerate(JSContext* cx, JS::HandleObject obj)
+	{
+#ifdef LAZY_STANDARD_CLASSES
+		return JS_EnumerateStandardClasses(cx, obj);
+#else
+		return true;
+#endif
 	}
 
-	void JsContext::SetContextPrivate(void *data)
+	static bool
+		global_resolve(JSContext* cx, JS::HandleObject obj, JS::HandleId id, bool* resolvedp)
 	{
-		return JS_SetContextPrivate(ctx,data);
-	}
-
-	bool JsContext::CompileScript(const std::string &script,const std::string &filename, unsigned int line,const void *xmlNode)
-	{
-		//LOG4CPLUS_DEBUG(log, "CompileScript:" << script);
-		JSBool status;
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
-
-		JSObject * scriptObj = getScriptObject(script,filename,line,xmlNode);
-		if (scriptObj == NULL)
-		{
-			status = JS_EvaluateScript(ctx,global , script.c_str(), script.length(), filename.c_str(), line, NULL); 
-		}else{
-			status = JS_ExecuteScript(ctx,global ,scriptObj , NULL); 
-		}
-		
-		if (status != JS_TRUE)
-			LOG4CPLUS_ERROR(log, "CompileScript:" << script<< " failed");
-		//JS_MaybeGC(ctx);
+#ifdef LAZY_STANDARD_CLASSES
+		if (!JS_ResolveStandardClass(cx, obj, id, resolvedp))
+			return false;
+#endif
 		return true;
 	}
-	JSBool JsContext::ShellOperationCallback(JSContext *cx)
+
+	static bool
+		global_mayResolve(const JSAtomState& names, jsid id, JSObject* maybeObj)
 	{
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsConext.ShellOperationCallback");
-		LOG4CPLUS_TRACE(log,"do nothing.");
-		return JS_FALSE;
+		return JS_MayResolveStandardClass(names, id, maybeObj);
+	}
+
+	static const JSClass global_class = {
+		"global", JSCLASS_GLOBAL_FLAGS,
+		nullptr, nullptr, nullptr, nullptr,
+		global_enumerate, global_resolve, global_mayResolve,
+		nullptr,
+		nullptr, nullptr, nullptr,
+		JS_GlobalObjectTraceHook
+	};
+
+	void JsContext::InitializeInstanceFields()
+	{
+		/* Create a JS runtime. */
+		m_jsrt = JS_NewRuntime(gMaxHeapSize);
+		if (m_jsrt == nullptr) {
+			LOG4CPLUS_ERROR(log, m_strSessionID << ",JS_NewRuntime error");
+			throw std::exception("JS_NewRuntime error.");;
+		}
+
+		JS_SetErrorReporter(m_jsrt, reportError);
+
+		JS_SetNativeStackQuota(m_jsrt, gMaxStackSize);
+
+		m_jsctx = JS_NewContext(m_jsrt, gStackChunkSize);
+		if (m_jsctx == NULL){
+			LOG4CPLUS_ERROR(log, m_strSessionID << ",JS_NewContext error.");
+			throw std::exception("JS_NewContext error.");
+		}
+		
+		JS_SetContextPrivate(m_jsctx, this);
+		/* Enter a request before running anything in the context */
+		JSAutoRequest ar(m_jsctx);
+
+		// Create the global object and a new compartment.
+
+		JS::CompartmentOptions options;
+		options.setVersion(JSVERSION_DEFAULT);
+		options.setInvisibleToDebugger(true);
+		
+		m_global = JS_NewGlobalObject(m_jsctx, &global_class, nullptr,
+			JS::DontFireOnNewGlobalHook, options);
+
+		JS::RootedObject global(m_jsctx, m_global);
+
+		if (!global)
+			throw std::exception("JS_NewGlobalObject error.") ;
+
+		// Enter the new global object's compartment.
+		JSAutoCompartment ac(m_jsctx, global);
+
+		/* Populate the global object with the standard globals, like Object and Array. */
+		if (!JS_InitStandardClasses(m_jsctx, global))
+			throw std::exception("JS_InitStandardClasses error.");
+
+#ifdef JS_HAS_CTYPES
+		if (!JS_InitCTypesClass(m_jsctx, global))
+			throw std::exception("JS_InitCTypesClass error.");
+#endif
+		if (!JS_InitReflectParse(m_jsctx, global))
+			throw std::exception("JS_InitReflectParse error.");
+
+		if (!JS_DefineDebuggerObject(m_jsctx, global))
+			throw std::exception("JS_DefineDebuggerObject error.");
+
+		if (!JS::RegisterPerfMeasurement(m_jsctx, global))
+			throw std::exception("RegisterPerfMeasurement error.");
+
+		bool succeeded;
+		if (!JS_SetImmutablePrototype(m_jsctx, global, &succeeded))
+			throw std::exception("JS_SetImmutablePrototype error.");
+
+
+		JS::RootedObject event(m_jsctx, JS_NewObject(m_jsctx, nullptr));
+		if (!event)
+			throw std::exception("JS_NewObject event error.");
+		
+		this->m_event = event;
+
+		if (!JS_DefineProperty(m_jsctx, global, "_event", event, JSPROP_ENUMERATE))
+			throw std::exception("JS_DefineProperty event error.");
+
+		JS_FireOnNewGlobalObject(m_jsctx, global);
 	}
 
 	JsContext::~JsContext()
 	{
-		LOG4CPLUS_DEBUG(log,"destruction... a scmxl.env.JsContext object." );
-		Reset();
-		
-		LOG4CPLUS_DEBUG(log,"Destroy SpiderMonkey Context." );
-		if (ctx) JS_DestroyContext(ctx);
-		LOG4CPLUS_DEBUG(log,"destructioned a scmxl.env.JsContext object." );
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",Destroy SpiderMonkey Context." );
+		if (m_jsctx) 
+			JS_DestroyContext(m_jsctx);
+		if (m_jsrt)
+			JS_DestroyRuntime(m_jsrt);
+
+		if (g_JSContextReferce.fetch_sub(1) == 1) {
+			JS_ShutDown();
+		}
+
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",destructioned a fsm.env.JsContext object." );
 	}
 
-	void JsContext::reportError(::JSContext *_ctx, const char *message, JSErrorReport *report) {
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("fsm.JsConext.ErrorReporter");
 
-		std::stringstream ss;
+	static void reportError(::JSContext *cx, const char *message, JSErrorReport *report) {
+
+		const JsContext * This = (JsContext *)JS_GetContextPrivate(cx);
+		
+		// Get exception object before printing and clearing exception.
+		JS::RootedValue exception(cx);
+		if (JS_IsExceptionPending(cx))
+			JS_GetPendingException(cx, &exception);
+
 		if (!report) {
-			LOG4CPLUS_ERROR(log,message);
+			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," <<  message);
 			return;
 		}
-		
-		ss <<(report->filename ? report->filename : "<no filename="">")
-			<<":line="<< report->lineno;
 
-		if(JSREPORT_IS_WARNING(report->flags))
-			ss << (JSREPORT_IS_STRICT(report->flags) ? "strict " : "") << "warning";
-		ss << ":";
-		std::string prefix = ss.str();
-		
-		std::string::size_type tmpPos;
-		std::string::size_type tmpStartPos = 0;
-		std::string strMsg(message);
-		/* embedded newlines -- argh! */
-		while ((tmpPos = strMsg.find('\n',tmpStartPos)) != std::string::npos) {
-			LOG4CPLUS_ERROR(log,prefix << strMsg.substr(tmpStartPos,tmpPos));
-			tmpStartPos = ++tmpPos;
+		std::stringstream ss;
+		ss << (report->filename ? report->filename : "<no filename="">")
+			<< ":" << report->lineno << ":" << report->column << " ";
+
+		if (JSREPORT_IS_WARNING(report->flags)) {
+			ss << (JSREPORT_IS_STRICT(report->flags) ? "strict " : "") << "warning: ";
 		}
-		LOG4CPLUS_ERROR(log, prefix << strMsg.substr(tmpStartPos));
 
-		if(report->linebuf){
-			/* report->linebuf usually ends with a newline. */
-			ss.clear();
-			size_t n ;//= strlen(report->linebuf);
-			LOG4CPLUS_ERROR(log, prefix << report->linebuf);
-			n = report->tokenptr - report->linebuf;
-			size_t i,j;
-			for (i = j = 0; i < n; i++) {
-				if (report->linebuf[i] == '\t') {
-					for (size_t k = (j + 8) & ~7; j < k; j++) {
-						ss << '.';
-					}
+		LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << ss.str());
+		
+		if (message)
+			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << message);
+
+
+		if (const char16_t* linebuf = report->linebuf()) {
+			size_t n = report->linebufLength();
+
+			std::string buf;
+			for (size_t i = 0; i < n; i++)
+				buf.push_back(static_cast<char>(linebuf[i]));
+
+			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << buf);
+
+			//// linebuf usually ends with a newline. If not, add one here.
+			//if (n == 0 || linebuf[n - 1] != '\n')
+			//	fputc('\n', file);
+
+
+			n = report->tokenOffset();
+			buf.clear();
+			for (size_t i = 0, j = 0; i < n; i++) {
+				if (linebuf[i] == '\t') {
+					for (size_t k = (j + 8) & ~7; j < k; j++)
+						buf.push_back('.');
 					continue;
 				}
-				ss << '.';
+				buf.push_back('.');
 				j++;
 			}
-			LOG4CPLUS_ERROR(log,ss.str() << "^");
+			buf.push_back('^');
+			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << buf);
 		}
-
 	}
 
-
-	JSObject * JsContext::getScriptObject(const std::string &expr,const std::string &filename, unsigned int line,const void *xmlNode)
+	JS::Value JsContext::JsonValueToJsval(const Json::Value &value)const
 	{
-
-		//return NULL;
-		if (xmlNode == NULL) return NULL;
-		typedef struct JSObject*    JSObjectPtr;
-		std::map<const void *,void*>::iterator it = mapObjectRoot.find(xmlNode);
-		if (it != mapObjectRoot.end())
-		{
-			JSObjectPtr *scriptObj = (JSObjectPtr*)it->second;
-			return *scriptObj;
-		}
-		JSObjectPtr * scriptObj = new (JSObjectPtr);
-
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
-		*scriptObj = JS_CompileScript(ctx,global , expr.c_str(), expr.length(), filename.c_str(), line);
-		if (*scriptObj == NULL){
-			delete scriptObj;
-			return NULL;   /* compilation error */
-		}
-
-		if (!JS_AddNamedObjectRoot(ctx, scriptObj, "compileAndRepeat script object"))
-			return NULL;
-		mapObjectRoot[xmlNode]=(void *)scriptObj;
-		return *scriptObj;
-
-	}
-	void JsContext::ExecuteFile(const std::string &fileName)
-	{
-		JSAutoRequest ar = JSAutoRequest(this->ctx);
-		JSAutoEnterCompartment ac ;
-		ac.enter(ctx, global);
-		uint32 oldopts = JS_GetOptions(ctx);
-		JS_SetOptions(ctx, oldopts | JSOPTION_COMPILE_N_GO | JSOPTION_NO_SCRIPT_RVAL);
-		JSObject * obj = JS_CompileFile(ctx,global,fileName.c_str());
-		JS_SetOptions(ctx, oldopts);
-		if (obj)
-		{
-			JS_ExecuteScript(ctx,global,obj,NULL);
-		}
-		
-	}
-
-	jsval JsContext::JsonValueToJsval(const Json::Value &value)const
-	{
-		jsval val = JSVAL_VOID;
+		JS::Value val = JS::NullValue();
 		if (value.isBool()){
-			val = BOOLEAN_TO_JSVAL(value.asBool());
+			val.setBoolean(value.asBool());
 
 		}else if (value.isDouble()){
-			val = DOUBLE_TO_JSVAL(value.asDouble());
+			val.setDouble(value.asDouble());
 
 		}else if(value.isInt() || value.isIntegral() || value.isNumeric()){
-			val = INT_TO_JSVAL(value.asInt());
+			val.setInt32(value.asInt());
 
 		}else if (value.isNull()){
-			val = JSVAL_NULL;
+			val.setNull();
 
 		}else if (value.isString())
 		{
-			val = STRING_TO_JSVAL(JS_NewStringCopyZ(this->ctx, value.asCString()));
+			val.setString(JS_NewStringCopyZ(this->m_jsctx, value.asCString()));
 		}else if (value.isUInt())
 		{
-			val = UINT_TO_JSVAL(value.asUInt());
+			val.setPrivateUint32(value.asUInt());
 		}
 		return val;
 	}
 
-	Json::Value JsContext::JsvalToJsonValue(const jsval &value)const
+	Json::Value JsContext::JsvalToJsonValue(const JS::Value &value)const
 	{
 		
-		if (JSVAL_IS_BOOLEAN(value)){
-			return JSVAL_TO_BOOLEAN(value);
+		if (value.isBoolean()){
+			return value.toBoolean();
 
-		}else if (JSVAL_IS_DOUBLE(value)){
-			return JSVAL_TO_DOUBLE(value);
+		}
+		else if (value.isDouble()){
+			return value.toDouble();
 
-		}else if(JSVAL_IS_INT(value)){
-			return JSVAL_TO_INT(value);
+		}
+		else if(value.isInt32()){
+			return value.toInt32();
 
-		}else if (JSVAL_IS_NULL(value)){
+		}
+		else if (value.isNullOrUndefined()){
 			return Json::Value();
 
-		}else if (JSVAL_IS_NUMBER(value))
+		}
+		else if (value.isNumber())
 		{
-			return JSVAL_TO_INT(value);
+			return value.toNumber();
 			
-		}else if (JSVAL_IS_STRING(value))
+		}
+		else if (value.isString())
 		{
-			std::stringstream ss;
-			fsm::env::ToString valueString(ctx,value);
-			ss << valueString.getBytes();
-			return ss.str();
+			JSAutoByteString bytes(this->m_jsctx, value.toString());
+			if (bytes.ptr()) {
+				return bytes.ptr();
+			}
 		}
 		return Json::Value();
 	}

@@ -11,8 +11,8 @@ namespace model
 	Data::Data(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode,session,filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Data");
-		this->m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
-		this->m_strExpr = helper::xml::getXmlNodeAttributesValue(node,"expr");
+		this->m_strId = helper::xml::getXmlNodeAttributesValue(m_node,"id");
+		this->m_strExpr = helper::xml::getXmlNodeAttributesValue(m_node,"expr");
 	}
 
 	const std::string & Data::getId()const
@@ -37,7 +37,7 @@ namespace model
 	void Data::execute(fsm::Context * ctx)
 	{
 		if (ctx == NULL){
-			LOG4CPLUS_WARN(log,"Context is null.");
+			LOG4CPLUS_WARN(log, m_strSession << ",Context is null.");
 			return ;
 		}
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
@@ -49,13 +49,14 @@ namespace model
 		{
 			//std::string value;
 			//value = evl->eval(ctx, getExpr(),m_strFileName,node->line);
-			ctx->eval("var " + getId()+"="+this->getExpr()+";" , m_strFileName, node->line, node);
+			ctx->eval("var " + getId()+"="+this->getExpr()+";" , m_strFileName, m_node->line/*, m_node*/);
 			
 		}
 		else
 		{
-			ctx->eval("var " + getId()+";" , m_strFileName, node->line, node);
+			ctx->eval("var " + getId()+";" , m_strFileName, m_node->line/*, m_node*/);
 		}
+		LOG4CPLUS_TRACE(log, m_strSession << ", data " << getId() << ":" << getExpr());
 		//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 	}
 

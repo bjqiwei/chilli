@@ -5,24 +5,17 @@
 //#ifdef SCXML 
 #include "sendimp.h"
 #include <fsm.h>
-#include <scxml/SMInstance.h>
-#include <common/Timer.h>
 //#endif // SCXML
 //#include "io/SCXMLParser.h"
 #include <string>
 #include <iostream>
+#include <thread>
 
 using namespace std;
 
 
 //#ifdef SCXML
 using namespace fsm;
-class MyTimer : public helper::CTimerNotify{
-	void OnTimerExpired(unsigned long timerId, const std::string & attr){
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("timer");
-		LOG4CPLUS_DEBUG(log, timerId << attr);
-	}
-};
 
 int main(int argc, _TCHAR* argv[])
 {
@@ -35,25 +28,27 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
-		MyTimer mytimer;
-		fsm::SMInstance m_smInstance(&mytimer);
-		fsm::StateMachine mysmscxml(strStateFile);
+		fsm::StateMachine mysmscxml("0123456",strStateFile);
 		SendImp mySend;
-		mysmscxml.setscInstance(&m_smInstance);
-		mysmscxml.addSendImplement(&mySend);
-		mysmscxml.setSessionID("123456");
 
-		mysmscxml.go();
-		std::string strEvent;
+		std::thread th([&]() {
+			mysmscxml.addSendImplement(&mySend);
+
+			mysmscxml.go();
+			mysmscxml.mainEventLoop();
+		});
+
 		
+		std::string strEvent;
 		
 		while (std::cin>>strEvent && strEvent.compare("quit") != 0){
 			fsm::TriggerEvent evt(strEvent,"");
 			mysmscxml.pushEvent(evt);
-			mysmscxml.mainEventLoop();
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
 			//std::cout << stateid << endl;
 		}
+		mysmscxml.termination();
+		th.join();
 	}
 	catch(exception & e)
 	{

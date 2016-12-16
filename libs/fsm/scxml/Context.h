@@ -14,6 +14,7 @@ namespace fsm{
 	class Evaluator;
 	class  Context
 	{
+	friend class Evaluator;
 	public:
 		Context(Evaluator * evl, Context * _parent):evaluator(evl),parent(_parent){
 		};
@@ -40,38 +41,22 @@ namespace fsm{
 		virtual void deleteVar(const std::string & name, ValueContext va = globalObject) = 0;
 
 		/// <summary>
-		/// reset this Context.
-		/// </summary>
-		virtual void Reset() = 0;
-
-		/// <summary>
 		/// Get the parent Context, may be null.
 		/// </summary>
 		/// <returns> The parent Context in a chained Context environment </returns>
 		virtual Context *getParent() = 0;
-
-		///<summary>
-		///编译一段脚本。
-		///</summary>
-		///<returns>返回此脚本执行是否成功的结果。</returns>
-		virtual bool CompileScript(const std::string &script,const std::string &filename, unsigned int line,const void *index) = 0;
-
 		///<summary>
 		///计算一段表达式脚本。
 		///</summary>
 		///<returns>返回此表达式执行的结果，转换为string类型。</returns>
-		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line,const void *index) = 0;
+		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line) = 0;
 
 		///<summary>
 		///计算一段boolen表达式脚本
 		///</summary>
 		///<returns>返回此表达式执行的结果。</returns>
-		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line,const void *index) = 0;
+		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line) = 0;
 
-		///<summary>
-		///设置私有数据。
-		///</summary>
-		virtual void SetContextPrivate(void *data) = 0;
 		///<summary>
 		///获取它的虚拟机。
 		///</summary>

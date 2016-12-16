@@ -1,6 +1,7 @@
 #include "Sleep.h"
 #include "../../common/xmlHelper.h"
-#include <Windows.h>
+#include <thread>
+#include <log4cplus/loggingmacros.h>
 
 namespace fsm{
 namespace model{
@@ -9,7 +10,7 @@ namespace model{
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Sleep");
-		this->interval = helper::xml::getXmlNodeAttributesValue(node,"interval");
+		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");
 	}
 	Sleep::~Sleep(){
 
@@ -22,7 +23,8 @@ namespace model{
 
 	void Sleep::execute(fsm::Context * ctx)
 	{
-		::Sleep(getInterval());
+		LOG4CPLUS_DEBUG(log, m_strSession << ",sleep " << getInterval() << "ms");
+		std::this_thread::sleep_for(std::chrono::milliseconds(getInterval()));
 	}
 
 }

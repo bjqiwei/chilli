@@ -5,14 +5,9 @@
 
 using namespace std;
 
-fsm::StateMachine::StateMachine(const string  &xml, xmlType xtype) :imp(nullptr)
+fsm::StateMachine::StateMachine(const std::string &sessionid, const string  &xml, xmlType xtype) :imp(nullptr)
 {
-	imp = new fsm::StateMachineimp(xml, xtype);
-}
-
-fsm::StateMachine::StateMachine(const string &xml, log4cplus::Logger log, xmlType xtype) : imp(nullptr)
-{
-	imp = new fsm::StateMachineimp(xml, xtype, log);
+	imp = new fsm::StateMachineimp(sessionid, xml, xtype);
 }
 
 fsm::StateMachine::~StateMachine()
@@ -47,13 +42,6 @@ const std::string & fsm::StateMachine::getSessionId()const {
 	return imp->getSessionId();
 }
 
-
-
-void fsm::StateMachine::setscInstance(SMInstance * scIns)
-{
-	return imp->setscInstance(scIns);
-}
-
 void fsm::StateMachine::go()
 {
 	return imp->go();
@@ -73,8 +61,6 @@ void fsm::StateMachine::mainEventLoop()
 {
 	return imp->mainEventLoop();
 }
-
-
 
 bool fsm::StateMachine::setVar(const std::string &name, const Json::Value & value)
 {  

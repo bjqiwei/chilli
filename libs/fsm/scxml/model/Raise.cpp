@@ -6,7 +6,7 @@ namespace fsm{
 			:Action(xNode, session, filename)
 		{
 			log = log4cplus::Logger::getInstance("fsm.model.Raise");
-			m_strEvent = helper::xml::getXmlNodeAttributesValue(node,"event");
+			m_strEvent = helper::xml::getXmlNodeAttributesValue(m_node,"event");
 		}
 
 

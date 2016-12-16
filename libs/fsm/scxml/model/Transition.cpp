@@ -11,7 +11,7 @@ namespace model
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Transition");
-		m_strTarget = helper::xml::getXmlNodeAttributesValue(node,"target");
+		m_strTarget = helper::xml::getXmlNodeAttributesValue(m_node,"target");
 	}
 
 

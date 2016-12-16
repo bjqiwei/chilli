@@ -6,7 +6,7 @@ namespace model{
 
 	void OnExit::execute(fsm::Context * ctx)
 	{
-		if (node == 0) return;
+		if (m_node == 0) return;
 
 		/*for (xmlNodePtr exeNode = node->children ; exeNode !=  NULL; exeNode = exeNode->next)
 		{

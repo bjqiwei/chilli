@@ -23,22 +23,22 @@ namespace model
 		/// </summary>
 	public:
 
-		Action(xmlNodePtr xNode,const std::string & session,const std::string &filename):node(xNode),
+		Action(xmlNodePtr xNode,const std::string & session,const std::string &filename):m_node(xNode),
 			m_strSession(session),m_strFileName(filename),m_bCond(true)
 		{
-			m_strCond = helper::xml::getXmlNodeAttributesValue(node,"cond");
+			m_strCond = helper::xml::getXmlNodeAttributesValue(m_node,"cond");
 		}; //super();
 		virtual~Action(){};
 		virtual void execute(fsm::Context * ctx) = 0;
 		virtual bool isEnabledCondition(fsm::Context * ctx)
 		{
 			if (!this->getCond().empty() && ctx){
-				return ctx->evalCond(this->getCond(),m_strFileName,node->line,node);
+				return ctx->evalCond(this->getCond(),m_strFileName,m_node->line);
 			}
 			return m_bCond;
 		}
 	protected:
-		xmlNodePtr node;
+		xmlNodePtr m_node;
 		std::string m_strSession;
 		std::string m_strFileName;
 		std::string m_strCond;

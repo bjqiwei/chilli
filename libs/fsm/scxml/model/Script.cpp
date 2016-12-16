@@ -11,8 +11,8 @@ namespace model
 	Script::Script(xmlNodePtr xNode,const std::string &session,const std::string & filename):Action(xNode, session ,filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Script");
-		this->content =  helper::xml::XStr(xmlNodeGetContent(node)).strForm();
-		this->m_fileName = helper::xml::XStr(xmlGetProp(node,BAD_CAST"src")).strForm();
+		this->m_content =  helper::xml::XStr(xmlNodeGetContent(m_node)).strForm();
+		this->m_fileName = helper::xml::XStr(xmlGetProp(m_node,BAD_CAST"src")).strForm();
 	}
 
 	//std::string &Script::getContent()
@@ -27,9 +27,9 @@ namespace model
 			LOG4CPLUS_TRACE(log,m_strSession << ",script file is:" << m_fileName);
 			ctx->ExecuteFile(m_fileName);
 		}
-		else if (!content.empty()){
-			LOG4CPLUS_TRACE(log,m_strSession << ",execute script is:" << content);
-			ctx->CompileScript(content,m_strFileName,node->line,node);
+		else if (!m_content.empty()){
+			LOG4CPLUS_TRACE(log,m_strSession << ",execute script is:" << m_content);
+			ctx->eval(m_content,m_strFileName,m_node->line/*,m_node*/);
 		}
 	}
 }

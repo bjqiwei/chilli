@@ -14,9 +14,9 @@ Scriptmodel::Scriptmodel(xmlNodePtr xnode,const std::string &session, const std:
 
 void Scriptmodel::execute(fsm::Context * ctx){
 	//LOG4CPLUS_TRACE(log,m_strSession << ",execute starting...");
-	if (node == NULL) return;
+	if (m_node == NULL) return;
 	bool bFindData = false;
-	for (xmlNodePtr funNode = node->children ; funNode !=  NULL; funNode = funNode->next)
+	for (xmlNodePtr funNode = m_node->children ; funNode !=  NULL; funNode = funNode->next)
 	{
 		if(funNode->type != XML_ELEMENT_NODE ||
 			!xmlStrEqual(funNode->name, BAD_CAST("script")))
@@ -27,7 +27,7 @@ void Scriptmodel::execute(fsm::Context * ctx){
 	}
 	if (!bFindData)
 	{
-		LOG4CPLUS_WARN(log,"not find data element in this Scriptmodel.");
+		LOG4CPLUS_WARN(log, m_strSession << ",not find data element in this Scriptmodel.");
 	}
 	//LOG4CPLUS_TRACE(log,m_strSession << ",execute end.");
 }

@@ -9,15 +9,15 @@ namespace model{
 		:Action(xNode, sessionid, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Log");
-		m_strExpr =  XStr(xmlNodeGetContent(node)).strForm();
-		m_Type = getXmlNodeAttributesValue(node,"type");
-		m_strLevel = getXmlNodeAttributesValue(node,"level");
+		m_strExpr =  XStr(xmlNodeGetContent(m_node)).strForm();
+		m_Type = getXmlNodeAttributesValue(m_node,"type");
+		m_strLevel = getXmlNodeAttributesValue(m_node,"level");
 	}
 	void Log::execute(Context * ctx)
 	{
 
 		if(ctx && m_Type.compare("script") == 0)
-			m_strExpr = ctx->eval(m_strExpr,m_strFileName,node->line,node);
+			m_strExpr = ctx->eval(m_strExpr,m_strFileName,m_node->line/*,m_node*/);
 
 		if (m_strLevel.compare("trace") == 0){
 			LOG4CPLUS_TRACE(log, m_strSession << "," << m_strExpr);

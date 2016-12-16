@@ -15,7 +15,7 @@ namespace model
 	{
 	private:
 		//TLogFile * log;
-		std::string content;
+		std::string m_content;
 		std::string m_fileName;
 
 	public:

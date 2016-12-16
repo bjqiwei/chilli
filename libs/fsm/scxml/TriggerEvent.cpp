@@ -30,10 +30,11 @@ namespace fsm
 		return ss.str();
 	}
 
-	void TriggerEvent::setVars(std::map<std::string,std::string> params)
+	void TriggerEvent::addVars(const std::string & name, Json::Value & value)
 	{
-		m_eventVars  = params;
+		m_eventVars.insert(std::make_pair(name, value));
 	}
+
 
 }
 

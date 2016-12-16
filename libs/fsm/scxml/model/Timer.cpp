@@ -8,9 +8,9 @@ namespace model{
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Timer");
-		this->id = helper::xml::getXmlNodeAttributesValue(node,"id");
-		this->idexpr = helper::xml::getXmlNodeAttributesValue(node,"idexpr");
-		this->interval = helper::xml::getXmlNodeAttributesValue(node,"interval");
+		this->id = helper::xml::getXmlNodeAttributesValue(m_node,"id");
+		this->idexpr = helper::xml::getXmlNodeAttributesValue(m_node,"idexpr");
+		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");
 	}
 	Timer::~Timer(){
 
@@ -33,7 +33,7 @@ namespace model{
 	void Timer::execute(fsm::Context * ctx)
 	{
 		if (ctx && id.empty()){
-			id = ctx->eval(idexpr,m_strFileName,node->line,node);
+			id = ctx->eval(idexpr,m_strFileName,m_node->line);
 		}
 	}
 

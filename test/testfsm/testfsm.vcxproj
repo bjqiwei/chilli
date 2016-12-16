@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -12,23 +12,23 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{37854432-9C4D-4430-987F-4E6B35516887}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
     <RootNamespace>testfsm</RootNamespace>
     <ProjectName>testfsm</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -42,8 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)D</TargetName>
@@ -52,29 +51,25 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libxml2-2.7.7\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\js-1.8.5\js\src\dist\include\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\js-1.8.5\js\src\dist\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,14 +87,11 @@ xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll 
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>mozjs185-1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -118,10 +110,10 @@ xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\$(PlatformName)\bin.msvc\libxml2.dll 
     <ClCompile Include="testfsm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\fsm\msvc12\FSM.vcxproj">
+    <ProjectReference Include="..\..\libs\fsm\msvc14\fsm.vcxproj">
       <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
+    <ProjectReference Include="..\..\libs\log4cplus-1.2.0\msvc14\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
   </ItemGroup>

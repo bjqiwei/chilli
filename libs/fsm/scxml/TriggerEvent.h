@@ -3,6 +3,7 @@
 #define _SCXML_TRIGGEREVENT_HEADER_
 #include "..\config.h"
 #include <string>
+#include <json/json.h>
 
 namespace fsm
 {
@@ -25,7 +26,7 @@ namespace fsm
 		std::string m_strMsgType;
 		std::string m_strData;
 		const void * m_ParamPtr;
-		std::map<std::string,std::string> m_eventVars;
+		std::map<std::string, Json::Value> m_eventVars;
 		
 		
 	public:
@@ -33,13 +34,13 @@ namespace fsm
 		void setData(const std::string &strData){m_strData = strData;}
 		void setMsgType(const std::string &strMsgtype){m_strMsgType = strMsgtype;}
 		void setParam(const void * param){m_ParamPtr = param;}
-		void setVars(std::map<std::string,std::string> params);
+		void addVars(const std::string & name, Json::Value & value);
 
 		const std::string &getEventName()const{return m_strEventName;}
 		const std::string &getData(){return m_strData;}
 		const std::string &getMsgType(){return m_strMsgType;}
 		const void * getParam(){return m_ParamPtr;}
-		const std::map <std::string,std::string> &getVars() { return m_eventVars; };
+		const std::map <std::string,Json::Value> &getVars() { return m_eventVars; };
 
 		virtual bool Equals(const TriggerEvent & obj);
 		virtual std::string ToString();
