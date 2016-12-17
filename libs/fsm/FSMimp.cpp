@@ -747,7 +747,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 	if (getRootContext()){
 		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->deleteVar("_" + it.first,fsm::eventOjbect);
+			getRootContext()->deleteVar(it.first,fsm::eventOjbect);
 		}
 		m_currentEvt = event;
 
@@ -756,7 +756,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 		getRootContext()->setVar("_data", m_currentEvt.getData(), fsm::eventOjbect);
 		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->setVar("_" + it.first, it.second, fsm::eventOjbect);
+			getRootContext()->setVar(it.first, it.second, fsm::eventOjbect);
 		}
 	}else
 	{
@@ -806,7 +806,7 @@ bool fsm::StateMachineimp::setVar(const std::string &name, const Json::Value & v
 	this->m_globalVars[name] = value;
 	if (getRootContext())
 	{
-		getRootContext()->setVar("_"+name,value);
+		getRootContext()->setVar(name, value);
 	}
 	return true;
 }
