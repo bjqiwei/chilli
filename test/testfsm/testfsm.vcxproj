@@ -69,7 +69,8 @@
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,10 +92,12 @@ xcopy /Y *.js $(OutDir)</Command>
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="log4cplus.properties" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
