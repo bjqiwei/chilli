@@ -22,7 +22,7 @@
 /* Define to 1 if you have the `fork' function. */
 /* #undef LWS_HAVE_FORK */
 
-/* Define to 1 if you have the `getenv’ function. */
+/* Define to 1 if you have the `getenv' function. */
 #define LWS_HAVE_GETENV
 
 /* Define to 1 if you have the <in6addr.h> header file. */
