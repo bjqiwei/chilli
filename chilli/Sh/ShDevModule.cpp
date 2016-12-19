@@ -15,7 +15,7 @@ static std::string GetSsmLastErrMsg()
 	return Err;
 }
 
-ShDevModule::ShDevModule(void):DevModule()
+ShDevModule::ShDevModule(void)
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
 	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
@@ -84,9 +84,9 @@ int ShDevModule::Stop()
 }
 
 
-const std::map<std::string, chilli::model::ExtensionPtr> ShDevModule::GetExtension()
+const model::ExtensionMap & ShDevModule::GetExtension()
 {
-	return std::map <std::string, chilli::model::ExtensionPtr>();
+	return m_Extensions;
 }
 
 int ShDevModule::getDeviceTypeByName(const std::string & strChType)
@@ -101,7 +101,7 @@ int ShDevModule::getDeviceTypeByName(const std::string & strChType)
 	else return -1;
 }
 
-int ShDevModule::EvtHandler(const PSSM_EVENT const pEvent)
+int ShDevModule::EvtHandler(const PSSM_EVENT pEvent)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 	unsigned int evtCh = pEvent->nReference;
@@ -118,11 +118,11 @@ int ShDevModule::EvtHandler(const PSSM_EVENT const pEvent)
 }
 
 
-bool ShDevModule::LoadConfig(const std::string & configFile)
+bool ShDevModule::LoadConfig(const std::string & configContext)
 {
 	return false;
 }
-std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT const pEvent, const std::string & extNum){
+std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const std::string & extNum){
 	
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 

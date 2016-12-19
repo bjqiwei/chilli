@@ -12,20 +12,25 @@ namespace ShDev{
 class ShExtension :public model::Extension
 {
 public:
-	ShExtension(void);
+	ShExtension(const std::string &ext, const std::string &smFileName);
 	virtual ~ShExtension(void);
-	virtual void fireSend(const std::string &strContent);
 
-	virtual bool ParserConfig(void);
-	virtual bool processTransfer(std::string strEvent,std::string from);
-	virtual bool addAcdEvent(const std::string& strEvent) ;
+	virtual const std::string & getExtensionNumber() const override;
+	virtual void setSessionId(const std::string & sessinId) override;
+	virtual const std::string & getSessionId() override;
+	virtual int pushEvent(const std::string &evt) override;
+
 	virtual int getChannelID();
 	bool setType(std::string strType);
 	void setType(int _type);
-	virtual int Answer();
-	virtual int PlayFile(std::string file);
-	virtual int HangUp();
 
+	//media interface
+	virtual int Answer() override;
+	virtual int PlayFile(const std::string & file) override;
+	virtual int HangUp() override;
+
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
 	int ch;

@@ -6,7 +6,8 @@
 namespace chilli{
 namespace ShDev{
 
-ShExtension::ShExtension(void)
+ShExtension::ShExtension(const std::string &ext, const std::string &smFileName)
+	:Extension(ext,smFileName)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDev.Extension");
 	LOG4CPLUS_DEBUG(log,"new a extension object.");
@@ -17,16 +18,6 @@ ShExtension::ShExtension(void)
 ShExtension::~ShExtension(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a extension object.");
-}
-
-bool ShExtension::ParserConfig(void)
-{
-	//if(chilli::model::Extension::LoadConfig())
-	//{
-	//	//this->setType(helper::xml::getXmlNodeAttributesValue(m_xmlConfigNodePtr,"Type"));
-	//	return true;
-	//}
-	return false;
 }
 
 bool ShExtension::setType(std::string strType)
@@ -52,29 +43,17 @@ int ShExtension::getChannelID()
 
 
 
-void ShExtension::fireSend(const std::string &strContent)
+void ShExtension::fireSend(const std::string &strContent, const void * param)
 {
 	LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
 }
 
 
-bool ShExtension::processTransfer(std::string strEvent,std::string from)
-{
-	//recEvtBuffer.addData(strEvent);
-	return true;
-}
-
-bool ShExtension::addAcdEvent(const std::string& strEvent)
-{
-	//recEvtBuffer.addData(strEvent);
-	return true;
-}
-
 int ShExtension::Answer()
 {
 	return SsmPickup(ch);
 }
-int ShExtension::PlayFile(std::string file)
+int ShExtension::PlayFile(const std::string  & file)
 {
 	return SsmPlayFile(ch,file.c_str(),-1,0,0xFFFFFFFF);
 }
