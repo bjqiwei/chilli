@@ -6,15 +6,15 @@ namespace chilli{
 namespace Agent{
 
 
-Agent::Agent(const std::string &ext, const std::string &smFileName, fsm::SMInstance * smInstance) :Extension(), 
-SendInterface("this"), m_ExtNumber(ext), m_smInstance(smInstance), m_SM(nullptr)
+Agent::Agent(const std::string &ext, const std::string &smFileName) 
+	:Extension(ext, smFileName), m_ExtNumber(ext)
 {
-	log = log4cplus::Logger::getInstance(m_ExtNumber);
-	m_SM = new fsm::StateMachine(smFileName, log);
+	std::string logName= "Agent.";
+	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
 	LOG4CPLUS_DEBUG(log,"new a ACD extension object.");
 }
+
 Agent::~Agent(){
-	delete m_SM;
 	LOG4CPLUS_DEBUG(log,"destruction a ACD extension object.");
 }
 
@@ -24,16 +24,10 @@ const std::string & Agent::getExtensionNumber() const
 	return m_ExtNumber;
 }
 
-bool Agent::isIdle()
-{
-	return m_SM->getCurrentStateID() == "Idle";
-}
 
 void Agent::setSessionId(const std::string & sessinId)
 {
 	this->m_SessionId = sessinId;
-	this->m_SM->setSessionID(m_SessionId);
-	this->m_SM->setVar("_sessionid", this->m_SessionId);
 }
 
 const std::string & Agent::getSessionId()
@@ -41,23 +35,6 @@ const std::string & Agent::getSessionId()
 	return this->m_SessionId;
 }
 
-void Agent::go()
-{
-	m_SM->setSessionID(m_SessionId);
-	m_SM->setscInstance(m_smInstance);
-	m_SM->addSendImplement(this);
-	m_SM->go();
-}
-
-void Agent::run()
-{
-	m_SM->mainEventLoop();
-}
-
-void Agent::termination()
-{
-	m_SM->termination();
-}
 
 int Agent::Answer()
 {
