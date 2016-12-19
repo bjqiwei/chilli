@@ -2,29 +2,26 @@
 #define WEBSOCKET_CLASS
 
 #include <log4cplus/logger.h>
-#include <string>
 #include <libwebsockets.h>
 
-namespace WebSocket{
-	class websocketserver{
+namespace WebSocket {
+	class WebSocketServer {
 	public:
-		explicit websocketserver(int port = CONTEXT_PORT_NO_LISTEN);
-		virtual~websocketserver();
+		explicit WebSocketServer(int port = CONTEXT_PORT_NO_LISTEN);
+		virtual ~WebSocketServer();
 	private:
-		struct lws_context_creation_info info;
-		struct lws_context *context;
-		bool bInit;
+		struct lws_context_creation_info m_Info;
+		struct lws_context *m_Context;
 		int m_port;
 		log4cplus::Logger log;
 	public:
 		bool InitInstance();
 		bool UnInitInstance();
-		struct lws_context * GetContext();
 		void Loop(int timeout_ms);
 	};
 
 	typedef enum {
-		CONNECTING	= 0,// 	The connection is not yet open.
+	CONNECTING	= 0,// 	The connection is not yet open.
 		OPEN		= 1,// 	The connection is open and ready to communicate.
 		CLOSING 	= 2,// 	The connection is in the process of closing.
 		CLOSED 		= 3,// 	The connection is closed or couldn't be opened.
@@ -59,11 +56,12 @@ namespace WebSocket{
 			void *user, void *in, size_t len);
 	private:
 		log4cplus::Logger log;
-		struct lws_context *context;
+		struct lws_context *m_Context;
 		struct lws_client_connect_info con_info;
 		struct lws *wsi;
 		std::string m_url;
 		std::vector<unsigned char> m_sendBuf;
+		std::string m_SessionId;
 	};
 }
 
