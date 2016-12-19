@@ -3,20 +3,43 @@
 #define _CHILLI_CTI_EXTENSION_HEADER_
 #include <string>
 #include <memory>
+#include <thread>
+#include <atomic>
+#include <FSM.h>
 
 namespace chilli{
 namespace model{
 
-class Extension
+class Extension: public fsm::SendInterface
 {
 public:
-	Extension(){};
-	virtual ~Extension(){};
+	Extension(const std::string &ext, const std::string &smFileName):SendInterface("this") 
+	{
+		m_SM = new fsm::StateMachine(ext,smFileName);
+	};
+
+	virtual ~Extension(){
+		if (m_thread.joinable()){
+			Stop();
+		}
+		delete m_SM;
+	};
+
+	virtual void Start() final {
+		if (!m_thread.joinable()) {
+			m_thread = std::thread(&Extension::run, this);
+		}
+	};
+
+	virtual void Stop() final {
+
+		if (m_thread.joinable()){
+			m_SM->termination();
+			m_thread.join();
+		}
+	};
+
 	virtual const std::string & getExtensionNumber() const = 0;
-	virtual bool isIdle() = 0;
-	virtual void go() = 0;
-	virtual void run() = 0;
-	virtual void termination() = 0;
 	virtual int pushEvent(const std::string &evt) = 0;
 	virtual void setSessionId(const std::string & sessinId) = 0;
 	virtual const std::string & getSessionId() = 0;
@@ -29,6 +52,19 @@ public:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	Extension(const Extension &) = delete;
 	Extension & operator=(const Extension &) = delete;
+private:
+	void run()
+	{
+		m_SM->addSendImplement(this);
+		m_SM->go();
+		m_SM->mainEventLoop();
+	};
+
+	std::atomic_bool m_Running = false;
+	std::thread m_thread;
+protected:
+	fsm::StateMachine * m_SM = nullptr;
+
 };
 typedef std::shared_ptr<model::Extension> ExtensionPtr;
 }
