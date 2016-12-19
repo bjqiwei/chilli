@@ -22,9 +22,6 @@
     <Filter Include="IVR">
       <UniqueIdentifier>{23c3db04-58bb-4976-b079-1d643c10a741}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Device">
-      <UniqueIdentifier>{683e62f6-13e1-4c0a-ad8f-f875691278aa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ACD">
       <UniqueIdentifier>{704ea279-ecaa-4f36-a30f-e34b91eab198}</UniqueIdentifier>
     </Filter>
@@ -78,9 +75,6 @@
     <ClInclude Include="Sh\ShExtension.h">
       <Filter>Sh</Filter>
     </ClInclude>
-    <ClInclude Include="Device\DevModule.h">
-      <Filter>Device</Filter>
-    </ClInclude>
     <ClInclude Include="IVR\IVRExtension.h">
       <Filter>IVR</Filter>
     </ClInclude>
@@ -97,12 +91,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CEventBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Csemaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tinyxml2\tinyxml2.h">
@@ -136,9 +124,6 @@
     </ClCompile>
     <ClCompile Include="Sh\ShExtension.cpp">
       <Filter>Sh</Filter>
-    </ClCompile>
-    <ClCompile Include="Device\DevModule.cpp">
-      <Filter>Device</Filter>
     </ClCompile>
     <ClCompile Include="IVR\IVRExtension.cpp">
       <Filter>IVR</Filter>

@@ -17,12 +17,6 @@
 #include "tinyxml2/tinyxml2.h"
 
 
-
-chilli::ShDev::ShDevModule _deviceSH;
-chilli::ACD::ACDModule _ACD;
-chilli::IVR::IVRModule _IVR;
-chilli::Agent::AgentModule _Agent;
-
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ConsoleHandler");
@@ -180,10 +174,6 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 	bool bResult = true;
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_INFO(log, "config file: " << strConfigFile);
-	_deviceSH.LoadConfig(strConfigFile);
-	_ACD.LoadConfig(strConfigFile);
-	_IVR.LoadConfig(strConfigFile);
-	_Agent.LoadConfig(strConfigFile);
 
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument config;
@@ -250,10 +240,6 @@ void chilli::App::Start()
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
-	_deviceSH.Start();
-	_ACD.Start();
-	_IVR.Start();
-	_Agent.Start();
 	for (auto it:m_Modules){
 		it->Start();
 	}
@@ -265,10 +251,6 @@ void chilli::App::Stop()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	_deviceSH.Stop();
-	_ACD.Stop();
-	_IVR.Stop();
-	_Agent.Stop();
 	for (auto it : m_Modules){
 		it->Stop();
 	}

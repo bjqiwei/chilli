@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -12,9 +12,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{61C9D508-31EC-4BE4-8CC6-EF59BFA2C068}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CardAdapter</RootNamespace>
+    <RootNamespace>chilli</RootNamespace>
     <ProjectName>chilli</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -22,14 +22,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -45,51 +45,40 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
-    <ReferencePath>$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib</ReferencePath>
-    <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\libs\log4cplus-1.2.0\include;$(SolutionDir)\libs\FSM\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libwebsockets-1.7.5\lib;$(SolutionDir)libs\libwebsockets-1.7.5\build;$(SolutionDir)libs\freeswitch\esl\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\ShCti\lib;$(SolutionDir)libs\libevent-release-2.0.22-stable;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;ESL_DECLARE_STATIC;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SHP_A3.lib;libevent_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(TargetName).xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Sh\ShIndex.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Sh\ShConfig.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y ACD.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Agent.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y log4cplus.properties $(OutDir)
+xcopy /Y $(TargetName).xml $(OutDir)
+xcopy /Y Sh\ShIndex.ini $(OutDir)
+xcopy /Y Sh\ShConfig.ini $(OutDir)
+xcopy /Y Analog_Trunk.xml $(OutDir)
+xcopy /Y Anolog_User.xml $(OutDir)
+xcopy /Y Group.xml $(OutDir)
+xcopy /Y IVR.xml $(OutDir)
+xcopy /Y ACD.xml $(OutDir)
+xcopy /Y Agent.xml $(OutDir)
+xcopy /Y welcome.wav $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -99,15 +88,15 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SHP_A3.lib;libevent_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
@@ -115,19 +104,17 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /Y log4cplus.properties "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(TargetName).xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\libxml2-2.7.7\win32\bin.msvc\*.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y $(SolutionDir)\libs\js-1.8.5\js\src\dist\bin\mozjs185-1.0.dll "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Sh\ShIndex.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Sh\ShConfig.ini "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Analog_Trunk.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Anolog_User.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Group.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y IVR.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y ACD.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y Agent.xml "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"
-xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Command>
+      <Command>xcopy /Y log4cplus.properties $(OutDir)
+xcopy /Y $(TargetName).xml $(OutDir)
+xcopy /Y Sh\ShIndex.ini $(OutDir)
+xcopy /Y Sh\ShConfig.ini $(OutDir)
+xcopy /Y Analog_Trunk.xml $(OutDir)
+xcopy /Y Anolog_User.xml $(OutDir)
+xcopy /Y Group.xml $(OutDir)
+xcopy /Y IVR.xml $(OutDir)
+xcopy /Y ACD.xml $(OutDir)
+xcopy /Y Agent.xml $(OutDir)
+xcopy /Y welcome.wav $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -135,7 +122,9 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
       <FileType>Document</FileType>
     </CustomBuild>
     <None Include="Analog_Trunk.xml" />
-    <None Include="Analog_User.xml" />
+    <None Include="Analog_User.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Group.xml" />
     <None Include="IVR.xml" />
     <None Include="ReadMe.txt" />
@@ -147,12 +136,9 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
     <ClInclude Include="CEventBuffer.h" />
-    <ClInclude Include="Csemaphore.h" />
-    <ClInclude Include="Device\DevModule.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
-    <ClInclude Include="lock.h" />
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />
@@ -170,7 +156,6 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
-    <ClCompile Include="Device\DevModule.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
@@ -183,26 +168,31 @@ xcopy /Y welcome.wav "$(SolutionDir)$(PlatformName)\bin.$(Configuration)\"</Comm
     <ClCompile Include="websocket\websocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libs\freeswitch\esl\esl.2013.vcxproj">
-      <Project>{cf405366-9558-4ae8-90ef-5e21b51ccb4e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libs\fsm\msvc12\FSM.vcxproj">
-      <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2013\lib_json.vcxproj">
-      <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libs\libwebsockets-1.7.5\build\websockets.vcxproj">
-      <Project>{30832379-d211-33d7-b072-16fb0791af75}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libs\log4cplus-1.2.0\msvc12\log4cplus.vcxproj">
-      <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Xml Include="ACD.xml" />
     <Xml Include="Agent.xml" />
-    <Xml Include="chilli.xml" />
+    <Xml Include="chilli.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libs\freeswitch\esl\esl.2015.vcxproj">
+      <Project>{cf405366-9558-4ae8-90ef-5e21b51ccb4e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\fsm\msvc14\fsm.vcxproj">
+      <Project>{d851713a-9d32-4693-89f5-b2ed52fefedb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2015\lib_json.vcxproj">
+      <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\libevent-release-2.0.22-stable\libevent_core.vcxproj">
+      <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\libwebsockets-2.1.0\websockets.vcxproj">
+      <Project>{f27b384c-ab21-3ee3-a4be-5352962cf2b3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\log4cplus-1.2.0\msvc14\log4cplus.vcxproj">
+      <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
