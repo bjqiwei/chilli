@@ -10,7 +10,7 @@ namespace chilli{
 namespace FreeSwitch{
 
 
-FreeSwtichModule::FreeSwtichModule(void) :SMInstance(this), bRunning(false), m_Port(0)
+FreeSwtichModule::FreeSwtichModule(void)
 {
 	log = log4cplus::Logger::getInstance("chilli.FreeSwtichModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
@@ -31,30 +31,21 @@ int FreeSwtichModule::Stop(void)
 	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
 	bRunning = false;
 
-	int result = m_Thread.size();
-	for (auto it : this->m_Thread){
-		if (it->joinable()){
-			it->join();
-		}
+	if (m_Thread.joinable()){
+		m_Thread.join();
 	}
-
-	m_Thread.clear();
-	return result;
+	
+	return 0;
 }
 
 int FreeSwtichModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start...  FreeSwitch module");
-	while (!bRunning)
-	{
+	if(!m_Thread.joinable()){
 		bRunning = true;
-		for (int i = 0; i < 1; i++)
-		{
-			std::shared_ptr<std::thread> th(new std::thread(&FreeSwtichModule::ConnectFS, this));
-			m_Thread.push_back(th);
-		}
+		m_Thread = std::thread(&FreeSwtichModule::ConnectFS, this);
 	}
-	return m_Thread.size();
+	return 0;
 }
 
 bool FreeSwtichModule::LoadConfig(const std::string & configContext)
@@ -75,22 +66,11 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-const std::map<std::string, model::ExtensionPtr> FreeSwtichModule::GetExtension()
+const std::map<std::string, model::ExtensionPtr> & FreeSwtichModule::GetExtension()
 {
 	return m_Extension;
 }
 
-
-void FreeSwtichModule::OnTimerExpired(unsigned long timerId, const std::string & attr)
-{
-	LOG4CPLUS_DEBUG(log, __FUNCTION__ << "," << timerId << ":" << attr);
-	Json::Value jsonEvent;
-	jsonEvent["event"] = "timer";
-	std::string sessionId = attr.substr(0, attr.find_first_of(":"));
-	jsonEvent["sessionid"] = sessionId;
-
-	this->PushEvent(jsonEvent.toStyledString());
-}
 
 void FreeSwtichModule::ConnectFS()
 {

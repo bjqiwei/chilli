@@ -4,10 +4,12 @@
 #include "..\CEventBuffer.h"
 #include "Extension.h"
 #include <map>
+#include <memory>
 
 namespace chilli{
 namespace model{
 
+typedef std::map<std::string, ExtensionPtr> ExtensionMap;
 class ProcessModule
 {
 public:
@@ -17,16 +19,16 @@ public:
 	virtual bool LoadConfig(const std::string & configFile) = 0;
 	virtual int Start() = 0;
 	virtual int Stop() = 0;
-	virtual void PushEvent(const std::string & event)
-	{
-		m_recEvtBuffer.addData(event);
-	};
-	virtual const std::map<std::string, ExtensionPtr>GetExtension() = 0;
-private:
+	virtual const ExtensionMap & GetExtension() = 0;
+
 	//Only define a copy constructor and assignment function, these two functions can be disabled
-	ProcessModule(const ProcessModule & other);
-	ProcessModule & operator=(const ProcessModule &);
+	ProcessModule(const ProcessModule & other) = delete;
+	ProcessModule & operator=(const ProcessModule &) = delete;
 protected:
+	virtual void PushEvent(const std::string & event) final
+	{
+		m_recEvtBuffer.Put(event);
+	};
 	helper::CEventBuffer<std::string> m_recEvtBuffer;
 };
 typedef std::shared_ptr<model::ProcessModule> ProcessModulePtr;
