@@ -1,10 +1,14 @@
 #pragma once
 #ifndef _CEVENTBUFFER_HEADER_
 #define _CEVENTBUFFER_HEADER_
-#include <deque>
+#include <list>
+#include <mutex>
+#include <condition_variable>
 #include <stdexcept>
-#include "lock.h"
-#include "Csemaphore.h"
+
+#ifndef INFINITE
+#define INFINITE 0xFFFFFFFF
+#endif
 
 namespace helper{
 
@@ -12,44 +16,43 @@ template<class T>
 class CEventBuffer
 {
 public:
-	CEventBuffer(unsigned long maxBuffer = 1024*1024*1024):MAXBUFFER(maxBuffer){}
+	explicit CEventBuffer(unsigned long maxBuffer = 1024*1024*1024):MAXBUFFER(maxBuffer){
+	}
 	virtual ~CEventBuffer(void){}
 
-	bool addData(const T &data){
-		helper::AutoLock auLock(&m_lock);
+	bool Put(const T &data){
+		std::unique_lock<std::mutex> lck(m_mtx);
 		if (m_dataBuffer.size() > MAXBUFFER){
 			std::logic_error ex("CEventBuffer size Exceed max buffer.");
 			throw  std::exception(ex);
 		}
 		this->m_dataBuffer.push_back(data);
-		this->m_sem.Post();
+		this->m_cv.notify_one();
 		return true;
 	}
 
-	bool getData(T& data, unsigned long dwMilliseconeds = INFINITE)
+	bool Get(T& data, long long dwMilliseconeds = INT32_MAX)
 	{
-		bool result =false;
-		if(this->m_sem.Wait(dwMilliseconeds)){
-			helper::AutoLock auLock(&m_lock);
-			if (m_dataBuffer.size() > 0)
-			{
-				data = m_dataBuffer.front();
-				m_dataBuffer.pop_front();
-				result = true;
-			}
+		std::unique_lock<std::mutex> lck(m_mtx);
+		
+		bool result = this->m_cv.wait_for(lck, std::chrono::milliseconds(dwMilliseconeds), [&]()->bool{ return !this->m_dataBuffer.empty(); });
+		
+		if (result){
+			data = m_dataBuffer.front();
+			m_dataBuffer.pop_front();
 		}
 		
 		return result;
 	}
 	unsigned long size()
 	{
-		helper::AutoLock auLock(&m_lock);
+		std::unique_lock<std::mutex> lck(m_mtx);
 		return m_dataBuffer.size();
 	}
 private:
-	std::deque<T> m_dataBuffer; 
-	helper::CLock m_lock;
-	helper::CSemaphore m_sem;
+	std::list<T> m_dataBuffer; 
+	std::mutex m_mtx;
+	std::condition_variable m_cv;
 	const unsigned long MAXBUFFER;
 };// end CEventBuffer class
 }//end namespace helper
