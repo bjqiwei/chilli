@@ -12,13 +12,13 @@ namespace model{
 class Group:public Extension
 {
 public:
-	Group();
+	Group(const std::string &ext, const std::string &smFileName);
 	virtual ~Group();
 private:
 	std::vector<std::string> m_ExtVec;
 	log4cplus::Logger log;
 };
-typedef Group * GroupPtr;
+typedef std::shared_ptr<Group> GroupPtr;
 
 }
 }
