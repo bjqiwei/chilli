@@ -6,15 +6,13 @@ namespace chilli{
 namespace ACD{
 
 
-ACDExtension::ACDExtension(const std::string &ext, const std::string &smFileName, fsm::SMInstance * smInstance) :Extension(), 
-SendInterface("this"), m_ExtNumber(ext), m_smInstance(smInstance), m_SM(nullptr)
+ACDExtension::ACDExtension(const std::string &ext, const std::string &smFileName) 
+	:Extension(ext,smFileName)
 {
 	log = log4cplus::Logger::getInstance(m_ExtNumber);
-	m_SM = new fsm::StateMachine(smFileName, log);
 	LOG4CPLUS_DEBUG(log,"new a ACD extension object.");
 }
 ACDExtension::~ACDExtension(){
-	delete m_SM;
 	LOG4CPLUS_DEBUG(log,"destruction a ACD extension object.");
 }
 
@@ -24,10 +22,6 @@ const std::string & ACDExtension::getExtensionNumber() const
 	return m_ExtNumber;
 }
 
-bool ACDExtension::isIdle()
-{
-	return m_SM->getCurrentStateID() == "Idle";
-}
 
 void ACDExtension::setSessionId(const std::string & sessinId)
 {
@@ -37,24 +31,6 @@ void ACDExtension::setSessionId(const std::string & sessinId)
 const std::string & ACDExtension::getSessionId()
 {
 	return this->m_SessionId;
-}
-
-void ACDExtension::go()
-{
-	m_SM->setSessionID(m_SessionId);
-	m_SM->setscInstance(m_smInstance);
-	m_SM->addSendImplement(this);
-	m_SM->go();
-}
-
-void ACDExtension::run()
-{
-	m_SM->mainEventLoop();
-}
-
-void ACDExtension::termination()
-{
-	m_SM->termination();
 }
 
 int ACDExtension::Answer()
