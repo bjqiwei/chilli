@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7C7CC7E2-BEA5-4F4E-BDF0-3FE717109923}</ProjectGuid>
     <RootNamespace>helloworld</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -29,7 +30,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <Import Project="..\libevent_static.props" />
+  <Import Project=".\libevent_static.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -40,11 +41,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(PlatformName)\</OutDir>
+    <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(PlatformName)\</OutDir>
+    <OutDir>$(SolutionDir)$(PlatformName)\bin.$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -75,10 +76,10 @@
     <ClCompile Include="hello-world.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libevent_core.vcxproj">
+    <ProjectReference Include="..\..\libs\libevent-release-2.0.22-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libevent_extras.vcxproj">
+    <ProjectReference Include="..\..\libs\libevent-release-2.0.22-stable\libevent_extras.vcxproj">
       <Project>{7bd82078-0049-4b2f-843e-2f7c018f426a}</Project>
     </ProjectReference>
   </ItemGroup>
