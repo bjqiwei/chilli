@@ -3,7 +3,7 @@
 #define _CHILLI_SHDEV_MODULE_HEADER_
 #include "..\model\ProcessModule.h"
 #include <log4cplus\logger.h>
-#include "shpa3api.h"
+#include "ShAPI.h"
 
 namespace chilli{
 namespace ShDev{
@@ -18,6 +18,7 @@ namespace ShDev{
 		ISND_Trunk = 8,
 	};
 
+using namespace SHAPI;
 class ShDevModule :
 	public chilli::model::ProcessModule
 {
@@ -37,7 +38,7 @@ private:
 	//sanhuid event callback function
 	static int CALLBACK EvtHandler(const PSSM_EVENT pEvent);
 	static int getDeviceTypeByName(const std::string & strType);
-	static std::string TransferEvtToJsonEvent(PSSM_EVENT pEvent, const std::string & extNum);
+	static std::string TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const std::string & extNum);
 	static const char *GetString_EventType ( int nEvent );
 	static const char *GetString_State ( int state );
 	static const char *GetString_PengdingReason(int nReason);

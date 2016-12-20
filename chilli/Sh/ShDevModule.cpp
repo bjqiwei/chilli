@@ -1,12 +1,12 @@
 #include "ShDevModule.h"
 #include "ShExtension.h"
 #include <log4cplus/loggingmacros.h>
-#include <thread>
 #include <json/json.h>
 
 namespace chilli{
 namespace ShDev{
 
+using namespace SHAPI;
 
 static std::string GetSsmLastErrMsg()
 {
@@ -19,12 +19,14 @@ ShDevModule::ShDevModule(void)
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
 	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
+	InitLib();
 }
 
 
 ShDevModule::~ShDevModule(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
+	UnInitLib();
 }
 
 bool ShDevModule::Init()
@@ -122,8 +124,8 @@ bool ShDevModule::LoadConfig(const std::string & configContext)
 {
 	return false;
 }
-std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const std::string & extNum){
-	
+std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const std::string & extNum)
+{
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ShDev.ShDevModule.EvtHandler");
 
 	Json::Value jsonEvent;

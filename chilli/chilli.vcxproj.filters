@@ -84,9 +84,6 @@
     <ClInclude Include="model\Group.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="Sh\shpa3api.h">
-      <Filter>Sh</Filter>
-    </ClInclude>
     <ClInclude Include="chilli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,6 +110,15 @@
     </ClInclude>
     <ClInclude Include="freeswitch\FreeSwitchModule.h">
       <Filter>freeswitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\ShAPI.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\shpa3api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamiclibrary.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp">
       <Filter>freeswitch</Filter>
+    </ClCompile>
+    <ClCompile Include="Sh\ShAPI.cpp">
+      <Filter>Sh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

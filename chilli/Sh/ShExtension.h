@@ -4,6 +4,7 @@
 #define _CHILLI_SHDEV_SHEXTENSION_HEADER_
 #include "..\model\Extension.h"
 #include <log4cplus\logger.h>
+#include <memory>
 
 namespace chilli{
 namespace ShDev{
@@ -21,7 +22,7 @@ public:
 	virtual int pushEvent(const std::string &evt) override;
 
 	virtual int getChannelID();
-	bool setType(std::string strType);
+	bool setType(const std::string & strType);
 	void setType(int _type);
 
 	//media interface
@@ -33,6 +34,8 @@ public:
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
+	std::string m_ExtNumber;
+	std::string m_SessionId;
 	int ch;
 		
 };

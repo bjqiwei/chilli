@@ -136,6 +136,7 @@ xcopy /Y welcome.wav $(OutDir)</Command>
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
     <ClInclude Include="CEventBuffer.h" />
+    <ClInclude Include="Dynamiclibrary.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
@@ -144,6 +145,7 @@ xcopy /Y welcome.wav $(OutDir)</Command>
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
+    <ClInclude Include="Sh\ShAPI.h" />
     <ClInclude Include="Sh\ShDevModule.h" />
     <ClInclude Include="Sh\ShExtension.h" />
     <ClInclude Include="Sh\shpa3api.h" />
@@ -162,6 +164,7 @@ xcopy /Y welcome.wav $(OutDir)</Command>
     <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
+    <ClCompile Include="Sh\ShAPI.cpp" />
     <ClCompile Include="Sh\ShDevModule.cpp" />
     <ClCompile Include="Sh\ShExtension.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
