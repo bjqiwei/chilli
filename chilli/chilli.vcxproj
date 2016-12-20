@@ -57,7 +57,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -78,7 +78,8 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
-xcopy /Y welcome.wav $(OutDir)</Command>
+xcopy /Y welcome.wav $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,7 +89,7 @@ xcopy /Y welcome.wav $(OutDir)</Command>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -114,7 +115,8 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
-xcopy /Y welcome.wav $(OutDir)</Command>
+xcopy /Y welcome.wav $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

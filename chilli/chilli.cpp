@@ -59,84 +59,122 @@ int main(int argc, char* argv[])
 	log4cplus::initialize();
 	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
 	log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
+	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 
-	LOG4CPLUS_INFO(log,"Entering main()...");
+	std::string parameter;
+	if (argc > 1 && argv[1]) {
+		const char * para = argv[1];
+		while (*para && !isalpha(*para)) {
+			para++;
+		}
+		if (para)
+			parameter = para;
+	}
+
+	if (parameter == "service") {
+		/* New installs service  */
+		LOG4CPLUS_INFO(log, "Command parameter is service,registerserver begin...");
+		return chilli::ServiceModule::RegisterServer(true);
+	}
+
+	else if (parameter == "install") {
+		/* New install service*/
+		LOG4CPLUS_INFO(log, "Command parameter is install,registerserver begin...");
+		return chilli::ServiceModule::RegisterServer(true);
+	}
+
+	else if (parameter == "UnregServer") {
+		/*uninstall service*/
+		LOG4CPLUS_INFO(log, "Command parameter is UnregServer,unregister server begin...");
+		return chilli::ServiceModule::UnregisterServer();
+	}
+
+	else if (parameter == "uninstall") {
+		/*uninstall service*/
+		LOG4CPLUS_INFO(log, "Command parameter is uninstall,unregister server begin...");
+		return chilli::ServiceModule::UnregisterServer();
+	}
+	else if (parameter == "version") {
+		std::cout << VERSION << std::endl;
+		return 0;
+	}
+	else if (parameter == WINSERVERPARAMETER && parameter == "start") {
+		/*startup by service manager*/
+		LOG4CPLUS_INFO(log, "Command parameter is startservice,start server begin...");
+		chilli::ServiceModule::m_bService = true;
+	}
+
+
+	signal(SIGTERM, SignalHandler);
+	signal(SIGILL, SignalHandler);
+
+	if (chilli::ServiceModule::m_bService)
+	{
+		// 如果是以服务程序启动
+#ifdef __linux__
+
+		pid_t pid;
+		/* 屏蔽一些有关控制终端操作的信号
+		* 防止在守护进程没有正常运转起来时，因控制终端受到干扰退出或挂起
+		* */
+
+		signal(SIGINT, SIG_IGN);// 终端中断  
+		signal(SIGHUP, SIG_IGN);// 连接挂断  
+		signal(SIGQUIT, SIG_IGN);// 终端退出  
+		signal(SIGPIPE, SIG_IGN);// 向无读进程的管道写数据  
+		signal(SIGTTOU, SIG_IGN);// 后台程序尝试写操作  
+		signal(SIGTTIN, SIG_IGN);// 后台程序尝试读操作  
+		signal(SIGTERM, SIG_IGN);// 终止  
+
+		pid = fork();
+		if (pid < 0) {
+			perror("fork error!");
+			exit(1);
+		}
+		else if (pid > 0) {
+			exit(0);
+		}
+
+		// [2] create a new session  
+		setsid();
+
+		// [3] set current path  
+
+		int fd;
+		//[4]将标准输入输出重定向到空设备
+		fd = open("/dev/null", O_RDWR, 0);
+		if (fd != -1) {
+			dup2(fd, STDIN_FILENO);
+			dup2(fd, STDOUT_FILENO);
+			dup2(fd, STDERR_FILENO);
+			if (fd > 2)
+				close(fd);
+		}
+		// [5] umask 0  
+		umask(0);
+#else
+		chilli::ServiceModule::Init();
+		SERVICE_TABLE_ENTRY st[] =
+		{
+			{ chilli::ServiceModule::m_szServiceName, chilli::ServiceModule::Start },
+			{ NULL, NULL }
+		};
+		if (chilli::ServiceModule::m_bService && !::StartServiceCtrlDispatcher(st))
+		{
+			LOG4CPLUS_DEBUG(log, "error startup as  a console app with a -startservice...");
+			chilli::ServiceModule::m_bService = FALSE;
+		}
+		LOG4CPLUS_DEBUG(log,"Service Exiting...");
+#endif
+	}
+
 	try
 	{
-		
-		int  x;
-
-		char opts_str[1024] = "";
-		char *local_argv[512] = { 0 };
-		int local_argc = argc;
-		char *arg_argv[128] = { 0 };
-		
-		for (x = 0; x < argc; x++) {
-			local_argv[x] = argv[x];
-		}
-		for (x = 1; x < local_argc; x++) {
-			if (strlen(local_argv[x])== 0)
-				continue;
-
-			if (x == 1 && !strcmp(local_argv[x], "-service")) {
-				/* New installs service  */
-				LOG4CPLUS_INFO(log,"Command parameter is service,registerserver begin...");
-				return chilli::ServiceModule::RegisterServer(true);
-			}
-
-			else if (x == 1 && !strcmp(local_argv[x], "-install")) {
-				/* New install service*/
-				LOG4CPLUS_INFO(log,"Command parameter is install,registerserver begin...");
-				return chilli::ServiceModule::RegisterServer(true);
-			}
-
-			else if (x == 1 && !strcmp(local_argv[x], "-UnregServer")) {
-				/*uninstall service*/
-				LOG4CPLUS_INFO(log,"Command parameter is UnregServer,unregister server begin...");
-				return chilli::ServiceModule::UnregisterServer();
-			}
-
-			else if (x == 1 && !strcmp(local_argv[x], "-uninstall")) {
-				/*uninstall service*/
-				LOG4CPLUS_INFO(log,"Command parameter is uninstall,unregister server begin...");
-				return chilli::ServiceModule::UnregisterServer();
-			}
-			else if (x == 1 && !strcmp(local_argv[x], WINSERVERPARAMETER)) {
-				/*startup by service manager*/
-				LOG4CPLUS_INFO(log,"Command parameter is startservice,start server begin...");
-				chilli::ServiceModule::m_bService = true;
-			}
-		}
-
-		signal(SIGTERM, SignalHandler);
-		signal(SIGILL, SignalHandler);
-
-		if (chilli::ServiceModule::m_bService)
-		{
-			// 如果是以服务程序启动
-			chilli::ServiceModule::Init();
-			SERVICE_TABLE_ENTRY st[] =
-			{
-				{ chilli::ServiceModule::m_szServiceName, chilli::ServiceModule::Start },
-				{ NULL, NULL }
-			};
-			if (chilli::ServiceModule::m_bService && !::StartServiceCtrlDispatcher(st))
-			{
-				LOG4CPLUS_DEBUG(log,"error startup as  a console app with a -startservice...");
-				chilli::ServiceModule::m_bService = FALSE;
-			}
-			LOG4CPLUS_DEBUG(log,"Service Exiting...");
-		}
-		else{
-
-			//在控制台方式下运行
-			SetConsoleCtrlHandler(ConsoleHandler, TRUE);
-			chilli::App::Start();
-			CoreRuntimeLoop(0);
-			chilli::App::Stop();
-			
-		}
+		//在控制台方式下运行
+		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+		chilli::App::Start();
+		CoreRuntimeLoop(0);
+		chilli::App::Stop();
 
 	}
 	catch (std::exception & e)
@@ -172,7 +210,7 @@ void chilli::App::AppInit(void)
 bool chilli::App::LoadConfig(const std::string & strConfigFile)
 {
 	bool bResult = true;
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
+	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_INFO(log, "config file: " << strConfigFile);
 
 	using namespace tinyxml2;
@@ -236,7 +274,11 @@ void CoreRuntimeLoop(int bg)
 
 void chilli::App::Start()
 {
-	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
+	log4cplus::initialize();
+	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
+	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
+
+	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
