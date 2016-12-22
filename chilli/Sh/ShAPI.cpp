@@ -2576,8 +2576,8 @@ namespace SHAPI {
 			ShgGetCpg = nullptr;
 			ShgGetReleaseReason = nullptr;
 #endif
+			SHP_A3.Close();
 		}
-		SHP_A3.Close();
 		return true;
 	}
 }
