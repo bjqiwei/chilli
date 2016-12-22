@@ -5,9 +5,7 @@
 #include <string>
 #include <atomic>
 #include <thread>
-#include <acs.h>
-#include <csta.h>
-#include <attpriv.h>
+#include "AvayaAPI.h"
 
 namespace chilli {
 	namespace Avaya {

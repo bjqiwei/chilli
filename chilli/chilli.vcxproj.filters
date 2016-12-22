@@ -126,6 +126,12 @@
     <ClInclude Include="Avaya\AvayaExtension.h">
       <Filter>Avaya</Filter>
     </ClInclude>
+    <ClInclude Include="Avaya\AvayaAPI.h">
+      <Filter>Avaya</Filter>
+    </ClInclude>
+    <ClInclude Include="Sh\ShAPI.h">
+      <Filter>Sh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -175,6 +181,12 @@
     </ClCompile>
     <ClCompile Include="Avaya\AvayaExtension.cpp">
       <Filter>Avaya</Filter>
+    </ClCompile>
+    <ClCompile Include="Avaya\AvayaAPI.cpp">
+      <Filter>Avaya</Filter>
+    </ClCompile>
+    <ClCompile Include="Sh\ShAPI.cpp">
+      <Filter>Sh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

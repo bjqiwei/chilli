@@ -9,6 +9,7 @@
 namespace chilli {
 	namespace Avaya {
 
+		using namespace AvayaAPI;
 		// Constructor of the TSAPIModule 
 		TSAPIModule::TSAPIModule()
 		{
@@ -27,6 +28,10 @@ namespace chilli {
 		int TSAPIModule::Start()
 		{
 			if (!m_thread.joinable()) {
+
+				if (!InitAvayaAPI())
+					return false;
+
 				bool ret = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
 				if (ret) {
 					m_thread = std::thread(&TSAPIModule::run, this);
@@ -42,6 +47,8 @@ namespace chilli {
 		int TSAPIModule::Stop()
 		{
 			if (m_thread.joinable()) {
+				UnInitAvayaAPI();
+
 				bool ret = CloseStream();
 				m_thread.join();
 				return ret;
@@ -127,7 +134,7 @@ namespace chilli {
 			strcpy_s(m_stPrivateData.vendor, "VERSION");
 			m_stPrivateData.data[0] = PRIVATE_DATA_ENCODING;
 
-			if (attMakeVersionString("2-8", &(m_stPrivateData.data[1])) > 0)
+			if (AvayaAPI::attMakeVersionString("2-8", &(m_stPrivateData.data[1])) > 0)
 			{
 				m_stPrivateData.length = (unsigned short)strlen(&m_stPrivateData.data[1]) + 2;
 			}
@@ -136,7 +143,7 @@ namespace chilli {
 				m_stPrivateData.length = 0;
 			}
 
-			RetCode_t nRetCode = acsOpenStream(&m_lAcsHandle			// Handle for ACS Stream 
+			RetCode_t nRetCode = AvayaAPI::acsOpenStream(&m_lAcsHandle			// Handle for ACS Stream 
 				, APP_GEN_ID			// APP_GEN_ID indicates Application generated invokeID's
 				, (InvokeID_t)m_ulInvokeID  // By default 1
 				, ST_CSTA
@@ -158,7 +165,7 @@ namespace chilli {
 
 
 			if (nRetCode < 0) {
-				LOG4CPLUS_ERROR(log, "acsOpenStream:" << acsReturnCodeString(nRetCode));
+				LOG4CPLUS_ERROR(log, "acsOpenStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
 				bResult = false;
 			}
 			else {
@@ -178,7 +185,7 @@ namespace chilli {
 			// If acsCloseStream() method is used then we will get confirmation or failure event, 
 			// however in this case we do not want to receive confirmation event as our application
 			// is going to exit.
-			RetCode_t nRetCode = acsCloseStream(m_lAcsHandle, ++m_ulInvokeID, NULL);
+			RetCode_t nRetCode = AvayaAPI::acsCloseStream(m_lAcsHandle, ++m_ulInvokeID, NULL);
 
 
 			// If acsAbortStream() method is used we will not receive confirmation or failure event,
@@ -186,7 +193,7 @@ namespace chilli {
 			//RetCode_t nRetCode = acsAbortStream(m_lAcsHandle, NULL);
 
 			if (nRetCode < 0) {
-				LOG4CPLUS_ERROR(log, "acsCloseStream:" << acsReturnCodeString(nRetCode));
+				LOG4CPLUS_ERROR(log, "acsCloseStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
 			}
 			else {
 				bReturnValue = true;
@@ -208,7 +215,7 @@ namespace chilli {
 
 			while (true) {
 
-				RetCode_t nRetCode = acsGetEventBlock(m_lAcsHandle, (void *)&cstaEvent, &usEventBufSize,
+				RetCode_t nRetCode = AvayaAPI::acsGetEventBlock(m_lAcsHandle, (void *)&cstaEvent, &usEventBufSize,
 					(PrivateData_t *)&m_stPrivateData, NULL);
 
 				// If there is error retriveing Event Structure 
@@ -216,14 +223,14 @@ namespace chilli {
 				while (nRetCode == ACSERR_UBUFSMALL) {
 
 					std::shared_ptr<char> EventPtr(new char[usEventBufSize]);
-					nRetCode = acsGetEventBlock(m_lAcsHandle, EventPtr.get(), &usEventBufSize,
+					nRetCode = AvayaAPI::acsGetEventBlock(m_lAcsHandle, EventPtr.get(), &usEventBufSize,
 						(PrivateData_t *)&m_stPrivateData, NULL);
 
 					memcpy(&cstaEvent, EventPtr.get(), sizeof(cstaEvent));
 				}
 
 				if (nRetCode < 0) {
-					LOG4CPLUS_ERROR(log, "acsGetEventBlock:" << acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "acsGetEventBlock:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					break;
 				}
 
@@ -237,7 +244,7 @@ namespace chilli {
 					case ACS_OPEN_STREAM_CONF:
 					{
 						ServerID_t svrId;
-						if (acsGetServerID(m_lAcsHandle, &svrId) == ACSPOSITIVE_ACK)
+						if (AvayaAPI::acsGetServerID(m_lAcsHandle, &svrId) == ACSPOSITIVE_ACK)
 							LOG4CPLUS_INFO(log, "Open ServerID:" << svrId);
 
 						LOG4CPLUS_INFO(log, "ACS_OPEN_STREAM_CONF.");
@@ -246,8 +253,8 @@ namespace chilli {
 						LOG4CPLUS_INFO(log, "Tsrv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.tsrvVer);
 						LOG4CPLUS_INFO(log, "Drv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.drvrVer);
 
-						cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
-						cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
+						AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
+						AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
 					}
 					break;
 					case ACS_CLOSE_STREAM_CONF:
@@ -258,7 +265,7 @@ namespace chilli {
 					break;
 					case ACS_UNIVERSAL_FAILURE_CONF:
 					{
-						LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE_CONF:" << acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
+						LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
 					}
 					break;
 					default: {};
