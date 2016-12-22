@@ -127,7 +127,7 @@ namespace AvayaAPI {
 	Proc_getATTPrivate getATTPrivate = nullptr;
 
 	static Dynamiclibrary CSTA32("CSTA32.DLL");
-	static Dynamiclibrary ATTPRV32("APPRV32.DLL");
+	static Dynamiclibrary ATTPRV32("ATTPRV32.DLL");
 
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
