@@ -26,6 +26,7 @@ namespace chilli{
 	private: 
 		static log4cplus::Logger log ;
 		static HANDLE stopEvent;
+		static HANDLE stopEvented;
 
 	public:
 		static void Init();

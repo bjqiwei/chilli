@@ -1,12 +1,16 @@
 #include "ServiceModule.h"
 #include "chilli.h"
+#include <log4cplus/logger.h>
+#include <log4cplus/helpers/loglog.h>
+#include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
 
 
 namespace chilli{
 
 	log4cplus::Logger ServiceModule::log = log4cplus::Logger::getInstance("chilli.ServiceModule");
-	HANDLE ServiceModule::stopEvent;
+	HANDLE ServiceModule::stopEvent = NULL;
+	HANDLE ServiceModule::stopEvented = NULL;
 	bool ServiceModule::m_bService = false;
 	char ServiceModule::m_szServiceName[256] = SERVICENAME_DEFAULT;
 	SERVICE_STATUS_HANDLE ServiceModule::m_hServiceStatus = NULL;
@@ -219,20 +223,29 @@ void WINAPI chilli::ServiceModule::Start(DWORD  dwArgc, LPTSTR* lpszArgv)
 	chilli::ServiceModule::SetServiceStatus(SERVICE_START_PENDING);
 	//执行你自己的代码
 	stopEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
+	stopEvented = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+	log4cplus::initialize();
+#ifdef DEBUG
+	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
+#endif
+	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
+
 	chilli::App::Start();
 
 	chilli::ServiceModule::SetServiceStatus(SERVICE_RUNNING);
 	WaitForSingleObject(stopEvent,INFINITE);
 	chilli::App::Stop();
+	SetEvent(stopEvented);
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
-	SetEvent(stopEvent);
 }
 
 void chilli::ServiceModule::Stop()
 {
 	SetEvent(stopEvent);
-	WaitForSingleObject(stopEvent,INFINITE);
+	WaitForSingleObject(stopEvented,INFINITE);
 	CloseHandle(stopEvent);
+	CloseHandle(stopEvented);
 }
 
 void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode)
@@ -241,19 +254,26 @@ void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode)
 	switch (dwOpcode)
 	{
 	case SERVICE_CONTROL_STOP:
+		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_STOP");
+		goto stoping;
 	case SERVICE_CONTROL_SHUTDOWN:
+		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_SHUTDOWN");
+stoping:
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOP_PENDING);
 		Stop();
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOPPED);
 		break;
 	case SERVICE_CONTROL_PAUSE:
+		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_PAUSE");
 		break;
 	case SERVICE_CONTROL_CONTINUE:
+		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_CONTINUE");
 		break;
 	case SERVICE_CONTROL_INTERROGATE:
+		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_INTERROGATE");
 		break;
 	default:
-		LOG4CPLUS_WARN(log,"Bad service request:" << dwOpcode);
+		LOG4CPLUS_WARN(log, "Bad service request:" << dwOpcode);
 	}
 
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");

@@ -57,7 +57,9 @@ int main(int argc, char* argv[])
 	chilli::App::AppInit();
 
 	log4cplus::initialize();
+#ifdef DEBUG
 	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
+#endif
 	log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 
@@ -98,7 +100,7 @@ int main(int argc, char* argv[])
 		std::cout << VERSION << std::endl;
 		return 0;
 	}
-	else if (parameter == WINSERVERPARAMETER && parameter == "start") {
+	else if (parameter == "startservice" || parameter == "start") {
 		/*startup by service manager*/
 		LOG4CPLUS_INFO(log, "Command parameter is startservice,start server begin...");
 		chilli::ServiceModule::m_bService = true;
@@ -165,12 +167,19 @@ int main(int argc, char* argv[])
 			chilli::ServiceModule::m_bService = FALSE;
 		}
 		LOG4CPLUS_DEBUG(log,"Service Exiting...");
+		return 0;
 #endif
 	}
 
 	try
 	{
 		//在控制台方式下运行
+		log4cplus::initialize();
+#ifdef DEBUG
+		log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
+#endif
+		log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
+
 		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 		chilli::App::Start();
 		CoreRuntimeLoop(0);
@@ -183,7 +192,6 @@ int main(int argc, char* argv[])
 		LOG4CPLUS_FATAL(log,e.what());
 	}
 
-	LOG4CPLUS_INFO(log,"Exiting main()...");
 	// When we get here, the service has been stopped
 	int nExitCode = 0;
 	return nExitCode;
@@ -274,10 +282,6 @@ void CoreRuntimeLoop(int bg)
 
 void chilli::App::Start()
 {
-	log4cplus::initialize();
-	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
-	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
-
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = strFileNameNoExtension + ".xml";
