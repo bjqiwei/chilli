@@ -37,6 +37,9 @@
     <Filter Include="freeswitch">
       <UniqueIdentifier>{3f4e453c-8f58-4e1d-bc69-020370354b2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Avaya">
+      <UniqueIdentifier>{30b81287-8bbb-4298-9c40-99fe02dbde55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -111,14 +114,17 @@
     <ClInclude Include="freeswitch\FreeSwitchModule.h">
       <Filter>freeswitch</Filter>
     </ClInclude>
-    <ClInclude Include="Sh\ShAPI.h">
-      <Filter>Sh</Filter>
-    </ClInclude>
     <ClInclude Include="Sh\shpa3api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dynamiclibrary.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Avaya\TSAPIModule.h">
+      <Filter>Avaya</Filter>
+    </ClInclude>
+    <ClInclude Include="Avaya\AvayaExtension.h">
+      <Filter>Avaya</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,8 +170,11 @@
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp">
       <Filter>freeswitch</Filter>
     </ClCompile>
-    <ClCompile Include="Sh\ShAPI.cpp">
-      <Filter>Sh</Filter>
+    <ClCompile Include="Avaya\TSAPIModule.cpp">
+      <Filter>Avaya</Filter>
+    </ClCompile>
+    <ClCompile Include="Avaya\AvayaExtension.cpp">
+      <Filter>Avaya</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +190,9 @@
       <Filter>Resource Files</Filter>
     </Xml>
     <Xml Include="Agent.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="AvayaExtension.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

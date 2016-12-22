@@ -67,6 +67,16 @@
         <Extension>5010</Extension>
     </group>
     </groups>
-	<FreeSwitch host="127.0.0.1" port ="8021" password="ClueCon">
-	</FreeSwitch>
+	<!--<FreeSwitch host="127.0.0.1" port ="8021" password="ClueCon">
+	</FreeSwitch>-->
+	<Avaya>
+		<TSAPI>
+		<TLink>AVAYA#CM#CSTA#AES</TLink>
+		<UserID>ctiadaptor</UserID>
+		<Password>Dadmin@01</Password>
+		</TSAPI>
+		<Extensions>
+			<Extension ExtensionNumber="1010" StateMachine="./AvayaExtension.xml"></Extension>
+		</Extensions>
+	</Avaya>
 </Config>

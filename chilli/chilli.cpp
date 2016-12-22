@@ -11,11 +11,14 @@
 #include "Agent/AgentModule.h"
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
+#include "Avaya/TSAPIModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
 #include "tinyxml2/tinyxml2.h"
 
+#define  FREESWITCHNODE "FreeSwitch"
+#define  AVAYANODE      "Avaya"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -230,21 +233,28 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 	}
 	if (tinyxml2::XMLElement *eConfig = config.FirstChildElement("Config")){
 		tinyxml2::XMLElement * e = eConfig->FirstChildElement();
-		while( e != nullptr)
+		while (e != nullptr)
 		{
-#define  FREESWITCHNODE "FreeSwitch"
 			std::string nodeName = e->Name() ? e->Name() : "";
-			if (nodeName == FREESWITCHNODE){
+			if (nodeName == FREESWITCHNODE) {
 				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule());
 				XMLPrinter printer;
 				e->Accept(&printer);
 				freeswtich->LoadConfig(printer.CStr());
 				m_Modules.push_back(freeswtich);
 			}
+			else if (nodeName == AVAYANODE)
+			{
+				model::ProcessModulePtr tsapi(new chilli::Avaya::TSAPIModule());
+				XMLPrinter printer;
+				e->Accept(&printer);
+				tsapi->LoadConfig(printer.CStr());
+				m_Modules.push_back(tsapi);
+
+			}
 		
 			e = e->NextSiblingElement();
 		}
-#undef FREESWITCHNODE
 
 	}
 	else {
@@ -286,7 +296,7 @@ void chilli::App::Start()
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
-	for (auto it:m_Modules){
+	for (auto & it:m_Modules){
 		it->Start();
 	}
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
@@ -297,7 +307,7 @@ void chilli::App::Stop()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	for (auto it : m_Modules){
+	for (auto & it : m_Modules){
 		it->Stop();
 	}
 	m_Modules.clear();

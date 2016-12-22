@@ -59,7 +59,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,6 +78,7 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
+xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
@@ -91,7 +92,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,6 +116,7 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
+xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
@@ -137,6 +139,8 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="ACD\ACDModule.h" />
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
+    <ClInclude Include="Avaya\AvayaExtension.h" />
+    <ClInclude Include="Avaya\TSAPIModule.h" />
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Dynamiclibrary.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
@@ -147,7 +151,6 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
-    <ClInclude Include="Sh\ShAPI.h" />
     <ClInclude Include="Sh\ShDevModule.h" />
     <ClInclude Include="Sh\ShExtension.h" />
     <ClInclude Include="Sh\shpa3api.h" />
@@ -160,13 +163,14 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
+    <ClCompile Include="Avaya\AvayaExtension.cpp" />
+    <ClCompile Include="Avaya\TSAPIModule.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
     <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
-    <ClCompile Include="Sh\ShAPI.cpp" />
     <ClCompile Include="Sh\ShDevModule.cpp" />
     <ClCompile Include="Sh\ShExtension.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
@@ -175,6 +179,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
   <ItemGroup>
     <Xml Include="ACD.xml" />
     <Xml Include="Agent.xml" />
+    <Xml Include="AvayaExtension.xml" />
     <Xml Include="chilli.xml">
       <SubType>Designer</SubType>
     </Xml>
