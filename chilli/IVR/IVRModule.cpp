@@ -68,8 +68,10 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		child != nullptr; 
 		child = child->NextSiblingElement("Extension")) {
 
-		const char * num = child->Attribute("ExtensionNumber", "");
-		const char * sm = child->Attribute("StateMachine", "");
+		const char * num = child->Attribute("ExtensionNumber");
+		const char * sm = child->Attribute("StateMachine");
+		num = num ? num : "";
+		sm = sm ? sm : "";
 		if (this->m_Extensions.find(num) == this->m_Extensions.end())
 		{
 			model::ExtensionPtr ext(new IVRExtension(num, sm));

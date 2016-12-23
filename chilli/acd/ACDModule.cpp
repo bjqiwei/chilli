@@ -66,8 +66,11 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 		child != nullptr;
 		child = child->NextSiblingElement("Extension"))
 	{
-		const char * num = child->Attribute("ExtensionNumber", "");
-		const char * sm = child->Attribute("StateMachine", "");
+		const char * num = child->Attribute("ExtensionNumber");
+		const char * sm = child->Attribute("StateMachine");
+		num = num ? num : "";
+		sm = sm ? sm : "";
+
 		if (this->m_Extension.find(num) == this->m_Extension.end())
 		{
 			model::ExtensionPtr ext(new ACDExtension(num, sm));

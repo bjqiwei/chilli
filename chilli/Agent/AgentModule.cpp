@@ -63,11 +63,12 @@ int AgentModule::Start()
 
 	if(!m_bRunning)
 	{
+		m_bRunning = true;
+
 		for (auto & it : m_Agents) {
 			it.second->Start();
 		}
 
-		m_bRunning = true;
 		if (this->m_tcpPort !=-1){
 			std::thread th(&AgentModule::listenTCP, this, this->m_tcpPort);
 			m_Threads.push_back(std::move(th));
@@ -98,13 +99,15 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	eAgent->QueryIntAttribute("TCPPort", &this->m_tcpPort);
 	eAgent->QueryIntAttribute("WSPort", &this->m_wsPort);
 
-	for (XMLElement *child = eAgent->FirstChildElement("Extension");
+	for (XMLElement *child = eAgent->FirstChildElement("Agent");
 		child != nullptr;
-		child = child->NextSiblingElement("Extension"))
+		child = child->NextSiblingElement("Agent"))
 	{
 
-		const char * num = child->Attribute("ExtensionNumber", "");
-		const char * sm = child->Attribute("StateMachine", "");
+		const char * num = child->Attribute("ExtensionNumber");
+		const char * sm = child->Attribute("StateMachine");
+		num = num ? num : "";
+		sm = sm ? sm : "";
 		if (this->m_Agents.find(num) == this->m_Agents.end())
 		{
 			model::ExtensionPtr ext(new Agent(num, sm));
@@ -162,7 +165,7 @@ void AgentModule::run()
 
 			}
 			else{
-				LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << strEvent << " not json data.");
+				LOG4CPLUS_ERROR(log, ",event:" << strEvent << " not json data.");
 			}
 		}
 	}
@@ -198,7 +201,7 @@ static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, str
 static void conn_read_cb(struct bufferevent *bev, void * user_data)
 {
 	AgentModule * This = reinterpret_cast<AgentModule *>(user_data);
-	LOG4CPLUS_DEBUG(This->log, __FUNCTION__":" << bev);
+	LOG4CPLUS_DEBUG(This->log, ":" << bev);
 	/* This callback is invoked when there is data to read on bev. */
 	struct evbuffer *input = bufferevent_get_input(bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
@@ -220,7 +223,7 @@ static void conn_eventcb(struct bufferevent *bev, short events, void * user_data
 {
 	AgentModule * This = reinterpret_cast<AgentModule *>(user_data);
 
-	LOG4CPLUS_DEBUG(This->log, __FUNCTION__":" << bev);
+	LOG4CPLUS_DEBUG(This->log, ":" << bev);
 	if (events & BEV_EVENT_ERROR)
 		LOG4CPLUS_DEBUG(This->log, "Error from bufferevent");
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
@@ -245,11 +248,11 @@ bool AgentModule::listenTCP(int port)
 
 	const char ** methods = event_get_supported_methods();
 	for (int i = 0; methods[i] != nullptr; ++i) {
-		LOG4CPLUS_INFO(log, __FUNCTION__",libevent supported method:" << methods[i]);
+		LOG4CPLUS_INFO(log, ",libevent supported method:" << methods[i]);
 	}
 
 	m_Base = event_base_new();
-	LOG4CPLUS_INFO(log, __FUNCTION__",libevent current method:" <<  event_base_get_method(m_Base));
+	LOG4CPLUS_INFO(log, ",libevent current method:" <<  event_base_get_method(m_Base));
 
 	if (!m_Base) {
 		LOG4CPLUS_ERROR(log, "Could not initialize libevent!");
@@ -271,7 +274,7 @@ bool AgentModule::listenTCP(int port)
 		goto done;
 	}
 
-	LOG4CPLUS_INFO(log, __FUNCTION__",start listen tcp port:" << port);
+	LOG4CPLUS_INFO(log, ",start listen tcp port:" << port);
 
 	while (m_bRunning){
 		event_base_dispatch(m_Base);
@@ -299,7 +302,7 @@ bool AgentModule::listenWS(int port)const
 {
 	bool result = true;
 	WebSocket::WebSocketServer wsserver(port);
-	LOG4CPLUS_INFO(log, __FUNCTION__",start listen port:" << port);
+	LOG4CPLUS_INFO(log, ",start listen port:" << port);
 	wsserver.InitInstance();
 
 	while (m_bRunning){

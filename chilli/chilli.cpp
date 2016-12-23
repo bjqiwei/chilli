@@ -19,6 +19,7 @@
 
 #define  FREESWITCHNODE "FreeSwitch"
 #define  AVAYANODE      "Avaya"
+#define  AGENTNODE      "Agents"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -250,6 +251,15 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				e->Accept(&printer);
 				tsapi->LoadConfig(printer.CStr());
 				m_Modules.push_back(tsapi);
+
+			}
+			else if (nodeName == AGENTNODE)
+			{
+				model::ProcessModulePtr agent(new chilli::Agent::AgentModule());
+				XMLPrinter printer;
+				e->Accept(&printer);
+				agent->LoadConfig(printer.CStr());
+				m_Modules.push_back(agent);
 
 			}
 		

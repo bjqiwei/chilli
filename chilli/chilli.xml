@@ -3,11 +3,11 @@
   <ACD>
 	    <Extension ExtensionNumber="0001" StateMachine="./ACD.xml"></Extension>
   </ACD>
-  <Agent TCPPort="9995" WSPort="9996">
-    <Extension ExtensionNumber="6001" StateMachine="./Agent.xml"></Extension>
-    <Extension ExtensionNumber="6002" StateMachine="./Agent.xml"></Extension>
-    <Extension ExtensionNumber="6003" StateMachine="./Agent.xml"></Extension>
-  </Agent>
+  <Agents TCPPort="9995" WSPort="9996">
+    <Agent ExtensionNumber="6001" StateMachine="./Agent.xml"></Agent>
+    <Agent ExtensionNumber="6002" StateMachine="./Agent.xml"></Agent>
+    <Agent ExtensionNumber="6003" StateMachine="./Agent.xml"></Agent>
+  </Agents>
   <Extensions>
     <Extension ExtensionNumber="1000" ChannelID="0" Type="Analog_Trunk" Enable="1" StateMachine="./Analog_Trunk.xml"></Extension>
     <Extension ExtensionNumber="1001" ChannelID="1" Type="Anolog_User" Enable="1" StateMachine="./Anolog_User.xml"></Extension>
