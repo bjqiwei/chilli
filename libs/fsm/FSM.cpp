@@ -42,7 +42,7 @@ const std::string & fsm::StateMachine::getSessionId()const {
 	return imp->getSessionId();
 }
 
-void fsm::StateMachine::go()
+bool fsm::StateMachine::go()
 {
 	return imp->go();
 }

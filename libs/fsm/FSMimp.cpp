@@ -658,7 +658,8 @@ void fsm::StateMachineimp::setLog(log4cplus::Logger log)
 {
 	this->log = log;
 }
-void fsm::StateMachineimp::go()
+
+bool fsm::StateMachineimp::go()
 {
 	if (Init()){
 		fsm::Context *ctx = getRootContext();
@@ -690,10 +691,12 @@ void fsm::StateMachineimp::go()
 		m_Running = true;
 		LOG4CPLUS_INFO(log, m_strSessionID << ",go");
 		enterStates(this->m_initState);
+		return true;
 	}
 	else{
 		throw std::exception("Error: unable init statemachine.");
 	}
+	return false;
 }
 
 void fsm::StateMachineimp::termination()

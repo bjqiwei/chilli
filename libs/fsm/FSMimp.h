@@ -29,7 +29,7 @@ namespace fsm{
 		StateMachineimp & operator=(const StateMachineimp & other) = delete;
 
 		//开始进入初始化状态
-		void go();
+		bool go();
 		//停止运行
 		void termination();
 		//const xmlNodePtr getCurrentState(void) const;
