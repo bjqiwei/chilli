@@ -66,8 +66,9 @@ namespace chilli {
 				return false;
 			}
 
+			XMLElement * avaya = config.FirstChildElement("Avaya");
 			// tsapi link
-			XMLElement * tsapi = config.FirstChildElement("TSAPI");
+			XMLElement * tsapi = avaya->FirstChildElement("TSAPI");
 			if (tsapi != nullptr) {
 				XMLElement* LinkElement = tsapi->FirstChildElement("TLink");
 				if (LinkElement != nullptr) {
@@ -98,10 +99,10 @@ namespace chilli {
 			}
 
 			//extensions 
-			XMLElement * extensions = config.FirstChildElement("Extensions");
+			XMLElement * extensions = avaya->FirstChildElement("Extensions");
 			if (extensions != nullptr) {
 
-				for (XMLElement *child = config.FirstChildElement("Extension");
+				for (XMLElement *child = extensions->FirstChildElement("Extension");
 					child != nullptr;
 					child = child->NextSiblingElement("Extension"))
 				{
