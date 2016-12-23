@@ -72,6 +72,7 @@ private:
 		{
 			LOG4CPLUS_ERROR(log, e.what());
 		}
+		log4cplus::threadCleanup();
 	};
 
 	std::atomic_bool m_Running = false;

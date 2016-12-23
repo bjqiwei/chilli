@@ -110,6 +110,7 @@ void FreeSwtichModule::ConnectFS()
 		esl_disconnect(&handle);
 	}
 	LOG4CPLUS_DEBUG(log, "Stoped  FreeSwitch module");
+	log4cplus::threadCleanup();
 }
 }
 }

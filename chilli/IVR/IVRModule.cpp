@@ -138,7 +138,7 @@ void IVRModule::run()
 		}
 	}
 	LOG4CPLUS_INFO(log, "Stoped.");
-	
+	log4cplus::threadCleanup();
 }
 }
 }

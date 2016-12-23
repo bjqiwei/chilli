@@ -155,7 +155,7 @@ void ACDModule::run()
 			}
 		}
 	}
-	
+	log4cplus::threadCleanup();
 }
 }
 }

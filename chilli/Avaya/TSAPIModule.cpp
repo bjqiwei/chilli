@@ -387,6 +387,7 @@ namespace chilli {
 			}
 		end:
 			LOG4CPLUS_INFO(log, "Stoped.");
+			log4cplus::threadCleanup();
 		}
 	}
 }
