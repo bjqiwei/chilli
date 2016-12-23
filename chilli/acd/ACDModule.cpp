@@ -9,7 +9,7 @@ namespace chilli{
 namespace ACD{
 
 
-ACDModule::ACDModule(void)
+ACDModule::ACDModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACDModule");
 	LOG4CPLUS_DEBUG(log,"Constuction a ACD module.");
@@ -87,6 +87,11 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 const model::ExtensionMap & ACDModule::GetExtension()
 {
 	return m_Extension;
+}
+
+void ACDModule::fireSend(const std::string & strContent, const void * param)
+{
+	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
 model::ExtensionPtr ACDModule::GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext)

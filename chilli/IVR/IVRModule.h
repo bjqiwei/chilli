@@ -12,12 +12,15 @@ namespace IVR{
 class IVRModule :public model::ProcessModule
 {
 public:
-	IVRModule();
+	explicit IVRModule(const std::string & id);
 	virtual ~IVRModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
 	virtual const model::ExtensionMap & GetExtension() override;
+private:
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
 	std::thread m_Thread;

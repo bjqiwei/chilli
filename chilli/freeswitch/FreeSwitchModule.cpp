@@ -10,7 +10,7 @@ namespace chilli{
 namespace FreeSwitch{
 
 
-FreeSwtichModule::FreeSwtichModule(void)
+FreeSwtichModule::FreeSwtichModule(const std::string & id):ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.FreeSwtichModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
@@ -71,6 +71,10 @@ const std::map<std::string, model::ExtensionPtr> & FreeSwtichModule::GetExtensio
 	return m_Extension;
 }
 
+void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)
+{
+	LOG4CPLUS_WARN(log, "fireSend not implement.");
+}
 
 void FreeSwtichModule::ConnectFS()
 {

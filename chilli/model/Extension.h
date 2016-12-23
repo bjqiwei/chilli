@@ -39,6 +39,11 @@ public:
 		}
 	};
 
+	bool AddSendImplement(SendInterface * evtDsp){
+		return m_SM->addSendImplement(evtDsp);
+	}
+
+
 	virtual const std::string & getExtensionNumber() const = 0;
 	virtual int pushEvent(const std::string &evt) = 0;
 	virtual void setSessionId(const std::string & sessinId) = 0;

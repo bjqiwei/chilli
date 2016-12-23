@@ -23,7 +23,7 @@ class ShDevModule :
 	public chilli::model::ProcessModule
 {
 public:
-	ShDevModule(void);
+	explicit ShDevModule(const std::string & id);
 	virtual ~ShDevModule(void);
 
 	virtual int Start() override;
@@ -31,7 +31,9 @@ public:
 	virtual bool LoadConfig(const std::string & configContext) override;
 	virtual const model::ExtensionMap & GetExtension() override;
 
-
+private:
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 
 	bool Init();

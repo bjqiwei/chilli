@@ -13,13 +13,15 @@ namespace ACD{
 class ACDModule :public model::ProcessModule
 {
 public:
-	ACDModule();
+	explicit ACDModule(const std::string & id);
 	virtual ~ACDModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
 	virtual const std::map<std::string, model::ExtensionPtr> &GetExtension() override;
-
+private:
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
 	std::thread m_Thread;

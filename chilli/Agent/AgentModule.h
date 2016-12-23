@@ -12,13 +12,15 @@ namespace Agent{
 class AgentModule :public model::ProcessModule
 {
 public:
-	AgentModule();
+	explicit AgentModule(const std::string & id);
 	virtual ~AgentModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
 	virtual const model::ExtensionMap & GetExtension() override;
-
+private:
+	//inherit from SendInterface
+	virtual void fireSend(const std::string &strContent, const void * param) override;
 public:
 	log4cplus::Logger log;
 private:

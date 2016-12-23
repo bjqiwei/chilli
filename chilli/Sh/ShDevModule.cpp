@@ -15,7 +15,7 @@ static std::string GetSsmLastErrMsg()
 	return Err;
 }
 
-ShDevModule::ShDevModule(void)
+ShDevModule::ShDevModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
 	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
@@ -27,6 +27,11 @@ ShDevModule::~ShDevModule(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
 	UnInitLib();
+}
+
+void ShDevModule::fireSend(const std::string &strContent, const void * param)
+{
+	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
 bool ShDevModule::Init()

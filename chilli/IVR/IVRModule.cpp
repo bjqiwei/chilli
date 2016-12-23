@@ -9,7 +9,7 @@ namespace chilli{
 namespace IVR{
 
 
-IVRModule::IVRModule(void)
+IVRModule::IVRModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.IVRModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a IVR module.");
@@ -87,6 +87,11 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 const model::ExtensionMap & IVRModule::GetExtension()
 {
 	return m_Extensions;
+}
+
+void IVRModule::fireSend(const std::string &strContent, const void * param)
+{
+	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
 void IVRModule::run()

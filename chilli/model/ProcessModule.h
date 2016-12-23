@@ -5,15 +5,16 @@
 #include "Extension.h"
 #include <map>
 #include <memory>
+#include <FSM.h>
 
 namespace chilli{
 namespace model{
 
 typedef std::map<std::string, ExtensionPtr> ExtensionMap;
-class ProcessModule
+class ProcessModule :public fsm::SendInterface
 {
 public:
-	explicit ProcessModule(){};
+	explicit ProcessModule(const std::string & modelId):SendInterface(modelId){};
 	virtual ~ProcessModule(){};
 
 	virtual bool LoadConfig(const std::string & configContext) = 0;

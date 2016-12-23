@@ -10,12 +10,15 @@ namespace FreeSwitch{
 	class FreeSwtichModule :public model::ProcessModule
 	{
 	public:
-		FreeSwtichModule();
+		explicit FreeSwtichModule(const std::string & id);
 		virtual ~FreeSwtichModule(void);
 		virtual int Start() override;
 		virtual int Stop() override;
 		virtual bool LoadConfig(const std::string & config) override;
 		virtual const model::ExtensionMap & GetExtension() override;
+	private:
+		//inherit from SendInterface
+		virtual void fireSend(const std::string &strContent, const void * param) override;
 	private:
 		log4cplus::Logger log;
 		model::ExtensionMap m_Extension;

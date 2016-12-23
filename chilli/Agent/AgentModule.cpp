@@ -18,7 +18,7 @@
 namespace chilli{
 namespace Agent{
 
-AgentModule::AgentModule(void)
+AgentModule::AgentModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a Agent module.");
@@ -125,6 +125,11 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 const model::ExtensionMap & AgentModule::GetExtension()
 {
 	return m_Agents;
+}
+
+void AgentModule::fireSend(const std::string & strContent, const void * param)
+{
+	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
 

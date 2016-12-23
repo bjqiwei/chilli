@@ -11,7 +11,7 @@ namespace chilli {
 
 		using namespace AvayaAPI;
 		// Constructor of the TSAPIModule 
-		TSAPIModule::TSAPIModule()
+		TSAPIModule::TSAPIModule(const std::string & id):ProcessModule(id)
 		{
 			log = log4cplus::Logger::getInstance("chilli.TSAPIModule");
 		}
@@ -128,6 +128,11 @@ namespace chilli {
 		{
 			// TODO: insert return statement here
 			return m_Extensions;
+		}
+
+		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
+		{
+			LOG4CPLUS_WARN(log, "fireSend not implement.");
 		}
 
 		bool TSAPIModule::OpenStream(const char * serverID, const char * loginID, const char * password)

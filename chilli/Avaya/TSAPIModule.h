@@ -13,7 +13,7 @@ namespace chilli {
 		{
 
 		public:
-			explicit TSAPIModule();
+			explicit TSAPIModule(const std::string & id);
 			~TSAPIModule();
 
 			virtual int Start() override;
@@ -22,6 +22,9 @@ namespace chilli {
 			virtual const model::ExtensionMap &GetExtension() override;
 
 		private:
+			//inherit from SendInterface
+			virtual void fireSend(const std::string &strContent, const void * param) override;
+
 			// This function is used to Open a communication Channel(in the form of ACS Stream) for the application to send csta request
 			bool OpenStream(const char * serviceId, const char * userId, const char * password);		// for opening an ACS Stream
 

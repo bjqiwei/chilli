@@ -237,8 +237,11 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 		while (e != nullptr)
 		{
 			std::string nodeName = e->Name() ? e->Name() : "";
+			const char * modelid = e->Attribute("id");
+			modelid = modelid ? modelid : "";
+
 			if (nodeName == FREESWITCHNODE) {
-				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule());
+				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule(modelid));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				freeswtich->LoadConfig(printer.CStr());
@@ -246,7 +249,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			}
 			else if (nodeName == AVAYANODE)
 			{
-				model::ProcessModulePtr tsapi(new chilli::Avaya::TSAPIModule());
+				model::ProcessModulePtr tsapi(new chilli::Avaya::TSAPIModule(modelid));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				tsapi->LoadConfig(printer.CStr());
@@ -255,7 +258,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			}
 			else if (nodeName == AGENTNODE)
 			{
-				model::ProcessModulePtr agent(new chilli::Agent::AgentModule());
+				model::ProcessModulePtr agent(new chilli::Agent::AgentModule(modelid));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				agent->LoadConfig(printer.CStr());
@@ -306,9 +309,20 @@ void chilli::App::Start()
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
+
+	for (auto & it : m_Modules) {
+		for (auto &ext: it->GetExtension())
+		{
+			for (auto & it : m_Modules) {
+				ext.second->AddSendImplement(it.get());
+			}
+		}
+	}
+
 	for (auto & it:m_Modules){
 		it->Start();
 	}
+
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }
