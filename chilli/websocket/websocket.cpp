@@ -5,7 +5,7 @@
 #include <mutex>
 
 namespace WebSocket {
-	static std::map<websocketclient *, struct lws *> WSClientSet;
+	static std::map<WebSocketClient *, struct lws *> WSClientSet;
 	static std::recursive_mutex wsClientSetMtx;
 
 	/*
@@ -18,9 +18,10 @@ namespace WebSocket {
 	static int
 		callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 	{
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("WebSocketModule");
 
-		websocketclient * wsclient = (websocketclient*)user;
+		WebSocketClient * wsclient = (WebSocketClient*)user;
+		WebSocketServer * This = reinterpret_cast<WebSocketServer*>(lws_context_user(lws_get_context(wsi)));
+
 		std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
 		bool isdeconstruct = false;
 		if (WSClientSet.find(wsclient) == WSClientSet.end()) {
@@ -29,12 +30,12 @@ namespace WebSocket {
 
 		switch (reason) {
 		case LWS_CALLBACK_ESTABLISHED:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_ESTABLISHED");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_ESTABLISHED");
 			if (!isdeconstruct)
 				wsclient->OnOpen();
 			break;
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_CONNECTION_ERROR");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_CONNECTION_ERROR");
 			std::string errorCode;
 			if (in) {
 				errorCode.assign((char *)in, len);
@@ -44,19 +45,21 @@ namespace WebSocket {
 		}
 												   break;
 		case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH");
 			break;
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_ESTABLISHED");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_ESTABLISHED");
 			if (!isdeconstruct)
 				wsclient->OnOpen();
 			break;
 		case LWS_CALLBACK_CLOSED:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLOSED");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED");
+			goto lwsclose;
 			break;
 		case LWS_CALLBACK_CLOSED_HTTP:
 		{
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLOSED_HTTP");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED_HTTP");
+lwsclose:
 			std::string errorCode;
 			if (in) {
 				errorCode.assign((char *)in, len);
@@ -67,7 +70,7 @@ namespace WebSocket {
 		}
 		break;
 		case LWS_CALLBACK_RECEIVE: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_RECEIVE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_RECEIVE");
 			std::string message;
 			if (in) {
 				message.assign((char *)in, len);
@@ -77,10 +80,10 @@ namespace WebSocket {
 		}
 								   break;
 		case LWS_CALLBACK_RECEIVE_PONG:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_RECEIVE_PONG");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_RECEIVE_PONG");
 			break;
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_RECEIVE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_RECEIVE");
 			std::string message;
 			if (in) {
 				message.assign((char *)in, len);
@@ -90,14 +93,14 @@ namespace WebSocket {
 		}
 										  break;
 		case LWS_CALLBACK_CLIENT_RECEIVE_PONG:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_RECEIVE_PONG");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_RECEIVE_PONG");
 			break;
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_WRITEABLE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_WRITEABLE");
 			goto ws_write;
 			break;
 		case LWS_CALLBACK_SERVER_WRITEABLE: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_SERVER_WRITEABLE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_SERVER_WRITEABLE");
 		ws_write:
 			if (!isdeconstruct) {
 				wsclient->OnSend();
@@ -119,89 +122,91 @@ namespace WebSocket {
 				}
 			}
 			else {
-				LOG4CPLUS_DEBUG(log, "Close a connection " << wsi);
+				LOG4CPLUS_DEBUG(This->log, "Close a connection " << wsi);
 				return -1;
 			}
 		}
 											break;
 		case LWS_CALLBACK_HTTP: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_HTTP");
 		}
 								break;
 		case LWS_CALLBACK_HTTP_BODY: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_BODY");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_HTTP_BODY");
 		}
 									 break;
 		case LWS_CALLBACK_HTTP_BODY_COMPLETION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_BODY_COMPLETION");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_HTTP_BODY_COMPLETION");
 		}
 												break;
 		case LWS_CALLBACK_HTTP_FILE_COMPLETION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_FILE_COMPLETION");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_HTTP_FILE_COMPLETION");
 		}
 												break;
 		case LWS_CALLBACK_HTTP_WRITEABLE: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_WRITEABLE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_HTTP_WRITEABLE");
 		}
 										  break;
 		case LWS_CALLBACK_FILTER_NETWORK_CONNECTION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_FILTER_NETWORK_CONNECTION");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_FILTER_NETWORK_CONNECTION");
 		}
 													 break;
 		case LWS_CALLBACK_FILTER_HTTP_CONNECTION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_FILTER_HTTP_CONNECTION");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_FILTER_HTTP_CONNECTION");
 		}
 												  break;
 		case LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED");
 		}
 														  break;
 		case LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION");
 		}
 													  break;
 		case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS");
 		}
 																  break;
 		case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS");
 		}
 																  break;
 		case LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION");
 		}
 																	break;
 		case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER");
 			break;
 		case LWS_CALLBACK_CONFIRM_EXTENSION_OKAY: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CONFIRM_EXTENSION_OKAY");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CONFIRM_EXTENSION_OKAY");
 		}
 												  break;
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED");
 			break;
 		case LWS_CALLBACK_PROTOCOL_INIT:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_INIT");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_INIT");
 			break;
 		case LWS_CALLBACK_PROTOCOL_DESTROY: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_DESTROY");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_DESTROY");
 		}
 											break;
 		case LWS_CALLBACK_WSI_CREATE: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_WSI_CREATE");
-			websocketclient * wsclient = new websocketclient(wsi);
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_CREATE");
+			WebSocketClient * wsclient = This->OnAccept(wsi);
 			lws_wsi_set_user(wsi, wsclient);
-			WSClientSet.insert(std::pair<websocketclient*, struct lws *>(wsclient, wsi));
+			WSClientSet.insert(std::pair<WebSocketClient*, struct lws *>(wsclient, wsi));
 		}
 									  break;
 		case LWS_CALLBACK_WSI_DESTROY: {
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_WSI_DESTROY");
-			WSClientSet.erase(wsclient);
-			if (!isdeconstruct) {
-				delete wsclient;
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_DESTROY");
+			if (wsclient){
+				WSClientSet.erase(wsclient);
+				if (typeid(*wsclient) == typeid(WebSocketClient))
+					delete wsclient;
 			}
+
 		}
 									   break;
 		case LWS_CALLBACK_GET_THREAD_ID: {
@@ -209,34 +214,34 @@ namespace WebSocket {
 		}
 										 break;
 		case LWS_CALLBACK_ADD_POLL_FD:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_ADD_POLL_FD");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_ADD_POLL_FD");
 			break;
 		case LWS_CALLBACK_DEL_POLL_FD:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_DEL_POLL_FD");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_DEL_POLL_FD");
 			break;
 		case LWS_CALLBACK_CHANGE_MODE_POLL_FD:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CHANGE_MODE_POLL_FD");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CHANGE_MODE_POLL_FD");
 			break;
 		case LWS_CALLBACK_LOCK_POLL:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_LOCK_POLL");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_LOCK_POLL");
 			break;
 		case LWS_CALLBACK_UNLOCK_POLL:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_UNLOCK_POLL");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_UNLOCK_POLL");
 			break;
 		case LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY");
 			break;
 		case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_WS_PEER_INITIATED_CLOSE");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WS_PEER_INITIATED_CLOSE");
 			break;
 		case LWS_CALLBACK_WS_EXT_DEFAULTS:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_WS_EXT_DEFAULTS");
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WS_EXT_DEFAULTS");
 			break;
 		case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
-			LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_DROP_PROTOCOL");
+			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_DROP_PROTOCOL");
 			break;
 		default:
-			LOG4CPLUS_DEBUG(log, "Unknown:" << reason);
+			LOG4CPLUS_DEBUG(This->log, "Unknown:" << reason);
 			break;
 		}
 
@@ -262,9 +267,15 @@ namespace WebSocket {
 		lws_service(m_Context, timeout_ms);
 	}
 
+	WebSocket::WebSocketClient * WebSocketServer::OnAccept(struct lws *wsi)
+	{
+		WebSocketClient * wsclient = new WebSocketClient(wsi);
+		return wsclient;
+	}
+
 	WebSocketServer::WebSocketServer(int port) :m_Context(nullptr), m_port(port)
 	{
-		this->log = log4cplus::Logger::getInstance("WebSocketModule");
+		this->log = log4cplus::Logger::getInstance("chilli.WebSocketModule");
 	}
 
 	WebSocketServer::~WebSocketServer()
@@ -281,6 +292,7 @@ namespace WebSocket {
 		m_Info.gid = -1;
 		m_Info.uid = -1;
 		m_Info.timeout_secs = 5;
+		m_Info.user = this;
 		m_Context = lws_create_context(&m_Info);
 		if (m_Context == NULL) {
 			LOG4CPLUS_ERROR(log, "Creating libwebsocket context failed");
@@ -304,7 +316,7 @@ namespace WebSocket {
 
 	}
 
-	websocketclient::websocketclient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -320,7 +332,7 @@ namespace WebSocket {
 
 	}
 
-	websocketclient::websocketclient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -335,7 +347,7 @@ namespace WebSocket {
 
 	}
 
-	websocketclient::websocketclient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi), m_state(CLOSED), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -352,13 +364,13 @@ namespace WebSocket {
 
 	}
 
-	websocketclient::~websocketclient()
+	WebSocketClient::~WebSocketClient()
 	{
 		Close();
 		LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
-	void websocketclient::Open()
+	void WebSocketClient::Open()
 	{
 		const char * prot = nullptr;
 		char m_urlbuff[1024];
@@ -383,13 +395,13 @@ namespace WebSocket {
 		LOG4CPLUS_TRACE(log, m_SessionId << "wsi:" << wsi);
 
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
-		WSClientSet.insert(std::pair<websocketclient*, struct lws *>(this, wsi));
+		WSClientSet.insert(std::pair<WebSocketClient*, struct lws *>(this, wsi));
 
 		m_state = CONNECTING;
 
 	}
 
-	void websocketclient::Close()
+	void WebSocketClient::Close()
 	{
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this) != WSClientSet.end())
@@ -401,7 +413,7 @@ namespace WebSocket {
 
 	}
 
-	int websocketclient::Send(const char* lpBuf, int nBufLen)
+	int WebSocketClient::Send(const char* lpBuf, int nBufLen)
 	{
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		m_sendBuf.insert(m_sendBuf.end(), lpBuf, lpBuf + nBufLen);
@@ -419,38 +431,38 @@ namespace WebSocket {
 	}
 
 
-	void websocketclient::OnOpen()
+	void WebSocketClient::OnOpen()
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnOpen");
 	}
 
-	void websocketclient::OnSend()
+	void WebSocketClient::OnSend()
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnSend");
 	}
 
-	void websocketclient::OnClose(const std::string & ErrorCode)
+	void WebSocketClient::OnClose(const std::string & ErrorCode)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnClose:" << ErrorCode);
 	}
 
-	void websocketclient::OnError(const std::string & errorCode)
+	void WebSocketClient::OnError(const std::string & errorCode)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnError:" << errorCode);
 	}
 
-	void websocketclient::OnMessage(const std::string & message)
+	void WebSocketClient::OnMessage(const std::string & message)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnMessage:" << message);
 	}
 
-	void websocketclient::SetWSUrl(const std::string & url)
+	void WebSocketClient::SetWSUrl(const std::string & url)
 	{
 		this->m_url = url;
 		LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << this->m_url);
 	}
 
-	const std::string & websocketclient::GetWSUrl()
+	const std::string & WebSocketClient::GetWSUrl()
 	{
 		return this->m_url;
 	}
