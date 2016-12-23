@@ -31,7 +31,7 @@ namespace env
 
 	Context * JSEvaluator::newContext(const std::string &sessionid, Context *const parent)
 	{
-		LOG4CPLUS_DEBUG(log,"new a JsContext,parent="<< parent);
+		LOG4CPLUS_DEBUG(log, sessionid << " new a JsContext,parent="<< parent);
 
 		Context * cx = new env::JsContext(sessionid, this, parent);
 		m_contexts.push_back(cx);

@@ -16,7 +16,7 @@ public:
 	explicit ProcessModule(){};
 	virtual ~ProcessModule(){};
 
-	virtual bool LoadConfig(const std::string & configFile) = 0;
+	virtual bool LoadConfig(const std::string & configContext) = 0;
 	virtual int Start() = 0;
 	virtual int Stop() = 0;
 	virtual const ExtensionMap & GetExtension() = 0;

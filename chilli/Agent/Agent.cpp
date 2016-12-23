@@ -11,11 +11,11 @@ Agent::Agent(const std::string &ext, const std::string &smFileName)
 {
 	std::string logName= "Agent.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
-	LOG4CPLUS_DEBUG(log,"new a ACD extension object.");
+	LOG4CPLUS_DEBUG(log,"new a Agent object.");
 }
 
 Agent::~Agent(){
-	LOG4CPLUS_DEBUG(log,"destruction a ACD extension object.");
+	LOG4CPLUS_DEBUG(log,"destruction a Agent object.");
 }
 
 
