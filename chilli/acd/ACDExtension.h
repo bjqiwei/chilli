@@ -28,7 +28,6 @@ public:
 	virtual int HangUp() override;
 
 private:
-	log4cplus::Logger log;
 	std::string m_ExtNumber;
 	std::string m_SessionId;
 };

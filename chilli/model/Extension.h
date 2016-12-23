@@ -6,6 +6,8 @@
 #include <thread>
 #include <atomic>
 #include <FSM.h>
+#include <log4cplus/logger.h>
+#include <log4cplus/loggingmacros.h>
 
 namespace chilli{
 namespace model{
@@ -60,15 +62,23 @@ public:
 private:
 	void run()
 	{
-		m_SM->addSendImplement(this);
-		m_SM->go();
-		m_SM->mainEventLoop();
+		try
+		{
+			m_SM->addSendImplement(this);
+			m_SM->go();
+			m_SM->mainEventLoop();
+		}
+		catch (std::exception & e)
+		{
+			LOG4CPLUS_ERROR(log, e.what());
+		}
 	};
 
 	std::atomic_bool m_Running = false;
 	std::thread m_thread;
 protected:
 	fsm::StateMachine * m_SM = nullptr;
+	log4cplus::Logger log;
 
 };
 typedef std::shared_ptr<model::Extension> ExtensionPtr;

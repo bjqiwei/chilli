@@ -33,7 +33,6 @@ public:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
-	log4cplus::Logger log;
 	std::string m_ExtNumber;
 	std::string m_SessionId;
 	int ch;
