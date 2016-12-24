@@ -143,16 +143,10 @@ void AgentModule::run()
 			Json::Value jsonEvent;
 			Json::Reader jsonReader;
 			if (jsonReader.parse(strEvent, jsonEvent)){
-				std::string eventName;
-				std::string sessionId;
-				std::string ext;
-				if (jsonEvent["event"].isString()){
-					eventName = jsonEvent["event"].asString();
-				}
 
-				if (jsonEvent["sessionid"].isString()){
-					sessionId = jsonEvent["sessionid"].asString();
-				}
+				std::string ext;
+				jsonEvent["event"] = jsonEvent.removeMember("cmd");
+				jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
 
 				if (jsonEvent["extension"].isString()){
 					ext = jsonEvent["extension"].asString();
@@ -160,9 +154,8 @@ void AgentModule::run()
 
 				auto & it = m_Agents.find(ext);
 
-				if (it != m_Agents.end())
-				{
-					it->second->pushEvent(strEvent);
+				if (it != m_Agents.end()){
+					it->second->pushEvent(jsonEvent.toStyledString());
 				}
 				else{
 					LOG4CPLUS_ERROR(log, " not find extension by event:" << strEvent);
@@ -174,6 +167,7 @@ void AgentModule::run()
 			}
 		}
 	}
+	log4cplus::threadCleanup();
 
 }
 
@@ -300,20 +294,71 @@ done:
 	WSACleanup();
 #endif
 	LOG4CPLUS_INFO(log, "listen TCP Stoped.");
+	log4cplus::threadCleanup();
 	return true;
 }
 
-bool AgentModule::listenWS(int port)const
+class AgentWSclient :public WebSocket::WebSocketClient
+{
+public:
+	explicit AgentWSclient(struct lws * wsi, model::ProcessModule * module) 
+		:WebSocketClient(wsi),m_module(module)
+	{
+		this->log = log4cplus::Logger::getInstance("chilli.AgentWSclient");
+	};
+
+	~AgentWSclient()
+	{
+
+	}
+
+	virtual void OnClose(const std::string & ErrorCode) override
+	{
+	};
+
+	virtual void OnError(const std::string & errorCode) override
+	{
+	};
+
+	virtual void OnMessage(const std::string & message) override
+	{
+		m_module->PushEvent(message);
+	};
+
+private:
+	model::ProcessModule * m_module;
+
+};
+
+class AgentWSServer :public WebSocket::WebSocketServer
+{
+public:
+	explicit AgentWSServer(int port, model::ProcessModule * module)
+		:WebSocketServer(port), m_module(module)
+	{};
+	virtual WebSocket::WebSocketClient * OnAccept(struct lws *wsi) override
+	{
+		WebSocket::WebSocketClient * wsc = new AgentWSclient(wsi, m_module);
+		return wsc;
+	}
+private:
+	model::ProcessModule * m_module;
+};
+
+bool AgentModule::listenWS(int port)
 {
 	bool result = true;
-	WebSocket::WebSocketServer wsserver(port);
-	LOG4CPLUS_INFO(log, ",start listen port:" << port);
+
+	AgentWSServer wsserver(port, this);
+	LOG4CPLUS_INFO(log, ",websocket start listen port:" << port);
 	wsserver.InitInstance();
 
 	while (m_bRunning){
 		wsserver.Loop(1000);
 	}
+
 	wsserver.UnInitInstance();
+	log4cplus::threadCleanup();
 	return result;
 }
 }

@@ -34,7 +34,7 @@ private:
 	int m_wsPort = -1;
 
 	bool listenTCP(int port);
-	bool listenWS(int port)const;
+	bool listenWS(int port);
 
 };
 }

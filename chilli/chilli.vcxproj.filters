@@ -207,5 +207,8 @@
     <Xml Include="AvayaExtension.xml">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="AvayaAgent.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

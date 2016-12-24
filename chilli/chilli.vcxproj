@@ -78,6 +78,7 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
+xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
@@ -116,6 +117,7 @@ xcopy /Y Group.xml $(OutDir)
 xcopy /Y IVR.xml $(OutDir)
 xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
+xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
@@ -183,6 +185,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
   <ItemGroup>
     <Xml Include="ACD.xml" />
     <Xml Include="Agent.xml" />
+    <Xml Include="AvayaAgent.xml" />
     <Xml Include="AvayaExtension.xml" />
     <Xml Include="chilli.xml">
       <SubType>Designer</SubType>
