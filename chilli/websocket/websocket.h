@@ -52,6 +52,8 @@ namespace WebSocket {
 		//websocketclient& operator=(const websocketclient&) volatile = delete;
 
 	protected:
+		log4cplus::Logger log;
+		std::string m_SessionId;
 		Status m_state;
 		virtual void OnOpen();
 		virtual void OnSend();
@@ -62,13 +64,11 @@ namespace WebSocket {
 		friend int callback_lws(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len);
 	private:
-		log4cplus::Logger log;
 		struct lws_context *m_Context;
 		struct lws_client_connect_info con_info;
 		struct lws *wsi;
 		std::string m_url;
 		std::vector<unsigned char> m_sendBuf;
-		std::string m_SessionId;
 	};
 }
 

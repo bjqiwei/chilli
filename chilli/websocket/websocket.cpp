@@ -323,12 +323,12 @@ lwsclose:
 		m_SessionId = str.str();
 
 		this->log = log4cplus::Logger::getInstance("wsclient");
-		LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << m_url);
-		LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
+		//LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << m_url);
+		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
 
 		memset(&con_info, 0, sizeof(con_info));
 
-		LOG4CPLUS_TRACE(log, m_SessionId << "construction");
+		//LOG4CPLUS_TRACE(log, m_SessionId << "construction");
 
 	}
 
@@ -339,11 +339,11 @@ lwsclose:
 		m_SessionId = str.str();
 		this->log = log4cplus::Logger::getInstance("wsclient");
 
-		LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
+		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
 
 		memset(&con_info, 0, sizeof(con_info));
 
-		LOG4CPLUS_TRACE(log, m_SessionId << "construction");
+		//LOG4CPLUS_TRACE(log, m_SessionId << "construction");
 
 	}
 
@@ -354,20 +354,20 @@ lwsclose:
 		m_SessionId = str.str();
 		this->log = log4cplus::Logger::getInstance("wsclient");
 
-		LOG4CPLUS_DEBUG(log, m_SessionId << "wsi:" << wsi);
+		//LOG4CPLUS_DEBUG(log, m_SessionId << "wsi:" << wsi);
 		m_Context = lws_get_context(wsi);
-		LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
+		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
 
 		memset(&con_info, 0, sizeof(con_info));
 
-		LOG4CPLUS_TRACE(log, m_SessionId << "construction");
+		//LOG4CPLUS_TRACE(log, m_SessionId << "construction");
 
 	}
 
 	WebSocketClient::~WebSocketClient()
 	{
 		Close();
-		LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
+		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
 	void WebSocketClient::Open()
