@@ -25,11 +25,11 @@ public:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other) = delete;
 	ProcessModule & operator=(const ProcessModule &) = delete;
-protected:
 	virtual void PushEvent(const std::string & event) final
 	{
 		m_recEvtBuffer.Put(event);
 	};
+protected:
 	helper::CEventBuffer<std::string> m_recEvtBuffer;
 };
 typedef std::shared_ptr<model::ProcessModule> ProcessModulePtr;

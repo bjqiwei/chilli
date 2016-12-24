@@ -70,7 +70,7 @@ lwsclose:
 		}
 		break;
 		case LWS_CALLBACK_RECEIVE: {
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_RECEIVE");
+			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_RECEIVE");
 			std::string message;
 			if (in) {
 				message.assign((char *)in, len);
