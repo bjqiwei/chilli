@@ -668,8 +668,13 @@ bool fsm::StateMachineimp::go()
 		{
 			/*创建JsContext私有数据指针*/
 			//ctx->SetContextPrivate(this);
+			for (auto & it : m_globalVars){
+				ctx->setVar(it.first, it.second);
+			}
+
 			ctx->setVar("_name", getName());
 			ctx->setVar("_sessionid", getSessionId());
+
 		}
 		if (m_rootNode)
 		{
@@ -804,21 +809,15 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 
 bool fsm::StateMachineimp::setVar(const std::string &name, const Json::Value & value)
 {  
-	std::string out2 = value.toStyledString();
-	LOG4CPLUS_TRACE(log, m_strSessionID << ",set " << name << "=" << helper::string::trim(out2));
-	this->m_globalVars[name] = value;
-	if (getRootContext())
-	{
-		getRootContext()->setVar(name, value);
-	}
+	this->m_globalVars.push_back(std::make_pair(name,value));
+	this->m__globalVars_[name] = value;
 	return true;
 }
 
 Json::Value fsm::StateMachineimp::getVar(const std::string &name)const
 {
-	std::map<std::string,Json::Value>::const_iterator it = m_globalVars.find(name);
-	if (it != m_globalVars.end())
-	{
+	const auto it = m__globalVars_.find(name);
+	if (it != m__globalVars_.end()){
 		return it->second;
 	}
 	return Json::Value();

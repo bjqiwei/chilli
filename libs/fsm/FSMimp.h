@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <queue>
+#include <list>
 #include <log4cplus/logger.h>
 #include "scxml/TriggerEvent.h"
 #include "scxml/SendInterface.h"
@@ -69,7 +70,8 @@ namespace fsm{
 		std::atomic_bool m_Running = false;
 		std::queue<TriggerEvent> m_internalQueue;
 		helper::CEventBuffer<TriggerEvent> m_externalQueue;
-		std::map<std::string, Json::Value> m_globalVars;
+		std::list<std::pair<std::string, Json::Value>> m_globalVars;
+		std::map<std::string, Json::Value> m__globalVars_;
 		std::map<std::string, SendInterface *> m_mapSendObject;
 		log4cplus::Logger  log;
 	private:

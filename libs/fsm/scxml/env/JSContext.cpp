@@ -47,13 +47,48 @@ namespace env
 
 		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value));
 
-		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global:this->m_event));
+		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global : this->m_event));
+		
+		std::string _name = name;
+		std::string::size_type pos;
+		while ((pos = _name.find_first_of(".")) != std::string::npos)
+		{
+			std::string objName = _name.substr(0,pos);
+			_name = _name.substr(pos + 1);
+			JS::RootedValue rval(this->m_jsctx);
+
+			if (JS_GetProperty(m_jsctx, obj, objName.c_str(), &rval)){
+				
+				if (rval.isObject()){
+					obj.set(&rval.toObject());
+				}
+				else {
+
+					JS::RootedObject _object(m_jsctx, JS_NewObject(m_jsctx, nullptr));
+					if (!_object) {
+						LOG4CPLUS_ERROR(log, "JS_NewObject " << objName);
+						return;
+					}
+
+					if (!JS_DefineProperty(m_jsctx, obj, objName.c_str(), _object, JSPROP_ENUMERATE)) {
+						LOG4CPLUS_ERROR(log, "JS_DefineProperty " << objName);
+						return;
+					}
+					obj = _object;
+				}
+			}
+			else {
+				LOG4CPLUS_ERROR(log, "JS_GetProperty " << objName);
+				return;
+			}
+		}
+
 
 		std::string out = value.toStyledString();
 		helper::string::trim(out);
 		LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
 
-		if (!JS_DefineProperty(m_jsctx, obj, name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
+		if (!JS_DefineProperty(m_jsctx, obj, _name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
 			LOG4CPLUS_WARN(log, m_strSessionID << ",define " << (va == fsm::globalObject ? "global." : "_event.") << " property " << name << " failed.");
 		}
 
