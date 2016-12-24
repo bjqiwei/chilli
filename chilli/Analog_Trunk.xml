@@ -25,7 +25,7 @@
   </functionmodel>
 	<state id="init">
 		<onentry>
-			<log level = "info" expr="enter Init state."/>
+			<log level = "info">enter Init state.</log>
 		</onentry>
         <event event="E_CHG_ChState" cond="extension.eventData=='S_CALL_RINGING';" >
 			<transition  target="ringing"/>
@@ -36,7 +36,7 @@
 		
 			<state id="ringing">
 			<onentry>
-				<log level = "info" expr="enter running state."/>
+				<log level = "info">enter running state.</log>
 				<script>logging('caller='+extension.Caller);logging('callee='+extension.Callee);</script>
 				<send target="acd" type="cmd" idlocation="extension.number;"  from="extension.number;" dest="5000" event="transfer"></send>
 				<script>forward=5000;</script>
@@ -59,7 +59,7 @@
 
 		<state id="idle">
 			<onentry>
-				<log level = "info" expr="enter idle state."/>
+				<log level = "info">enter idle state.</log>
 				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
 			</onentry>
 			 <event event="E_CHG_ChState" cond="extension.eventData=='S_CALL_RINGING';" >
@@ -69,7 +69,7 @@
 
 		<state id="talking">
 			<onentry>
-				<log level = "info" expr="enter talking state."/>
+				<log level = "info">enter talking state.</log>
 			</onentry>
 			<event event="playFile" >
 				<send target="extension" type="cmd" idlocation="extension.number; " from="extension.number;" event="playFile" >
@@ -80,7 +80,7 @@
 		</state>
 		<state id="playVoice">
 			<onentry>
-				<log level = "info" expr="enter playVoice state."/>
+				<log level = "info">enter playVoice state."</log>
 			</onentry>
 			<event event="E_PROC_PlayEnd" >
 				<send target="acd" type="event" idlocation="extension.number; " from="extension.number;" dest="forward" event="E_PROC_PlayEnd" ></send>

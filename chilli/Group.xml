@@ -21,7 +21,7 @@
 	</functionmodel>
 	<state id="init">
 		<onentry>
-			<log level = "info" expr="enter init state."/>
+			<log level = "info">enter init state.</log>
 		</onentry>
     </state>
 

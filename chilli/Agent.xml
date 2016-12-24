@@ -21,11 +21,11 @@
 	</functionmodel>
 	<state id="init">
 		<onentry>
-			<log level = "info" expr="enter init state."/>
+			<log level = "info">enter init state.</log>
 		</onentry>
 		<state id="idle">
 			<onentry>
-				<log level = "info" expr="enter idle state."/>
+				<log level = "info">enter idle state.</log>
 				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
 			</onentry>
 			<event event="transfer">
@@ -37,7 +37,7 @@
 		
 		<state id="waitingForAnswer">
 			<onentry>
-				<log level = "info" expr="enter waitingForAnswer state."/>
+				<log level = "info">enter waitingForAnswer state.</log>
 			</onentry>
 			<event event="talking">
 				<transition  target="welcome"/>
@@ -46,7 +46,7 @@
 		
 		<state id="welcome">
 			<onentry>
-				<log level = "info" expr="enter welcome state."/>
+				<log level = "info">enter welcome state.</log>
 				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
 					<file>'./wav/welcome.wav'</file>
 				</send>

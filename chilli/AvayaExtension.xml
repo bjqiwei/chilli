@@ -25,7 +25,7 @@
 
 	<state id="init">
 		<onentry>
-			<log level = "info" expr="enter Init state."/>
+			<log level = "info">enter Init state.</log>
 			<send target="extension" type="cmd" idlocation="extension.number;" from="extension.ch;" dest="extension.number;" event="autoSendDialTone" delay="0">
 				<enable>1</enable>
 			</send>
@@ -41,7 +41,7 @@
 		</event>
 		<state id="onhook">
 			<onentry>
-				<log level = "info" expr="enter onhook state."/>
+				<log level = "info">enter onhook state.</log>
 				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" dest="extension.number;" event="reloadConfig"></send>
 			</onentry>
 			<event event="E_CHG_HookState" cond="extension.eventData=='1'" >
@@ -51,7 +51,7 @@
 
 		<state id="offhook">
 			<onentry>
-				<log level = "info" expr="enter offhook state."/>
+				<log level = "info">enter offhook state.</log>
 				<script> dialNumber= '';</script>
 				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
 			</onentry>
@@ -69,7 +69,7 @@
 
 		<state id="stopped">
 			<onentry>
-				<log level = "info" expr="enter stopped state."/>
+				<log level = "info">enter stopped state.</log>
 			</onentry>
 			<event event="watch.start" >
 				<transition  target="running2"/>
@@ -79,7 +79,7 @@
 			</event>
 			<state id="running2">
 				<onentry>
-					<log level = "info" expr="enter running2 state."/>
+					<log level = "info">enter running2 state.</log>
 				</onentry>
 				<event event="watch.reset"   target="reset">
 					<transition  target="stopped"/>
