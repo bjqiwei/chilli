@@ -47,10 +47,10 @@ namespace chilli {
 		int TSAPIModule::Stop()
 		{
 			if (m_thread.joinable()) {
-				UnInitAvayaAPI();
-
+				
 				bool ret = CloseStream();
 				m_thread.join();
+				UnInitAvayaAPI();
 				return ret;
 			}
 			return true;
