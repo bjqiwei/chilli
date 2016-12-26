@@ -71,7 +71,7 @@ namespace fsm{
 		std::queue<TriggerEvent> m_internalQueue;
 		helper::CEventBuffer<TriggerEvent> m_externalQueue;
 		std::list<std::pair<std::string, Json::Value>> m_globalVars;
-		std::map<std::string, Json::Value> m__globalVars_;
+		std::map<std::string, Json::Value> m_globalVarsPersist;
 		std::map<std::string, SendInterface *> m_mapSendObject;
 		log4cplus::Logger  log;
 	private:

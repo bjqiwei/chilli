@@ -671,6 +671,7 @@ bool fsm::StateMachineimp::go()
 			for (auto & it : m_globalVars){
 				ctx->setVar(it.first, it.second);
 			}
+			m_globalVars.clear();
 
 			ctx->setVar("_name", getName());
 			ctx->setVar("_sessionid", getSessionId());
@@ -725,8 +726,13 @@ void fsm::StateMachineimp::mainEventLoop()
 
 		//如果外部事件队列不为空，执行一个外部事件
 		TriggerEvent trigEvent;
-		if(m_externalQueue.Get(trigEvent) && !trigEvent.getEventName().empty()){
-			processEvent(trigEvent);
+		if(m_externalQueue.Get(trigEvent)){
+
+			for_each (m_globalVars.begin(),m_globalVars.end(), [&](auto & it) {getRootContext()->setVar(it.first, it.second); });
+			m_globalVars.clear();
+			if (!trigEvent.getEventName().empty()){
+				processEvent(trigEvent);
+			}
 		}
 
 		//内部事件队列循环
@@ -810,14 +816,14 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 bool fsm::StateMachineimp::setVar(const std::string &name, const Json::Value & value)
 {  
 	this->m_globalVars.push_back(std::make_pair(name,value));
-	this->m__globalVars_[name] = value;
+	this->m_globalVarsPersist[name] = value;
 	return true;
 }
 
 Json::Value fsm::StateMachineimp::getVar(const std::string &name)const
 {
-	const auto it = m__globalVars_.find(name);
-	if (it != m__globalVars_.end()){
+	const auto it = m_globalVarsPersist.find(name);
+	if (it != m_globalVarsPersist.end()){
 		return it->second;
 	}
 	return Json::Value();
