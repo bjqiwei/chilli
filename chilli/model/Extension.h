@@ -45,6 +45,10 @@ public:
 		return m_SM->addSendImplement(evtDsp);
 	}
 
+	bool setVar(const std::string &name, const Json::Value &value)
+	{
+		return m_SM->setVar(name, value);
+	}
 
 	virtual const std::string & getExtensionNumber() const = 0;
 	virtual int pushEvent(const std::string &evt) = 0;
