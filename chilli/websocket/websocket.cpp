@@ -407,6 +407,7 @@ lwsclose:
 		if (WSClientSet.find(this) != WSClientSet.end())
 		{
 			WSClientSet.erase(this);
+			lws_wsi_set_user(wsi, nullptr);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
