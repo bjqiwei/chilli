@@ -56,11 +56,11 @@ void AvayaExtension::fireSend(const std::string &strContent, const void * param)
 	LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
 }
 
-int AvayaExtension::pushEvent(const std::string& strEvent)
+int AvayaExtension::pushEvent(const model::EventType_t & Event)
 {
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
-	if (jsonReader.parse(strEvent, jsonEvent)){
+	if (jsonReader.parse(Event.event, jsonEvent)){
 		std::string eventName;
 		std::string _from;
 		if (jsonEvent["event"].isString()){
@@ -78,7 +78,7 @@ int AvayaExtension::pushEvent(const std::string& strEvent)
 
 	}
 	else{
-		LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << strEvent << " not json data.");
+		LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << Event.event << " not json data.");
 	}
 
 	return 0;

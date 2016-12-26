@@ -132,6 +132,9 @@
     <ClInclude Include="Sh\ShAPI.h">
       <Filter>Sh</Filter>
     </ClInclude>
+    <ClInclude Include="model\TypeDef.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">

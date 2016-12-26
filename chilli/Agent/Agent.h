@@ -17,7 +17,7 @@ public:
 	virtual const std::string & getExtensionNumber() const override;
 	virtual void setSessionId(const std::string & sessinId) override;
 	virtual const std::string & getSessionId() override;
-	virtual int pushEvent(const std::string &evt) override;
+	virtual int pushEvent(const model::EventType_t &evt) override;
 
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;

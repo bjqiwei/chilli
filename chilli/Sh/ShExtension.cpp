@@ -39,11 +39,11 @@ const std::string & ShExtension::getSessionId()
 	return m_SessionId;
 }
 
-int ShExtension::pushEvent(const std::string & evt)
+int ShExtension::pushEvent(const model::EventType_t & evt)
 {
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
-	if (jsonReader.parse(evt, jsonEvent)) {
+	if (jsonReader.parse(evt.event, jsonEvent)) {
 		std::string eventName;
 		std::string _from;
 		if (jsonEvent["event"].isString()) {
@@ -61,7 +61,7 @@ int ShExtension::pushEvent(const std::string & evt)
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << evt << " not json data.");
+		LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << evt.event << " not json data.");
 	}
 
 	return 0;

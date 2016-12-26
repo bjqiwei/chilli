@@ -100,12 +100,12 @@ void IVRModule::run()
 
 	while (bRunning)
 	{
-		std::string strEvent;
-		if (m_recEvtBuffer.Get(strEvent) && !strEvent.empty())
+		model::EventType_t Event;
+		if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
 		{
 			Json::Value jsonEvent;
 			Json::Reader jsonReader;
-			if (jsonReader.parse(strEvent, jsonEvent)){
+			if (jsonReader.parse(Event.event, jsonEvent)){
 				std::string eventName;
 				std::string sessionId;
 				std::string ext;
@@ -125,15 +125,15 @@ void IVRModule::run()
 
 				if (it != m_Extensions.end()){
 
-					it->second->pushEvent(strEvent);
+					it->second->pushEvent(Event);
 				}
 				else{
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << strEvent);
+					LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
 				}
 	
 			}
 			else{
-				LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << strEvent << " not json data.");
+				LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << Event.event << " not json data.");
 			}
 		}
 	}

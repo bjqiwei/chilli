@@ -152,6 +152,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />
+    <ClInclude Include="model\TypeDef.h" />
     <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
     <ClInclude Include="Sh\ShAPI.h" />

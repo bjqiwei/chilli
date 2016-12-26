@@ -59,11 +59,11 @@ void Agent::fireSend(const std::string & strContent,const void * param)
 	LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
 }
 
-int Agent::pushEvent(const std::string& strEvent)
+int Agent::pushEvent(const model::EventType_t & Event)
 {
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
-	if (jsonReader.parse(strEvent, jsonEvent)){
+	if (jsonReader.parse(Event.event, jsonEvent)){
 		std::string eventName;
 
 		if (jsonEvent["event"].isString()){
@@ -76,12 +76,12 @@ int Agent::pushEvent(const std::string& strEvent)
 			evt.addVars(it, jsonEvent[it]);
 		}
 
-		LOG4CPLUS_INFO(log, " Recived a event," << strEvent);
+		LOG4CPLUS_INFO(log, " Recived a event," << Event.event);
 		m_SM->pushEvent(evt);
 
 	}
 	else{
-		LOG4CPLUS_ERROR(log, ",event:" << strEvent << " not json data.");
+		LOG4CPLUS_ERROR(log, ",event:" << Event.event << " not json data.");
 	}
 
 	return 0;
