@@ -149,6 +149,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
+    <ClInclude Include="model\ConnectAdapter.h" />
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />
@@ -174,6 +175,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
+    <ClCompile Include="model\ConnectAdapter.cpp" />
     <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />

@@ -135,6 +135,9 @@
     <ClInclude Include="model\TypeDef.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="model\ConnectAdapter.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -190,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="Sh\ShAPI.cpp">
       <Filter>Sh</Filter>
+    </ClCompile>
+    <ClCompile Include="model\ConnectAdapter.cpp">
+      <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
