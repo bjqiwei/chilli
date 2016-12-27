@@ -1,39 +1,54 @@
 ﻿<?xml version="1.0" ?>
-<fsm name="avayaAgent">
+<fsm name="avayaAgent" initial="init">
 	<state id="init">
 		<onentry>
 			<log level = "info">enter init state.</log>
 		</onentry>
-		<state id="idle">
+		<event event="logon" cond="_event.password == _agent.Password">
+			<transition  target="logined"/>
+		</event>
+		<event event="logon">
+			<send target="this" type="response" dest="client" event="logon">
+				<status>1</status>
+				<type>logon</type>
+			</send>
+		</event>
+		<event event=".*">
+			<send target="this" type="response" dest="client" eventexpr="_event._name">
+				<status>1</status>
+				<type type="script">_event._name;</type>
+				<mem>未登录</mem>
+			</send>
+		</event>
+		<state id="logined">
 			<onentry>
-				<log level = "info">enter idle state.</log>
-				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
+				<log level = "info">enter logined state.</log>
+				<send target="this" type="response" dest="client" event="logon">
+					<status>0</status>
+					<type>logon</type>
+				</send>
 			</onentry>
 			<event event="transfer">
 				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
 				<transition  target="waitingForAnswer"/>
 			</event>
+			<event event="ping">
+				<log level="debug"> ping message</log>
+			</event>
+			<event event="ConnectError">
+				<transition  target="init"/>
+			</event>
+			<event event="ConnectClose">
+				<transition  target="init"/>
+			</event>
+			<event event="logout">
+				<transition  target="init"/>
+			</event>
+			<event event=".*">
+				<log level="warn" type="script">"not process event "+_event._name;</log>
+			</event>
 		</state>
 		
-		<state id="waitingForAnswer">
-			<onentry>
-				<log level = "info">enter waitingForAnswer state.</log>
-			</onentry>
-			<event event="talking">
-				<transition  target="welcome"/>
-			</event>
-		</state> 
-		
-		<state id="welcome">
-			<onentry>
-				<log level = "info">enter welcome state.</log>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
-					<file>'./wav/welcome.wav'</file>
-				</send>
-			</onentry>
-		</state> 
-	
-	 <event event="onhook"><transition  target="idle"/></event>
     </state>
 
 </fsm>

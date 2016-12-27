@@ -1,6 +1,7 @@
 #include "Agent.h"
 #include <log4cplus/loggingmacros.h>
 #include <json/json.h>
+#include "../model/ConnectAdapter.h"
 
 namespace chilli{
 namespace Agent{
@@ -56,11 +57,48 @@ int Agent::HangUp()
 
 void Agent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_TRACE(log," recive a Send event from stateMachine:" << strContent);
+	LOG4CPLUS_DEBUG(log," recive a Send event from stateMachine:" << strContent);
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (jsonReader.parse(strContent, jsonData)) {
+		if (jsonData["type"].asString() == "response" && jsonData["dest"].asString() == "client")
+		{
+			Json::FastWriter writer;
+			std::string sendData = writer.write(jsonData["param"]);
+			model::ConnectAdapter::Send(m_curConnectId, sendData.c_str(), sendData.length());
+
+			if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "logon") {
+				if (jsonData["param"]["status"].isString() && jsonData["param"]["status"].asString() == "0")
+				{
+					//登陆成功
+					model::ConnectAdapter::Close(m_ConnectId); //关闭原有连接
+					m_ConnectId = m_curConnectId;//更新为当前连接
+					model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtensionNumber());//为当前连接设置坐席工号
+				}
+				else {
+					//登陆失败
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+					model::ConnectAdapter::Close(m_curConnectId);
+				}
+			}
+		}
+		else if (jsonData["type"].asString() == "notify" && jsonData["dest"].asString() == "client")
+		{
+			Json::FastWriter writer;
+			std::string sendData = writer.write(jsonData["param"]);
+			model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
+		}
+	}
+	
+	else {
+		LOG4CPLUS_ERROR(log, strContent << " not json data.");
+	}
 }
 
 int Agent::pushEvent(const model::EventType_t & Event)
 {
+
+	this->m_curConnectId = Event.connect;
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(Event.event, jsonEvent)){

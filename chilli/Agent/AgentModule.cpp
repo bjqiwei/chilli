@@ -13,6 +13,7 @@
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
 #include "../websocket/websocket.h"
+#include "../model/ConnectAdapter.h"
 
 
 namespace chilli{
@@ -106,13 +107,17 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 
 		const char * num = child->Attribute("ExtensionNumber");
 		const char * sm = child->Attribute("StateMachine");
+		const char * password = child->Attribute("password");
 		num = num ? num : "";
 		sm = sm ? sm : "";
+		password = password ? password : "";
+
 		if (this->m_Agents.find(num) == this->m_Agents.end())
 		{
 			model::ExtensionPtr ext(new Agent(num, sm));
 			this->m_Agents[num] = ext;
-
+			ext->setVar("_agent.AgentId", num);
+			ext->setVar("_agent.Password", password);
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -137,33 +142,43 @@ void AgentModule::run()
 {
 	while (m_bRunning)
 	{
-		std::string strEvent;
-		if (m_recEvtBuffer.Get(strEvent) && !strEvent.empty())
+		model::EventType_t Event;
+		if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
 		{
 			Json::Value jsonEvent;
 			Json::Reader jsonReader;
-			if (jsonReader.parse(strEvent, jsonEvent)){
+			if (jsonReader.parse(Event.event, jsonEvent)){
 
 				std::string ext;
-				jsonEvent["event"] = jsonEvent.removeMember("cmd");
-				jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
+				std::string eventName;
+
+				if (jsonEvent["event"].isNull())
+					jsonEvent["event"] = jsonEvent.removeMember("cmd");
+				if(jsonEvent["extension"].isNull())
+					jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
 
 				if (jsonEvent["extension"].isString()){
 					ext = jsonEvent["extension"].asString();
 				}
 
+				if (jsonEvent["event"].isString()) {
+					eventName = jsonEvent["event"].asString();
+				}
+
+				Event.event = jsonEvent.toStyledString();
+
 				auto & it = m_Agents.find(ext);
 
 				if (it != m_Agents.end()){
-					it->second->pushEvent(jsonEvent.toStyledString());
+					it->second->pushEvent(Event);
 				}
 				else{
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << strEvent);
+					LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
 				}
 
 			}
 			else{
-				LOG4CPLUS_ERROR(log, ",event:" << strEvent << " not json data.");
+				LOG4CPLUS_ERROR(log, ",event:" << Event.event << " not json data.");
 			}
 		}
 	}
@@ -298,7 +313,7 @@ done:
 	return true;
 }
 
-class AgentWSclient :public WebSocket::WebSocketClient
+class AgentWSclient :public WebSocket::WebSocketClient, chilli::model::ConnectAdapter
 {
 public:
 	explicit AgentWSclient(struct lws * wsi, model::ProcessModule * module) 
@@ -312,18 +327,45 @@ public:
 
 	}
 
-	virtual void OnClose(const std::string & ErrorCode) override
+	virtual void OnClose(const std::string & errorCode) override
 	{
+		Json::Value event;
+		event["extension"] = m_Extension;
+		event["event"] = "ConnectClose";
+		event["errorCode"] = errorCode;
+		model::EventType_t evt(event.toStyledString(), GetId());
+		m_module->PushEvent(evt);
+		delete this;
 	};
 
 	virtual void OnError(const std::string & errorCode) override
 	{
+		Json::Value event;
+		event["extension"] = m_Extension;
+		event["event"] = "ConnectError";
+		event["errorCode"] = errorCode;
+		model::EventType_t evt(event.toStyledString(), GetId());
+		m_module->PushEvent(evt);
+		delete this;
 	};
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		m_module->PushEvent(message);
+		LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
+		model::EventType_t evt(message, GetId());
+		m_module->PushEvent(evt);
 	};
+
+	virtual int Send(const char * lpBuf, int nBufLen) override
+	{
+		LOG4CPLUS_ERROR(log, m_SessionId << " Send:" << std::string(lpBuf, nBufLen));
+		return WebSocketClient::Send(lpBuf, nBufLen);
+	}
+
+	virtual void Close() override
+	{
+		return WebSocketClient::Close();
+	}
 
 private:
 	model::ProcessModule * m_module;

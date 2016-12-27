@@ -30,6 +30,8 @@ public:
 private:
 	std::string m_ExtNumber;
 	std::string m_SessionId;
+	uint64_t m_curConnectId = 0;
+	uint64_t m_ConnectId = 0;
 };
 typedef std::shared_ptr<Agent>  AgentPtr;
 }
