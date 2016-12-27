@@ -15,6 +15,7 @@ namespace model {
 		static int Send(uint64_t id, const char * lpBuf, int nBufLen);
 		static void Close(uint64_t id);
 		static bool SetExtension(uint64_t id, const std::string & ext);
+		static std::string GetExtension(uint64_t id);
 	private:
 		virtual int Send(const char * lpBuf, int nBufLen) = 0;
 		virtual void Close() = 0;

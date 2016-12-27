@@ -62,5 +62,15 @@ namespace model {
 		return false;
 	}
 
+	std::string ConnectAdapter::GetExtension(uint64_t id)
+	{
+		std::unique_lock<std::mutex> lcx(g_ConnecterSetMtx);
+		auto & it = g_ConnecterSet.find(id);
+		if (it != g_ConnecterSet.end()) {
+			return it->second->m_Extension;
+		}
+		return std::string();
+	}
+
 }
 }
