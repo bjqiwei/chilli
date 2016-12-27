@@ -722,33 +722,39 @@ void fsm::StateMachineimp::mainEventLoop()
 {
 
 	//外部事件队列循环
-	while(m_Running){
 
-		//如果外部事件队列不为空，执行一个外部事件
-		TriggerEvent trigEvent;
-		if(m_externalQueue.Get(trigEvent)){
+	while (m_Running) {
+		try {
+			//如果外部事件队列不为空，执行一个外部事件
+			TriggerEvent trigEvent;
+			if (m_externalQueue.Get(trigEvent)) {
 
-			for_each (m_globalVars.begin(),m_globalVars.end(), [&](auto & it) {getRootContext()->setVar(it.first, it.second); });
-			m_globalVars.clear();
-			if (!trigEvent.getEventName().empty()){
-				processEvent(trigEvent);
+				for_each(m_globalVars.begin(), m_globalVars.end(), [&](auto & it) {getRootContext()->setVar(it.first, it.second); });
+				m_globalVars.clear();
+				if (!trigEvent.getEventName().empty()) {
+					processEvent(trigEvent);
+				}
+			}
+
+			//内部事件队列循环
+			LOG4CPLUS_TRACE(log, m_strSessionID << ", Internal Event Queue size:" << m_internalQueue.size());
+			if (m_Running && !m_internalQueue.empty())
+			{
+				std::queue<TriggerEvent> excQueue;
+				// 拷贝现在内部事件队列中的事件到执行队列中
+				excQueue.swap(m_internalQueue);
+
+				//执行当前执行队列
+				while (m_Running && !excQueue.empty()) {
+					TriggerEvent inEvent = excQueue.front();
+					excQueue.pop();
+					processEvent(inEvent);
+				}
 			}
 		}
-
-		//内部事件队列循环
-		LOG4CPLUS_TRACE(log, m_strSessionID << ", Internal Event Queue size:" << m_internalQueue.size());
-		if(m_Running && !m_internalQueue.empty())
+		catch (std::exception & e)
 		{
-			std::queue<TriggerEvent> excQueue;
-			// 拷贝现在内部事件队列中的事件到执行队列中
-			excQueue.swap(m_internalQueue);
-
-			//执行当前执行队列
-			while (m_Running && !excQueue.empty()){
-				TriggerEvent inEvent = excQueue.front();
-				excQueue.pop();
-				processEvent(inEvent);
-			}
+			LOG4CPLUS_ERROR(log, e.what());
 		}
 	}
 	g_Evaluator->deleteContext(m_Context);
