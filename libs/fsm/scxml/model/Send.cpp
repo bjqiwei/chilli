@@ -3,6 +3,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "../../common/xmlHelper.h"
 #include "../../common/stringHelper.h"
+#include <json/json.h>
 
 namespace fsm
 {
@@ -151,14 +152,13 @@ namespace model
 */
 		//Á¬½Ó·¢ËÍ×Ö·û´®
 	
-		helper::xml::CXmlDocmentHelper m_xmlDoc;
-
-		m_xmlDoc.setRootNode(getType());
-		m_xmlDoc.newRootProp(getType(),getEvent());
-		m_xmlDoc.newRootProp("id",getId());
-		m_xmlDoc.newRootProp("from",getFrom());
-		m_xmlDoc.newRootProp("dest",getDestination());
-		m_xmlDoc.newRootProp("target",getTarget());
+		Json::Value sendValue;
+		sendValue["type"] = getType();
+		sendValue["event"] = getEvent();
+		sendValue["id"] = getId();
+		sendValue["from"] = getFrom();
+		sendValue["dest"] = getDestination();
+		sendValue["target"] = getTarget();
 
 		xmlAttrPtr attrPtr = m_node->properties;
 		while (attrPtr != NULL)
@@ -176,13 +176,14 @@ namespace model
 				!xmlStrEqual(attrPtr->name, BAD_CAST "destexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "eventexpr")&&
 				!xmlStrEqual(attrPtr->name, BAD_CAST "cond")){
-					m_xmlDoc.newRootProp((char *)attrPtr->name, helper::xml::XStr(xmlGetProp(m_node,attrPtr->name)).strForm());
+					sendValue[(const char *)attrPtr->name] = helper::xml::XStr(xmlGetProp(m_node,attrPtr->name)).strForm();
 			}
 			attrPtr = attrPtr->next;
 		}
 
 		//m_xmlDoc.addAddChildList(node->children);
 		xmlNodePtr childNode  = m_node->children;
+		Json::Value param;
 		while(childNode != NULL)
 		{
 			if(childNode->type == XML_ELEMENT_NODE){
@@ -191,15 +192,18 @@ namespace model
 				//xmlAddChild(newNode,content);
 				std::string _type = helper::xml::getXmlNodeAttributesValue(childNode,"type");
 				if(ctx && _type.compare("script") == 0)
-					m_xmlDoc.addChild((char *)childNode->name,ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFileName,childNode->line/*,childNode*/));
+					param[(const char *)childNode->name] = ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFileName,childNode->line/*,childNode*/);
 				else
-					m_xmlDoc.addChild((char *)childNode->name,helper::xml::XStr(xmlNodeGetContent(childNode)).strForm());
+					param[(const char *)childNode->name] = helper::xml::XStr(xmlNodeGetContent(childNode)).strForm();
 
 				//xmlFreeNode(newNode);
 			}
 			childNode = childNode->next;
 		}
-		content = m_xmlDoc.getContent();
+		if (!param.isNull())
+			sendValue["param"] = param;
+		Json::FastWriter writer;
+		content = writer.write(sendValue);;
 		//LOG4CPLUS_TRACE(log,m_strSession << ",send content:" << content);
 	}
 
