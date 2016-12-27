@@ -1,6 +1,7 @@
 #include "Event.h"
 #include "../../common/xmlHelper.h"
 #include <regex>
+#include <log4cplus/loggingmacros.h>
 
 namespace fsm
 {
@@ -47,10 +48,18 @@ namespace model
 		if (m_strEvent.empty()) {
 
 		} else {
-			std::regex regPattern(m_strEvent);
-			if (!std::regex_match(strEventName,regPattern))
+			try
 			{
-				return false;
+				std::regex regPattern(m_strEvent);
+				if (!std::regex_match(strEventName, regPattern))
+				{
+					return false;
+				}
+			}
+			catch (std::exception * e)
+			{
+				LOG4CPLUS_ERROR(log, m_strFileName << ":" << m_node->line << " " << e->what());
+				throw *e;
 			}
 		}
 		return true;
