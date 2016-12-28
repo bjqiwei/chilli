@@ -366,6 +366,8 @@ lwsclose:
 
 	WebSocketClient::~WebSocketClient()
 	{
+		if (this->wsi)
+			lws_wsi_set_user(wsi, nullptr);
 		Close();
 		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
@@ -407,7 +409,6 @@ lwsclose:
 		if (WSClientSet.find(this) != WSClientSet.end())
 		{
 			WSClientSet.erase(this);
-			lws_wsi_set_user(wsi, nullptr);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
