@@ -28,10 +28,6 @@
 					<type>logon</type>
 				</send>
 			</onentry>
-			<event event="transfer">
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
-				<transition  target="waitingForAnswer"/>
-			</event>
 			<event event="ping">
 				<log level="debug"> ping message</log>
 			</event>

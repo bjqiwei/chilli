@@ -320,11 +320,12 @@ public:
 		:WebSocketClient(wsi),m_module(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.AgentWSclient");
+		LOG4CPLUS_TRACE(log, m_SessionId << "construction");
 	};
 
 	~AgentWSclient()
 	{
-
+		LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
 	virtual void OnClose(const std::string & errorCode) override

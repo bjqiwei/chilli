@@ -98,7 +98,9 @@ void Agent::fireSend(const std::string & strContent,const void * param)
 int Agent::pushEvent(const model::EventType_t & Event)
 {
 
-	this->m_curConnectId = Event.connect;
+	if (Event.connect != 0)
+		this->m_curConnectId = Event.connect;
+
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(Event.event, jsonEvent)){
