@@ -121,7 +121,7 @@ bool fsm::StateMachineimp::Init(void)
 		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
 		 {
 			 m_rootNode = rootNode;
-			 LOG4CPLUS_TRACE(log, m_strSessionID << ",set rootNode=" << m_rootNode);
+			 //LOG4CPLUS_TRACE(log, m_strSessionID << ",set rootNode=" << m_rootNode);
 
 			 m_strName =  getXmlNodeAttributesValue(m_rootNode,"name");
 			 LOG4CPLUS_TRACE(log, m_strSessionID << ",set name=" << m_strName);

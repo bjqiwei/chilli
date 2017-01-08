@@ -36,7 +36,7 @@ namespace env
 			}
 		}
 		InitializeInstanceFields();
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object finish.");
+		//LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object finish.");
 	}
 
 	void JsContext::setVar(const std::string & name, const Json::Value & value, ValueContext va )
