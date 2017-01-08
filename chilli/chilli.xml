@@ -70,9 +70,9 @@
         <Extension>5010</Extension>
     </group>
     </groups>
-	<!--<FreeSwitch id = "freeswitch001" host="127.0.0.1" port ="8021" password="ClueCon">
-	</FreeSwitch>-->
-	<Avaya id = "tsapi001">
+	<FreeSwitch id = "freeswitch001" host="127.0.0.1" port ="8021" password="ClueCon">
+	</FreeSwitch>
+	<!--<Avaya id = "tsapi001">
 		<TSAPI>
 		<TLink>AVAYA#CM#CSTA#AES</TLink>
 		<UserID>ctiadaptor</UserID>
@@ -81,5 +81,5 @@
 		<Extensions>
 			<Extension ExtensionNumber="1010" StateMachine="./AvayaExtension.xml"></Extension>
 		</Extensions>
-	</Avaya>
+	</Avaya>-->
 </Config>

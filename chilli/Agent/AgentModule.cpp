@@ -262,7 +262,7 @@ bool AgentModule::listenTCP(int port)
 
 	const char ** methods = event_get_supported_methods();
 	for (int i = 0; methods[i] != nullptr; ++i) {
-		LOG4CPLUS_INFO(log, ",libevent supported method:" << methods[i]);
+		//LOG4CPLUS_INFO(log, ",libevent supported method:" << methods[i]);
 	}
 
 	m_Base = event_base_new();

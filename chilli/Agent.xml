@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<fsm>
+<fsm name="Agent" initial="init">
 	<functionmodel>
 		<function >function log(var1){logging(var1);}</function>
 	</functionmodel>
