@@ -60,8 +60,14 @@ lwsclose:
 			if (in) {
 				errorCode.assign((char *)in, len);
 			}
-			if (wsclient)
+
+			WSClientSet.erase(wsi);
+			lws_wsi_set_user(wsi, nullptr);
+
+			if (wsclient) {
+				wsclient->wsi = nullptr;
 				wsclient->OnClose(errorCode);
+			}
 		}
 		break;
 		case LWS_CALLBACK_RECEIVE: {
@@ -118,7 +124,7 @@ lwsclose:
 				}
 			}
 			else {
-				LOG4CPLUS_DEBUG(This->log, "Close a connection " << wsi);
+				LOG4CPLUS_DEBUG(This->log, "Close a connection " << (wsclient ? wsclient->m_SessionId : ""));
 				return -1;
 			}
 		}
@@ -260,6 +266,11 @@ lwsclose:
 		lws_service(m_Context, timeout_ms);
 	}
 
+	lws_context * WebSocketServer::GetContext()
+	{
+		return m_Context;
+	}
+
 	WebSocket::WebSocketClient * WebSocketServer::OnAccept(struct lws *wsi)
 	{
 		WebSocketClient * wsclient = new WebSocketClient(wsi);
@@ -309,7 +320,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -325,7 +336,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -340,7 +351,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi), m_state(CLOSED), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi), m_sendBuf(LWS_PRE)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -362,8 +373,6 @@ lwsclose:
 	WebSocketClient::~WebSocketClient()
 	{
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
-		if (this->wsi)
-			lws_wsi_set_user(wsi, nullptr);
 		Close();
 		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
@@ -408,6 +417,7 @@ lwsclose:
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
 		{
 			WSClientSet.erase(this->wsi);
+			lws_wsi_set_user(this->wsi, nullptr);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
@@ -419,12 +429,13 @@ lwsclose:
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		m_sendBuf.insert(m_sendBuf.end(), lpBuf, lpBuf + nBufLen);
 
+		LOG4CPLUS_DEBUG(log, m_SessionId << "Send:" << std::string(m_sendBuf.begin() + LWS_PRE, m_sendBuf.end()));
+
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi) {
 			lws_callback_on_writable(this->wsi);
 			lws_cancel_service(m_Context);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, m_SessionId << "Send:" << std::string(m_sendBuf.begin() + LWS_PRE, m_sendBuf.end()));
 			LOG4CPLUS_ERROR(log, m_SessionId << " closed");
 		}
 
@@ -467,4 +478,10 @@ lwsclose:
 	{
 		return this->m_url;
 	}
+
+	long WebSocketClient::GetStatus()
+	{
+		return m_state;
+	}
+
 }

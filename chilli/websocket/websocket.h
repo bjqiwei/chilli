@@ -20,6 +20,7 @@ namespace WebSocket {
 		bool InitInstance();
 		bool UnInitInstance();
 		void Loop(int timeout_ms);
+		struct lws_context * GetContext();
 		virtual WebSocketClient * OnAccept(struct lws *wsi);
 
 		friend int callback_lws(struct lws *wsi, enum lws_callback_reasons reason,
@@ -27,7 +28,7 @@ namespace WebSocket {
 	};
 
 	typedef enum {
-	CONNECTING	= 0,// 	The connection is not yet open.
+		CONNECTING	= 0,// 	The connection is not yet open.
 		OPEN		= 1,// 	The connection is open and ready to communicate.
 		CLOSING 	= 2,// 	The connection is in the process of closing.
 		CLOSED 		= 3,// 	The connection is closed or couldn't be opened.
@@ -41,11 +42,13 @@ namespace WebSocket {
 		explicit WebSocketClient(struct lws *);
 		virtual ~WebSocketClient();
 
+	public:
 		void Open();
 		void Close();
 		int Send(const char * lpBuf, int nBufLen);
 		void SetWSUrl(const std::string & url);
 		const std::string & GetWSUrl();
+		long GetStatus();
 
 		WebSocketClient(const WebSocketClient&) = delete;
 		WebSocketClient& operator=(const WebSocketClient&) = delete;
@@ -54,7 +57,7 @@ namespace WebSocket {
 	protected:
 		log4cplus::Logger log;
 		std::string m_SessionId;
-		Status m_state;
+		Status m_state = CONNECTING;
 		virtual void OnOpen();
 		virtual void OnSend();
 		virtual void OnClose(const std::string & ErrorCode);
