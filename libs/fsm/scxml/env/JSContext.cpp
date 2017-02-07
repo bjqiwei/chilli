@@ -299,7 +299,7 @@ namespace env
 
 	JsContext::~JsContext()
 	{
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",Destroy SpiderMonkey Context." );
+		//LOG4CPLUS_DEBUG(log, m_strSessionID << ",Destroy SpiderMonkey Context." );
 		if (m_jsctx) 
 			JS_DestroyContext(m_jsctx);
 		if (m_jsrt)
