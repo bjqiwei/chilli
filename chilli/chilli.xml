@@ -70,7 +70,7 @@
         <Extension>5010</Extension>
     </group>
     </groups>
-	<FreeSwitch id = "freeswitch001" host="127.0.0.1" port ="8021" password="ClueCon">
+	<FreeSwitch id = "freeswitch001" host="123.56.241.85" port ="18021" password="qiwei">
 	</FreeSwitch>
 	<!--<Avaya id = "tsapi001">
 		<TSAPI>
