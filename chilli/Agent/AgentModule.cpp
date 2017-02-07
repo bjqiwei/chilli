@@ -154,6 +154,8 @@ void AgentModule::run()
 
 				if (jsonEvent["event"].isNull())
 					jsonEvent["event"] = jsonEvent.removeMember("cmd");
+				if (jsonEvent["extension"].isNull())
+					jsonEvent["extension"] = jsonEvent.removeMember("agentid");
 				if(jsonEvent["extension"].isNull())
 					jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
 
