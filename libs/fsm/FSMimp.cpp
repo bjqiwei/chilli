@@ -737,9 +737,9 @@ void fsm::StateMachineimp::mainEventLoop()
 			}
 
 			//内部事件队列循环
-			LOG4CPLUS_TRACE(log, m_strSessionID << ", Internal Event Queue size:" << m_internalQueue.size());
 			if (m_Running && !m_internalQueue.empty())
 			{
+				LOG4CPLUS_TRACE(log, m_strSessionID << ", Internal Event Queue size:" << m_internalQueue.size());
 				std::queue<TriggerEvent> excQueue;
 				// 拷贝现在内部事件队列中的事件到执行队列中
 				excQueue.swap(m_internalQueue);

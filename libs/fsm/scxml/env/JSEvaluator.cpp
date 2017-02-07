@@ -16,7 +16,7 @@ namespace env
 	JSEvaluator::~JSEvaluator(){
 		
 		if (!m_contexts.empty())
-			LOG4CPLUS_WARN(log, "has " << m_contexts.size() << "context when evaluator delete.");
+			LOG4CPLUS_WARN(log, "has " << m_contexts.size() << " context when evaluator delete.");
 
 		while(!m_contexts.empty())
 		{
@@ -42,8 +42,8 @@ namespace env
 	void JSEvaluator::deleteContext(Context * const cx)
 	{
 		m_contexts.remove(cx);
-		LOG4CPLUS_DEBUG(log, "contexts size " << m_contexts.size());
 		delete cx;
+		LOG4CPLUS_DEBUG(log, "contexts size " << m_contexts.size());
 	}
 
 	bool JSEvaluator::hasContext()

@@ -86,7 +86,7 @@ namespace env
 
 		std::string out = value.toStyledString();
 		helper::string::trim(out);
-		LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
+		//LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
 
 		if (!JS_DefineProperty(m_jsctx, obj, _name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
 			LOG4CPLUS_WARN(log, m_strSessionID << ",define " << (va == fsm::globalObject ? "global." : "_event.") << " property " << name << " failed.");
@@ -119,7 +119,7 @@ namespace env
 
 		JS::RootedObject obj (this->m_jsctx, (va==fsm::globalObject ? this->m_global:this->m_event));
 
-		LOG4CPLUS_TRACE(log, m_strSessionID << ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
+		//LOG4CPLUS_TRACE(log, m_strSessionID << ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
 
 		if(!JS_DeleteProperty(m_jsctx, obj, name.c_str())){
 			LOG4CPLUS_ERROR(log, m_strSessionID << ", delete " << (va == fsm::globalObject ? "global." : "_event.") << "Var failed.");
@@ -309,7 +309,7 @@ namespace env
 			JS_ShutDown();
 		}
 
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",destructioned a fsm.env.JsContext object." );
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ",destructioned a fsm.env.JsContext object:" << this );
 	}
 
 
