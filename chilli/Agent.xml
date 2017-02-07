@@ -1,59 +1,60 @@
 ﻿<?xml version="1.0" ?>
-<!--
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
--->
-<fsm name="Agent" initial="init">
-	<functionmodel>
-		<function >function log(var1){logging(var1);}</function>
-	</functionmodel>
+<fsm name="avayaAgent" initial="init">
 	<state id="init">
 		<onentry>
 			<log level = "info">enter init state.</log>
 		</onentry>
-		<state id="idle">
+		<event event="logon" cond="_event.password == _agent.Password">
+			<transition  target="logined"/>
+		</event>
+		<event event="logon">
+			<send target="this" type="response" dest="client" event="logon">
+				<status>1</status>
+				<type>logon</type>
+			</send>
+		</event>
+		<event event=".*">
+			<send target="this" type="response" dest="client" eventexpr="_event._name">
+				<status>1</status>
+				<type type="script">_event._name;</type>
+				<mem>未登录</mem>
+			</send>
+		</event>
+		<state id="logined">
 			<onentry>
-				<log level = "info">enter idle state.</log>
-				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
+				<log level = "info">enter logined state.</log>
+				<send target="this" type="response" dest="client" event="logon">
+					<status>0</status>
+					<type>logon</type>
+				</send>
 			</onentry>
-			<event event="transfer">
-				<script>forward = extension.eventData; log(extension.number+':'+forward);</script>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
-				<transition  target="waitingForAnswer"/>
+			<event event="ping">
+				<log level="debug"> ping message</log>
+			</event>
+			<event event="ConnectError">
+				<transition  target="init"/>
+			</event>
+			<event event="ConnectClose">
+				<transition  target="init"/>
+			</event>
+			<event event="logout">
+				<transition  target="init"/>
+			</event>
+			<event event="logon">
+				<send target="this" type="notify" dest="client" event="logon">
+					<status>1</status>
+					<type>logon</type>
+				</send>
+				<send target="this" type="response" dest="client" event="logon">
+					<status>0</status>
+					<type>logon</type>
+				</send>
+			</event>
+			<event event=".*">
+				<log level="warn" type="script">"not process event "+_event._name;</log>
 			</event>
 		</state>
 		
-		<state id="waitingForAnswer">
-			<onentry>
-				<log level = "info">enter waitingForAnswer state.</log>
-			</onentry>
-			<event event="talking">
-				<transition  target="welcome"/>
-			</event>
-		</state> 
-		
-		<state id="welcome">
-			<onentry>
-				<log level = "info">enter welcome state.</log>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
-					<file>'./wav/welcome.wav'</file>
-				</send>
-			</onentry>
-		</state> 
-	
-	 <event event="onhook"><transition  target="idle"/></event>
     </state>
 
 </fsm>

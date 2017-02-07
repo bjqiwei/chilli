@@ -40,6 +40,16 @@
 			<event event="logout">
 				<transition  target="init"/>
 			</event>
+			<event event="logon">
+				<send target="this" type="notify" dest="client" event="logon">
+					<status>1</status>
+					<type>logon</type>
+				</send>
+				<send target="this" type="response" dest="client" event="logon">
+					<status>0</status>
+					<type>logon</type>
+				</send>
+			</event>
 			<event event=".*">
 				<log level="warn" type="script">"not process event "+_event._name;</log>
 			</event>
