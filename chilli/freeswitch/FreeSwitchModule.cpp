@@ -82,11 +82,13 @@ void FreeSwtichModule::ConnectFS()
 	while (bRunning)
 	{
 		esl_handle_t handle = { { 0 } };
+		LOG4CPLUS_DEBUG(log, "connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),10*1000);
 
 		if (!handle.connected){
-			LOG4CPLUS_ERROR(log, "connect freeswitch error");
+			LOG4CPLUS_ERROR(log, "connect freeswitch " << m_Host << ":" << m_Port << " error,"
+				<< handle.errnum << " " << handle.err);
 			continue;
 		}
 

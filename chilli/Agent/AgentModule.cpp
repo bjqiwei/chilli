@@ -352,14 +352,14 @@ public:
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
+		//LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
 		model::EventType_t evt(message, GetId());
 		m_module->PushEvent(evt);
 	};
 
 	virtual int Send(const char * lpBuf, int nBufLen) override
 	{
-		LOG4CPLUS_ERROR(log, m_SessionId << " Send:" << std::string(lpBuf, nBufLen));
+		//LOG4CPLUS_DEBUG(log, m_SessionId << " Send:" << std::string(lpBuf, nBufLen));
 		return WebSocketClient::Send(lpBuf, nBufLen);
 	}
 
