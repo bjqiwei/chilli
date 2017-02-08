@@ -12,6 +12,7 @@
 	<font>坐席ID</font><input type="text" id="agentId" value="6001" /><p/>
 	<font>密码</font><input type="password" id="password" value="1234" /><p/>
     <input type="button" value="登陆" onclick="Login();" />
+	<input type="button" value="登出" onclick="Logout();" />
 	
     <script type="text/javascript">
 
@@ -31,6 +32,15 @@
             websocket.onerror = function(evt) { onError(evt) };
         }
 
+		function Logout()
+		{
+			var logout = new Object();
+			logout.agentid= document.getElementById("agentId").value;
+			logout.password = document.getElementById("password").value;
+			logout.event = "logout";
+			websocket.close();
+		}
+		
         function onOpen(evt)
         {
             document.getElementById("status").value = "已连接";

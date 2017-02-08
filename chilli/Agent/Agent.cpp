@@ -71,6 +71,7 @@ void Agent::fireSend(const std::string & strContent,const void * param)
 				if (jsonData["param"]["status"].isString() && jsonData["param"]["status"].asString() == "0")
 				{
 					//登陆成功
+					model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
 					model::ConnectAdapter::Close(m_ConnectId); //关闭原有连接
 					m_ConnectId = m_curConnectId;//更新为当前连接
 					model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtensionNumber());//为当前连接设置坐席工号

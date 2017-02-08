@@ -426,7 +426,7 @@ lwsclose:
 		{
 			this->m_state = CLOSING;
 			WSClientSet.erase(this->wsi);
-			lws_wsi_set_user(this->wsi, nullptr);
+			//lws_wsi_set_user(this->wsi, nullptr);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
