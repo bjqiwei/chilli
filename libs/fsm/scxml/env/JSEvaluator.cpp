@@ -35,7 +35,7 @@ namespace env
 
 		Context * cx = new env::JsContext(sessionid, this, parent);
 		m_contexts.push_back(cx);
-		LOG4CPLUS_DEBUG(log,"contexts size " << m_contexts.size());
+		LOG4CPLUS_DEBUG(log, "push context:" << cx << " contexts size " << m_contexts.size());
 		return cx;
 
 	}
@@ -43,7 +43,7 @@ namespace env
 	{
 		m_contexts.remove(cx);
 		delete cx;
-		LOG4CPLUS_DEBUG(log, "contexts size " << m_contexts.size());
+		LOG4CPLUS_DEBUG(log, "remove context:" << cx << " contexts size " << m_contexts.size());
 	}
 
 	bool JSEvaluator::hasContext()
