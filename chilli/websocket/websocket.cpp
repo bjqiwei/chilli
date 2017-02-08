@@ -27,8 +27,10 @@ namespace WebSocket {
 		switch (reason) {
 		case LWS_CALLBACK_ESTABLISHED:
 			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_ESTABLISHED");
-			if (wsclient)
+			if (wsclient) {
+				wsclient->m_state = OPEN;
 				wsclient->OnOpen();
+			}
 			break;
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
 			LOG4CPLUS_WARN(This->log, "LWS_CALLBACK_CLIENT_CONNECTION_ERROR");
@@ -36,8 +38,10 @@ namespace WebSocket {
 			if (in) {
 				errorCode.assign((char *)in, len);
 			}
-			if (wsclient)
+			if (wsclient) {
+				wsclient->m_state = CLOSED;
 				wsclient->OnError(errorCode);
+			}
 		}
 												   break;
 		case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
@@ -45,8 +49,10 @@ namespace WebSocket {
 			break;
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_ESTABLISHED");
-			if (wsclient)
+			if (wsclient) {
+				wsclient->m_state = OPEN;
 				wsclient->OnOpen();
+			}
 			break;
 		case LWS_CALLBACK_CLOSED:
 			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED");
@@ -66,6 +72,7 @@ lwsclose:
 
 			if (wsclient) {
 				wsclient->wsi = nullptr;
+				wsclient->m_state = CLOSED;
 				wsclient->OnClose(errorCode);
 			}
 		}
@@ -196,7 +203,8 @@ lwsclose:
 											break;
 		case LWS_CALLBACK_WSI_CREATE: {
 			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_CREATE");
-			WebSocketClient * wsclient = This->OnAccept(wsi);
+			if(lws_wsi_user(wsi) == nullptr)
+				WebSocketClient * wsclient = This->OnAccept(wsi);
 		}
 									  break;
 		case LWS_CALLBACK_WSI_DESTROY: {
@@ -389,7 +397,7 @@ lwsclose:
 		strncpy_s(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
 
 		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path))
-			LOG4CPLUS_ERROR(log, m_SessionId << "parse uri error.");
+			LOG4CPLUS_ERROR(log, m_SessionId << " parse uri error.");
 
 		if (!strcmp(prot, "http") || !strcmp(prot, "ws"))
 			con_info.ssl_connection = 0;
@@ -416,6 +424,7 @@ lwsclose:
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
 		{
+			this->m_state = CLOSING;
 			WSClientSet.erase(this->wsi);
 			lws_wsi_set_user(this->wsi, nullptr);
 			lws_callback_on_writable(wsi);
