@@ -58,6 +58,10 @@ namespace WebSocket {
 			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED");
 			goto lwsclose;
 			break;
+		case LWS_CALLBACK_CLOSED_CLIENT_HTTP:
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED_CLIENT_HTTP");
+			goto lwsclose;
+			break;
 		case LWS_CALLBACK_CLOSED_HTTP:
 		{
 			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED_HTTP");
@@ -396,8 +400,16 @@ lwsclose:
 		memset(m_urlbuff, 0, sizeof(m_urlbuff));
 		strncpy_s(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
 
-		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path))
+		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path)) {
 			LOG4CPLUS_ERROR(log, m_SessionId << " parse uri error.");
+			return;
+		}
+
+		std::string path = con_info.path;
+		if (!path.empty() && path.compare(0,1,"/",1)){
+			path = "/" + path;
+			con_info.path = path.c_str();
+		}
 
 		if (!strcmp(prot, "http") || !strcmp(prot, "ws"))
 			con_info.ssl_connection = 0;
