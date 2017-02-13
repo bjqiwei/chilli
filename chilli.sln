@@ -33,9 +33,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esl", "libs\freeswitch\esl\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsm", "libs\fsm\msvc14\fsm.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent_core", "libs\libevent-release-2.0.22-stable\libevent_core.vcxproj", "{3C2BE383-A1B5-41AB-86CD-11455DF41EDC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent_core", "libs\libevent-2.0.22-stable\libevent_core.vcxproj", "{3C2BE383-A1B5-41AB-86CD-11455DF41EDC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent_extras", "libs\libevent-release-2.0.22-stable\libevent_extras.vcxproj", "{7BD82078-0049-4B2F-843E-2F7C018F426A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent_extras", "libs\libevent-2.0.22-stable\libevent_extras.vcxproj", "{7BD82078-0049-4B2F-843E-2F7C018F426A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testlibevent", "test\testlibevent\testlibevent.vcxproj", "{7C7CC7E2-BEA5-4F4E-BDF0-3FE717109923}"
 EndProject

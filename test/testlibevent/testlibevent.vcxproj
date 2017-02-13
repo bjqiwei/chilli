@@ -76,10 +76,10 @@
     <ClCompile Include="hello-world.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\libevent-release-2.0.22-stable\libevent_core.vcxproj">
+    <ProjectReference Include="..\..\libs\libevent-2.0.22-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\libevent-release-2.0.22-stable\libevent_extras.vcxproj">
+    <ProjectReference Include="..\..\libs\libevent-2.0.22-stable\libevent_extras.vcxproj">
       <Project>{7bd82078-0049-4b2f-843e-2f7c018f426a}</Project>
     </ProjectReference>
   </ItemGroup>

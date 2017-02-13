@@ -59,7 +59,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +93,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-release-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-release-2.0.22-stable\include;$(SolutionDir)libs\libevent-release-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -204,7 +204,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2015\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libs\libevent-release-2.0.22-stable\libevent_core.vcxproj">
+    <ProjectReference Include="..\libs\libevent-2.0.22-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libs\libwebsockets-2.1.0\websockets.vcxproj">
