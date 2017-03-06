@@ -19,10 +19,13 @@ namespace WebSocket {
 		callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 	{
 
-		WebSocketClient * wsclient = (WebSocketClient*)user;
+		WebSocketClient * wsclient = nullptr;
 		WebSocketServer * This = reinterpret_cast<WebSocketServer*>(lws_context_user(lws_get_context(wsi)));
 
 		std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
+		auto & it = WSClientSet.find(wsi);
+		if (it != WSClientSet.end())
+			wsclient = it->second;
 
 		switch (reason) {
 		case LWS_CALLBACK_ESTABLISHED:
@@ -72,10 +75,7 @@ lwsclose:
 			}
 
 			WSClientSet.erase(wsi);
-			lws_wsi_set_user(wsi, nullptr);
-
 			if (wsclient) {
-				wsclient->wsi = nullptr;
 				wsclient->m_state = CLOSED;
 				wsclient->OnClose(errorCode);
 			}
@@ -298,10 +298,28 @@ lwsclose:
 	{
 	}
 
+	void lwsl_log(int level, const char *line)
+	{
+		log4cplus::Logger log = log4cplus::Logger::getInstance("wslog");
+		std::string msg(line,strlen(line)-1);
+		if (level == LLL_ERR)
+			LOG4CPLUS_ERROR(log, msg);
+		else if (level == LLL_WARN)
+			LOG4CPLUS_WARN(log, msg);
+		else if (level == LLL_NOTICE)
+			LOG4CPLUS_INFO(log, msg);
+		else if (level == LLL_INFO)
+			LOG4CPLUS_INFO(log, msg);
+		else if (level == LLL_DEBUG)
+			LOG4CPLUS_DEBUG(log, msg);
+		else 
+			LOG4CPLUS_TRACE(log, msg);
+	}
+
 	bool WebSocketServer::InitInstance()
 	{
 		bool result = true;
-
+		lws_set_log_level(LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_INFO | LLL_DEBUG | LLL_PARSER | LLL_HEADER | LLL_EXT | LLL_CLIENT | LLL_LATENCY, lwsl_log);
 		memset(&m_Info, 0, sizeof(m_Info));
 		m_Info.port = m_port;
 		m_Info.protocols = protocols;
@@ -374,7 +392,6 @@ lwsclose:
 		m_Context = lws_get_context(wsi);
 		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
 
-		lws_wsi_set_user(wsi, this);
 		WSClientSet.insert(std::make_pair(wsi, this));
 		memset(&con_info, 0, sizeof(con_info));
 
@@ -385,7 +402,8 @@ lwsclose:
 	WebSocketClient::~WebSocketClient()
 	{
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
-		Close();
+		if (WSClientSet.find(this->wsi) != WSClientSet.end())
+			Close();
 		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
@@ -421,10 +439,10 @@ lwsclose:
 		con_info.host = con_info.address;
 		con_info.origin = con_info.address;
 		con_info.userdata = this;
+		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		wsi = lws_client_connect_via_info(&con_info);
 		LOG4CPLUS_TRACE(log, m_SessionId << "wsi:" << wsi);
 
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		WSClientSet.insert(std::make_pair(wsi, this));
 
 		m_state = CONNECTING;
@@ -438,7 +456,6 @@ lwsclose:
 		{
 			this->m_state = CLOSING;
 			WSClientSet.erase(this->wsi);
-			//lws_wsi_set_user(this->wsi, nullptr);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
