@@ -127,6 +127,9 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <CustomBuild Include="log4cplus.properties">
       <FileType>Document</FileType>
     </CustomBuild>
+    <None Include="AgentClient.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Analog_Trunk.xml" />
     <None Include="Analog_User.xml">
       <SubType>Designer</SubType>

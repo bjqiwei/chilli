@@ -58,6 +58,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ReadMe.txt" />
+    <None Include="AgentClient.htm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

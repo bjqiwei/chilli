@@ -9,10 +9,12 @@
     <hr />
 
     <font>服务器地址</font><input type="text" id="wsUri" value="ws://127.0.0.1:9996" /><p/>
-	<font>坐席ID</font><input type="text" id="agentId" value="6001" /><p/>
+	<font>坐席ID</font><input type="text" id="agentId" value="6001" />
 	<font>密码</font><input type="password" id="password" value="1234" /><p/>
     <input type="button" value="登陆" onclick="Login();" />
-	<input type="button" value="登出" onclick="Logout();" />
+	<input type="button" value="登出" onclick="Logout();" /><p/>
+	<font>电话</font><input type="text" id="idTel" value="" width="300"/><input type="button" value="添加" onclick="AddTel();" />
+	<input type="button" value="开始" onclick="StartConf();" /><p/>
 	
     <script type="text/javascript">
 
@@ -24,7 +26,10 @@
 			
 		}
 		
-        function Login() {
+		function Login() {
+		    if(websocket != undefined){
+                delete websocket;
+		    }
 			websocket = new WebSocket(document.getElementById("wsUri").value);
             websocket.onopen = function(evt) { onOpen(evt) };
             websocket.onclose = function(evt) { onClose(evt) };
@@ -38,6 +43,7 @@
 			logout.agentid= document.getElementById("agentId").value;
 			logout.password = document.getElementById("password").value;
 			logout.event = "logout";
+			doSend(JSON.stringify(logout));
 			websocket.close();
 		}
 		
@@ -85,8 +91,55 @@
 			pre.innerHTML = message;
 			output.appendChild(pre);
 		}
+		
     </script>
-	
+	<table id = "conferencelist" border="1" width="300" height="30">
+	  <tbody>
+	  </tbody>
+	</table>
+	<script type="text/javascript">
+		var telArray = new Array();
+		function AddTel()
+		{
+			var tel = document.getElementById("idTel").value;
+			var x;
+			for(x in telArray)
+			{
+				if (telArray[x] == tel){
+					return;
+				}
+			}
+			telArray.push(tel);
+			var tBody = document.getElementById("conferencelist").tBodies[0];
+			var rowIndex=tBody.rows.length;
+        
+			var row = tBody.insertRow(rowIndex);
+            //checkBox
+			row.insertCell(0);
+			var cell1 = document.createElement("input");
+			cell1.id="chbChild"; cell1.value=rowIndex; cell1.type="checkbox"; cell1.checked=true;
+			row.cells[0].appendChild(cell1);
+			//row.cells[0].className = "tableNext";
+
+			row.insertCell(1);
+			row.cells[1].appendChild(document.createTextNode(tel));
+			//row.cells[1].noWrap=true;
+		}
+		
+		function StartConf()
+		{
+			var rows = document.getElementById("conferencelist").tBodies[0].rows;
+			var tels = new Array();
+			for(var row in rows)
+			{
+				if(checked = rows[row].cells[0].childNodes[0].checked){
+					var tel = rows[row].cells[1].childNodes[0].nodeValue;
+					tels.push(tel);
+				}
+			}
+		}
+		
+	</script>
 	<div id="output"></div>
 </BODY>
 </HTML>
