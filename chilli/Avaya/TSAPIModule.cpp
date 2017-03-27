@@ -158,7 +158,7 @@ namespace chilli {
 				, (ServerID_t *)(serverID)  // AE Server Name
 				, (LoginID_t *)(loginID)	// CTI LoginID
 				, (Passwd_t *)(password)  // CTI LoginID password
-				, (AppName_t *)"CCS-SERVER"
+				, (AppName_t *)"CHILLI-SERVER"
 				, ACS_LEVEL1
 				, (Version_t *) "TS1-2" // private Data version in use 8 in our case
 				, 10
@@ -245,16 +245,14 @@ namespace chilli {
 				// Check for event type.
 				switch (cstaEvent.eventHeader.eventClass)
 				{
-				case ACSCONFIRMATION:
-				{
+				case ACSCONFIRMATION:{
 					switch (cstaEvent.eventHeader.eventType)
 					{
-					case ACS_OPEN_STREAM_CONF:
-					{
+					case ACS_OPEN_STREAM_CONF:{
 						ServerID_t svrId;
 						if (AvayaAPI::acsGetServerID(m_lAcsHandle, &svrId) == ACSPOSITIVE_ACK)
 							LOG4CPLUS_INFO(log, "Open ServerID:" << svrId);
-
+						
 						LOG4CPLUS_INFO(log, "ACS_OPEN_STREAM_CONF.");
 						LOG4CPLUS_INFO(log, "API Version:" << cstaEvent.event.acsConfirmation.u.acsopen.apiVer);
 						LOG4CPLUS_INFO(log, "Lib Version:" << cstaEvent.event.acsConfirmation.u.acsopen.libVer);
@@ -263,16 +261,15 @@ namespace chilli {
 
 						AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
 						AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
+						AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_DEVICE_DEVICE_MONITOR);
 					}
 					break;
-					case ACS_CLOSE_STREAM_CONF:
-					{
+					case ACS_CLOSE_STREAM_CONF:{
 						LOG4CPLUS_INFO(log, "ACS_CLOSE_STREAM_CONF.");
 						goto end;
 					}
 					break;
-					case ACS_UNIVERSAL_FAILURE_CONF:
-					{
+					case ACS_UNIVERSAL_FAILURE_CONF:{
 						LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
 					}
 					break;
@@ -280,12 +277,21 @@ namespace chilli {
 					};
 				}// end of inner switch
 				break;
-				case CSTACONFIRMATION:
-				{
+				case ACSUNSOLICITED: {
+					switch (cstaEvent.eventHeader.eventType) {
+					case ACS_UNIVERSAL_FAILURE:{
+						LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE:" << AvayaAPI::acsErrorString(cstaEvent.event.acsUnsolicited.u.failureEvent.error));
+					}
+					break;
+					default:
+						break;
+					}
+				}
+				break;
+				case CSTACONFIRMATION:{
 					switch (cstaEvent.eventHeader.eventType)
 					{
-					case CSTA_GETAPI_CAPS_CONF:
-					{
+					case CSTA_GETAPI_CAPS_CONF:{
 						LOG4CPLUS_INFO(log, "CSTA_GETAPI_CAPS_CONF.");
 						LOG4CPLUS_INFO(log, "alternateCall:" << cstaEvent.event.cstaConfirmation.u.getAPICaps.alternateCall);
 						LOG4CPLUS_INFO(log, "answerCall:" << cstaEvent.event.cstaConfirmation.u.getAPICaps.answerCall);
@@ -368,21 +374,38 @@ namespace chilli {
 						LOG4CPLUS_INFO(log, "sysStatEvent:" << cstaEvent.event.cstaConfirmation.u.getAPICaps.sysStatEvent);
 					}
 					break;
-					case CSTA_QUERY_CALL_MONITOR_CONF:
-					{
+					case CSTA_QUERY_CALL_MONITOR_CONF:{
 						LOG4CPLUS_INFO(log, "CSTA_QUERY_CALL_MONITOR_CONF:" << (int)cstaEvent.event.cstaConfirmation.u.queryCallMonitor.callMonitor);
 					}
 					break;
-					default: {};
+					case CSTA_GET_DEVICE_LIST_CONF: {
+						LOG4CPLUS_DEBUG(log, "driverSdbLevel:" << cstaEvent.event.cstaConfirmation.u.getDeviceList.driverSdbLevel);
+						short count = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.count;
+						DeviceID_t * devices = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.device;
+						for (int i = 0; i < count; i++) {
+							LOG4CPLUS_DEBUG(log, (const char *)devices[i]);
+						}
+
+					}
+					break;
+					default: {}break;
 					}
 				}// end of ctsaconfirmation
 				break;
-				case CSTAUNSOLICITED:
-				{
-
+				case CSTAUNSOLICITED:{
+					switch (cstaEvent.eventHeader.eventType) {
+					case CSTA_UNIVERSAL_FAILURE_CONF:
+						//LOG4CPLUS_INFO(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstErrorString(cstaEvent.event.cstaUnsolicited.u.failed.cause));
+						break;
+					default:
+						break;
+					}
 				}// end of CSTAUNSOLICITED Events
 				break;
-				default: {}
+				default: {
+					LOG4CPLUS_WARN(log, "unkonwn eventClass:" << cstaEvent.eventHeader.eventClass);
+				}
+				break;
 				}// end of outer switch
 			}
 		end:
