@@ -383,20 +383,166 @@ namespace chilli {
 						short count = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.count;
 						DeviceID_t * devices = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.device;
 						for (int i = 0; i < count; i++) {
-							LOG4CPLUS_DEBUG(log, (const char *)devices[i]);
+							LOG4CPLUS_DEBUG(log, devices[i]);
 						}
 
 					}
 					break;
-					default: {}break;
+					case CSTA_ALTERNATE_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_ALTERNATE_CALL_CONF");
+					}
+					break;
+					case CSTA_ANSWER_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_ANSWER_CALL_CONF");
+					}
+					break;
+					case CSTA_CALL_COMPLETION_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_CALL_COMPLETION_CONF");
+					}
+					break;
+					case CSTA_CLEAR_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_CLEAR_CALL_CONF");
+					}
+					break;
+					case CSTA_CLEAR_CONNECTION_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_CLEAR_CONNECTION_CONF");
+					}
+					break;
+					case CSTA_CONFERENCE_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_CONFERENCE_CALL_CONF:");
+						ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.conferenceCall.newCall;
+						LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
+						<<"," << newCall.deviceID << "," << newCall.devIDType);
+						ConnectionList_t connList = cstaEvent.event.cstaConfirmation.u.conferenceCall.connList;
+						for (int i = 0; i < connList.count; i++) {
+							ConnectionID_t party = connList.connection[i].party;
+							LOG4CPLUS_DEBUG(log, "party[" << i << "]:" << party.callID
+									<< "," << party.deviceID << "," << party.devIDType);
+						}
+					}
+					break;
+					case CSTA_CONSULTATION_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_CONSULTATION_CALL_CONF:");
+						ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.consultationCall.newCall;
+						LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
+							<< "," << newCall.deviceID << "," << newCall.devIDType);
+					}
+					break;
+					case CSTA_DEFLECT_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_DEFLECT_CALL_CONF");
+					}
+					break;
+					case CSTA_GROUP_PICKUP_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_GROUP_PICKUP_CALL_CONF");
+					}
+					break;
+					case CSTA_HOLD_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_HOLD_CALL_CONF");
+					}
+					break;
+					case CSTA_MAKE_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_MAKE_CALL_CONF:");
+						ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.makeCall.newCall;
+						LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
+							<< "," << newCall.deviceID << "," << newCall.devIDType);
+					}
+					break;
+					case CSTA_MAKE_PREDICTIVE_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_MAKE_PREDICTIVE_CALL_CONF:");
+						ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.makePredictiveCall.newCall;
+						LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
+							<< "," << newCall.deviceID << "," << newCall.devIDType);
+					}
+					break;
+					case CSTA_PICKUP_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_PICKUP_CALL_CONF");
+					}
+					break;
+					case CSTA_RECONNECT_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_RECONNECT_CALL_CONF");
+					}
+					break;
+					case CSTA_RETRIEVE_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_RETRIEVE_CALL_CONF");
+					}
+					break;
+					case CSTA_TRANSFER_CALL_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_TRANSFER_CALL_CONF");
+						ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.transferCall.newCall;
+						LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
+							<< "," << newCall.deviceID << "," << newCall.devIDType);
+						ConnectionList_t connList = cstaEvent.event.cstaConfirmation.u.transferCall.connList;
+						for (int i = 0; i < connList.count; i++) {
+							ConnectionID_t party = connList.connection[i].party;
+							LOG4CPLUS_DEBUG(log, "party[" << i << "]:" << party.callID
+								<< "," << party.deviceID << "," << party.devIDType);
+						}
+					}
+					break;
+					case CSTA_SET_MWI_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_SET_MWI_CONF");
+					}
+					break;
+					case CSTA_SET_DND_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_SET_DND_CONF");
+					}
+					break;
+					case CSTA_SET_FWD_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_SET_FWD_CONF");
+					}
+					break;
+					case CSTA_SET_AGENT_STATE_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
+					}
+					break;
+					case CSTA_QUERY_MWI_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_MWI_CONF:");
+						LOG4CPLUS_DEBUG(log, "messages:" << (bool)cstaEvent.event.cstaConfirmation.u.queryMwi.messages);
+					}
+					break;
+					case CSTA_QUERY_DND_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_DND_CONF");
+						LOG4CPLUS_DEBUG(log, "doNotDisturb:" << (bool)cstaEvent.event.cstaConfirmation.u.queryDnd.doNotDisturb);
+					}
+					break;
+					case CSTA_QUERY_FWD_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_FWD_CONF");
+						CSTAQueryFwdConfEvent_t queryFwd = cstaEvent.event.cstaConfirmation.u.queryFwd;
+						ListForwardParameters_t forward = queryFwd.forward;
+						for (int i = 0; i < forward.count; i++) {
+							LOG4CPLUS_DEBUG(log, "fwd[" << i << "]:" << forward.param[i].forwardingType
+								<< "," << forward.param[i].forwardingOn
+								<< "," << forward.param[i].forwardDN);
+						}
+					}
+					break;
+					case CSTA_QUERY_AGENT_STATE_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_AGENT_STATE_CONF:");
+						LOG4CPLUS_DEBUG(log, "agentState:" << cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState);
+					}
+					break;
+					case CSTA_QUERY_LAST_NUMBER_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_LAST_NUMBER_CONF:");
+						LOG4CPLUS_DEBUG(log, "lastNumber:" << cstaEvent.event.cstaConfirmation.u.queryLastNumber.lastNumber);
+					}
+					break;
+					case CSTA_QUERY_DEVICE_INFO_CONF: {
+						LOG4CPLUS_DEBUG(log, "CSTA_QUERY_DEVICE_INFO_CONF:");
+						CSTAQueryDeviceInfoConfEvent_t queryDeviceInfo = cstaEvent.event.cstaConfirmation.u.queryDeviceInfo;
+						LOG4CPLUS_DEBUG(log, "queryDeviceInfo,device:" << queryDeviceInfo.device << ",deviceClass:" << queryDeviceInfo.deviceClass << ",deviceType:" << queryDeviceInfo.deviceType);
+					}
+					break;
+					default: {}
+							 break;
 					}
 				}// end of ctsaconfirmation
 				break;
 				case CSTAUNSOLICITED:{
 					switch (cstaEvent.eventHeader.eventType) {
-					case CSTA_UNIVERSAL_FAILURE_CONF:
-						//LOG4CPLUS_INFO(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstErrorString(cstaEvent.event.cstaUnsolicited.u.failed.cause));
-						break;
+					case CSTA_UNIVERSAL_FAILURE_CONF: {
+						LOG4CPLUS_WARN(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(cstaEvent.event.cstaConfirmation.u.universalFailure.error));
+					}
+					break;
 					default:
 						break;
 					}
