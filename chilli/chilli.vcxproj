@@ -145,10 +145,11 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
     <ClInclude Include="Avaya\AvayaAPI.h" />
-    <ClInclude Include="Avaya\AvayaExtension.h" />
     <ClInclude Include="Avaya\TSAPIModule.h" />
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Dynamiclibrary.h" />
+    <ClInclude Include="Extension\ExtensionImp.h" />
+    <ClInclude Include="Extension\ExtensionModule.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="IVR\IVRExtension.h" />
     <ClInclude Include="IVR\IVRModule.h" />
@@ -173,8 +174,9 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
     <ClCompile Include="Avaya\AvayaAPI.cpp" />
-    <ClCompile Include="Avaya\AvayaExtension.cpp" />
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
+    <ClCompile Include="Extension\ExtensionImp.cpp" />
+    <ClCompile Include="Extension\ExtensionModule.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="IVR\IVRExtension.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />

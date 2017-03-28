@@ -9,6 +9,7 @@
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
+#include "Extension/ExtensionModule.h"
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
 #include "Avaya/TSAPIModule.h"
@@ -20,6 +21,7 @@
 #define  FREESWITCHNODE "FreeSwitch"
 #define  AVAYANODE      "Avaya"
 #define  AGENTNODE      "Agents"
+#define  EXTENSIONS		"Extensions"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -265,7 +267,16 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				m_Modules.push_back(agent);
 
 			}
-		
+			else if (nodeName == EXTENSIONS)
+			{
+				model::ProcessModulePtr extension(new chilli::Extension::ExtensionModule(modelid));
+				XMLPrinter printer;
+				e->Accept(&printer);
+				extension->LoadConfig(printer.CStr());
+				m_Modules.push_back(extension);
+
+			}
+
 			e = e->NextSiblingElement();
 		}
 

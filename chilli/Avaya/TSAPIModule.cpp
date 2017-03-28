@@ -1,5 +1,4 @@
 #include "TSAPIModule.h"
-#include "AvayaExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
@@ -98,29 +97,6 @@ namespace chilli {
 
 			}
 
-			//extensions 
-			XMLElement * extensions = avaya->FirstChildElement("Extensions");
-			if (extensions != nullptr) {
-
-				for (XMLElement *child = extensions->FirstChildElement("Extension");
-					child != nullptr;
-					child = child->NextSiblingElement("Extension"))
-				{
-					const char * num = child->Attribute("ExtensionNumber");
-					const char * sm = child->Attribute("StateMachine");
-					num = num ? num : "";
-					sm = sm ? sm : "";
-					if (this->m_Extensions.find(num) == this->m_Extensions.end())
-					{
-						model::ExtensionPtr ext(new AvayaExtension(num, sm));
-						this->m_Extensions[num] = ext;
-					}
-					else {
-						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
-					}
-				}
-			}
-
 			return true;
 		}
 
@@ -132,6 +108,7 @@ namespace chilli {
 
 		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
 		{
+			LOG4CPLUS_DEBUG(log, strContent);
 			LOG4CPLUS_WARN(log, "fireSend not implement.");
 		}
 

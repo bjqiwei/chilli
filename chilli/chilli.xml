@@ -78,8 +78,5 @@
 		<UserID>ctiadaptor</UserID>
 		<Password>Dadmin@01</Password>
 		</TSAPI>
-		<Extensions>
-			<Extension ExtensionNumber="1010" StateMachine="./AvayaExtension.xml"></Extension>
-		</Extensions>
 	</Avaya>
 </Config>

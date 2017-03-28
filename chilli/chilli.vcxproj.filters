@@ -40,6 +40,9 @@
     <Filter Include="Avaya">
       <UniqueIdentifier>{30b81287-8bbb-4298-9c40-99fe02dbde55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extension">
+      <UniqueIdentifier>{e74a7c9f-a71a-4955-819f-415cf4ebb6b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -124,9 +127,6 @@
     <ClInclude Include="Avaya\TSAPIModule.h">
       <Filter>Avaya</Filter>
     </ClInclude>
-    <ClInclude Include="Avaya\AvayaExtension.h">
-      <Filter>Avaya</Filter>
-    </ClInclude>
     <ClInclude Include="Avaya\AvayaAPI.h">
       <Filter>Avaya</Filter>
     </ClInclude>
@@ -138,6 +138,12 @@
     </ClInclude>
     <ClInclude Include="model\ConnectAdapter.h">
       <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ExtensionImp.h">
+      <Filter>Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ExtensionModule.h">
+      <Filter>Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -186,9 +192,6 @@
     <ClCompile Include="Avaya\TSAPIModule.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="Avaya\AvayaExtension.cpp">
-      <Filter>Avaya</Filter>
-    </ClCompile>
     <ClCompile Include="Avaya\AvayaAPI.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
@@ -197,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="model\ConnectAdapter.cpp">
       <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\ExtensionImp.cpp">
+      <Filter>Extension</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\ExtensionModule.cpp">
+      <Filter>Extension</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
