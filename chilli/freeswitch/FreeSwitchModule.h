@@ -21,7 +21,6 @@ namespace FreeSwitch{
 		virtual void fireSend(const std::string &strContent, const void * param) override;
 	private:
 		log4cplus::Logger log;
-		model::ExtensionMap m_Extension;
 		std::thread m_Thread;
 		std::atomic<bool> bRunning = false;
 		std::string m_Host;

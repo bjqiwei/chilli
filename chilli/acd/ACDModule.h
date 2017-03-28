@@ -25,7 +25,6 @@ private:
 private:
 	log4cplus::Logger log;
 	std::thread m_Thread;
-	std::map<std::string, model::ExtensionPtr> m_Extension;
 	std::map<std::string, model::ExtensionPtr> m_Session;
 	std::mutex m_SessionLock;
 	model::ExtensionPtr GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext);

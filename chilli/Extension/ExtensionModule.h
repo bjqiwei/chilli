@@ -26,7 +26,6 @@ namespace chilli {
 
 			log4cplus::Logger log;
 			std::atomic_bool m_bRunning = true;
-			model::ExtensionMap m_Extensions;
 
 			std::thread m_thread;
 			void run();

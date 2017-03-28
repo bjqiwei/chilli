@@ -71,10 +71,10 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 		num = num ? num : "";
 		sm = sm ? sm : "";
 
-		if (this->m_Extension.find(num) == this->m_Extension.end())
+		if (this->m_Extensions.find(num) == this->m_Extensions.end())
 		{
 			model::ExtensionPtr ext(new ACDExtension(num, sm));
-			this->m_Extension[num] = ext;
+			this->m_Extensions[num] = ext;
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -86,7 +86,7 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 
 const model::ExtensionMap & ACDModule::GetExtension()
 {
-	return m_Extension;
+	return m_Extensions;
 }
 
 void ACDModule::fireSend(const std::string & strContent, const void * param)

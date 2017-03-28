@@ -30,7 +30,6 @@ namespace chilli {
 
 			bool CloseStream();
 			log4cplus::Logger log;
-			model::ExtensionMap m_Extensions;
 			ACSHandle_t m_lAcsHandle = 0;	// Handle for ACS Stream
 			ATTPrivateData_t m_stPrivateData;	// Private Data for using extended features of TSAPI service
 			InvokeID_t m_ulInvokeID = 1;			// This application uses, Application generated InvokeID

@@ -5,7 +5,6 @@
 #include "Extension.h"
 #include <map>
 #include <memory>
-#include <FSM.h>
 #include "TypeDef.h"
 
 namespace chilli{
@@ -32,6 +31,7 @@ public:
 	};
 protected:
 	helper::CEventBuffer<EventType_t> m_recEvtBuffer;
+	model::ExtensionMap m_Extensions;
 };
 typedef std::shared_ptr<model::ProcessModule> ProcessModulePtr;
 }

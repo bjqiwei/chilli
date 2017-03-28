@@ -25,7 +25,6 @@ public:
 	log4cplus::Logger log;
 private:
 	std::vector<std::thread> m_Threads;
-	model::ExtensionMap m_Agents;
 	std::atomic<bool> m_bRunning = false;
 	void run();
 

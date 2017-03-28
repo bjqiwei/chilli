@@ -46,7 +46,6 @@ private:
 	static const char *GetString_PengdingReason(int nReason);
 private:
 	log4cplus::Logger log;
-	model::ExtensionMap m_Extensions;
 
 };
 typedef ShDevModule * ShDevModulePtr;

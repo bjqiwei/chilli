@@ -25,7 +25,6 @@ private:
 	log4cplus::Logger log;
 	std::thread m_Thread;
 	std::atomic_bool bRunning = false;
-	model::ExtensionMap m_Extensions;
 	void run();
 };
 }

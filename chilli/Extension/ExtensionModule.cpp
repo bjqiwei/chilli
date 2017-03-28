@@ -102,9 +102,6 @@ namespace chilli {
 			LOG4CPLUS_WARN(log, "fireSend not implement.");
 		}
 
-
-
-
 		void ExtensionModule::run()
 		{
 			LOG4CPLUS_INFO(log, "Starting...");

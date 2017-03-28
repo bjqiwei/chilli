@@ -44,7 +44,7 @@ int AgentModule::Stop(void)
 
 	event_base_loopexit(m_Base, nullptr);
 
-	for (auto & it : m_Agents){
+	for (auto & it : m_Extensions){
 		it.second->Stop();
 	}
 	
@@ -66,7 +66,7 @@ int AgentModule::Start()
 	{
 		m_bRunning = true;
 
-		for (auto & it : m_Agents) {
+		for (auto & it : m_Extensions) {
 			it.second->Start();
 		}
 
@@ -108,16 +108,26 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 		const char * num = child->Attribute("ExtensionNumber");
 		const char * sm = child->Attribute("StateMachine");
 		const char * password = child->Attribute("password");
+		const char * avayaAgentId = child->Attribute("avayaAgentId");
+		const char * avayaPassword = child->Attribute("avayaPassword");
+		const char * avayaExtenion = child->Attribute("avayaExtenion");
+
 		num = num ? num : "";
 		sm = sm ? sm : "";
 		password = password ? password : "";
 
-		if (this->m_Agents.find(num) == this->m_Agents.end())
+		avayaAgentId = avayaAgentId ? avayaAgentId : "";
+		avayaPassword = avayaPassword ? avayaPassword : "";
+		avayaExtenion = avayaExtenion ? avayaExtenion : "";
+		if (this->m_Extensions.find(num) == this->m_Extensions.end())
 		{
 			model::ExtensionPtr ext(new Agent(num, sm));
-			this->m_Agents[num] = ext;
+			this->m_Extensions[num] = ext;
 			ext->setVar("_agent.AgentId", num);
 			ext->setVar("_agent.Password", password);
+			ext->setVar("_agent.avayaAgentId", avayaAgentId);
+			ext->setVar("_agent.avayaPassword", avayaPassword);
+			ext->setVar("_agent.avayaExtenion", avayaExtenion);
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -129,7 +139,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 
 const model::ExtensionMap & AgentModule::GetExtension()
 {
-	return m_Agents;
+	return m_Extensions;
 }
 
 void AgentModule::fireSend(const std::string & strContent, const void * param)
@@ -169,9 +179,9 @@ void AgentModule::run()
 
 				Event.event = jsonEvent.toStyledString();
 
-				auto & it = m_Agents.find(ext);
+				auto & it = m_Extensions.find(ext);
 
-				if (it != m_Agents.end()){
+				if (it != m_Extensions.end()){
 					it->second->pushEvent(Event);
 				}
 				else{
