@@ -1,5 +1,5 @@
 #include "ACDModule.h"
-#include "ACDExtension.h"
+#include "../Extension/ExtensionImp.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -18,8 +18,12 @@ ACDModule::ACDModule(const std::string & id):ProcessModule(id)
 
 ACDModule::~ACDModule(void)
 {
-	if (bRunning){
+	if (m_bRunning){
 		Stop();
+	}
+
+	for (auto & it : m_Extensions) {
+		g_Extensions.erase(it.first);
 	}
 
 	LOG4CPLUS_DEBUG(log,"Destruction a ACD module.");
@@ -28,26 +32,23 @@ ACDModule::~ACDModule(void)
 int ACDModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log,"Stop  ACD module");
-	bRunning = false;
-	for (auto & it: m_Session){
-		it.second->Stop();
+	if (m_bRunning) {
+		m_bRunning = false;
+		for (auto & it : m_Extensions) {
+			it.second->Stop();
+		}
 	}
-
-	if (m_Thread.joinable()) {
-		PushEvent(std::string());
-		m_Thread.join();
-	}
-
 	return 0;
 }
 
 int ACDModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start  ACD module");
-	while (!bRunning)
-	{
-		bRunning = true;
-		std::thread m_Thread = std::thread(&ACDModule::run, this);
+	if (!m_bRunning) {
+		m_bRunning = true;
+		for (auto & it : m_Extensions) {
+			it.second->Start();
+		}
 	}
 	return 0;
 }
@@ -71,9 +72,10 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 		num = num ? num : "";
 		sm = sm ? sm : "";
 
-		if (this->m_Extensions.find(num) == this->m_Extensions.end())
+		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
-			model::ExtensionPtr ext(new ACDExtension(num, sm));
+			model::ExtensionPtr ext(new Extension::ExtensionImp(num, sm));
+			this->g_Extensions[num] = ext;
 			this->m_Extensions[num] = ext;
 		}
 		else {
@@ -94,68 +96,5 @@ void ACDModule::fireSend(const std::string & strContent, const void * param)
 	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
-model::ExtensionPtr ACDModule::GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext)
-{
-	std::lock_guard<std::mutex> lcx(m_SessionLock);
-	auto &it = m_Session.find(sessionid);
-	if (it != m_Session.end())
-	{
-		return it->second;
-	}
-	return nullptr;
-}
-
-void ACDModule::RemoveSession(const std::string & sessionId)
-{
-	std::lock_guard<std::mutex> lcx(m_SessionLock);
-	m_Session.erase(sessionId);
-}
-
-void ACDModule::run()
-{
-	while (bRunning)
-	{
-		model::EventType_t Event;
-		if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
-		{
-			Json::Value jsonEvent;
-			Json::Reader jsonReader;
-			if (jsonReader.parse(Event.event, jsonEvent)){
-				std::string eventName;
-				std::string sessionId;
-				std::string ext;
-				if (jsonEvent["event"].isString()){
-					eventName = jsonEvent["event"].asString();
-				}
-
-				if (jsonEvent["sessionid"].isString()){
-					sessionId = jsonEvent["sessionid"].asString();
-				}
-
-				if (jsonEvent["extension"].isString()){
-					ext = jsonEvent["extension"].asString();
-				}
-
-				model::ExtensionPtr extptr = nullptr;
-				if (extptr = GetSession(sessionId,eventName, ext))
-				{
-					extptr->pushEvent(Event);
-					if (eventName == "hangup"){
-						extptr->Stop();
-						RemoveSession(sessionId);
-					}
-				}
-				else{
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
-				}
-	
-			}
-			else{
-				LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << Event.event << " not json data.");
-			}
-		}
-	}
-	log4cplus::threadCleanup();
-}
 }
 }

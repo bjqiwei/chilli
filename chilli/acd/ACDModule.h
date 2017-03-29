@@ -24,13 +24,8 @@ private:
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
-	std::thread m_Thread;
-	std::map<std::string, model::ExtensionPtr> m_Session;
-	std::mutex m_SessionLock;
-	model::ExtensionPtr GetSession(const std::string & sessionid, const std::string & eventName, const std::string & ext);
-	void RemoveSession(const std::string & sessionId);
-	std::atomic<bool> bRunning = false;
-	void run();
+	std::atomic_bool m_bRunning = false;
+	model::ExtensionMap m_Extensions;
 };
 }
 }

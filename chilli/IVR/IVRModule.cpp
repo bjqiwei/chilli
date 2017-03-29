@@ -32,11 +32,12 @@ IVRModule::~IVRModule(void)
 int IVRModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log,"Stop  IVR module");
-	m_bRunning = false;
-	for (auto & it: m_Extensions){
-		it.second->Stop();
+	if (m_bRunning) {
+		m_bRunning = false;
+		for (auto & it : m_Extensions) {
+			it.second->Stop();
+		}
 	}
-
 	return 0;
 }
 

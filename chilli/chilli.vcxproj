@@ -140,7 +140,6 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <None Include="welcome.wav" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="acd\ACDExtension.h" />
     <ClInclude Include="ACD\ACDModule.h" />
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
@@ -168,7 +167,6 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="websocket\websocket.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="acd\ACDExtension.cpp" />
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
