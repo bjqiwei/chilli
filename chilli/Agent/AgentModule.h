@@ -26,7 +26,7 @@ public:
 private:
 	std::vector<std::thread> m_Threads;
 	std::atomic<bool> m_bRunning = false;
-	void run();
+	model::ExtensionMap m_Extensions;
 
 	struct event_base * m_Base = nullptr;
 	int m_tcpPort = -1;

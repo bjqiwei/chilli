@@ -32,6 +32,10 @@ AgentModule::~AgentModule(void)
 		Stop();
 	}
 
+	for (auto & it : m_Extensions) {
+		g_Extensions.erase(it.first);
+	}
+
 	LOG4CPLUS_DEBUG(log, "Destruction a Agent module.");
 }
 
@@ -39,21 +43,21 @@ int AgentModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log, "Stop  Agent module");
 
-	m_bRunning = false;
-	PushEvent(std::string());
+	if (m_bRunning){
+		m_bRunning = false;
 
-	event_base_loopexit(m_Base, nullptr);
+		event_base_loopexit(m_Base, nullptr);
 
-	for (auto & it : m_Extensions){
-		it.second->Stop();
-	}
-	
-	for (auto & it : this->m_Threads) {
-		if (it.joinable()) {
-			it.join();
+		for (auto & it : m_Extensions) {
+			it.second->Stop();
+		}
+
+		for (auto & it : this->m_Threads) {
+			if (it.joinable()) {
+				it.join();
+			}
 		}
 	}
-
 	m_Threads.clear();
 	return 0;
 }
@@ -62,8 +66,7 @@ int AgentModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start  Agent module");
 
-	if(!m_bRunning)
-	{
+	if(!m_bRunning){
 		m_bRunning = true;
 
 		for (auto & it : m_Extensions) {
@@ -80,8 +83,6 @@ int AgentModule::Start()
 			m_Threads.push_back(std::move(th));
 		}
 
-		std::thread th(&AgentModule::run, this);
-		m_Threads.push_back(std::move(th));
 	}
 	return 0;
 }
@@ -108,26 +109,18 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 		const char * num = child->Attribute("ExtensionNumber");
 		const char * sm = child->Attribute("StateMachine");
 		const char * password = child->Attribute("password");
-		const char * avayaAgentId = child->Attribute("avayaAgentId");
-		const char * avayaPassword = child->Attribute("avayaPassword");
-		const char * avayaExtenion = child->Attribute("avayaExtenion");
 
 		num = num ? num : "";
 		sm = sm ? sm : "";
 		password = password ? password : "";
 
-		avayaAgentId = avayaAgentId ? avayaAgentId : "";
-		avayaPassword = avayaPassword ? avayaPassword : "";
-		avayaExtenion = avayaExtenion ? avayaExtenion : "";
-		if (this->m_Extensions.find(num) == this->m_Extensions.end())
+		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
 			model::ExtensionPtr ext(new Agent(num, sm));
+			this->g_Extensions[num] = ext;
 			this->m_Extensions[num] = ext;
 			ext->setVar("_agent.AgentId", num);
 			ext->setVar("_agent.Password", password);
-			ext->setVar("_agent.avayaAgentId", avayaAgentId);
-			ext->setVar("_agent.avayaPassword", avayaPassword);
-			ext->setVar("_agent.avayaExtenion", avayaExtenion);
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -145,57 +138,6 @@ const model::ExtensionMap & AgentModule::GetExtension()
 void AgentModule::fireSend(const std::string & strContent, const void * param)
 {
 	LOG4CPLUS_WARN(log, "fireSend not implement.");
-}
-
-
-void AgentModule::run()
-{
-	while (m_bRunning)
-	{
-		model::EventType_t Event;
-		if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
-		{
-			Json::Value jsonEvent;
-			Json::Reader jsonReader;
-			if (jsonReader.parse(Event.event, jsonEvent)){
-
-				std::string ext;
-				std::string eventName;
-
-				if (jsonEvent["event"].isNull())
-					jsonEvent["event"] = jsonEvent.removeMember("cmd");
-				if (jsonEvent["extension"].isNull())
-					jsonEvent["extension"] = jsonEvent.removeMember("agentid");
-				if(jsonEvent["extension"].isNull())
-					jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
-
-				if (jsonEvent["extension"].isString()){
-					ext = jsonEvent["extension"].asString();
-				}
-
-				if (jsonEvent["event"].isString()) {
-					eventName = jsonEvent["event"].asString();
-				}
-
-				Event.event = jsonEvent.toStyledString();
-
-				auto & it = m_Extensions.find(ext);
-
-				if (it != m_Extensions.end()){
-					it->second->pushEvent(Event);
-				}
-				else{
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
-				}
-
-			}
-			else{
-				LOG4CPLUS_ERROR(log, ",event:" << Event.event << " not json data.");
-			}
-		}
-	}
-	log4cplus::threadCleanup();
-
 }
 
 
@@ -365,7 +307,19 @@ public:
 	virtual void OnMessage(const std::string & message) override
 	{
 		//LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
-		model::EventType_t evt(message, GetId());
+		Json::Value jsonEvent;
+		Json::Reader jsonReader;
+		if (jsonReader.parse(message, jsonEvent)) {
+
+			if (jsonEvent["event"].isNull())
+				jsonEvent["event"] = jsonEvent.removeMember("cmd");
+			if (jsonEvent["extension"].isNull())
+				jsonEvent["extension"] = jsonEvent.removeMember("agentid");
+			if (jsonEvent["extension"].isNull())
+				jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
+		}
+
+		model::EventType_t evt(jsonEvent.toStyledString(), GetId());
 		m_module->PushEvent(evt);
 	};
 

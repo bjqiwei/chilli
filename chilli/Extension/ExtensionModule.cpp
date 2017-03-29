@@ -126,13 +126,6 @@ namespace chilli {
 						std::string sessionId;
 						std::string ext;
 
-						if (jsonEvent["event"].isNull())
-							jsonEvent["event"] = jsonEvent.removeMember("cmd");
-						if (jsonEvent["extension"].isNull())
-							jsonEvent["extension"] = jsonEvent.removeMember("agentid");
-						if (jsonEvent["extension"].isNull())
-							jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
-
 						if (jsonEvent["event"].isString()) {
 							eventName = jsonEvent["event"].asString();
 						}
@@ -144,8 +137,6 @@ namespace chilli {
 						if (jsonEvent["extension"].isString()) {
 							ext = jsonEvent["extension"].asString();
 						}
-
-						Event.event = jsonEvent.toStyledString();
 
 						auto &it = g_Extensions.find(ext);
 
