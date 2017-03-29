@@ -38,47 +38,60 @@
 				</send>
 				<transition  target="init"/>
 			</event>
-			<event event=".*">
-				<log level="warn" type="script">"not process event "+_event._name;</log>
-			</event>
-		</state>
-
-		<state id="logined">
-			<onentry>
-				<send target="this" type="response" dest="client" event="logon">
-					<status>0</status>
-					<type>logon</type>
-				</send>
-			</onentry>
-			<event event="ping">
-				<log level="debug"> ping message</log>
-			</event>
 			<event event="ConnectError">
+				<send target="this" type="cmd" dest="this" event="AgentLogout">
+					<deviceId type="script">_agent.avayaExtenion</deviceId>
+					<password type="script">_agent.avayaPassword</password>
+					<agentId type="script">_agent.avayaAgentId</agentId>
+				</send>
 				<transition  target="init"/>
 			</event>
 			<event event="ConnectClose">
+				<send target="this" type="cmd" dest="this" event="AgentLogout">
+					<deviceId type="script">_agent.avayaExtenion</deviceId>
+					<password type="script">_agent.avayaPassword</password>
+					<agentId type="script">_agent.avayaAgentId</agentId>
+				</send>
 				<transition  target="init"/>
 			</event>
 			<event event="logout">
+				<send target="this" type="cmd" dest="this" event="AgentLogout">
+					<deviceId type="script">_agent.avayaExtenion</deviceId>
+					<password type="script">_agent.avayaPassword</password>
+					<agentId type="script">_agent.avayaAgentId</agentId>
+					<group type="script">_event.logingroups</group>
+				</send>
 				<transition  target="init"/>
 			</event>
-			<event event="logon" cond="_event.password == _agent.Password">
-				<send target="this" type="notify" dest="client" event="logon">
-					<status>1</status>
-					<type>logon</type>
-				</send>
-				<transition  target="logining"/>
-			</event>
-			<event event="logon">
-				<send target="this" type="response" dest="client" event="logon">
-					<status>1</status>
-					<type>logon</type>
-				</send>
+			<event event="ping">
+				<log level="debug"> ping message</log>
 			</event>
 			<event event=".*">
 				<log level="warn" type="script">"not process event "+_event._name;</log>
 			</event>
+			<state id="logined">
+				<onentry>
+					<send target="this" type="response" dest="client" event="logon">
+						<status>0</status>
+						<type>logon</type>
+					</send>
+				</onentry>
+				<event event="logon" cond="_event.password == _agent.Password">
+					<send target="this" type="notify" dest="client" event="logon">
+						<status>1</status>
+						<type>logon</type>
+					</send>
+					<transition  target="logining"/>
+				</event>
+				<event event="logon">
+					<send target="this" type="response" dest="client" event="logon">
+						<status>1</status>
+						<type>logon</type>
+					</send>
+				</event>
+			</state>
 		</state>
+
 		
     </state>
 

@@ -80,6 +80,50 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 			}
 		}
+		else if (eventName == "AgentLogout")
+		{
+			const char* agentid = nullptr;
+			const char* deviceId = nullptr;
+			const char* password = nullptr;
+			const char* group = "";
+
+			if (jsonEvent["param"]["agentId"].isString())
+				agentid = jsonEvent["param"]["agentId"].asCString();
+
+			if (jsonEvent["param"]["deviceId"].isString())
+				deviceId = jsonEvent["param"]["deviceId"].asCString();
+
+			if (jsonEvent["param"]["group"].isString())
+				group = jsonEvent["param"]["group"].asCString();
+
+			if (jsonEvent["param"]["password"].isString())
+				password = jsonEvent["param"]["password"].asCString();
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
+				uInvodeId,
+				(DeviceID_t *)deviceId,
+				amLogOut,
+				(AgentID_t *)agentid,
+				(AgentGroup_t *)group,
+				(AgentPassword_t *)password,
+				NULL);
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "AgentLogout";
+				event["status"] = nRetCode;
+				event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "AgentLogout";
+			}
+		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");

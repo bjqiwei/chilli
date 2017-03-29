@@ -533,6 +533,13 @@ namespace chilli {
 												break;
 						case CSTA_SET_AGENT_STATE_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
+							uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["status"] = 0;
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 														break;
 						case CSTA_QUERY_MWI_CONF: {
