@@ -9,7 +9,8 @@ namespace ACD{
 ACDExtension::ACDExtension(const std::string &ext, const std::string &smFileName) 
 	:Extension(ext,smFileName)
 {
-	log = log4cplus::Logger::getInstance(m_ExtNumber);
+	std::string logName = "ACD.";
+	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
 	LOG4CPLUS_DEBUG(log,"new a ACD extension object.");
 }
 ACDExtension::~ACDExtension(){

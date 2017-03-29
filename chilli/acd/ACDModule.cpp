@@ -1,5 +1,5 @@
 #include "ACDModule.h"
-#include "../Extension/ExtensionImp.h"
+#include "ACDExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -74,7 +74,7 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 
 		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
-			model::ExtensionPtr ext(new Extension::ExtensionImp(num, sm));
+			model::ExtensionPtr ext(new ACDExtension(num, sm));
 			this->g_Extensions[num] = ext;
 			this->m_Extensions[num] = ext;
 		}

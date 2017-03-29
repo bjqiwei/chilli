@@ -139,6 +139,9 @@
     <ClInclude Include="Extension\ExtensionModule.h">
       <Filter>Extension</Filter>
     </ClInclude>
+    <ClInclude Include="acd\ACDExtension.h">
+      <Filter>ACD</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -197,6 +200,9 @@
     </ClCompile>
     <ClCompile Include="model\ProcessModule.cpp">
       <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="acd\ACDExtension.cpp">
+      <Filter>ACD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

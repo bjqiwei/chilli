@@ -3,9 +3,7 @@
 #define _CHILLI_ACDMODULE_HEADER_
 #include "../model/ProcessModule.h"
 #include <log4cplus/logger.h>
-#include <thread>
-#include <mutex>
-#include <memory>
+#include <atomic>
 
 namespace chilli{
 namespace ACD{
