@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CHILLI_ACD_EXTENSION_HEADER_
-#define _CHILLI_ACD_EXTENSION_HEADER_
 #include "..\model\extension.h"
 #include <log4cplus\logger.h>
 
@@ -36,4 +34,3 @@ private:
 typedef std::shared_ptr<Agent>  AgentPtr;
 }
 }
-#endif // end ACD extension header
