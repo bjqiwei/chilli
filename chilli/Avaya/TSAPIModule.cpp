@@ -565,7 +565,16 @@ namespace chilli {
 												  break;
 						case CSTA_QUERY_AGENT_STATE_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_QUERY_AGENT_STATE_CONF:");
-							LOG4CPLUS_DEBUG(log, "agentState:" << cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState);
+							uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
+							AgentState_t agentState = cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState;
+							LOG4CPLUS_DEBUG(log, "agentState:" << agentState);
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["status"] = agentState;
+							event["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 														  break;
 						case CSTA_QUERY_LAST_NUMBER_CONF: {

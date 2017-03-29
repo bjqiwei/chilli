@@ -878,6 +878,7 @@ namespace AvayaAPI{
 	extern Proc_addATTPrivate addATTPrivate;
 	extern Proc_getATTPrivate getATTPrivate;
 
+	const char * cstaAgentStateString(AgentState_t agentState);
 	bool InitAvayaAPI();
 	bool UnInitAvayaAPI();
 }

@@ -129,6 +129,25 @@ namespace AvayaAPI {
 	static Dynamiclibrary CSTA32("CSTA32.DLL");
 	static Dynamiclibrary ATTPRV32("ATTPRV32.DLL");
 
+	const char * cstaAgentStateString(AgentState_t agentState)
+	{
+		switch (agentState)
+		{
+		case AgentState_t::agNotReady:
+			return "NotReady";
+		case AgentState_t::agNull:
+			return "Null";
+		case AgentState_t::agReady:
+			return "Ready";
+		case AgentState_t::agWorkNotReady:
+			return "WorkNotReady";
+		case AgentState_t::agWorkReady:
+			return "WorkReady";
+		default:
+			return "";
+		}
+	}
+
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
 			if (!CSTA32.Open()){

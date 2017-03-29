@@ -75,7 +75,25 @@
 						<status>0</status>
 						<type>logon</type>
 					</send>
+					<send target="this" type="cmd" dest="this" event="AgentGetState">
+						<deviceId type="script">_agent.avayaExtenion</deviceId>
+					</send>
 				</onentry>
+				<event event="AgentGetState" cond="_event.agentState=='NotReady'">
+					<transition  target="NotReady"/>
+				</event>
+				<event event="AgentGetState" cond="_event.agentState=='Ready'">
+					<transition  target="Ready"/>
+				</event>
+				<event event="AgentGetState" cond="_event.agentState=='Null'">
+					<transition  target="Null"/>
+				</event>
+				<event event="AgentGetState" cond="_event.agentState=='WorkNotReady'">
+					<transition  target="WorkNotReady"/>
+				</event>
+				<event event="AgentGetState" cond="_event.agentState=='WorkReady'">
+					<transition  target="WorkReady"/>
+				</event>
 				<event event="logon" cond="_event.password == _agent.Password">
 					<send target="this" type="notify" dest="client" event="logon">
 						<status>1</status>
@@ -89,6 +107,16 @@
 						<type>logon</type>
 					</send>
 				</event>
+				<state id="NotReady">
+				</state>
+				<state id="Ready">
+				</state>
+				<state id="Null">
+				</state>
+				<state id="WorkNotReady">
+				</state>
+				<state id="WorkReady">
+				</state>
 			</state>
 		</state>
 
