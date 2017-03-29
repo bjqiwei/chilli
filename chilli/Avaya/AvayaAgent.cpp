@@ -56,9 +56,9 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				password = jsonEvent["param"]["password"].asCString();
 
 
-
-			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(NULL,
-				++(m_model->m_ulInvokeID),
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
+				uInvodeId,
 				(DeviceID_t *)deviceId,
 				amLogIn,
 				(AgentID_t *)agentid,
@@ -70,9 +70,14 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				Json::Value event;
 				event["extension"] = this->m_ExtNumber;
 				event["event"] = "AgentLogin";
-				event["errorCode"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				event["status"] = nRetCode;
+				event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
 				model::EventType_t evt(event.toStyledString());
 				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 			}
 		}
 	}

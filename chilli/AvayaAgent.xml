@@ -2,10 +2,9 @@
 <fsm name="avayaAgent" initial="init">
 	<state id="init">
 		<onentry>
-			<log level = "info">enter init state.</log>
 		</onentry>
 		<event event="logon" cond="_event.password == _agent.Password">
-			<transition  target="logined"/>
+			<transition  target="logining"/>
 		</event>
 		<event event="logon">
 			<send target="this" type="response" dest="client" event="logon">
@@ -20,9 +19,32 @@
 				<mem>未登录</mem>
 			</send>
 		</event>
+		<state id="logining">
+			<onentry>
+				<send target="this" type="cmd" dest="this" event="AgentLogin">
+					<deviceId type="script">_agent.avayaExtenion</deviceId>
+					<password type="script">_agent.avayaPassword</password>
+					<agentId type="script">_agent.avayaAgentId</agentId>
+					<group type="script">_event.logingroups</group>
+				</send>
+			</onentry>
+			<event event="AgentLogin" cond="_event.status==0">
+				<transition  target="logined"/>
+			</event>
+			<event event="AgentLogin">
+				<send target="this" type="response" dest="client" event="logon">
+					<status type="script">_event.status</status>
+					<type>logon</type>
+				</send>
+				<transition  target="init"/>
+			</event>
+			<event event=".*">
+				<log level="warn" type="script">"not process event "+_event._name;</log>
+			</event>
+		</state>
+
 		<state id="logined">
 			<onentry>
-				<log level = "info">enter logined state.</log>
 				<send target="this" type="response" dest="client" event="logon">
 					<status>0</status>
 					<type>logon</type>
@@ -40,13 +62,16 @@
 			<event event="logout">
 				<transition  target="init"/>
 			</event>
-			<event event="logon">
+			<event event="logon" cond="_event.password == _agent.Password">
 				<send target="this" type="notify" dest="client" event="logon">
 					<status>1</status>
 					<type>logon</type>
 				</send>
+				<transition  target="logining"/>
+			</event>
+			<event event="logon">
 				<send target="this" type="response" dest="client" event="logon">
-					<status>0</status>
+					<status>1</status>
 					<type>logon</type>
 				</send>
 			</event>
