@@ -93,7 +93,7 @@ int ShDevModule::Stop()
 
 const model::ExtensionMap & ShDevModule::GetExtension()
 {
-	return m_Extensions;
+	return model::ExtensionMap();
 }
 
 int ShDevModule::getDeviceTypeByName(const std::string & strChType)
