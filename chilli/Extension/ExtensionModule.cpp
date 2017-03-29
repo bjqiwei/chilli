@@ -22,37 +22,45 @@ namespace chilli {
 			if (m_bRunning) {
 				Stop();
 			}
+
+			for (auto & it : m_Extensions) {
+				g_Extensions.erase(it.first);
+			}
+
 			LOG4CPLUS_DEBUG(log, "Destruction a module.");
 		}
 
 		int ExtensionModule::Start()
 		{
-			for (auto & it : m_Extensions) {
-				it.second->Start();
-			}
-
-			if (!m_thread.joinable()) {
+			if (!m_bRunning){
 				m_bRunning = true;
+
+				for (auto & it : m_Extensions) {
+					it.second->Start();
+				}
+
 				m_thread = std::thread(&ExtensionModule::run, this);
-				return 0;
+				
 			}
 			else {
 				LOG4CPLUS_WARN(log, "already running for this module.");
 			}
-			return true;
+			return 0;
 		}
 
 		int ExtensionModule::Stop()
 		{
-			m_bRunning = false;
-			PushEvent(std::string());
+			if (m_bRunning) {
+				m_bRunning = false;
+				PushEvent(std::string());
 
-			for (auto & it : m_Extensions) {
-				it.second->Stop();
-			}
+				for (auto & it : m_Extensions) {
+					it.second->Stop();
+				}
 
-			if (m_thread.joinable()) {
-				m_thread.join();
+				if (m_thread.joinable()) {
+					m_thread.join();
+				}
 			}
 			return 0;
 		}
@@ -77,9 +85,10 @@ namespace chilli {
 				const char * sm = child->Attribute("StateMachine");
 				num = num ? num : "";
 				sm = sm ? sm : "";
-				if (this->m_Extensions.find(num) == this->m_Extensions.end())
+				if (this->g_Extensions.find(num) == this->g_Extensions.end())
 				{
 					model::ExtensionPtr ext(new ExtensionImp(num, sm));
+					this->g_Extensions[num] = ext;
 					this->m_Extensions[num] = ext;
 				}
 				else {
@@ -108,7 +117,7 @@ namespace chilli {
 			while (m_bRunning)
 			{
 				model::EventType_t Event;
-				if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
+				if (g_recEvtBuffer.Get(Event) && !Event.event.empty())
 				{
 					Json::Value jsonEvent;
 					Json::Reader jsonReader;
@@ -128,9 +137,9 @@ namespace chilli {
 							ext = jsonEvent["extension"].asString();
 						}
 
-						auto &it = m_Extensions.find(ext);
+						auto &it = g_Extensions.find(ext);
 
-						if (it != m_Extensions.end()) {
+						if (it != g_Extensions.end()) {
 
 							it->second->pushEvent(Event);
 						}
