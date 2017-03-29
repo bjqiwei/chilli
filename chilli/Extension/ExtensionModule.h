@@ -25,7 +25,7 @@ namespace chilli {
 			virtual void fireSend(const std::string &strContent, const void * param) override;
 
 			log4cplus::Logger log;
-			std::atomic_bool m_bRunning = true;
+			std::atomic_bool m_bRunning = false;
 			model::ExtensionMap m_Extensions;
 
 			std::thread m_thread;
