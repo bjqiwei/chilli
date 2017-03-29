@@ -7,7 +7,7 @@
     <Agent ExtensionNumber="6001" StateMachine="./Agent.xml" password="1234"></Agent>
     <Agent ExtensionNumber="6002" StateMachine="./Agent.xml" password="1234"></Agent>
     <Agent ExtensionNumber="6003" StateMachine="./Agent.xml" password="1234"></Agent>
-    <Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112"></Agent>
+    <Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" avayaAgentId="6030" avayaPassword="1234" avayaExtenion="8005"></Agent>
     <Agent ExtensionNumber="6005" StateMachine="./AvayaAgent.xml"></Agent>
     <Agent ExtensionNumber="6006" StateMachine="./AvayaAgent.xml"></Agent>
   </Agents>
