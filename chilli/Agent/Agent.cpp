@@ -55,9 +55,8 @@ int Agent::HangUp()
 	return 0;
 }
 
-void Agent::fireSend(const std::string & strContent,const void * param)
+void Agent::processSend(const std::string & strContent, const void * param, bool & bHandled)
 {
-	LOG4CPLUS_DEBUG(log," recive a Send event from stateMachine:" << strContent);
 	Json::Value jsonData;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonData)) {
@@ -82,18 +81,27 @@ void Agent::fireSend(const std::string & strContent,const void * param)
 					model::ConnectAdapter::Close(m_curConnectId);
 				}
 			}
+			bHandled = true;
 		}
 		else if (jsonData["type"].asString() == "notify" && jsonData["dest"].asString() == "client")
 		{
 			Json::FastWriter writer;
 			std::string sendData = writer.write(jsonData["param"]);
 			model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
+			bHandled = true;
 		}
 	}
-	
+
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");
 	}
+}
+
+void Agent::fireSend(const std::string & strContent,const void * param)
+{
+	LOG4CPLUS_DEBUG(log," recive a Send event from stateMachine:" << strContent);
+	bool bHandled = false;
+	processSend(strContent, param, bHandled);
 }
 
 int Agent::pushEvent(const model::EventType_t & Event)

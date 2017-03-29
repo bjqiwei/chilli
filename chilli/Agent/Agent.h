@@ -24,6 +24,8 @@ public:
 	virtual int Answer() override;
 	virtual int PlayFile(const std::string &fileName) override;
 	virtual int HangUp() override;
+protected:
+	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
 private:
 	std::string m_ExtNumber;
