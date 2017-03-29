@@ -1,5 +1,5 @@
 #include "IVRModule.h"
-#include "IVRExtension.h"
+#include "../Extension/ExtensionImp.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -18,8 +18,12 @@ IVRModule::IVRModule(const std::string & id):ProcessModule(id)
 
 IVRModule::~IVRModule(void)
 {
-	if (m_Thread.joinable()){
+	if (m_bRunning){
 		Stop();
+	}
+
+	for (auto & it : m_Extensions) {
+		g_Extensions.erase(it.first);
 	}
 
 	LOG4CPLUS_DEBUG(log, "Destruction a IVR module.");
@@ -28,14 +32,9 @@ IVRModule::~IVRModule(void)
 int IVRModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log,"Stop  IVR module");
-	bRunning = false;
+	m_bRunning = false;
 	for (auto & it: m_Extensions){
 		it.second->Stop();
-	}
-
-	if (m_Thread.joinable()){
-		PushEvent(std::string());
-		m_Thread.join();
 	}
 
 	return 0;
@@ -44,12 +43,11 @@ int IVRModule::Stop(void)
 int IVRModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start  IVR module");
-	if (!m_Thread.joinable()){
-		bRunning = true;
+	if (!m_bRunning){
+		m_bRunning = true;
 		for (auto & it : m_Extensions) {
 			it.second->Start();
 		}
-		m_Thread = std::thread(&IVRModule::run, this);	
 	}
 	return 0;
 }
@@ -72,9 +70,10 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		const char * sm = child->Attribute("StateMachine");
 		num = num ? num : "";
 		sm = sm ? sm : "";
-		if (this->m_Extensions.find(num) == this->m_Extensions.end())
+		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
-			model::ExtensionPtr ext(new IVRExtension(num, sm));
+			model::ExtensionPtr ext(new Extension::ExtensionImp(num, sm));
+			this->g_Extensions[num] = ext;
 			this->m_Extensions[num] = ext;
 		}
 		else {
@@ -92,53 +91,6 @@ const model::ExtensionMap & IVRModule::GetExtension()
 void IVRModule::fireSend(const std::string &strContent, const void * param)
 {
 	LOG4CPLUS_WARN(log, "fireSend not implement.");
-}
-
-void IVRModule::run()
-{
-	LOG4CPLUS_INFO(log, "Starting...");
-
-	while (bRunning)
-	{
-		model::EventType_t Event;
-		if (m_recEvtBuffer.Get(Event) && !Event.event.empty())
-		{
-			Json::Value jsonEvent;
-			Json::Reader jsonReader;
-			if (jsonReader.parse(Event.event, jsonEvent)){
-				std::string eventName;
-				std::string sessionId;
-				std::string ext;
-				if (jsonEvent["event"].isString()){
-					eventName = jsonEvent["event"].asString();
-				}
-
-				if (jsonEvent["sessionid"].isString()){
-					sessionId = jsonEvent["sessionid"].asString();
-				}
-
-				if (jsonEvent["extension"].isString()){
-					ext = jsonEvent["extension"].asString();
-				}
-
-				auto &it = m_Extensions.find(ext);
-
-				if (it != m_Extensions.end()){
-
-					it->second->pushEvent(Event);
-				}
-				else{
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
-				}
-	
-			}
-			else{
-				LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << Event.event << " not json data.");
-			}
-		}
-	}
-	LOG4CPLUS_INFO(log, "Stoped.");
-	log4cplus::threadCleanup();
 }
 }
 }

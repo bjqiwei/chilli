@@ -27,11 +27,11 @@ public:
 	ProcessModule & operator=(const ProcessModule &) = delete;
 	virtual void PushEvent(const EventType_t & event) final
 	{
-		m_recEvtBuffer.Put(event);
+		g_recEvtBuffer.Put(event);
 	};
 protected:
-	helper::CEventBuffer<EventType_t> m_recEvtBuffer;
-	model::ExtensionMap m_Extensions;
+	static helper::CEventBuffer<EventType_t> g_recEvtBuffer;
+	static model::ExtensionMap g_Extensions;
 };
 typedef std::shared_ptr<model::ProcessModule> ProcessModulePtr;
 }

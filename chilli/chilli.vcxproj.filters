@@ -82,9 +82,6 @@
     <ClInclude Include="Sh\ShExtension.h">
       <Filter>Sh</Filter>
     </ClInclude>
-    <ClInclude Include="IVR\IVRExtension.h">
-      <Filter>IVR</Filter>
-    </ClInclude>
     <ClInclude Include="ACD\ACDModule.h">
       <Filter>ACD</Filter>
     </ClInclude>
@@ -156,9 +153,6 @@
     <ClCompile Include="Sh\ShExtension.cpp">
       <Filter>Sh</Filter>
     </ClCompile>
-    <ClCompile Include="IVR\IVRExtension.cpp">
-      <Filter>IVR</Filter>
-    </ClCompile>
     <ClCompile Include="ACD\ACDModule.cpp">
       <Filter>ACD</Filter>
     </ClCompile>
@@ -206,6 +200,9 @@
     </ClCompile>
     <ClCompile Include="Extension\ExtensionModule.cpp">
       <Filter>Extension</Filter>
+    </ClCompile>
+    <ClCompile Include="model\ProcessModule.cpp">
+      <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

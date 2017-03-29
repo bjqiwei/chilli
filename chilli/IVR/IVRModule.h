@@ -23,9 +23,8 @@ private:
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
 	log4cplus::Logger log;
-	std::thread m_Thread;
-	std::atomic_bool bRunning = false;
-	void run();
+	std::atomic_bool m_bRunning = false;
+	model::ExtensionMap m_Extensions;
 };
 }
 }
