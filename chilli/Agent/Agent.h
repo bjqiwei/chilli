@@ -27,7 +27,6 @@ public:
 protected:
 	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
-private:
 	std::string m_ExtNumber;
 	std::string m_SessionId;
 	uint64_t m_curConnectId = 0;

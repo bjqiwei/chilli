@@ -144,6 +144,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="ACD\ACDModule.h" />
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
+    <ClInclude Include="Avaya\AvayaAgent.h" />
     <ClInclude Include="Avaya\AvayaAPI.h" />
     <ClInclude Include="Avaya\TSAPIModule.h" />
     <ClInclude Include="CEventBuffer.h" />
@@ -172,6 +173,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
+    <ClCompile Include="Avaya\AvayaAgent.cpp" />
     <ClCompile Include="Avaya\AvayaAPI.cpp" />
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
     <ClCompile Include="Extension\ExtensionImp.cpp" />
