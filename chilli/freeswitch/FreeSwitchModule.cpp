@@ -19,7 +19,7 @@ FreeSwtichModule::FreeSwtichModule(const std::string & id):ProcessModule(id)
 
 FreeSwtichModule::~FreeSwtichModule(void)
 {
-	if (bRunning){
+	if (m_bRunning){
 		Stop();
 	}
 
@@ -29,20 +29,22 @@ FreeSwtichModule::~FreeSwtichModule(void)
 int FreeSwtichModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
-	bRunning = false;
+	if (m_bRunning)
+	{
+		m_bRunning = false;
 
-	if (m_Thread.joinable()){
-		m_Thread.join();
+		if (m_Thread.joinable()) {
+			m_Thread.join();
+		}
 	}
-	
 	return 0;
 }
 
 int FreeSwtichModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start...  FreeSwitch module");
-	if(!m_Thread.joinable()){
-		bRunning = true;
+	if(!m_bRunning){
+		m_bRunning = true;
 		m_Thread = std::thread(&FreeSwtichModule::ConnectFS, this);
 	}
 	return 0;
@@ -66,9 +68,9 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-const std::map<std::string, model::ExtensionPtr> & FreeSwtichModule::GetExtension()
+const model::ExtensionMap & FreeSwtichModule::GetExtension()
 {
-	return m_Extensions;
+	return  model::ExtensionMap();
 }
 
 void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)
@@ -79,7 +81,7 @@ void FreeSwtichModule::fireSend(const std::string & strContent, const void * par
 void FreeSwtichModule::ConnectFS()
 {
 	LOG4CPLUS_DEBUG(log, "Run  FreeSwitch module");
-	while (bRunning)
+	while (m_bRunning)
 	{
 		esl_handle_t handle = { { 0 } };
 		LOG4CPLUS_DEBUG(log, "connect freeswitch " << m_Host << ":" << m_Port);
@@ -96,7 +98,7 @@ void FreeSwtichModule::ConnectFS()
 		esl_events(&handle, ESL_EVENT_TYPE_JSON, "all");
 		LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
 
-		while (bRunning){
+		while (m_bRunning){
 			esl_status_t status = esl_recv_timed(&handle, 1000);
 			if (status == ESL_SUCCESS){
 				if (handle.last_event && handle.last_event->body) {

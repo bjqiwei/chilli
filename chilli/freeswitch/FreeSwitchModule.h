@@ -22,7 +22,7 @@ namespace FreeSwitch{
 	private:
 		log4cplus::Logger log;
 		std::thread m_Thread;
-		std::atomic<bool> bRunning = false;
+		std::atomic_bool m_bRunning = false;
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;
