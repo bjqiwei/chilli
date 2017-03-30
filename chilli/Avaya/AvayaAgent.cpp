@@ -35,6 +35,15 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonEvent)) {
 		std::string eventName;
+		std::string typeName;
+
+		if (jsonEvent["type"].isString()) {
+			typeName = jsonEvent["type"].asString();
+		}
+
+		if (typeName != "cmd"){
+			return;
+		}
 
 		if (jsonEvent["event"].isString()) {
 			eventName = jsonEvent["event"].asString();

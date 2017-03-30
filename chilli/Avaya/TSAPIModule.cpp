@@ -574,7 +574,7 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
+							event["event"] = this->m_InvokeID2Event[invokeId];
 							event["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
@@ -607,7 +607,7 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "agentState:" << agentState);
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
+							event["event"] = this->m_InvokeID2Event[invokeId];
 							event["status"] = agentState;
 							event["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
 							model::EventType_t evt(event.toStyledString());
@@ -630,7 +630,7 @@ namespace chilli {
 							LOG4CPLUS_WARN(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
+							event["event"] = this->m_InvokeID2Event[invokeId];
 							event["status"] = error;
 							event["reason"] = AvayaAPI::cstaErrorString(error);
 							model::EventType_t evt(event.toStyledString());

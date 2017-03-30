@@ -312,7 +312,7 @@ public:
 		if (jsonReader.parse(message, jsonEvent)) {
 
 			if (jsonEvent["event"].isNull())
-				jsonEvent["event"] = jsonEvent.removeMember("cmd");
+				jsonEvent["event"] = "cmd";
 			if (jsonEvent["extension"].isNull())
 				jsonEvent["extension"] = jsonEvent.removeMember("agentid");
 			if (jsonEvent["extension"].isNull())
