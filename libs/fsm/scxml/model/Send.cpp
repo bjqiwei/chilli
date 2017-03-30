@@ -94,27 +94,45 @@ namespace model
 	void Send::execute(fsm::Context * ctx)
 	{
 		if (ctx && helper::string::isStringEmpty(id) && !idexpr.empty()){
-			id = ctx->eval(idexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"idexpr")*/);
+			Json::Value jsonid = ctx->eval(idexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"idexpr")*/);
+			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull()){
+				id = jsonid.asString();
+			}
 		}
 		
 		if (ctx && helper::string::isStringEmpty(target) && !targetexpr.empty()){
-			target = ctx->eval(targetexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
+			Json::Value jsontarget = ctx->eval(targetexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
+			if (jsontarget.isString() || jsontarget.isBool() || jsontarget.isNull()){
+				target = jsontarget.asString();
+			}
 		}
 
 		if (ctx && helper::string::isStringEmpty(type) && !typeexpr.empty()){
-			type = ctx->eval(typeexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"typeexpr")*/);
+			Json::Value jsontype = ctx->eval(typeexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"typeexpr")*/);
+			if (jsontype.isString() || jsontype.isBool() || jsontype.isNull()){
+				type = jsontype.asString();
+			}
 		}
 
 		if (ctx && helper::string::isStringEmpty(_event) && !eventexpr.empty()){
-			_event = ctx->eval(eventexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"eventexpr")*/);
+			Json::Value jsonEvent = ctx->eval(eventexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"eventexpr")*/);
+			if (jsonEvent.isString() || jsonEvent.isBool() || jsonEvent.isNull()){
+				_event = jsonEvent.asCString();
+			}
 		}
 
 		if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
-			from = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
+			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
+			if (jsonfrom.isString() || jsonfrom.isBool() || jsonfrom.isNull()){
+				from = jsonfrom.asCString();
+			}
 		}
 
 		if (ctx && helper::string::isStringEmpty(dest) && !destexpr.empty()){
-			dest = ctx->eval(destexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
+			Json::Value jsondest = ctx->eval(destexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
+			if (jsondest.isString() || jsondest.isBool() || jsondest.isNull()){
+				dest = jsondest.asString();
+			}
 		}
 
 	/*	if (!SCXMLHelper::isStringEmpty(namelist)){
@@ -160,7 +178,7 @@ namespace model
 		sendValue["dest"] = getDestination();
 		sendValue["target"] = getTarget();
 
-		xmlAttrPtr attrPtr = m_node->properties;
+		/*xmlAttrPtr attrPtr = m_node->properties;
 		while (attrPtr != NULL)
 		{
 			if (!xmlStrEqual(attrPtr->name, BAD_CAST "id") &&
@@ -179,7 +197,7 @@ namespace model
 					sendValue[(const char *)attrPtr->name] = helper::xml::XStr(xmlGetProp(m_node,attrPtr->name)).strForm();
 			}
 			attrPtr = attrPtr->next;
-		}
+		}*/
 
 		//m_xmlDoc.addAddChildList(node->children);
 		xmlNodePtr childNode  = m_node->children;

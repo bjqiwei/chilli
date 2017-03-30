@@ -44,9 +44,9 @@ namespace env
 	}
 
 
-	std::string SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
+	Json::Value SimpleContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
 	{
-		return "";
+		return Json::Value();
 	}
 
 	bool SimpleContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)

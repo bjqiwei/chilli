@@ -24,7 +24,7 @@ namespace env
 		virtual Json::Value getVar(const std::string &name) override;
 		virtual void deleteVar(const std::string & name) override;
 		virtual Context *getParent() override;
-		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line) override;
+		virtual Json::Value eval( const std::string &expr,const std::string &filename, unsigned int line) override;
 		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line) override;
 		virtual void ExecuteFile(const std::string &fileName) override;
 

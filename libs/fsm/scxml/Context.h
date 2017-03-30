@@ -45,7 +45,7 @@ namespace fsm{
 		///计算一段表达式脚本。
 		///</summary>
 		///<returns>返回此表达式执行的结果，转换为string类型。</returns>
-		virtual std::string eval(const std::string &expr,const std::string &filename, unsigned int line) = 0;
+		virtual Json::Value eval(const std::string &expr,const std::string &filename, unsigned int line) = 0;
 
 		///<summary>
 		///计算一段boolen表达式脚本

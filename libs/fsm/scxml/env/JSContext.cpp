@@ -135,7 +135,7 @@ namespace env
 	}
 
 
-	std::string JsContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
+	Json::Value JsContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 		//JS_DumpNamedRoots(JS_GetRuntime(ctx), JsGlobal::dumpRoot, NULL);
 		
@@ -147,15 +147,9 @@ namespace env
 
 		JS::RootedValue rv(this->m_jsctx);
 		if (JS::Evaluate(this->m_jsctx, options, expr.c_str(), expr.length(), &rv)) {
-			JSString *str = JS::ToString(this->m_jsctx,rv);
-			if (str) {
-				JSAutoByteString bytes(this->m_jsctx, str);
-				if (bytes.ptr()){
-					return bytes.ptr();
-				}
-			}
+			return JsvalToJsonValue(rv);
 		}
-		return std::string();
+		return Json::Value();
 	}
 
 	bool JsContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)

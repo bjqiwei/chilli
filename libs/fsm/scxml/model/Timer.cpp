@@ -33,7 +33,10 @@ namespace model{
 	void Timer::execute(fsm::Context * ctx)
 	{
 		if (ctx && id.empty()){
-			id = ctx->eval(idexpr,m_strFileName,m_node->line);
+			Json::Value jsonid = ctx->eval(idexpr,m_strFileName,m_node->line);
+			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull()){
+				id = jsonid.asString();
+			}
 		}
 	}
 
