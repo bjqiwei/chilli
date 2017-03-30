@@ -499,6 +499,7 @@ void fsm::StateMachineimp::enterStates(const xmlNodePtr &stateNode) const
 	{
 		const_cast<StateMachineimp*>(this)->m_currentStateNode = stateNode;
 		LOG4CPLUS_DEBUG(log, m_strSessionID << ", enter state:" << getCurrentStateID());
+		getRootContext()->setVar("_state._id", getCurrentStateID());
 		for (xmlNodePtr  entryNode = stateNode->children; entryNode != NULL; entryNode = entryNode->next)
 		{
 			if (isEntry(entryNode))
