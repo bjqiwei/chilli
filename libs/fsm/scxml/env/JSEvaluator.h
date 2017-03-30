@@ -3,6 +3,7 @@
 #define _FSM_ENV_JSEVALUATOR_HEADER_
 #include "../Evaluator.h"
 #include <log4cplus/logger.h>
+#include <mutex>
 
 
 namespace fsm
@@ -20,6 +21,7 @@ namespace env
 
 	private:
 			log4cplus::Logger log;
+			std::mutex m_mtx;
 	public:
 
 		JSEvaluator(); 

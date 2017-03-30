@@ -383,6 +383,41 @@ namespace env
 		{
 			val.setPrivateUint32(value.asUInt());
 		}
+		else if (value.isObject())
+		{
+			JS::RootedObject  obj(this->m_jsctx, JS_NewObject(m_jsctx, nullptr));
+		
+			if (!obj) {
+				LOG4CPLUS_ERROR(log, "JS_NewObject " << value.toStyledString());
+				return val;
+			}
+
+			for (auto & it : value.getMemberNames()) {
+				
+				JS::RootedValue  val2(this->m_jsctx,JsonValueToJsval(value[it]));
+			
+				if(!JS_DefineProperty(this->m_jsctx, obj, it.c_str(), val2, JSPROP_ENUMERATE))
+				{
+					LOG4CPLUS_WARN(log, m_strSessionID << ",define " << " property " << it << " failed.");
+				}
+			}
+
+			val.setObject(*obj);
+		}
+		else if (value.isArray())
+		{
+			JS::RootedObject _array(m_jsctx, JS_NewArrayObject(m_jsctx, value.size()));
+			if (!_array) {
+				LOG4CPLUS_ERROR(log, "JS_NewArrayObject " << value.toStyledString());
+				return val;
+			}
+			for (int i = 0; i < value.size(); i++)
+			{
+				JS::RootedValue val2(this->m_jsctx, JsonValueToJsval(value[i]));
+				JS_DefineElement(m_jsctx, _array, i, val2, JSPROP_ENUMERATE);
+			}
+			val.setObject(*_array);
+		}
 		return val;
 	}
 

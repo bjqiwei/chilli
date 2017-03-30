@@ -32,7 +32,7 @@ namespace env
 	Context * JSEvaluator::newContext(const std::string &sessionid, Context *const parent)
 	{
 		//LOG4CPLUS_DEBUG(log, sessionid << " new a JsContext,parent="<< parent);
-
+		std::lock_guard<std::mutex>lck(m_mtx);
 		Context * cx = new env::JsContext(sessionid, this, parent);
 		m_contexts.push_back(cx);
 		LOG4CPLUS_DEBUG(log, "push context:" << cx << " contexts size " << m_contexts.size());
@@ -41,6 +41,7 @@ namespace env
 	}
 	void JSEvaluator::deleteContext(Context * const cx)
 	{
+		std::lock_guard<std::mutex>lck(m_mtx);
 		m_contexts.remove(cx);
 		delete cx;
 		LOG4CPLUS_DEBUG(log, "remove context:" << cx << " contexts size " << m_contexts.size());
@@ -48,6 +49,7 @@ namespace env
 
 	bool JSEvaluator::hasContext()
 	{
+		std::lock_guard<std::mutex>lck(m_mtx);
 		return !m_contexts.empty();
 	}
 
