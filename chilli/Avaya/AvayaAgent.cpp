@@ -151,6 +151,80 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentGetState";
 			}
 		}
+		else if (eventName == "AgentSetFree")
+		{
+			const char* agentid = nullptr;
+			const char* deviceId = nullptr;
+
+			if (jsonEvent["param"]["agentId"].isString())
+				agentid = jsonEvent["param"]["agentId"].asCString();
+
+			if (jsonEvent["param"]["deviceId"].isString())
+				deviceId = jsonEvent["param"]["deviceId"].asCString();
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
+				uInvodeId,
+				(DeviceID_t *)deviceId,
+				amReady,
+				(AgentID_t *)agentid,
+				(AgentGroup_t *)"",
+				(AgentPassword_t *)"",
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "AgentSetFree";
+				event["status"] = nRetCode;
+				event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "AgentSetFree";
+			}
+		}
+		else if (eventName == "AgentSetBusy")
+		{
+			const char* agentid = nullptr;
+			const char* deviceId = nullptr;
+
+			if (jsonEvent["param"]["agentId"].isString())
+				agentid = jsonEvent["param"]["agentId"].asCString();
+
+			if (jsonEvent["param"]["deviceId"].isString())
+				deviceId = jsonEvent["param"]["deviceId"].asCString();
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
+				uInvodeId,
+				(DeviceID_t *)deviceId,
+				amNotReady,
+				(AgentID_t *)agentid,
+				(AgentGroup_t *)"",
+				(AgentPassword_t *)"",
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "AgentSetBusy";
+				event["status"] = nRetCode;
+				event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "AgentSetBusy";
+			}
+		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");

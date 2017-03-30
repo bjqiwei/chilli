@@ -67,7 +67,7 @@
 				<log level="debug"> ping message</log>
 			</event>
 			<event event=".*">
-				<log level="warn" type="script">"not process event "+_event._name;</log>
+				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
 			</event>
 			<state id="logined">
 				<onentry>
@@ -108,8 +108,34 @@
 					</send>
 				</event>
 				<state id="NotReady">
+					<event event="agentidle">
+						<send target="this" type="cmd" dest="this" event="AgentSetFree">
+							<deviceId type="script">_agent.avayaExtenion</deviceId>
+							<agentId type="script">_agent.avayaAgentId</agentId>
+						</send>
+					</event>
+					<event event="AgentSetFree" cond="_event.status==0">
+						<send target="this" type="notify" dest="client" event="agentidle">
+							<status>0</status>
+							<type>agentidle</type>
+						</send>
+						<transition  target="Ready"/>
+					</event>
 				</state>
 				<state id="Ready">
+					<event event="agentbusy">
+						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
+							<deviceId type="script">_agent.avayaExtenion</deviceId>
+							<agentId type="script">_agent.avayaAgentId</agentId>
+						</send>
+					</event>
+					<event event="AgentSetBusy" cond="_event.status==0">
+						<send target="this" type="notify" dest="client" event="agentbusy">
+							<status>0</status>
+							<type>agentbusy</type>
+						</send>
+						<transition  target="NotReady"/>
+					</event>
 				</state>
 				<state id="Null">
 				</state>
