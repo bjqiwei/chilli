@@ -39,7 +39,7 @@ namespace env
 		//LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object finish.");
 	}
 
-	void JsContext::setVar(const std::string & name, const Json::Value & value, ValueContext va )
+	void JsContext::setVar(const std::string & name, const Json::Value & value)
 	{
 		JSAutoRequest ar(this->m_jsctx);
 		
@@ -47,7 +47,7 @@ namespace env
 
 		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value));
 
-		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global : this->m_event));
+		JS::RootedObject  obj(this->m_jsctx, this->m_global);
 		
 		std::string _name = name;
 		std::string::size_type pos;
@@ -89,17 +89,17 @@ namespace env
 		//LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
 
 		if (!JS_DefineProperty(m_jsctx, obj, _name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
-			LOG4CPLUS_WARN(log, m_strSessionID << ",define " << (va == fsm::globalObject ? "global." : "_event.") << " property " << name << " failed.");
+			LOG4CPLUS_WARN(log, m_strSessionID << ",define "<< " property " << name << " failed.");
 		}
 
 	}
 
-	Json::Value JsContext::getVar(const std::string &name, ValueContext va)
+	Json::Value JsContext::getVar(const std::string &name)
 	{
 		JS::RootedValue rval(this->m_jsctx);
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
 		JSAutoCompartment ac(this->m_jsctx, this->m_global);
-		JS::RootedObject  obj(this->m_jsctx, (va == fsm::globalObject ? this->m_global : this->m_event));
+		JS::RootedObject  obj(this->m_jsctx, this->m_global);
 
 		bool has = false;
 		if (JS_AlreadyHasOwnProperty(m_jsctx, obj, name.c_str(), &has) && has) {
@@ -112,17 +112,17 @@ namespace env
 		return Json::Value();
 	}
 
-	void JsContext::deleteVar(const std::string & name, ValueContext va)
+	void JsContext::deleteVar(const std::string & name)
 	{
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
 		JSAutoCompartment ac(this->m_jsctx, this->m_global);
 
-		JS::RootedObject obj (this->m_jsctx, (va==fsm::globalObject ? this->m_global:this->m_event));
+		JS::RootedObject obj (this->m_jsctx, this->m_global);
 
 		//LOG4CPLUS_TRACE(log, m_strSessionID << ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
 
 		if(!JS_DeleteProperty(m_jsctx, obj, name.c_str())){
-			LOG4CPLUS_ERROR(log, m_strSessionID << ", delete " << (va == fsm::globalObject ? "global." : "_event.") << "Var failed.");
+			LOG4CPLUS_ERROR(log, m_strSessionID << ", delete Var " << name << " failed.");
 		}
 	
 	}
@@ -283,16 +283,6 @@ namespace env
 		bool succeeded;
 		if (!JS_SetImmutablePrototype(m_jsctx, global, &succeeded))
 			throw std::exception("JS_SetImmutablePrototype error.");
-
-
-		JS::RootedObject event(m_jsctx, JS_NewObject(m_jsctx, nullptr));
-		if (!event)
-			throw std::exception("JS_NewObject event error.");
-		
-		this->m_event = event;
-
-		if (!JS_DefineProperty(m_jsctx, global, "_event", event, JSPROP_ENUMERATE))
-			throw std::exception("JS_DefineProperty event error.");
 
 		JS_FireOnNewGlobalObject(m_jsctx, global);
 	}

@@ -7,10 +7,6 @@
 
 namespace fsm{
 
-	enum ValueContext{
-		globalObject,
-		eventOjbect,
-	};
 	class Evaluator;
 	class  Context
 	{
@@ -26,19 +22,19 @@ namespace fsm{
 		///对一个变量设置新值。
 		///</summary>
 		///<returns></returns>
-		virtual void setVar(const std::string & name, const Json::Value & value, ValueContext va = globalObject) = 0;
+		virtual void setVar(const std::string & name, const Json::Value & value) = 0;
 
 		///<summary>
 		///获取一个变量值。
 		///</summary>
 		///<returns>返回此变量值。</returns>
-		virtual Json::Value getVar(const std::string &name, ValueContext va = globalObject) = 0;
+		virtual Json::Value getVar(const std::string &name) = 0;
 
 		///<summary>
 		///删除一个变量。
 		///</summary>
 		///<returns></returns>
-		virtual void deleteVar(const std::string & name, ValueContext va = globalObject) = 0;
+		virtual void deleteVar(const std::string & name) = 0;
 
 		/// <summary>
 		/// Get the parent Context, may be null.

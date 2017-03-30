@@ -768,16 +768,16 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 	if (getRootContext()){
 		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->deleteVar(it.first,fsm::eventOjbect);
+			getRootContext()->deleteVar("_event." + it.first);
 		}
 		m_currentEvt = event;
 
-		getRootContext()->setVar("_name", m_currentEvt.getEventName(), fsm::eventOjbect);
-		getRootContext()->setVar("_type", m_currentEvt.getMsgType(),fsm::eventOjbect);
-		getRootContext()->setVar("_data", m_currentEvt.getData(), fsm::eventOjbect);
+		getRootContext()->setVar("_event._name", m_currentEvt.getEventName());
+		getRootContext()->setVar("_event._type", m_currentEvt.getMsgType());
+		getRootContext()->setVar("_event._data", m_currentEvt.getData());
 		for(auto & it : m_currentEvt.getVars())
 		{
-			getRootContext()->setVar(it.first, it.second, fsm::eventOjbect);
+			getRootContext()->setVar("_event." + it.first, it.second);
 		}
 	}else
 	{

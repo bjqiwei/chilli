@@ -24,16 +24,15 @@ namespace env
 		::JSRuntime * m_jsrt = nullptr;
 		::JSContext * m_jsctx = nullptr;
 		::JSObject * m_global = nullptr;
-		::JSObject * m_event = nullptr;
 	public:
 		JsContext(const std::string &sessionid, Evaluator * eval,Context * parent);
 		virtual ~JsContext();
 
-		virtual void setVar(const std::string & name, const Json::Value & value, ValueContext va = fsm::globalObject) override;
+		virtual void setVar(const std::string & name, const Json::Value & value) override;
 
-		virtual Json::Value getVar(const std::string &name, ValueContext va = fsm::globalObject) override;
+		virtual Json::Value getVar(const std::string &name) override;
 
-		virtual void deleteVar(const std::string & name, ValueContext va = fsm::globalObject) override;
+		virtual void deleteVar(const std::string & name) override;
 
 		virtual Context *getParent() override;
 

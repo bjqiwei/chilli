@@ -20,9 +20,9 @@ namespace env
 	
 		SimpleContext(Context *const parent); //this(parent, nullptr);
 
-		virtual void setVar(const std::string & name, const Json::Value & value, ValueContext va = globalObject) override;
-		virtual Json::Value getVar(const std::string &name, ValueContext va = globalObject) override;
-		virtual void deleteVar(const std::string & name, ValueContext va = globalObject) override;
+		virtual void setVar(const std::string & name, const Json::Value & value) override;
+		virtual Json::Value getVar(const std::string &name) override;
+		virtual void deleteVar(const std::string & name) override;
 		virtual Context *getParent() override;
 		virtual std::string eval( const std::string &expr,const std::string &filename, unsigned int line) override;
 		virtual bool evalCond(const std::string &expr,const std::string &filename, unsigned int line) override;

@@ -18,15 +18,15 @@ namespace env
 		LOG4CPLUS_TRACE(log,"deconstruct a SimpleContext object.");
 	}
 
-	void SimpleContext::setVar(const std::string & name, const Json::Value & value, ValueContext va )
+	void SimpleContext::setVar(const std::string & name, const Json::Value & value )
 	{
 	}
 	
-	Json::Value SimpleContext::getVar(const std::string &name, ValueContext va )
+	Json::Value SimpleContext::getVar(const std::string &name)
 	{
 		return Json::Value();
 	}
-	void SimpleContext::deleteVar(const std::string & name, ValueContext va )
+	void SimpleContext::deleteVar(const std::string & name)
 	{
 	}
 
