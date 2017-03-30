@@ -823,15 +823,6 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 bool fsm::StateMachineimp::setVar(const std::string &name, const Json::Value & value)
 {  
 	this->m_globalVars.push_back(std::make_pair(name,value));
-	this->m_globalVarsPersist[name] = value;
 	return true;
 }
 
-Json::Value fsm::StateMachineimp::getVar(const std::string &name)const
-{
-	const auto it = m_globalVarsPersist.find(name);
-	if (it != m_globalVarsPersist.end()){
-		return it->second;
-	}
-	return Json::Value();
-}

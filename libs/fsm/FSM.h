@@ -41,7 +41,6 @@ namespace fsm{
 		const std::string& getSessionId()const;
 
 		bool setVar(const std::string &name, const Json::Value &value);
-		Json::Value getVar(const std::string &name) const;
 
 		bool addSendImplement( SendInterface * evtDsp);
 

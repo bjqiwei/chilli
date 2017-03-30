@@ -43,7 +43,6 @@ namespace fsm{
 		const std::string& getSessionId()const;
 
 		bool setVar(const std::string &name, const Json::Value &value);
-		Json::Value getVar(const std::string &name) const;
 
 		bool addSendImplement( SendInterface * evtDsp);
 		void setLog(log4cplus::Logger log);
@@ -71,7 +70,6 @@ namespace fsm{
 		std::queue<TriggerEvent> m_internalQueue;
 		helper::CEventBuffer<TriggerEvent> m_externalQueue;
 		std::list<std::pair<std::string, Json::Value>> m_globalVars;
-		std::map<std::string, Json::Value> m_globalVarsPersist;
 		std::map<std::string, SendInterface *> m_mapSendObject;
 		log4cplus::Logger  log;
 	private:

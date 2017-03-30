@@ -67,7 +67,3 @@ bool fsm::StateMachine::setVar(const std::string &name, const Json::Value & valu
 	return imp->setVar(name, value);
 }
 
-Json::Value fsm::StateMachine::getVar(const std::string &name)const
-{
-	return imp->getVar(name);
-}
