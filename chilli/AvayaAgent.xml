@@ -12,6 +12,9 @@
 				<type>logon</type>
 			</send>
 		</event>
+		<event event="AgentLogoutConf">
+			<transition  target="init"/>
+		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
 				<status>1</status>
@@ -22,16 +25,16 @@
 		<state id="logining">
 			<onentry>
 				<send target="this" type="cmd" dest="this" event="AgentLogin">
-					<deviceId type="script">_agent.avayaExtenion</deviceId>
-					<password type="script">_agent.avayaPassword</password>
-					<agentId type="script">_agent.avayaAgentId</agentId>
+					<deviceId type="script">_avaya.Extension</deviceId>
+					<password type="script">_avaya.Password</password>
+					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
 			</onentry>
-			<event event="AgentLogin" cond="_event.status==0">
+			<event event="AgentLoginConf" cond="_event.status==0">
 				<transition  target="logined"/>
 			</event>
-			<event event="AgentLogin">
+			<event event="AgentLoginConf">
 				<send target="this" type="response" dest="client" event="logon">
 					<status type="script">_event.status</status>
 					<type>logon</type>
@@ -40,25 +43,25 @@
 			</event>
 			<event event="ConnectError">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_agent.avayaExtenion</deviceId>
-					<password type="script">_agent.avayaPassword</password>
-					<agentId type="script">_agent.avayaAgentId</agentId>
+					<deviceId type="script">_avaya.Extension</deviceId>
+					<password type="script">_avaya.Password</password>
+					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
 				<transition  target="init"/>
 			</event>
 			<event event="ConnectClose">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_agent.avayaExtenion</deviceId>
-					<password type="script">_agent.avayaPassword</password>
-					<agentId type="script">_agent.avayaAgentId</agentId>
+					<deviceId type="script">_avaya.Extension</deviceId>
+					<password type="script">_avaya.Password</password>
+					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
 				<transition  target="init"/>
 			</event>
 			<event event="logout">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_agent.avayaExtenion</deviceId>
-					<password type="script">_agent.avayaPassword</password>
-					<agentId type="script">_agent.avayaAgentId</agentId>
+					<deviceId type="script">_avaya.Extension</deviceId>
+					<password type="script">_avaya.Password</password>
+					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
 				<transition  target="init"/>
@@ -76,22 +79,22 @@
 						<type>logon</type>
 					</send>
 					<send target="this" type="cmd" dest="this" event="AgentGetState">
-						<deviceId type="script">_agent.avayaExtenion</deviceId>
+						<deviceId type="script">_avaya.Extension</deviceId>
 					</send>
 				</onentry>
-				<event event="AgentGetState" cond="_event.agentState=='NotReady'">
+				<event event="AgentGetStateConf" cond="_event.agentState=='NotReady'">
 					<transition  target="NotReady"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='Ready'">
+				<event event="AgentGetStateConf" cond="_event.agentState=='Ready'">
 					<transition  target="Ready"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='Null'">
+				<event event="AgentGetStateConf" cond="_event.agentState=='Null'">
 					<transition  target="Null"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='WorkNotReady'">
+				<event event="AgentGetStateConf" cond="_event.agentState=='WorkNotReady'">
 					<transition  target="WorkNotReady"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='WorkReady'">
+				<event event="AgentGetStateConf" cond="_event.agentState=='WorkReady'">
 					<transition  target="WorkReady"/>
 				</event>
 				<event event="logon" cond="_event.password == _agent.Password">
@@ -110,11 +113,11 @@
 				<state id="NotReady">
 					<event event="agentidle">
 						<send target="this" type="cmd" dest="this" event="AgentSetFree">
-							<deviceId type="script">_agent.avayaExtenion</deviceId>
-							<agentId type="script">_agent.avayaAgentId</agentId>
+							<deviceId type="script">_avaya.Extension</deviceId>
+							<agentId type="script">_avaya.AgentId</agentId>
 						</send>
 					</event>
-					<event event="AgentSetFree" cond="_event.status==0">
+					<event event="AgentSetFreeConf" cond="_event.status==0">
 						<send target="this" type="notify" dest="client" event="agentidle">
 							<status>0</status>
 							<type>agentidle</type>
@@ -125,11 +128,11 @@
 				<state id="Ready">
 					<event event="agentbusy">
 						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
-							<deviceId type="script">_agent.avayaExtenion</deviceId>
-							<agentId type="script">_agent.avayaAgentId</agentId>
+							<deviceId type="script">_avaya.Extension</deviceId>
+							<agentId type="script">_avaya.AgentId</agentId>
 						</send>
 					</event>
-					<event event="AgentSetBusy" cond="_event.status==0">
+					<event event="AgentSetBusyConf" cond="_event.status==0">
 						<send target="this" type="notify" dest="client" event="agentbusy">
 							<status>0</status>
 							<type>agentbusy</type>

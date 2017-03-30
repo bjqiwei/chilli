@@ -25,7 +25,9 @@ namespace chilli{
 			virtual int PlayFile(const std::string &fileName) override;
 			virtual int HangUp() override;
 
-		private:
+		protected:
+			void processSend(const std::string &strContent, const void * param, bool & bHandled);
+
 			std::string m_ExtNumber;
 			std::string m_SessionId;
 

@@ -16,6 +16,9 @@ public:
 
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
+protected:
+	void processSend(const std::string &strContent, const void * param, bool & bHandled);
+
 private:
 	TSAPIModule * m_model;
 };

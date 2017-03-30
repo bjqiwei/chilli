@@ -46,7 +46,12 @@
 			<Password>Dadmin@01</Password>
 		</TSAPI>
 		<Agents>
-			<Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" avayaAgentId="6030" avayaPassword="1234" avayaExtenion="8005"></Agent>
+			<Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" avayaAgentId="6030" avayaPassword="1234" avayaExtension="8005"></Agent>
 		</Agents>
+		<Extensions>
+			<Extension ExtensionNumber="8005" StateMachine="./AvayaExtension.xml" avayaExtension="8005"></Extension>
+			<Extension ExtensionNumber="8006" StateMachine="./AvayaExtension.xml" avayaExtension="8006"></Extension>
+			<Extension ExtensionNumber="8007" StateMachine="./AvayaExtension.xml" avayaExtension="8007"></Extension>
+		</Extensions>
 	</Avaya>
 </Config>

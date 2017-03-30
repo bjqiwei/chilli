@@ -52,9 +52,15 @@ namespace chilli {
 			return 0;
 		}
 
+		void ExtensionImp::processSend(const std::string & strContent, const void * param, bool & bHandled)
+		{
+		}
+
 		void ExtensionImp::fireSend(const std::string &strContent, const void * param)
 		{
 			LOG4CPLUS_TRACE(log, " recive a Send event from stateMachine:" << strContent);
+			bool bHandled = false;
+			processSend(strContent, param, bHandled);
 		}
 
 		int ExtensionImp::pushEvent(const model::EventType_t & Event)

@@ -1,5 +1,6 @@
 #include "TSAPIModule.h"
 #include "AvayaAgent.h"
+#include "AvayaExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
@@ -124,14 +125,14 @@ namespace chilli {
 				const char * password = child->Attribute("password");
 				const char * avayaAgentId = child->Attribute("avayaAgentId");
 				const char * avayaPassword = child->Attribute("avayaPassword");
-				const char * avayaExtenion = child->Attribute("avayaExtenion");
+				const char * avayaExtension = child->Attribute("avayaExtension");
 
 				num = num ? num : "";
 				sm = sm ? sm : "";
 				password = password ? password : "";
 				avayaAgentId = avayaAgentId ? avayaAgentId : "";
 				avayaPassword = avayaPassword ? avayaPassword : "";
-				avayaExtenion = avayaExtenion ? avayaExtenion : "";
+				avayaExtension = avayaExtension ? avayaExtension : "";
 
 				if (this->g_Extensions.find(num) == this->g_Extensions.end())
 				{
@@ -140,9 +141,9 @@ namespace chilli {
 					this->m_Extensions[num] = ext;
 					ext->setVar("_agent.AgentId", num);
 					ext->setVar("_agent.Password", password);
-					ext->setVar("_agent.avayaAgentId", avayaAgentId);
-					ext->setVar("_agent.avayaPassword", avayaPassword);
-					ext->setVar("_agent.avayaExtenion", avayaExtenion);
+					ext->setVar("_avaya.AgentId", avayaAgentId);
+					ext->setVar("_avaya.Password", avayaPassword);
+					ext->setVar("_avaya.Extension", avayaExtension);
 				}
 				else {
 					LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -150,6 +151,35 @@ namespace chilli {
 			}
 
 			
+			// extensions 
+			XMLElement * extensions = avaya->FirstChildElement("Extensions");
+
+			for (XMLElement *child = extensions->FirstChildElement("Extension");
+				child != nullptr;
+				child = child->NextSiblingElement("Extension"))
+			{
+
+				const char * num = child->Attribute("ExtensionNumber");
+				const char * sm = child->Attribute("StateMachine");
+				const char * avayaExtension = child->Attribute("avayaExtension");
+
+				num = num ? num : "";
+				sm = sm ? sm : "";
+				avayaExtension = avayaExtension ? avayaExtension : "";
+
+				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				{
+					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+					this->g_Extensions[num] = ext;
+					this->m_Extensions[num] = ext;
+					ext->setVar("_extension.Extension", num);
+					ext->setVar("_avaya.Extension", avayaExtension);
+				}
+				else {
+					LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
+				}
+			}
+
 			return true;
 		}
 
@@ -297,6 +327,14 @@ namespace chilli {
 							AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_DEVICE_DEVICE_MONITOR);
+
+							Json::Value event;
+							event["event"] = "ACS_OPEN_STREAM_CONF";
+							event["status"] = 0;
+							model::EventType_t evt(event.toStyledString());
+							for (auto &it: this->m_Extensions){
+								it.second->pushEvent(evt);
+							}
 						}
 												   break;
 						case ACS_CLOSE_STREAM_CONF: {
@@ -536,7 +574,7 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
 							event["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
@@ -569,7 +607,7 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "agentState:" << agentState);
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
 							event["status"] = agentState;
 							event["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
 							model::EventType_t evt(event.toStyledString());
@@ -592,7 +630,7 @@ namespace chilli {
 							LOG4CPLUS_WARN(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId] + "Conf";
 							event["status"] = error;
 							event["reason"] = AvayaAPI::cstaErrorString(error);
 							model::EventType_t evt(event.toStyledString());

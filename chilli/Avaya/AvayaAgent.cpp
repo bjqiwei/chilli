@@ -22,11 +22,15 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 {
 	LOG4CPLUS_DEBUG(log," recive a Send event from stateMachine:" << strContent);
 	bool bHandled = false;
-	processSend(strContent, param, bHandled);
-	if (bHandled) {
-		return;
+	this->processSend(strContent, param, bHandled);
+	if (!bHandled) {
+		Agent::processSend(strContent, param, bHandled);
 	}
 	
+}
+
+void AvayaAgent::processSend(const std::string & strContent, const void * param, bool & bHandled)
+{
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonEvent)) {
@@ -79,6 +83,7 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 			}
+			bHandled = true;
 		}
 		else if (eventName == "AgentLogout")
 		{
@@ -123,6 +128,7 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentLogout";
 			}
+			bHandled = true;
 		}
 		else if (eventName == "AgentGetState")
 		{
@@ -150,6 +156,7 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentGetState";
 			}
+			bHandled = true;
 		}
 		else if (eventName == "AgentSetFree")
 		{
@@ -187,6 +194,7 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentSetFree";
 			}
+			bHandled = true;
 		}
 		else if (eventName == "AgentSetBusy")
 		{
@@ -224,12 +232,12 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
 				m_model->m_InvokeID2Event[uInvodeId] = "AgentSetBusy";
 			}
+			bHandled = true;
 		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");
 	}
-	
 }
 
 }
