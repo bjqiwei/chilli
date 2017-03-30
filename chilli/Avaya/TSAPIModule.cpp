@@ -329,6 +329,7 @@ namespace chilli {
 					}
 										 break;
 					case CSTACONFIRMATION: {
+						uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
 						switch (cstaEvent.eventHeader.eventType)
 						{
 						case CSTA_GETAPI_CAPS_CONF: {
@@ -533,7 +534,6 @@ namespace chilli {
 												break;
 						case CSTA_SET_AGENT_STATE_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
-							uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							event["event"] = this->m_InvokeID2Event[invokeId];
@@ -565,7 +565,6 @@ namespace chilli {
 												  break;
 						case CSTA_QUERY_AGENT_STATE_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_QUERY_AGENT_STATE_CONF:");
-							uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
 							AgentState_t agentState = cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState;
 							LOG4CPLUS_DEBUG(log, "agentState:" << agentState);
 							Json::Value event;
@@ -589,7 +588,6 @@ namespace chilli {
 						}
 														  break;
 						case CSTA_UNIVERSAL_FAILURE_CONF: {
-							uint32_t invokeId = cstaEvent.event.cstaConfirmation.invokeID;
 							CSTAUniversalFailure_t error = cstaEvent.event.cstaConfirmation.u.universalFailure.error;
 							LOG4CPLUS_WARN(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
 							Json::Value event;
@@ -606,6 +604,8 @@ namespace chilli {
 						}
 								 break;
 						}
+						m_InvokeID2Event.erase(invokeId);
+						m_InvokeID2Extension.erase(invokeId);
 					}// end of ctsaconfirmation
 										   break;
 					case CSTAUNSOLICITED: {
