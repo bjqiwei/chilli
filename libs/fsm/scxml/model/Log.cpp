@@ -17,9 +17,18 @@ namespace model{
 	{
 
 		if (ctx && m_Type.compare("script") == 0) { 
-			Json::Value jval = ctx->eval(m_strExpr, m_strFileName, m_node->line/*,m_node*/);
-			if (jval.isString() || jval.isBool() || jval.isNull()){
-				m_strExpr = jval.asString();
+			Json::Value jsonval = ctx->eval(m_strExpr, m_strFileName, m_node->line/*,m_node*/);
+			if (jsonval.isString() || jsonval.isBool() || jsonval.isNull()){
+				m_strExpr = jsonval.asString();
+			}
+			else if (jsonval.isInt()){
+				m_strExpr = std::to_string(jsonval.asInt());
+			}
+			else if (jsonval.isUInt()){
+				m_strExpr = std::to_string(jsonval.asUInt());
+			}
+			else if (jsonval.isDouble()){
+				m_strExpr = std::to_string(jsonval.asDouble());
 			}
 		}
 
