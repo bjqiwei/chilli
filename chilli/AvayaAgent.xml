@@ -15,6 +15,8 @@
 		<event event="AgentLogout">
 			<transition  target="init"/>
 		</event>
+		<event event="ACS_OPEN_STREAM_CONF" cond="_event.status==0">
+		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
 				<status>1</status>
@@ -117,12 +119,12 @@
 							<agentId type="script">_avaya.AgentId</agentId>
 						</send>
 					</event>
-					<event event="AgentSetFree" cond="_event.status==0">
+					<event event="AgentSetFree">
 						<send target="this" type="notify" dest="client" event="agentidle">
-							<status>0</status>
+							<status type="script"> _event.status</status>
 							<type>agentidle</type>
 						</send>
-						<transition  target="Ready"/>
+						<transition cond="_event.status==0" target="Ready"/>
 					</event>
 				</state>
 				<state id="Ready">
@@ -132,12 +134,12 @@
 							<agentId type="script">_avaya.AgentId</agentId>
 						</send>
 					</event>
-					<event event="AgentSetBusy" cond="_event.status==0">
+					<event event="AgentSetBusy">
 						<send target="this" type="notify" dest="client" event="agentbusy">
-							<status>0</status>
+							<status type="script">_event.status</status>
 							<type>agentbusy</type>
 						</send>
-						<transition  target="NotReady"/>
+						<transition  cond="_event.status==0" target="NotReady"/>
 					</event>
 				</state>
 				<state id="Null">
