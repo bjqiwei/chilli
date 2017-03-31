@@ -69,18 +69,18 @@ namespace chilli {
 			Json::Reader jsonReader;
 			if (jsonReader.parse(Event.event, jsonEvent)) {
 				std::string eventName;
-				std::string _from;
+
 				if (jsonEvent["event"].isString()) {
 					eventName = jsonEvent["event"].asString();
 				}
 
-				if (jsonEvent["from"].isString()) {
-					_from = jsonEvent["from"].asString();
+				fsm::TriggerEvent evt(eventName);
+
+				for (auto & it : jsonEvent.getMemberNames()) {
+					evt.addVars(it, jsonEvent[it]);
 				}
 
-
-				fsm::TriggerEvent evt(eventName, _from);
-				LOG4CPLUS_INFO(log, " Recived a event," << "from " << _from << "event=" << evt.ToString());
+				LOG4CPLUS_INFO(log, " Recived a event," << Event.event);
 				m_SM->pushEvent(evt);
 
 			}
