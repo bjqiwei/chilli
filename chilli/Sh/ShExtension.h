@@ -13,7 +13,7 @@ namespace ShDev{
 class ShExtension :public model::Extension
 {
 public:
-	ShExtension(const std::string &ext, const std::string &smFileName);
+	ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~ShExtension(void);
 
 	virtual const std::string & getExtensionNumber() const override;

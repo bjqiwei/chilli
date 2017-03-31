@@ -2,13 +2,14 @@
 #include <log4cplus/loggingmacros.h>
 #include <json/json.h>
 #include "../model/ConnectAdapter.h"
+#include "../model/ProcessModule.h"
 
 namespace chilli{
 namespace Agent{
 
 
-Agent::Agent(const std::string &ext, const std::string &smFileName) 
-	:Extension(ext, smFileName), m_ExtNumber(ext)
+Agent::Agent(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
+	:Extension(model, ext, smFileName), m_ExtNumber(ext)
 {
 	std::string logName= "Agent.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

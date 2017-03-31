@@ -6,8 +6,8 @@ namespace chilli{
 namespace ACD{
 
 
-ACDExtension::ACDExtension(const std::string &ext, const std::string &smFileName) 
-	:Extension(ext,smFileName)
+ACDExtension::ACDExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
+	:Extension(model, ext,smFileName)
 {
 	std::string logName = "ACD.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

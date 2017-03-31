@@ -12,7 +12,7 @@ namespace model{
 class Group:public Extension
 {
 public:
-	Group(const std::string &ext, const std::string &smFileName);
+	Group(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~Group();
 private:
 	std::vector<std::string> m_ExtVec;

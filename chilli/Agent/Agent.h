@@ -8,7 +8,7 @@ namespace Agent{
 
 class Agent :public model::Extension{
 public:
-	Agent(const std::string &ext, const std::string &smFileName);
+	Agent(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~Agent();
 
 public:

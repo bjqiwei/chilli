@@ -16,7 +16,8 @@ namespace model{
 class Extension: public fsm::SendInterface
 {
 public:
-	Extension(const std::string &ext, const std::string &smFileName):SendInterface("this") 
+	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName):
+		m_model(model), SendInterface("this")
 	{
 		m_SM = new fsm::StateMachine(ext,smFileName);
 	};
@@ -84,6 +85,7 @@ private:
 	std::thread m_thread;
 protected:
 	fsm::StateMachine * m_SM = nullptr;
+	class ProcessModule * const m_model = nullptr;
 	log4cplus::Logger log;
 
 };

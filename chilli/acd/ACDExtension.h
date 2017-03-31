@@ -8,7 +8,7 @@ namespace ACD{
 
 class ACDExtension :public model::Extension{
 public:
-	ACDExtension(const std::string &ext, const std::string &smFileName);
+	ACDExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~ACDExtension();
 
 public:

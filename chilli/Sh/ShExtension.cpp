@@ -8,8 +8,8 @@ namespace ShDev{
 
 using namespace SHAPI;
 
-ShExtension::ShExtension(const std::string &ext, const std::string &smFileName)
-	:Extension(ext, smFileName), m_ExtNumber(ext)
+ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
+	:Extension(model, ext, smFileName), m_ExtNumber(ext)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDev.Extension");
 	LOG4CPLUS_DEBUG(log,"new a extension object.");

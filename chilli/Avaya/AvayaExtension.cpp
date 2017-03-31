@@ -8,7 +8,7 @@ namespace chilli {
 namespace Avaya {
 
 	AvayaExtension::AvayaExtension(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
-		:m_model(model), ExtensionImp(ext, smFileName)
+		:m_model(model), ExtensionImp(model, ext, smFileName)
 	{
 		std::string logName = "AvayaExtension.";
 		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

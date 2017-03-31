@@ -73,7 +73,7 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		sm = sm ? sm : "";
 		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
-			model::ExtensionPtr ext(new Extension::ExtensionImp(num, sm));
+			model::ExtensionPtr ext(new Extension::ExtensionImp(this, num, sm));
 			this->g_Extensions[num] = ext;
 			this->m_Extensions[num] = ext;
 		}

@@ -8,7 +8,7 @@ namespace chilli{
 
 		class ExtensionImp :public model::Extension {
 		public:
-			ExtensionImp(const std::string &ext, const std::string &smFileName);
+			ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 			virtual ~ExtensionImp();
 
 			virtual const std::string & getExtensionNumber() const override;

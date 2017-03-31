@@ -9,7 +9,7 @@ namespace Avaya{
 
 
 AvayaAgent::AvayaAgent(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
-	:m_model(model), Agent(ext, smFileName)
+	:m_model(model), Agent(model, ext, smFileName)
 {
 
 }
