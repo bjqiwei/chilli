@@ -3,7 +3,22 @@
 <fsm name ="AvayaExtension" initial="init">
 <datamodel>
 	<data id="monitorId"/>
+	<data id="agentId" expr="''"/>
 </datamodel>
+<scriptmodel>
+	<script>
+		var localConnctionState = {
+　　　 		csNone:-1,
+			csNull:0,
+			csInitiate:1,
+			csAlerting:2,
+			csConnect:3,
+			csHold:4,
+			csQueued:5,
+			csFail:6
+　　　　};
+	</script>
+</scriptmodel>
 	<state id="init">
 		<onentry>
 		</onentry>
@@ -13,15 +28,28 @@
 			</send>
 		</event>
 		<event event="MonitorDevice">
-			<script>monitorId=_event.monitorCrossRefID;</script>
+			<script>monitorId=_event.monitorId;</script>
 			<!--timer idexpr="_extension.Extension" interval="10000"/-->
 		</event>
-		<event event="timer">
+		<event event="AgentLogin">
+			<script>agentId = _event.agentId;</script>
+		</event>
+		<event event ="CSTA_DELIVERED">
+			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<agentId type="script">agentId;</agentId>
+				<extension type="script">agentId;</extension>
+				<called type="script">_event.called;</called>
+				<calling type="script">_event.calling;</calling>
+			</send>
+		</event>
+		
+		<!--event event="timer">
 			<log level="debug" type="script">_event.id;</log>
 			<send target="this" type="cmd" dest="this" event="MonitorStop">
 				<monitorId type="script">monitorId</monitorId>
 			</send>
-		</event>
+		</event-->
     </state>
 </fsm>
 

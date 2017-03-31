@@ -642,11 +642,15 @@ namespace chilli {
 														  break;
 						case CSTA_MONITOR_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_MONITOR_CONF");
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaConfirmation.u.monitorStart.monitorCrossRefID;
+
+							this->m_monitorID2Extension[monitorId] = this->m_InvokeID2Extension[invokeId];
+
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							event["event"] = this->m_InvokeID2Event[invokeId];
 							event["status"] = 0;
-							event["monitorCrossRefID"] = cstaEvent.event.cstaConfirmation.u.monitorStart.monitorCrossRefID;
+							event["monitorId"] = monitorId;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -672,6 +676,51 @@ namespace chilli {
 										   break;
 					case CSTAUNSOLICITED: {
 						switch (cstaEvent.eventHeader.eventType) {
+						case CSTA_MONITOR_ENDED: {
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAEventCause_t cause = cstaEvent.event.cstaUnsolicited.u.monitorEnded.cause;
+							LOG4CPLUS_DEBUG(log, "CSTA_MONITOR_ENDED" );
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "CSTA_MONITOR_ENDED";
+							event["cause"] = cause;
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+							this->m_monitorID2Extension.erase(monitorId);
+
+						}
+												 break;
+						case CSTA_CALL_CLEARED: {
+							LOG4CPLUS_WARN(log, "CSTA_CALL_CLEARED");
+						}
+												break;
+						case CSTA_DELIVERED: {
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							int32_t callID = cstaEvent.event.cstaUnsolicited.u.delivered.connection.callID;
+							const char *called = cstaEvent.event.cstaUnsolicited.u.delivered.calledDevice.deviceID;
+							const char *calling = cstaEvent.event.cstaUnsolicited.u.delivered.callingDevice.deviceID;
+							const char *alerting = cstaEvent.event.cstaUnsolicited.u.delivered.alertingDevice.deviceID;
+							int32_t localConnect = cstaEvent.event.cstaUnsolicited.u.delivered.localConnectionInfo;
+							int32_t devIDType = cstaEvent.event.cstaUnsolicited.u.delivered.connection.devIDType;
+
+							LOG4CPLUS_DEBUG(log, "CSTA_DELIVERED");
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "CSTA_DELIVERED";
+							event["callID"] = callID;
+							event["called"] = called;
+							event["alerting"] = alerting;
+							event["calling"] = calling;
+							event["localConnect"] = localConnect;
+							event["devIDType"] = devIDType;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+
+						}
+													  break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}

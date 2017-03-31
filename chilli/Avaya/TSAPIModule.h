@@ -41,6 +41,7 @@ namespace chilli {
 			model::ExtensionMap m_Extensions;
 			std::map<uint32_t, std::string>m_InvokeID2Extension;
 			std::map<uint32_t, std::string>m_InvokeID2Event;
+			std::map<uint32_t, std::string>m_monitorID2Extension;
 			void run();
 			friend class AvayaAgent;
 			friend class AvayaExtension;

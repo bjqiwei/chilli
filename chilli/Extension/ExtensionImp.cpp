@@ -55,6 +55,21 @@ namespace chilli {
 
 		void ExtensionImp::processSend(const std::string & strContent, const void * param, bool & bHandled)
 		{
+			Json::Value jsonData;
+			Json::Reader jsonReader;
+			if (jsonReader.parse(strContent, jsonData)) {
+				if (jsonData["type"].asString() == "notify")
+				{
+					std::string dest = jsonData["dest"].asString();
+					Json::FastWriter writer;
+					std::string sendData = writer.write(jsonData["param"]);
+					this->m_model->PushEvent(sendData);
+				}
+			}
+			else {
+				LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			}
+
 		}
 
 		void ExtensionImp::fireSend(const std::string &strContent, const void * param)
