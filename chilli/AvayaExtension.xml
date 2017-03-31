@@ -4,7 +4,13 @@
 	<state id="init">
 		<onentry>
 		</onentry>
-		
+		<event event="ACS_OPEN_STREAM_CONF" cond="_event.status==0">
+			<send target="this" type="cmd" dest="this" event="MonitorDevice">
+				<deviceId type="script">_extension.Extension</deviceId>
+			</send>
+		</event>
+		<event event="MonitorDevice">
+		</event>
     </state>
 </fsm>
 

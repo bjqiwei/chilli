@@ -43,6 +43,7 @@ namespace chilli {
 			std::map<uint32_t, std::string>m_InvokeID2Event;
 			void run();
 			friend class AvayaAgent;
+			friend class AvayaExtension;
 
 		};
 	}
