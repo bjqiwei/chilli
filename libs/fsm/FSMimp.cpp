@@ -333,7 +333,7 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 	
 	if (!doneSomething)
 	{
-		LOG4CPLUS_ERROR(log, m_strSessionID << ", this event node done nothing,line:" << eventNode->line);
+		LOG4CPLUS_WARN(log, m_strSessionID << ", this event node done nothing,line:" << eventNode->line);
 	}
 	return doneSomething;
 }
