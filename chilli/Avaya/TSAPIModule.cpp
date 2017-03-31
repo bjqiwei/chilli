@@ -123,6 +123,7 @@ namespace chilli {
 				const char * num = child->Attribute("ExtensionNumber");
 				const char * sm = child->Attribute("StateMachine");
 				const char * password = child->Attribute("password");
+				const char * extension = child->Attribute("Extension");
 				const char * avayaAgentId = child->Attribute("avayaAgentId");
 				const char * avayaPassword = child->Attribute("avayaPassword");
 				const char * avayaExtension = child->Attribute("avayaExtension");
@@ -130,6 +131,7 @@ namespace chilli {
 				num = num ? num : "";
 				sm = sm ? sm : "";
 				password = password ? password : "";
+				extension = extension ? extension : "";
 				avayaAgentId = avayaAgentId ? avayaAgentId : "";
 				avayaPassword = avayaPassword ? avayaPassword : "";
 				avayaExtension = avayaExtension ? avayaExtension : "";
@@ -141,6 +143,7 @@ namespace chilli {
 					this->m_Extensions[num] = ext;
 					ext->setVar("_agent.AgentId", num);
 					ext->setVar("_agent.Password", password);
+					ext->setVar("_agent.Extension", extension);
 					ext->setVar("_avaya.AgentId", avayaAgentId);
 					ext->setVar("_avaya.Password", avayaPassword);
 					ext->setVar("_avaya.Extension", avayaExtension);

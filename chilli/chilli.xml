@@ -4,7 +4,7 @@
     <Extension ExtensionNumber="0001" StateMachine="./ACD.xml"></Extension>
   </ACD>
   <Agents id="agent001" TCPPort="9995" WSPort="9996">
-    <Agent ExtensionNumber="6001" StateMachine="./Agent.xml" password="1234"></Agent>
+    <Agent ExtensionNumber="6001" StateMachine="./Agent.xml" password="1234" Extension="1000"></Agent>
   </Agents>
   <Extensions id="ext001">
     <Extension ExtensionNumber="1000" ChannelID="0" Type="Analog_Trunk" Enable="1" StateMachine="./Analog_Trunk.xml"></Extension>
@@ -46,7 +46,7 @@
 			<Password>Dadmin@01</Password>
 		</TSAPI>
 		<Agents>
-			<Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" avayaAgentId="6030" avayaPassword="1234" avayaExtension="8005"></Agent>
+			<Agent ExtensionNumber="9999" StateMachine="./AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" Extension="8005" avayaAgentId="6030" avayaPassword="1234" avayaExtension="8005"></Agent>
 		</Agents>
 		<Extensions>
 			<Extension ExtensionNumber="8005" StateMachine="./AvayaExtension.xml" avayaExtension="8005"></Extension>

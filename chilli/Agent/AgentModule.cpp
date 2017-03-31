@@ -109,10 +109,12 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 		const char * num = child->Attribute("ExtensionNumber");
 		const char * sm = child->Attribute("StateMachine");
 		const char * password = child->Attribute("password");
+		const char * extension = child->Attribute("Extension");
 
 		num = num ? num : "";
 		sm = sm ? sm : "";
 		password = password ? password : "";
+		extension = extension ? extension : "";
 
 		if (this->g_Extensions.find(num) == this->g_Extensions.end())
 		{
@@ -121,6 +123,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 			this->m_Extensions[num] = ext;
 			ext->setVar("_agent.AgentId", num);
 			ext->setVar("_agent.Password", password);
+			ext->setVar("_agent.Extension", extension);
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
