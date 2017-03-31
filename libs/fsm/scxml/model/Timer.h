@@ -18,6 +18,7 @@ namespace model{
 		const std::string& getId() const;
 		const std::string& getIdExpr() const;
 		unsigned int getInterval();
+		const std::string& getIntervalExpr() const;
 
 		virtual  void execute(fsm::Context * ctx);
 
@@ -25,6 +26,8 @@ namespace model{
 		std::string id;
 		std::string idexpr;
 		std::string interval;
+		std::string intervalexpr;
+		Json::Value jsonInterval;
 	};
 }
 }
