@@ -1,15 +1,26 @@
 ﻿<?xml version="1.0" ?>
 
 <fsm name ="AvayaExtension" initial="init">
+<datamodel>
+	<data id="monitorId"/>
+</datamodel>
 	<state id="init">
 		<onentry>
 		</onentry>
 		<event event="ACS_OPEN_STREAM_CONF" cond="_event.status==0">
 			<send target="this" type="cmd" dest="this" event="MonitorDevice">
-				<deviceId type="script">_extension.Extension</deviceId>
+				<deviceId type="script">_avaya.Extension</deviceId>
 			</send>
 		</event>
 		<event event="MonitorDevice">
+			<script>monitorId=_event.monitorCrossRefID;</script>
+			<!--timer idexpr="_extension.Extension" interval="10000"/-->
+		</event>
+		<event event="timer">
+			<log level="debug" type="script">_event.id;</log>
+			<send target="this" type="cmd" dest="this" event="MonitorStop">
+				<monitorId type="script">monitorId</monitorId>
+			</send>
 		</event>
     </state>
 </fsm>

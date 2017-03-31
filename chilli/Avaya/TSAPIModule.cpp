@@ -648,6 +648,16 @@ namespace chilli {
 							this->PushEvent(evt);
 						}
 								  break;
+						case CSTA_MONITOR_STOP_CONF: {
+							LOG4CPLUS_DEBUG(log, "CSTA_MONITOR_STOP_CONF");
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							event["event"] = this->m_InvokeID2Event[invokeId];
+							event["status"] = 0;
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+													 break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTACONFIRMATION eventType:" << cstaEvent.eventHeader.eventType);
 						}
