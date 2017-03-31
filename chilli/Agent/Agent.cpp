@@ -61,35 +61,48 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 	Json::Value jsonData;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonData)) {
-		if (jsonData["type"].asString() == "response" && jsonData["dest"].asString() == "client")
+		if (jsonData["type"].asString() == "response")
 		{
-			Json::FastWriter writer;
-			std::string sendData = writer.write(jsonData["param"]);
-			model::ConnectAdapter::Send(m_curConnectId, sendData.c_str(), sendData.length());
+			if (jsonData["dest"].asString() == "client")
+			{
 
-			if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "logon") {
-				if (jsonData["param"]["status"].isString() && jsonData["param"]["status"].asString() == "0")
-				{
-					//登陆成功
-					model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
-					model::ConnectAdapter::Close(m_ConnectId); //关闭原有连接
-					m_ConnectId = m_curConnectId;//更新为当前连接
-					model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtensionNumber());//为当前连接设置坐席工号
+				Json::FastWriter writer;
+				std::string sendData = writer.write(jsonData["param"]);
+				model::ConnectAdapter::Send(m_curConnectId, sendData.c_str(), sendData.length());
+
+				if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "logon") {
+					if (jsonData["param"]["status"].isString() && jsonData["param"]["status"].asString() == "0")
+					{
+						//登陆成功
+						model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
+						model::ConnectAdapter::Close(m_ConnectId); //关闭原有连接
+						m_ConnectId = m_curConnectId;//更新为当前连接
+						model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtensionNumber());//为当前连接设置坐席工号
+					}
+					else {
+						//登陆失败
+						std::this_thread::sleep_for(std::chrono::milliseconds(1));
+						model::ConnectAdapter::Close(m_curConnectId);
+					}
 				}
-				else {
-					//登陆失败
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
-					model::ConnectAdapter::Close(m_curConnectId);
-				}
+				bHandled = true;
 			}
-			bHandled = true;
 		}
-		else if (jsonData["type"].asString() == "notify" && jsonData["dest"].asString() == "client")
+		else if (jsonData["type"].asString() == "notify")
 		{
-			Json::FastWriter writer;
-			std::string sendData = writer.write(jsonData["param"]);
-			model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
-			bHandled = true;
+			std::string dest = jsonData["dest"].asString();
+			if (dest == "client")
+			{
+				Json::FastWriter writer;
+				std::string sendData = writer.write(jsonData["param"]);
+				model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
+				bHandled = true;
+			}
+			else {
+				Json::FastWriter writer;
+				std::string sendData = writer.write(jsonData["param"]);
+				this->m_model->PushEvent(sendData);
+			}
 		}
 	}
 
