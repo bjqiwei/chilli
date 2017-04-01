@@ -220,8 +220,7 @@ namespace model
 		}
 		if (!param.isNull())
 			sendValue["param"] = param;
-		Json::FastWriter writer;
-		content = writer.write(sendValue);;
+		content = sendValue.toStyledString();
 		//LOG4CPLUS_TRACE(log,m_strSession << ",send content:" << content);
 	}
 

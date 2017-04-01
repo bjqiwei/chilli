@@ -282,7 +282,7 @@ StyledWriter::write( const Value &root )
    writeCommentBeforeValue( root );
    writeValue( root );
    writeCommentAfterValueOnSameLine( root );
-   document_ += "\n";
+   //document_ += "\n";
    return document_;
 }
 
