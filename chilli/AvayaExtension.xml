@@ -8,7 +8,7 @@
 <scriptmodel>
 	<script>
 		var localConnctionState = {
-　　　 		csNone:-1,
+			csNone:-1,
 			csNull:0,
 			csInitiate:1,
 			csAlerting:2,
@@ -16,7 +16,12 @@
 			csHold:4,
 			csQueued:5,
 			csFail:6
-　　　　};
+		};
+	</script>
+	<script>
+		var ErrorCause = {
+			ResourcesBusy:1
+		};
 	</script>
 </scriptmodel>
 	<state id="init">
@@ -31,11 +36,22 @@
 			<script>monitorId=_event.monitorId;</script>
 			<!--timer idexpr="_extension.Extension" interval="10000"/-->
 		</event>
-		<event event="AgentLogin">
+		<event event="AgentLogin" cond="agentId == ''">
 			<script>agentId = _event.agentId;</script>
 		</event>
-		<event event ="CSTA_DELIVERED">
+		<event event="AgentLogin">
 			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<agentId type="script">_event.agentId;</agentId>
+				<extension type="script">_event.agentId;</extension>
+				<status type="script">ErrorCause.ResourcesBusy;</status>
+			</send>
+		</event>
+		<event event="AgentLogout" cond="agentId == _event.agentId">
+			<script>agentId = '';</script>
+		</event>
+		<event event ="CSTA_DELIVERED">
+			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<agentId type="script">agentId;</agentId>
 				<extension type="script">agentId;</extension>

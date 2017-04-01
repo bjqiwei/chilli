@@ -2,6 +2,11 @@
 <fsm name="avayaAgent" initial="init">
 	<state id="init">
 		<onentry>
+			<send target="this" type="notify" dest="extension" event="AgentLogout">
+				<event>AgentLogout</event>
+				<agentId type="script">_agent.AgentId</agentId>
+				<extension type="script">_agent.Extension</extension>
+			</send>
 		</onentry>
 		<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
 			<transition  target="logining"/>
@@ -32,14 +37,13 @@
 					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
-			</onentry>
-			<event event="AgentLogin" cond="_event.status==0">
 				<send target="this" type="notify" dest="extension" event="AgentLogin">
 					<event>AgentLogin</event>
 					<agentId type="script">_agent.AgentId</agentId>
 					<extension type="script">_agent.Extension</extension>
-					<status type="script">_event.status</status>
 				</send>
+			</onentry>
+			<event event="AgentLogin" cond="_event.status==0">
 				<transition  target="logined"/>
 			</event>
 			<event event="AgentLogin">

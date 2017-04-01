@@ -58,7 +58,9 @@ namespace Avaya {
 				CSTAMonitorFilter_t noFilter;
 				noFilter.agent = 0;
 				noFilter.call = 0;
+				noFilter.feature = 0;
 				noFilter.maintenance = 0;
+				noFilter.privateFilter = 0;
 
 				uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
 				RetCode_t nRetCode = AvayaAPI::cstaMonitorDevice(m_model->m_lAcsHandle,
