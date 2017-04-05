@@ -148,6 +148,93 @@ namespace AvayaAPI {
 		}
 	}
 
+	const char * cstaAPICapsString(uint32_t api)
+	{
+		static CSTAGetAPICapsConfEvent_t event;
+		short * begin = (short *)&event;
+		
+		if (&event.alternateCall - begin == api) return "alternateCall";
+		if (&event.answerCall - begin == api) return "answerCall";
+		if (&event.callCompletion - begin == api) return "callCompletion";
+		if (&event.clearCall - begin == api) return "clearCall";
+		if (&event.clearConnection - begin == api) return "clearConnection";
+		if (&event.conferenceCall - begin == api) return "conferenceCall";
+		if (&event.consultationCall - begin == api) return "consultationCall";
+		if (&event.deflectCall - begin == api) return "deflectCall";
+		if (&event.pickupCall - begin == api) return "pickupCall";
+		if (&event.groupPickupCall - begin == api) return "groupPickupCall";
+		if (&event.holdCall - begin == api) return "holdCall";
+		if (&event.makeCall - begin == api) return "makeCall";
+		if (&event.makePredictiveCall - begin == api) return "makePredictiveCall";
+		if (&event.queryMwi - begin == api) return "queryMwi";
+		if (&event.queryDnd - begin == api) return "queryDnd";
+		if (&event.queryFwd - begin == api) return "queryFwd";
+		if (&event.queryAgentState - begin == api) return "queryAgentState";
+		if (&event.queryLastNumber - begin == api) return "queryLastNumber";
+		if (&event.queryDeviceInfo - begin == api) return "queryDeviceInfo";
+		if (&event.reconnectCall - begin == api) return "reconnectCall";
+		if (&event.retrieveCall - begin == api) return "retrieveCall";
+		if (&event.setMwi - begin == api) return "setMwi";
+		if (&event.setDnd - begin == api) return "setDnd";
+		if (&event.setFwd - begin == api) return "setFwd";
+		if (&event.setAgentState - begin == api) return "setAgentState";
+		if (&event.transferCall - begin == api) return "transferCall";
+		if (&event.eventReport - begin == api) return "eventReport";
+		if (&event.callClearedEvent - begin == api) return "callClearedEvent";
+		if (&event.conferencedEvent - begin == api) return "conferencedEvent";
+		if (&event.connectionClearedEvent - begin == api) return "connectionClearedEvent";
+		if (&event.deliveredEvent - begin == api) return "deliveredEvent";
+		if (&event.divertedEvent - begin == api) return "divertedEvent";
+		if (&event.establishedEvent - begin == api) return "establishedEvent";
+		if (&event.failedEvent - begin == api) return "failedEvent";
+		if (&event.heldEvent - begin == api) return "heldEvent";
+		if (&event.networkReachedEvent - begin == api) return "networkReachedEvent";
+		if (&event.originatedEvent - begin == api) return "originatedEvent";
+		if (&event.queuedEvent - begin == api) return "queuedEvent";
+		if (&event.retrievedEvent - begin == api) return "retrievedEvent";
+		if (&event.serviceInitiatedEvent - begin == api) return "serviceInitiatedEvent";
+		if (&event.transferredEvent - begin == api) return "transferredEvent";
+		if (&event.callInformationEvent - begin == api) return "callInformationEvent";
+		if (&event.doNotDisturbEvent - begin == api) return "doNotDisturbEvent";
+		if (&event.forwardingEvent - begin == api) return "forwardingEvent";
+		if (&event.messageWaitingEvent - begin == api) return "messageWaitingEvent";
+		if (&event.loggedOnEvent - begin == api) return "loggedOnEvent";
+		if (&event.loggedOffEvent - begin == api) return "loggedOffEvent";
+		if (&event.notReadyEvent - begin == api) return "notReadyEvent";
+		if (&event.readyEvent - begin == api) return "readyEvent";
+		if (&event.workNotReadyEvent - begin == api) return "workNotReadyEvent";
+		if (&event.workReadyEvent - begin == api) return "workReadyEvent";
+		if (&event.backInServiceEvent - begin == api) return "backInServiceEvent";
+		if (&event.outOfServiceEvent - begin == api) return "outOfServiceEvent";
+		if (&event.privateEvent - begin == api) return "privateEvent";
+		if (&event.routeRequestEvent - begin == api) return "routeRequestEvent";
+		if (&event.reRoute - begin == api) return "reRoute";
+		if (&event.routeSelect - begin == api) return "routeSelect";
+		if (&event.routeUsedEvent - begin == api) return "routeUsedEvent";
+		if (&event.routeEndEvent - begin == api) return "routeEndEvent";
+		if (&event.monitorDevice - begin == api) return "monitorDevice";
+		if (&event.monitorCall - begin == api) return "monitorCall";
+		if (&event.monitorCallsViaDevice - begin == api) return "monitorCallsViaDevice";
+		if (&event.changeMonitorFilter - begin == api) return "changeMonitorFilter";
+		if (&event.monitorStop - begin == api) return "monitorStop";
+		if (&event.monitorEnded - begin == api) return "monitorEnded";
+		if (&event.snapshotDeviceReq - begin == api) return "snapshotDeviceReq";
+		if (&event.snapshotCallReq - begin == api) return "snapshotCallReq";
+		if (&event.escapeService - begin == api) return "escapeService";
+		if (&event.privateStatusEvent - begin == api) return "privateStatusEvent";
+		if (&event.escapeServiceEvent - begin == api) return "escapeServiceEvent";
+		if (&event.escapeServiceConf - begin == api) return "escapeServiceConf";
+		if (&event.sendPrivateEvent - begin == api) return "sendPrivateEvent";
+		if (&event.sysStatReq - begin == api) return "sysStatReq";
+		if (&event.sysStatStart - begin == api) return "sysStatStart";
+		if (&event.sysStatStop - begin == api) return "sysStatStop";
+		if (&event.changeSysStatFilter - begin == api) return "changeSysStatFilter";
+		if (&event.sysStatReqEvent - begin == api) return "sysStatReqEvent";
+		if (&event.sysStatReqConf - begin == api) return "sysStatReqConf";
+		if (&event.sysStatEvent - begin == api) return "sysStatEvent";
+		return "";
+	}
+
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
 			if (!CSTA32.Open()){

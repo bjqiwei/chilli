@@ -2,6 +2,7 @@
 #include <acs.h>
 #include <csta.h>
 #include <attpriv.h>
+#include <cstdint>
 
 #if defined ( TSLIB_WINDOWS_32 )
 #define TSAPIPROC           RetCode_t (pascal *
@@ -879,6 +880,7 @@ namespace AvayaAPI{
 	extern Proc_getATTPrivate getATTPrivate;
 
 	const char * cstaAgentStateString(AgentState_t agentState);
+	const char * cstaAPICapsString(uint32_t api);
 	bool InitAvayaAPI();
 	bool UnInitAvayaAPI();
 }
