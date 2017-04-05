@@ -405,7 +405,7 @@ namespace env
 				LOG4CPLUS_ERROR(log, "JS_NewArrayObject " << value.toStyledString());
 				return val;
 			}
-			for (int i = 0; i < value.size(); i++)
+			for (uint32_t i = 0; i < value.size(); i++)
 			{
 				JS::RootedValue val2(this->m_jsctx, JsonValueToJsval(value[i]));
 				JS_DefineElement(m_jsctx, _array, i, val2, JSPROP_ENUMERATE);
@@ -445,6 +445,40 @@ namespace env
 			if (bytes.ptr()) {
 				return bytes.ptr();
 			}
+		}
+		else if (value.isObject())
+		{
+			Json::Value result;
+			JS::RootedObject obj(this->m_jsctx, value.toObjectOrNull());
+			JS::Rooted<JS::IdVector> props(this->m_jsctx, JS::IdVector(this->m_jsctx));
+
+
+			if (!JS_Enumerate(this->m_jsctx, obj, &props)) {
+				LOG4CPLUS_ERROR(log, "JS_Enumerate error");
+				return result;
+			}
+
+			size_t length = props.length();
+			length %=  256;
+			for (size_t i = 0; i < length; i++) {
+				JS::RootedValue v(this->m_jsctx);
+
+				if (JS_GetPropertyById(this->m_jsctx, obj, props[i], &v)) {
+
+					JS::RootedValue idname(this->m_jsctx, IdToValue(props[i]));
+					JSString *str = JS::ToString(this->m_jsctx, idname);
+					if (str) {
+						JSAutoByteString bytes(this->m_jsctx, str);
+						if (bytes.ptr()) {
+							Json::Value val = JsvalToJsonValue(v);
+							result[bytes.ptr()] = val;
+						}
+					}
+				}
+
+			}
+
+			return result;
 		}
 		return Json::Value();
 	}
