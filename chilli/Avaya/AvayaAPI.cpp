@@ -235,6 +235,39 @@ namespace AvayaAPI {
 		return "";
 	}
 
+	const char * cstaDeviceTypeString(ConnectionID_Device_t type)
+	{
+		switch (type)
+		{
+		case staticId: 
+			return "staticId";
+			break;
+		case dynamicId:
+			return "dynamicId";
+			break;
+		default:
+			return "";
+			break;
+		}
+	}
+
+	const char * cstaLocalConnectionStateString(LocalConnectionState_t localState)
+	{
+		switch (localState)
+		{
+		case csNone: return "None";
+		case csNull: return "Null";
+		case csInitiate:return "Initiate";
+		case csAlerting:return "Alerting";
+		case csConnect: return "Connect";
+		case csHold:return "Hold";
+		case csQueued:return "Queued";
+		case csFail:return "Fail";
+		default:return "";
+		}
+		
+	}
+
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
 			if (!CSTA32.Open()){

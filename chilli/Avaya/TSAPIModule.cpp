@@ -329,11 +329,12 @@ namespace chilli {
 
 							AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
-							AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_DEVICE_DEVICE_MONITOR);
+							AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_CALL_DEVICE_MONITOR);
 
 							Json::Value event;
 							event["event"] = "ACS_OPEN_STREAM_CONF";
-							event["status"] = 0;
+							event["OpenStream"] = Json::objectValue;
+							event["OpenStream"]["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							for (auto &it: this->m_Extensions){
 								it.second->pushEvent(evt);
@@ -503,8 +504,10 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "CSTA_SET_AGENT_STATE_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
-							event["status"] = 0;
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName] = Json::objectValue;
+							event[eventName]["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -533,12 +536,13 @@ namespace chilli {
 						case CSTA_QUERY_AGENT_STATE_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_QUERY_AGENT_STATE_CONF:");
 							AgentState_t agentState = cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState;
-							LOG4CPLUS_DEBUG(log, "agentState:" << agentState);
+							LOG4CPLUS_DEBUG(log, "agentState:" << AvayaAPI::cstaAgentStateString(agentState));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
-							event["status"] = agentState;
-							event["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName] = Json::objectValue;
+							event[eventName]["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -559,9 +563,10 @@ namespace chilli {
 							LOG4CPLUS_WARN(log, "CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
-							event["status"] = error;
-							event["reason"] = AvayaAPI::cstaErrorString(error);
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = error;
+							event[eventName]["reason"] = AvayaAPI::cstaErrorString(error);
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -574,9 +579,10 @@ namespace chilli {
 
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
-							event["status"] = 0;
-							event["monitorId"] = monitorId;
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
+							event[eventName]["monitorId"] = monitorId;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -585,8 +591,9 @@ namespace chilli {
 							LOG4CPLUS_DEBUG(log, "CSTA_MONITOR_STOP_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							event["event"] = this->m_InvokeID2Event[invokeId];
-							event["status"] = 0;
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -609,8 +616,8 @@ namespace chilli {
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
-							event["event"] = "CSTA_MONITOR_ENDED";
-							event["cause"] = cause;
+							event["event"] = "MONITOR_ENDED";
+							event["MONITOR_ENDED"]["cause"] = cause;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 							this->m_monitorID2Extension.erase(monitorId);
@@ -623,24 +630,32 @@ namespace chilli {
 												break;
 						case CSTA_DELIVERED: {
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
-							int32_t callID = cstaEvent.event.cstaUnsolicited.u.delivered.connection.callID;
+							
 							const char *called = cstaEvent.event.cstaUnsolicited.u.delivered.calledDevice.deviceID;
 							const char *calling = cstaEvent.event.cstaUnsolicited.u.delivered.callingDevice.deviceID;
 							const char *alerting = cstaEvent.event.cstaUnsolicited.u.delivered.alertingDevice.deviceID;
-							int32_t localConnect = cstaEvent.event.cstaUnsolicited.u.delivered.localConnectionInfo;
-							int32_t devIDType = cstaEvent.event.cstaUnsolicited.u.delivered.connection.devIDType;
+							LocalConnectionState_t localConnect = cstaEvent.event.cstaUnsolicited.u.delivered.localConnectionInfo;
+
+							const char * deviceID = cstaEvent.event.cstaUnsolicited.u.delivered.connection.deviceID;
+							ConnectionID_Device_t devIDType = cstaEvent.event.cstaUnsolicited.u.delivered.connection.devIDType;
+							int32_t callID = cstaEvent.event.cstaUnsolicited.u.delivered.connection.callID;
+
+							Json::Value connection;
+							connection["deviceID"] = deviceID;
+							connection["devIDType"] = AvayaAPI::cstaDeviceTypeString(devIDType);
+							connection["callID"] = callID;
 
 							LOG4CPLUS_DEBUG(log, "CSTA_DELIVERED");
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
-							event["event"] = "CSTA_DELIVERED";
-							event["callID"] = callID;
-							event["called"] = called;
-							event["alerting"] = alerting;
-							event["calling"] = calling;
-							event["localConnect"] = localConnect;
-							event["devIDType"] = devIDType;
+							event["event"] = "DELIVERED";
+							event["DELIVERED"]["called"] = called;
+							event["DELIVERED"]["alerting"] = alerting;
+							event["DELIVERED"]["calling"] = calling;
+							event["DELIVERED"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(localConnect);
+
+							event["DELIVERED"]["connection"] = connection;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);

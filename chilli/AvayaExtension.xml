@@ -6,28 +6,11 @@
 	<data id="agentId" expr="''"/>
 </datamodel>
 <scriptmodel>
-	<script>
-		var localConnctionState = {
-			csNone:-1,
-			csNull:0,
-			csInitiate:1,
-			csAlerting:2,
-			csConnect:3,
-			csHold:4,
-			csQueued:5,
-			csFail:6
-		};
-	</script>
-	<script>
-		var ErrorCause = {
-			ResourcesBusy:1
-		};
-	</script>
 </scriptmodel>
 	<state id="init">
 		<onentry>
 		</onentry>
-		<event event="ACS_OPEN_STREAM_CONF" cond="_event.status==0">
+		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
 			<send target="this" type="cmd" dest="this" event="MonitorDevice">
 				<deviceId type="script">_avaya.Extension</deviceId>
 			</send>
@@ -37,26 +20,24 @@
 			<!--timer idexpr="_extension.Extension" interval="10000"/-->
 		</event>
 		<event event="AgentLogin" cond="agentId == ''">
-			<script>agentId = _event.agentId;</script>
+			<script>agentId = _event.AgentLogin.agentId;</script>
 		</event>
 		<event event="AgentLogin">
 			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
-				<agentId type="script">_event.agentId;</agentId>
 				<extension type="script">_event.agentId;</extension>
-				<status type="script">ErrorCause.ResourcesBusy;</status>
+				<AgentLogin type="script">_event.AgentLogin.status = 1; _event.AgentLogin;</AgentLogin>
 			</send>
 		</event>
-		<event event="AgentLogout" cond="agentId == _event.agentId">
+		<event event="AgentLogout" cond="agentId == _event.AgentLogout.agentId">
 			<script>agentId = '';</script>
 		</event>
-		<event event ="CSTA_DELIVERED">
+		<event event ="DELIVERED">
 			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
-				<agentId type="script">agentId;</agentId>
 				<extension type="script">agentId;</extension>
-				<called type="script">_event.called;</called>
-				<calling type="script">_event.calling;</calling>
+				<monitorId type="script">_event.monitorId;</monitorId>
+				<DELIVERED type="script">_event.DELIVERED;</DELIVERED>
 			</send>
 		</event>
 		

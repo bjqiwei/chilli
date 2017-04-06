@@ -881,6 +881,8 @@ namespace AvayaAPI{
 
 	const char * cstaAgentStateString(AgentState_t agentState);
 	const char * cstaAPICapsString(uint32_t api);
+	const char * cstaDeviceTypeString(ConnectionID_Device_t type);
+	const char * cstaLocalConnectionStateString(LocalConnectionState_t localState);
 	bool InitAvayaAPI();
 	bool UnInitAvayaAPI();
 }

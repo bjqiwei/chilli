@@ -4,7 +4,7 @@
 		<onentry>
 			<send target="this" type="notify" dest="extension" event="AgentLogout">
 				<event>AgentLogout</event>
-				<agentId type="script">_agent.AgentId</agentId>
+				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId = agentId;</AgentLogout>
 				<extension type="script">_agent.Extension</extension>
 			</send>
 		</onentry>
@@ -20,7 +20,7 @@
 		<event event="AgentLogout">
 			<transition  target="init"/>
 		</event>
-		<event event="ACS_OPEN_STREAM_CONF" cond="_event.status==0">
+		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
 		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
@@ -39,16 +39,16 @@
 				</send>
 				<send target="this" type="notify" dest="extension" event="AgentLogin">
 					<event>AgentLogin</event>
-					<agentId type="script">_agent.AgentId</agentId>
+					<AgentLogin type="script">var AgentLogin ={};AgentLogin.agentId = _agent.AgentId; AgentLogin;</AgentLogin>
 					<extension type="script">_agent.Extension</extension>
 				</send>
 			</onentry>
-			<event event="AgentLogin" cond="_event.status==0">
+			<event event="AgentLogin" cond="_event.AgentLogin.status==0">
 				<transition  target="logined"/>
 			</event>
 			<event event="AgentLogin">
 				<send target="this" type="response" dest="client" event="logon">
-					<status type="script">_event.status</status>
+					<status type="script">_event.AgentLogin.status</status>
 					<type>logon</type>
 				</send>
 				<transition  target="init"/>
@@ -94,19 +94,19 @@
 						<deviceId type="script">_avaya.Extension</deviceId>
 					</send>
 				</onentry>
-				<event event="AgentGetState" cond="_event.agentState=='NotReady'">
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='NotReady'">
 					<transition  target="NotReady"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='Ready'">
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Ready'">
 					<transition  target="Ready"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='Null'">
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Null'">
 					<transition  target="Null"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='WorkNotReady'">
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkNotReady'">
 					<transition  target="WorkNotReady"/>
 				</event>
-				<event event="AgentGetState" cond="_event.agentState=='WorkReady'">
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkReady'">
 					<transition  target="WorkReady"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
@@ -131,10 +131,10 @@
 					</event>
 					<event event="AgentSetFree">
 						<send target="this" type="notify" dest="client" event="agentidle">
-							<status type="script"> _event.status</status>
+							<status type="script"> _event.AgentSetFree.status</status>
 							<type>agentidle</type>
 						</send>
-						<transition cond="_event.status==0" target="Ready"/>
+						<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
 					</event>
 				</state>
 				<state id="Ready">
@@ -146,10 +146,20 @@
 					</event>
 					<event event="AgentSetBusy">
 						<send target="this" type="notify" dest="client" event="agentbusy">
-							<status type="script">_event.status</status>
+							<status type="script">_event.AgentSetBusy.status</status>
 							<type>agentbusy</type>
 						</send>
 						<transition  cond="_event.status==0" target="NotReady"/>
+					</event>
+					<event event="DELIVERED" cond="_event.DELIVERED.localConnect == 'Alerting'">
+						<send target="this" type="notify" dest="client" event="agentbusy">
+							<type>inringing</type>
+							<callid type="script">_event.DELIVERED.connection.callID;</callid>
+							<timestamp type="script">Date.parse(new Date()); </timestamp>
+							<caller type="script">_event.DELIVERED.calling; </caller>
+							<called type="script">_event.DELIVERED.called;</called>
+							<nowgroupid type="script"> -1;</nowgroupid>
+						</send>
 					</event>
 				</state>
 				<state id="Null">
