@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" ?>
 <fsm name="avayaAgent" initial="init">
+<datamodel>
+	<data id="connection"/>
+</datamodel>
 	<state id="init">
 		<onentry>
 			<send target="this" type="notify" dest="extension" event="AgentLogout">
@@ -95,18 +98,34 @@
 					</send>
 				</onentry>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='NotReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
 					<transition  target="NotReady"/>
 				</event>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Ready'">
+					<send target="this" type="notify" dest="client" event="agentidle">
+						<status type="script">0;</status>
+						<type>agentidle</type>
+					</send>
 					<transition  target="Ready"/>
 				</event>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Null'">
 					<transition  target="Null"/>
 				</event>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkNotReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
 					<transition  target="WorkNotReady"/>
 				</event>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
 					<transition  target="WorkReady"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
@@ -122,20 +141,20 @@
 						<type>logon</type>
 					</send>
 				</event>
+				<event event="cmd" cond="_event.cmd=='agentidle'">
+					<send target="this" type="cmd" dest="this" event="AgentSetFree">
+						<deviceId type="script">_avaya.Extension</deviceId>
+						<agentId type="script">_avaya.AgentId</agentId>
+					</send>
+				</event>
+				<event event="AgentSetFree">
+					<send target="this" type="notify" dest="client" event="agentidle">
+						<status type="script"> _event.AgentSetFree.status</status>
+						<type>agentidle</type>
+					</send>
+					<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
+				</event>
 				<state id="NotReady">
-					<event event="cmd" cond="_event.cmd=='agentidle'">
-						<send target="this" type="cmd" dest="this" event="AgentSetFree">
-							<deviceId type="script">_avaya.Extension</deviceId>
-							<agentId type="script">_avaya.AgentId</agentId>
-						</send>
-					</event>
-					<event event="AgentSetFree">
-						<send target="this" type="notify" dest="client" event="agentidle">
-							<status type="script"> _event.AgentSetFree.status</status>
-							<type>agentidle</type>
-						</send>
-						<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
-					</event>
 				</state>
 				<state id="Ready">
 					<event event="cmd" cond="_event.cmd=='agentbusy'">
@@ -160,6 +179,7 @@
 							<called type="script">_event.delivered.called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
 						</send>
+						<script>connection = _event.delivered.connection;</script>
 						<transition  target="inringing"/>
 					</event>
 				</state>
@@ -178,8 +198,6 @@
 						</send>
 						<transition target="incall"/>
 					</event>
-				</state>
-				<state id="incall">
 					<event event="CONNECTION_CLEARED">
 						<send target="this" type="notify" dest="client" event="after">
 							<type>after</type>
@@ -188,6 +206,14 @@
 						</send>
 						<transition target="after"/>
 					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<state id="incall">
+					
+					</state>
 				</state>
 				<state id="after">
 				</state>

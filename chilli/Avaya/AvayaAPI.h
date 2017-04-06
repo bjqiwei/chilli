@@ -882,7 +882,8 @@ namespace AvayaAPI{
 
 	const char * cstaAgentStateString(AgentState_t agentState);
 	const char * cstaAPICapsString(uint32_t api);
-	const char * cstaDeviceTypeString(ConnectionID_Device_t type);
+	const char * cstaConnectionIDDeviceTypeString(ConnectionID_Device_t type);
+	ConnectionID_Device_t cstaStringConnectionIDDevice(const std::string & type);
 	const char * cstaLocalConnectionStateString(LocalConnectionState_t localState);
 	const char * cstaEventCauseString(CSTAEventCause_t cause);
 	Json::Value  cstaConnectionIDJson(ConnectionID_t connectionId);

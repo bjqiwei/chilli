@@ -229,7 +229,7 @@ namespace AvayaAPI {
 		return "";
 	}
 
-	const char * cstaDeviceTypeString(ConnectionID_Device_t type)
+	const char * cstaConnectionIDDeviceTypeString(ConnectionID_Device_t type)
 	{
 		switch (type)
 		{
@@ -237,6 +237,16 @@ namespace AvayaAPI {
 		case dynamicId: return "dynamicId";
 		default:return "";
 		}
+	}
+
+	ConnectionID_Device_t cstaStringConnectionIDDevice(const std::string & type)
+	{
+		if (type == "staticId")
+			return staticId;
+		else if (type == "dynamicId")
+			return dynamicId;
+		else
+			return staticId;
 	}
 
 	const char * cstaLocalConnectionStateString(LocalConnectionState_t localState)
@@ -637,7 +647,7 @@ Json::Value AvayaAPI::cstaConnectionIDJson(ConnectionID_t connectionId)
 
 	Json::Value connection;
 	connection["deviceID"] = deviceID;
-	connection["devIDType"] = cstaDeviceTypeString(devIDType);
+	connection["devIDType"] = cstaConnectionIDDeviceTypeString(devIDType);
 	connection["callID"] = callID;
 	return connection;
 }
