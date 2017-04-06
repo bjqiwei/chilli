@@ -221,7 +221,7 @@
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">_event.established.called;</called>
 						</send>
-						<transition target="incall"/>
+						<transition target="answer"/>
 					</event>
 					<event event="CONNECTION_CLEARED">
 						<send target="this" type="notify" dest="client" event="after">
@@ -241,13 +241,6 @@
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
-					<state id="incall">
-						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-							<send target="this" type="cmd" dest="this" event="ClearConnection">
-								<connection type="script">connection;</connection>
-							</send>
-						</event>
-					</state>
 				</state>
 				<state id="after">
 				</state>
@@ -273,11 +266,47 @@
 						</send>
 						<transition target="after"/>
 					</event>
-					<state id="answer">
-						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-							<send target="this" type="cmd" dest="this" event="ClearConnection">
+				</state>
+				<state id="answer">
+					<event event="CONNECTION_CLEARED">
+						<send target="this" type="notify" dest="client" event="after">
+							<type>after</type>
+							<callid type="script">_event.connectionCleared.connection.callID;</callid>
+							<called type="script">_agent.Extension;</called>
+						</send>
+						<transition target="after"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearConnection">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<event event="cmd" cond="_event.cmd=='mute'">
+						<send target="this" type="cmd" dest="this" event="HoldCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<event event="HoldCall" >
+						<send target="this" type="notify" dest="client" event="mute">
+							<type>mute</type>
+							<status type="script">_event.HoldCall.status;</status>
+							<reason type="script">_event.HoldCall.reason; </reason>
+						</send>
+						<transition  cond = "_event.HoldCall.status == 0" target="hold"/>
+					</event>
+					<state  id="hold">
+						<event event="cmd" cond="_event.cmd=='unmute'">
+							<send target="this" type="cmd" dest="this" event="RetrieveCall">
 								<connection type="script">connection;</connection>
 							</send>
+						</event>
+						<event event="RetrieveCall" >
+							<send target="this" type="notify" dest="client" event="unmute">
+								<type>unmute</type>
+								<status type="script">_event.RetrieveCall.status;</status>
+								<reason type="script">_event.RetrieveCall.reason; </reason>
+							</send>
+							<transition  cond = "_event.RetrieveCall.status == 0" target="answer"/>
 						</event>
 					</state>
 				</state>

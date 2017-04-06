@@ -389,6 +389,81 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 			}
 			bHandled = true;
 		}
+		else if (eventName == "HoldCall")
+		{
+			ConnectionID_t connection;
+
+			Json::Value jsonConnection = jsonEvent["param"]["connection"];
+			if (jsonConnection["callID"].isInt())
+				connection.callID = jsonConnection["callID"].asInt();
+
+			if (jsonConnection["devIDType"].isString())
+				connection.devIDType = AvayaAPI::cstaStringConnectionIDDevice(jsonEvent["devIDType"].asString());
+
+			if (jsonConnection["deviceID"].isString())
+				strcpy(connection.deviceID, jsonConnection["deviceID"].asCString());
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaHoldCall(m_model->m_lAcsHandle,
+				uInvodeId,
+				&connection,
+				false,
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaHoldCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "HoldCall";
+				event["HoldCall"]["status"] = nRetCode;
+				event["HoldCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "HoldCall";
+			}
+			bHandled = true;
+		}
+		else if (eventName == "RetrieveCall")
+		{
+			ConnectionID_t connection;
+
+			Json::Value jsonConnection = jsonEvent["param"]["connection"];
+			if (jsonConnection["callID"].isInt())
+				connection.callID = jsonConnection["callID"].asInt();
+
+			if (jsonConnection["devIDType"].isString())
+				connection.devIDType = AvayaAPI::cstaStringConnectionIDDevice(jsonEvent["devIDType"].asString());
+
+			if (jsonConnection["deviceID"].isString())
+				strcpy(connection.deviceID, jsonConnection["deviceID"].asCString());
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaRetrieveCall(m_model->m_lAcsHandle,
+				uInvodeId,
+				&connection,
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaRetrieveCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "RetrieveCall";
+				event["RetrieveCall"]["status"] = nRetCode;
+				event["RetrieveCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "RetrieveCall";
+			}
+			bHandled = true;
+		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");

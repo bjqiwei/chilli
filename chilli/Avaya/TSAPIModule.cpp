@@ -447,6 +447,16 @@ namespace chilli {
 														  break;
 						case CSTA_HOLD_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_HOLD_CALL_CONF");
+							
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
+							event[eventName]["holdCall"] = Json::nullValue;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 												  break;
 						case CSTA_MAKE_CALL_CONF: {
@@ -484,6 +494,15 @@ namespace chilli {
 													   break;
 						case CSTA_RETRIEVE_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_RETRIEVE_CALL_CONF");
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
+							event[eventName]["retrieveCall"] = Json::nullValue;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 													  break;
 						case CSTA_TRANSFER_CALL_CONF: {
@@ -756,6 +775,46 @@ namespace chilli {
 							this->PushEvent(evt);
 						}
 											  break;
+						case CSTA_HELD: {
+							LOG4CPLUS_DEBUG(log, "CSTA_HELD");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAHeldEvent_t held = cstaEvent.event.cstaUnsolicited.u.held;
+							const char * holdingDevice = held.holdingDevice.deviceID;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "HELD";
+							event["held"]["cause"] = AvayaAPI::cstaEventCauseString(held.cause);
+							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(held.localConnectionInfo);
+							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(held.heldConnection);
+							event["held"]["holdingDevice"] = holdingDevice;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+										break;
+						case CSTA_RETRIEVED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_RETRIEVED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTARetrievedEvent_t retrieved = cstaEvent.event.cstaUnsolicited.u.retrieved;
+							const char * retrievingDevice = retrieved.retrievingDevice.deviceID;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "RETRIEVED";
+							event["held"]["cause"] = AvayaAPI::cstaEventCauseString(retrieved.cause);
+							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
+							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
+							event["held"]["retrievingDevice"] = retrievingDevice;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+											 break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
