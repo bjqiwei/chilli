@@ -154,6 +154,18 @@
 					</send>
 					<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
 				</event>
+				<event event="DELIVERED" cond="_event.delivered.localConnect == 'Alerting'">
+					<send target="this" type="notify" dest="client" event="inringing">
+						<type>inringing</type>
+						<callid type="script">_event.delivered.connection.callID;</callid>
+						<timestamp type="script">Date.parse(new Date()); </timestamp>
+						<caller type="script">_event.delivered.calling; </caller>
+						<called type="script">_event.delivered.called;</called>
+						<nowgroupid type="script"> -1;</nowgroupid>
+					</send>
+					<script>connection = _event.delivered.connection;</script>
+					<transition  target="inringing"/>
+				</event>
 				<state id="NotReady">
 				</state>
 				<state id="Ready">
@@ -169,18 +181,6 @@
 							<type>agentbusy</type>
 						</send>
 						<transition  cond="_event.status==0" target="NotReady"/>
-					</event>
-					<event event="DELIVERED" cond="_event.delivered.localConnect == 'Alerting'">
-						<send target="this" type="notify" dest="client" event="inringing">
-							<type>inringing</type>
-							<callid type="script">_event.delivered.connection.callID;</callid>
-							<timestamp type="script">Date.parse(new Date()); </timestamp>
-							<caller type="script">_event.delivered.calling; </caller>
-							<called type="script">_event.delivered.called;</called>
-							<nowgroupid type="script"> -1;</nowgroupid>
-						</send>
-						<script>connection = _event.delivered.connection;</script>
-						<transition  target="inringing"/>
 					</event>
 				</state>
 				<state id="Null">
@@ -211,8 +211,15 @@
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
+					<event event="cmd" cond="_event.cmd=='answercall'">
+						<send target="this" type="cmd" dest="this" event="AnswerCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
 					<state id="incall">
-					
+						<send target="this" type="cmd" dest="this" event="ClearConnection">
+							<connection type="script">connection;</connection>
+						</send>
 					</state>
 				</state>
 				<state id="after">
