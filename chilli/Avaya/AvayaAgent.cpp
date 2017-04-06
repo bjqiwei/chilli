@@ -354,6 +354,41 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 			}
 			bHandled = true;
 		}
+		else if (eventName == "MakeCall")
+		{
+			DeviceID_t calling = "";
+			DeviceID_t called = "";
+
+			if (jsonEvent["param"]["calling"].isString())
+				strncpy(calling, jsonEvent["param"]["calling"].asCString(), sizeof(calling));
+			
+			if (jsonEvent["param"]["called"].isString())
+				strncpy(called, jsonEvent["param"]["called"].asCString(), sizeof(called));
+
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaMakeCall(m_model->m_lAcsHandle,
+				uInvodeId,
+				&calling,
+				&called,
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaMakeCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "MakeCall";
+				event["MakeCall"]["status"] = nRetCode;
+				event["MakeCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "MakeCall";
+			}
+			bHandled = true;
+		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");

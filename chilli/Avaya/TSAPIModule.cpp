@@ -451,9 +451,20 @@ namespace chilli {
 												  break;
 						case CSTA_MAKE_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_MAKE_CALL_CONF:");
-							ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.makeCall.newCall;
-							LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
-								<< "," << newCall.deviceID << "," << newCall.devIDType);
+							CSTAMakeCallConfEvent_t makeCall = cstaEvent.event.cstaConfirmation.u.makeCall;
+							ConnectionID_t newCall = makeCall.newCall;
+
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName] = Json::objectValue;
+							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
+							event[eventName]["status"] = 0;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						
 						}
 												  break;
 						case CSTA_MAKE_PREDICTIVE_CALL_CONF: {
@@ -543,6 +554,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName] = Json::objectValue;
 							event[eventName]["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
+							event[eventName]["status"] = 0;
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 						}
@@ -617,7 +629,8 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "MONITOR_ENDED";
-							event["MONITOR_ENDED"]["cause"] = cause;
+							event["monitorEnded"]["cause"] = AvayaAPI::cstaEventCauseString(cause);
+
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
 							this->m_monitorID2Extension.erase(monitorId);
@@ -703,6 +716,46 @@ namespace chilli {
 
 						}
 											   break;
+						case CSTA_SERVICE_INITIATED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_SERVICE_INITIATED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAServiceInitiatedEvent_t serviceInitiated = cstaEvent.event.cstaUnsolicited.u.serviceInitiated;
+							
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "SERVICE_INITIATED";
+							event["serviceInitiated"]["cause"] = AvayaAPI::cstaEventCauseString(serviceInitiated.cause);
+							event["serviceInitiated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(serviceInitiated.localConnectionInfo);
+							event["serviceInitiated"]["connection"] = AvayaAPI::cstaConnectionIDJson(serviceInitiated.initiatedConnection);
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+													 break;
+						case CSTA_ORIGINATED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_ORIGINATED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAOriginatedEvent_t originated = cstaEvent.event.cstaUnsolicited.u.originated;
+							const char * calling = originated.callingDevice.deviceID;
+							const char * called = originated.calledDevice.deviceID;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "ORIGINATED";
+							event["originated"]["cause"] = AvayaAPI::cstaEventCauseString(originated.cause);
+							event["originated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(originated.localConnectionInfo);
+							event["originated"]["connection"] = AvayaAPI::cstaConnectionIDJson(originated.originatedConnection);
+							event["originated"]["calling"] = calling;
+							event["originated"]["called"] = called;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+											  break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
