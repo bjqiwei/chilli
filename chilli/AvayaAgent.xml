@@ -151,15 +151,16 @@
 						</send>
 						<transition  cond="_event.status==0" target="NotReady"/>
 					</event>
-					<event event="DELIVERED" cond="_event.DELIVERED.localConnect == 'Alerting'">
-						<send target="this" type="notify" dest="client" event="agentbusy">
+					<event event="DELIVERED" cond="_event.delivered.localConnect == 'Alerting'">
+						<send target="this" type="notify" dest="client" event="inringing">
 							<type>inringing</type>
-							<callid type="script">_event.DELIVERED.connection.callID;</callid>
+							<callid type="script">_event.delivered.connection.callID;</callid>
 							<timestamp type="script">Date.parse(new Date()); </timestamp>
-							<caller type="script">_event.DELIVERED.calling; </caller>
-							<called type="script">_event.DELIVERED.called;</called>
+							<caller type="script">_event.delivered.calling; </caller>
+							<called type="script">_event.delivered.called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
 						</send>
+						<transition  target="inringing"/>
 					</event>
 				</state>
 				<state id="Null">
@@ -167,6 +168,28 @@
 				<state id="WorkNotReady">
 				</state>
 				<state id="WorkReady">
+				</state>
+				<state id="inringing">
+					<event event="ESTABLISHED">
+						<send target="this" type="notify" dest="client" event="incall">
+							<type>incall</type>
+							<callid type="script">_event.established.connection.callID;</callid>
+							<called type="script">_event.established.called;</called>
+						</send>
+						<transition target="incall"/>
+					</event>
+				</state>
+				<state id="incall">
+					<event event="CONNECTION_CLEARED">
+						<send target="this" type="notify" dest="client" event="after">
+							<type>after</type>
+							<callid type="script">_event.connectionCleared.connection.callID;</callid>
+							<called type="script">_agent.Extension;</called>
+						</send>
+						<transition target="after"/>
+					</event>
+				</state>
+				<state id="after">
 				</state>
 			</state>
 		</state>

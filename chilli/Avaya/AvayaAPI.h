@@ -3,6 +3,7 @@
 #include <csta.h>
 #include <attpriv.h>
 #include <cstdint>
+#include <json/json.h>
 
 #if defined ( TSLIB_WINDOWS_32 )
 #define TSAPIPROC           RetCode_t (pascal *
@@ -883,6 +884,10 @@ namespace AvayaAPI{
 	const char * cstaAPICapsString(uint32_t api);
 	const char * cstaDeviceTypeString(ConnectionID_Device_t type);
 	const char * cstaLocalConnectionStateString(LocalConnectionState_t localState);
+	const char * cstaEventCauseString(CSTAEventCause_t cause);
+	Json::Value  cstaConnectionIDJson(ConnectionID_t connectionId);
+	const char * cstaDeviceIDStatusString(DeviceIDStatus_t deviceIDStatus);
+	const char * cstaDeviceIDTypeString(DeviceIDType_t deviceIDType);
 	bool InitAvayaAPI();
 	bool UnInitAvayaAPI();
 }

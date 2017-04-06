@@ -37,10 +37,25 @@
 				<event type="script">_event._name;</event>
 				<extension type="script">agentId;</extension>
 				<monitorId type="script">_event.monitorId;</monitorId>
-				<DELIVERED type="script">_event.DELIVERED;</DELIVERED>
+				<delivered type="script">_event.delivered;</delivered>
 			</send>
 		</event>
-		
+		<event event ="ESTABLISHED">
+			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">agentId;</extension>
+				<monitorId type="script">_event.monitorId;</monitorId>
+				<established type="script">_event.established;</established>
+			</send>
+		</event>
+		<event event ="CONNECTION_CLEARED" cond="_event.connectionCleared.localConnect == 'Null'">
+			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">agentId;</extension>
+				<monitorId type="script">_event.monitorId;</monitorId>
+				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
+			</send>
+		</event>
 		<!--event event="timer">
 			<log level="debug" type="script">_event.id;</log>
 			<send target="this" type="cmd" dest="this" event="MonitorStop">

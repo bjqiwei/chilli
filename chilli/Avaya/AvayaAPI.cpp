@@ -133,18 +133,12 @@ namespace AvayaAPI {
 	{
 		switch (agentState)
 		{
-		case AgentState_t::agNotReady:
-			return "NotReady";
-		case AgentState_t::agNull:
-			return "Null";
-		case AgentState_t::agReady:
-			return "Ready";
-		case AgentState_t::agWorkNotReady:
-			return "WorkNotReady";
-		case AgentState_t::agWorkReady:
-			return "WorkReady";
-		default:
-			return "";
+		case AgentState_t::agNotReady: return "NotReady";
+		case AgentState_t::agNull: return "Null";
+		case AgentState_t::agReady: return "Ready";
+		case AgentState_t::agWorkNotReady: return "WorkNotReady";
+		case AgentState_t::agWorkReady: return "WorkReady";
+		default: return "";
 		}
 	}
 
@@ -239,15 +233,9 @@ namespace AvayaAPI {
 	{
 		switch (type)
 		{
-		case staticId: 
-			return "staticId";
-			break;
-		case dynamicId:
-			return "dynamicId";
-			break;
-		default:
-			return "";
-			break;
+		case staticId: return "staticId";
+		case dynamicId: return "dynamicId";
+		default:return "";
 		}
 	}
 
@@ -267,6 +255,115 @@ namespace AvayaAPI {
 		}
 		
 	}
+
+	const char * cstaEventCauseString(CSTAEventCause_t cause)
+	{
+		switch (cause)
+		{
+		case ecNone: return "None";
+		case ecActiveMonitor: return "ActiveMonitor";
+		case ecAlternate:return "Alternate";
+		case ecBusy: return "Busy";
+		case ecCallBack: return "CallBack";
+		case ecCallCancelled: return "CallCancelled";
+		case ecCallForwardAlways: return "CallForwardAlways";
+		case ecCallForwardBusy: return "CallForwardBusy";
+		case ecCallForwardNoAnswer: return "CallForwardNoAnswer";
+		case ecCallForward: return "CallForward";
+		case ecCallNotAnswered: return "CallNotAnswered";
+		case ecCallPickup: return "CallPickup";
+		case ecCampOn: return "CampOn";
+		case ecDestNotObtainable: return "DestNotObtainable";
+		case ecDoNotDisturb: return "DoNotDisturb";
+		case ecIncompatibleDestination: return "IncompatibleDestination";
+		case ecInvalidAccountCode: return "InvalidAccountCode";
+		case ecKeyConference: return "KeyConference";
+		case ecLockout: return "Lockout";
+		case ecMaintenance: return "Maintenance";
+		case ecNetworkCongestion: return "NetworkCongestion";
+		case ecNetworkNotObtainable: return "NetworkNotObtainable";
+		case ecNewCall: return "NewCall";
+		case ecNoAvailableAgents: return "NoAvailableAgents";
+		case ecOverride: return "Override";
+		case ecPark: return "Park";
+		case ecOverflow: return "Overflow";
+		case ecRecall: return "Recall";
+		case ecRedirected: return "Redirected";
+		case ecReorderTone: return "ReorderTone";
+		case ecResourcesNotAvailable: return "ResourcesNotAvailable";
+		case ecSilentMonitor: return "SilentMonitor";
+		case ecTransfer: return "Transfer";
+		case ecTrunksBusy: return "TrunksBusy";
+		case ecVoiceUnitInitiator: return "VoiceUnitInitiator";
+		case ecNetworkSignal: return "NetworkSignal";
+		case ecSingleStepTransfer: return "SingleStepTransfer";
+		case ecAlertTimeExpired: return "AlertTimeExpired";
+		case ecDestOutOfOrder: return "DestOutOfOrder";
+		case ecNotSupportedBearerService: return "NotSupportedBearerService";
+		case ecUnassignedNumber: return "UnassignedNumber";
+		case ecIncompatibleBearerService: return "IncompatibleBearerService";
+		default: return "";
+		}
+	}
+
+	const char * cstaDeviceIDStatusString(DeviceIDStatus_t deviceIDStatus)
+	{
+		switch (deviceIDStatus)
+		{
+		case idProvided: return "Provided";
+		case idNotKnown: return "NotKnown";
+		case idNotRequired: return "NotRequired";
+		default: return "";
+		}
+	}
+
+	const char * cstaDeviceIDTypeString(DeviceIDType_t deviceIDType)
+	{
+		switch (deviceIDType)
+		{
+		case deviceIdentifier: return "deviceIdentifier";
+			break;
+		case implicitPublic: return "implicitPublic";
+			break;
+		case explicitPublicUnknown: return "explicitPublicUnknown";
+			break;
+		case explicitPublicInternational: return "explicitPublicInternational";
+			break;
+		case explicitPublicNational: return "explicitPublicNational";
+			break;
+		case explicitPublicNetworkSpecific: return "explicitPublicNetworkSpecific";
+			break;
+		case explicitPublicSubscriber: return "explicitPublicSubscriber";
+			break;
+		case explicitPublicAbbreviated: return "explicitPublicAbbreviated";
+			break;
+		case implicitPrivate: return "implicitPrivate";
+			break;
+		case explicitPrivateUnknown: return "explicitPrivateUnknown";
+			break;
+		case explicitPrivateLevel3RegionalNumber: return "explicitPrivateLevel3RegionalNumber";
+			break;
+		case explicitPrivateLevel2RegionalNumber: return "explicitPrivateLevel2RegionalNumber";
+			break;
+		case explicitPrivateLevel1RegionalNumber: return "explicitPrivateLevel1RegionalNumber";
+			break;
+		case explicitPrivatePtnSpecificNumber: return "explicitPrivatePtnSpecificNumber";
+			break;
+		case explicitPrivateLocalNumber: return "explicitPrivateLocalNumber";
+			break;
+		case explicitPrivateAbbreviated: return "explicitPrivateAbbreviated";
+			break;
+		case otherPlan: return "otherPlan";
+			break;
+		case trunkIdentifier: return "trunkIdentifier";
+			break;
+		case trunkGroupIdentifier: return "trunkGroupIdentifier";
+			break;
+		default: return "";
+			break;
+		}
+	}
+
 
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
@@ -530,4 +627,17 @@ namespace AvayaAPI {
 		
 		return true;
 	}
+}
+
+Json::Value AvayaAPI::cstaConnectionIDJson(ConnectionID_t connectionId)
+{
+	const char * deviceID = connectionId.deviceID;
+	ConnectionID_Device_t devIDType = connectionId.devIDType;
+	int32_t callID = connectionId.callID;
+
+	Json::Value connection;
+	connection["deviceID"] = deviceID;
+	connection["devIDType"] = cstaDeviceTypeString(devIDType);
+	connection["callID"] = callID;
+	return connection;
 }
