@@ -9,6 +9,7 @@
 </scriptmodel>
 	<state id="init">
 		<onentry>
+			<script>agentId = '';</script>
 		</onentry>
 		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
 			<send target="this" type="cmd" dest="this" event="MonitorDevice">
@@ -19,49 +20,117 @@
 			<script>monitorId=_event.monitorId;</script>
 			<!--timer idexpr="_extension.Extension" interval="10000"/-->
 		</event>
-		<event event="AgentLogin" cond="agentId == ''">
-			<script>agentId = _event.AgentLogin.agentId;</script>
+		<event event="AgentLogin" cond="_event.AgentLogin.agentId != ''">
+			<transition target="agentLogged"/>	
 		</event>
-		<event event="AgentLogin">
-			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">_event.agentId;</extension>
-				<AgentLogin type="script">_event.AgentLogin.status = 1; _event.AgentLogin;</AgentLogin>
-			</send>
+		<event event="SERVICE_INITIATED">
 		</event>
-		<event event="AgentLogout" cond="agentId == _event.AgentLogout.agentId">
-			<script>agentId = '';</script>
+		<event event="ORIGINATED">
 		</event>
-		<event event ="DELIVERED">
-			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
-				<delivered type="script">_event.delivered;</delivered>
-			</send>
-		</event>
-		<event event ="ESTABLISHED">
-			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
-				<established type="script">_event.established;</established>
-			</send>
-		</event>
-		<event event ="CONNECTION_CLEARED" cond="_event.connectionCleared.localConnect == 'Null'">
-			<send cond ="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
-				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
-			</send>
-		</event>
-		<!--event event="timer">
-			<log level="debug" type="script">_event.id;</log>
-			<send target="this" type="cmd" dest="this" event="MonitorStop">
-				<monitorId type="script">monitorId</monitorId>
-			</send>
-		</event-->
+		<state id="agentLogged">
+			<onentry>
+				<script>agentId = _event.AgentLogin.agentId;</script>
+			</onentry>
+			<event event="AgentLogin">
+				<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+					<event type="script">_event._name;</event>
+					<extension type="script">_event.agentId;</extension>
+					<AgentLogin type="script">_event.AgentLogin.status = 1; _event.AgentLogin;</AgentLogin>
+				</send>
+			</event>
+			<event event="AgentLogout" cond="agentId == _event.AgentLogout.agentId">
+				<transition target="init"/>	
+			</event>
+			<event event="FAILED">
+				<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+					<event type="script">_event._name;</event>
+					<extension type="script">agentId;</extension>
+					<monitorId type="script">_event.monitorId;</monitorId>
+					<failed type="script">_event.failed;</failed>
+				</send>
+			</event>
+			<event event="ORIGINATED">
+				<transition target="makecalling"/>
+			</event>
+			<event event ="DELIVERED">
+				<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+					<event type="script">_event._name;</event>
+					<extension type="script">agentId;</extension>
+					<monitorId type="script">_event.monitorId;</monitorId>
+					<delivered type="script">_event.delivered;</delivered>
+				</send>
+				<transition target="alerting"/>
+			</event>
+			<!--event event="timer">
+				<log level="debug" type="script">_event.id;</log>
+				<send target="this" type="cmd" dest="this" event="MonitorStop">
+					<monitorId type="script">monitorId</monitorId>
+				</send>
+			</event-->
+			<state id ="makecalling">
+				<event event ="CONNECTION_CLEARED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
+					</send>
+				</event>
+				<event event ="DELIVERED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<delivered type="script">_event.delivered;</delivered>
+					</send>
+					<transition target="delivered"/>
+				</event>
+				<state id="delivered">
+					<event event ="ESTABLISHED">
+						<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+							<event type="script">_event._name;</event>
+							<extension type="script">agentId;</extension>
+							<monitorId type="script">_event.monitorId;</monitorId>
+							<established type="script">_event.established;</established>
+						</send>
+						<transition target="answered"/>
+					</event>
+				</state>
+			</state>
+			<state id="answered">
+				<event event ="CONNECTION_CLEARED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
+					</send>
+					<transition target="acw"/>
+				</event>
+				<event event="HELD">
+					<transition target="held"/>
+				</event>
+				<state id="held">
+					<event event="RETRIEVED">
+						<transition target="answer"/>
+					</event>
+				</state>
+			</state>
+			<state id="acw">
+			</state>
+			<state id="alerting">
+				<event event ="ESTABLISHED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<established type="script">_event.established;</established>
+					</send>
+					<transition target="answered"/>
+				</event>
+			</state>
+		</state>
+		
     </state>
 </fsm>
 

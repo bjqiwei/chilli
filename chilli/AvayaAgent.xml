@@ -91,7 +91,7 @@
 			<state id="logined">
 				<onentry>
 					<send target="this" type="response" dest="client" event="logon">
-						<status>0</status>
+						<status type="script">0</status>
 						<type>logon</type>
 					</send>
 					<send target="this" type="cmd" dest="this" event="AgentGetState">
@@ -155,7 +155,7 @@
 					</send>
 					<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
 				</event>
-				<event event="DELIVERED" cond="_event.delivered.localConnect == 'Alerting'">
+				<event event="DELIVERED">
 					<send target="this" type="notify" dest="client" event="inringing">
 						<type>inringing</type>
 						<callid type="script">_event.delivered.connection.callID;</callid>
@@ -164,20 +164,7 @@
 						<called type="script">_event.delivered.called;</called>
 						<nowgroupid type="script"> -1;</nowgroupid>
 					</send>
-					<script>connection = _event.delivered.connection;</script>
 					<transition  target="inringing"/>
-				</event>
-				<event event="DELIVERED" cond="_event.delivered.localConnect == 'Connect'">
-					<send target="this" type="notify" dest="client" event="calledringing">
-						<type>calledringing</type>
-						<callid type="script">_event.delivered.connection.callID;</callid>
-						<timestamp type="script">Date.parse(new Date()); </timestamp>
-						<caller type="script">_event.delivered.calling; </caller>
-						<called type="script">_event.delivered.called;</called>
-						<nowgroupid type="script"> -1;</nowgroupid>
-					</send>
-					<script>connection = _event.delivered.connection;</script>
-					<transition  target="calledringing"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='makecall'">
 					<send target="this" type="cmd" dest="this" event="MakeCall">
@@ -191,6 +178,8 @@
 						<type>makecall</type>
 						<reason type="script">_event.MakeCall.reason;</reason>
 					</send>
+					<transition cond="_event.MakeCall.status==0" target="makecalling"/>
+					<transition target="after"/>
 				</event>
 				<state id="NotReady">
 				</state>
@@ -215,7 +204,50 @@
 				</state>
 				<state id="WorkReady">
 				</state>
+				<state id="makecalling">
+					<onentry>
+						<script>connection = _event.MakeCall.newCall;</script>
+					</onentry>
+					<event event="DELIVERED">
+						<send target="this" type="notify" dest="client" event="calledringing">
+							<type>calledringing</type>
+							<callid type="script">_event.delivered.connection.callID;</callid>
+							<timestamp type="script">Date.parse(new Date()); </timestamp>
+							<caller type="script">_event.delivered.calling; </caller>
+							<called type="script">_event.delivered.called;</called>
+							<nowgroupid type="script"> -1;</nowgroupid>
+						</send>
+						<script>connection = _event.delivered.connection;</script>
+						<transition  target="calledringing"/>
+					</event>
+					<event event="CONNECTION_CLEARED">
+						<transition target="after"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<state id ="calledringing">
+						<event event="ESTABLISHED">
+							<send target="this" type="notify" dest="client" event="answer">
+								<type>answer</type>
+								<callid type="script">_event.established.connection.callID;</callid>
+								<called type="script">_event.established.called;</called>
+							</send>
+							<transition target="answer"/>
+						</event>
+						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+						</event>
+					</state>
+				</state>
 				<state id="inringing">
+					<onentry>
+						<script>connection = _event.delivered.connection;</script>
+					</onentry>
 					<event event="ESTABLISHED">
 						<send target="this" type="notify" dest="client" event="incall">
 							<type>incall</type>
@@ -225,11 +257,6 @@
 						<transition target="answer"/>
 					</event>
 					<event event="CONNECTION_CLEARED">
-						<send target="this" type="notify" dest="client" event="after">
-							<type>after</type>
-							<callid type="script">_event.connectionCleared.connection.callID;</callid>
-							<called type="script">_agent.Extension;</called>
-						</send>
 						<transition target="after"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
@@ -244,37 +271,16 @@
 					</event>
 				</state>
 				<state id="after">
-				</state>
-				<state id ="calledringing">
-					<event event="ESTABLISHED">
-						<send target="this" type="notify" dest="client" event="answer">
-							<type>answer</type>
-							<callid type="script">_event.established.connection.callID;</callid>
-							<called type="script">_event.established.called;</called>
-						</send>
-						<transition target="answer"/>
-					</event>
-					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-						<send target="this" type="cmd" dest="this" event="ClearCall">
-							<connection type="script">connection;</connection>
-						</send>
-					</event>
-					<event event="CONNECTION_CLEARED">
+					<onentry>
 						<send target="this" type="notify" dest="client" event="after">
 							<type>after</type>
 							<callid type="script">_event.connectionCleared.connection.callID;</callid>
 							<called type="script">_agent.Extension;</called>
 						</send>
-						<transition target="after"/>
-					</event>
+					</onentry>
 				</state>
 				<state id="answer">
-					<event event="CONNECTION_CLEARED">
-						<send target="this" type="notify" dest="client" event="after">
-							<type>after</type>
-							<callid type="script">_event.connectionCleared.connection.callID;</callid>
-							<called type="script">_agent.Extension;</called>
-						</send>
+					<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == connection.callID">
 						<transition target="after"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
@@ -307,9 +313,9 @@
 							<status type="script">_event.ConsultationCall.status;</status>
 							<reason type="script">_event.ConsultationCall.reason; </reason>
 						</send>
-						<transition  cond = "_event.ConsultationCall.status == 0" target="consultation"/>
+						<transition  cond = "_event.ConsultationCall.status == 0" target="consultationing"/>
 					</event>
-					<state id="consultation">
+					<state id="consultationing">
 						<onentry>
 							<script>
 								consultationNewCall = _event.ConsultationCall.newCall;
@@ -328,6 +334,20 @@
 								<reason type="script">_event.ReconnectCall.reason; </reason>
 							</send>
 							<transition cond="_event.ReconnectCall.status==0" target="answer"/>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == consultationNewCall.callID">
+							<send target="this" type="notify" dest="client" event="agentconsultback">
+								<type>agentconsultback</type>
+								<status type="script">0;</status>
+							</send>
+							<transition target="answer"/>
+						</event>
+						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+						</event>
+						<event event="DELIVERED" cond="_event.delivered.localConnect == 'Connect'">
 						</event>
 					</state>
 					<state  id="hold">
