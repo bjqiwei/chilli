@@ -107,12 +107,39 @@
 					</send>
 					<transition target="acw"/>
 				</event>
+				<event event="ORIGINATED">
+				</event>
+				<event event ="DELIVERED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<delivered type="script">_event.delivered;</delivered>
+					</send>
+				</event>
+				<event event ="TRANSFERRED">
+					<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<delivered type="script">_event.transferred;</delivered>
+					</send>
+					<transition target="agentLogged"/>
+				</event>
 				<event event="HELD">
 					<transition target="held"/>
 				</event>
 				<state id="held">
 					<event event="RETRIEVED">
 						<transition target="answer"/>
+					</event>
+					<event event="FAILED">
+						<send target="this" type="notify" dest="agent" eventexpr="_event._name">
+							<event type="script">_event._name;</event>
+							<extension type="script">agentId;</extension>
+							<monitorId type="script">_event.monitorId;</monitorId>
+							<failed type="script">_event.failed;</failed>
+						</send>
 					</event>
 				</state>
 			</state>

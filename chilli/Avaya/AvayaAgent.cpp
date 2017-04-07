@@ -555,6 +555,56 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 			}
 			bHandled = true;
 		}
+		else if (eventName == "TransferCall")
+		{
+			ConnectionID_t heldCall;
+			ConnectionID_t activeCall;
+
+			Json::Value jsonheldCall = jsonEvent["param"]["heldCall"];
+			Json::Value jsonactiveCall = jsonEvent["param"]["activeCall"];
+
+			if (jsonheldCall["callID"].isInt())
+				heldCall.callID = jsonheldCall["callID"].asInt();
+
+			if (jsonheldCall["devIDType"].isString())
+				heldCall.devIDType = AvayaAPI::cstaStringConnectionIDDevice(jsonheldCall["devIDType"].asString());
+
+			if (jsonheldCall["deviceID"].isString())
+				strncpy(heldCall.deviceID, jsonheldCall["deviceID"].asCString(), sizeof(DeviceID_t));
+
+
+			if (jsonactiveCall["callID"].isInt())
+				activeCall.callID = jsonactiveCall["callID"].asInt();
+
+			if (jsonactiveCall["devIDType"].isString())
+				activeCall.devIDType = AvayaAPI::cstaStringConnectionIDDevice(jsonactiveCall["devIDType"].asString());
+
+			if (jsonactiveCall["deviceID"].isString())
+				strncpy(activeCall.deviceID, jsonactiveCall["deviceID"].asCString(), sizeof(DeviceID_t));
+
+			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
+			RetCode_t nRetCode = AvayaAPI::cstaTransferCall(m_model->m_lAcsHandle,
+				uInvodeId,
+				&heldCall,
+				&activeCall,
+				NULL);
+
+			if (nRetCode != ACSPOSITIVE_ACK) {
+				LOG4CPLUS_ERROR(log, "cstaTransferCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				Json::Value event;
+				event["extension"] = this->m_ExtNumber;
+				event["event"] = "TransferCall";
+				event["TransferCall"]["status"] = nRetCode;
+				event["TransferCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+				model::EventType_t evt(event.toStyledString());
+				m_model->PushEvent(evt);
+			}
+			else {
+				m_model->m_InvokeID2Extension[uInvodeId] = this->m_ExtNumber;
+				m_model->m_InvokeID2Event[uInvodeId] = "TransferCall";
+			}
+			bHandled = true;
+		}
 	}
 	else {
 		LOG4CPLUS_ERROR(log, strContent << " not json data.");

@@ -526,15 +526,22 @@ namespace chilli {
 													  break;
 						case CSTA_TRANSFER_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_TRANSFER_CALL_CONF");
-							ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.transferCall.newCall;
-							LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
-								<< "," << newCall.deviceID << "," << newCall.devIDType);
-							ConnectionList_t connList = cstaEvent.event.cstaConfirmation.u.transferCall.connList;
-							for (int i = 0; i < connList.count; i++) {
-								ConnectionID_t party = connList.connection[i].party;
-								LOG4CPLUS_DEBUG(log, "party[" << i << "]:" << party.callID
-									<< "," << party.deviceID << "," << party.devIDType);
+
+							CSTATransferCallConfEvent_t transferCall = cstaEvent.event.cstaConfirmation.u.transferCall;
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(transferCall.newCall);
+							for (int i = 0; i < transferCall.connList.count; i++)
+							{
+								event[eventName]["connList"].append(
+									AvayaAPI::cstaConnectionIDJson(
+										transferCall.connList.connection[i].party));
 							}
+						
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 													  break;
 						case CSTA_SET_MWI_CONF: {
@@ -883,6 +890,30 @@ namespace chilli {
 							this->PushEvent(evt);
 						}
 										  break;
+						case CSTA_TRANSFERRED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_TRANSFERRED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTATransferredEvent_t transferred = cstaEvent.event.cstaUnsolicited.u.transferred;
+				
+							const char * transferring = transferred.transferringDevice.deviceID;
+							const char * ctransferred = transferred.transferredDevice.deviceID;
+
+
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "TRANSFERRED";
+							event["transferred"]["cause"] = AvayaAPI::cstaEventCauseString(transferred.cause);
+							event["transferred"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(transferred.localConnectionInfo);
+							event["transferred"]["transferring"] = transferring;
+							event["transferred"]["transferred"] = ctransferred;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+											   break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
