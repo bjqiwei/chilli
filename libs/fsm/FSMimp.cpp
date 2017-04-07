@@ -350,7 +350,7 @@ bool fsm::StateMachineimp::processTransition(const xmlNodePtr &actionNode)const
 	}
 	else
 	{
-		LOG4CPLUS_ERROR(log, m_strSessionID << ","<<m_strStateFile<<" file,not find the target:" << transition.getTarget() << " state");
+		LOG4CPLUS_ERROR(log, m_strSessionID << ","<<m_strStateFile<<" file,not find the target:" << transition.getTarget() << " state, line:" << actionNode->line);
 	}
 	return true;
 }
