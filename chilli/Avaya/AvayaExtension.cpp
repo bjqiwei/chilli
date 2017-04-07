@@ -19,7 +19,7 @@ namespace Avaya {
 
 	void AvayaExtension::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, " recive a Send event from stateMachine:" << strContent);
+		//LOG4CPLUS_TRACE(log, " recive a Send event from stateMachine:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 		if (!bHandled) {

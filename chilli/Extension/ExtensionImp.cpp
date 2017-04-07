@@ -61,8 +61,7 @@ namespace chilli {
 				if (jsonData["type"].asString() == "notify")
 				{
 					std::string dest = jsonData["dest"].asString();
-					Json::FastWriter writer;
-					std::string sendData = writer.write(jsonData["param"]);
+					std::string sendData = jsonData["param"].toStyledString();
 					this->m_model->PushEvent(sendData);
 				}
 			}

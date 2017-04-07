@@ -99,8 +99,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				bHandled = true;
 			}
 			else {
-				Json::FastWriter writer;
-				std::string sendData = writer.write(jsonData["param"]);
+				std::string sendData = jsonData["param"].toStyledString();
 				this->m_model->PushEvent(sendData);
 			}
 		}
