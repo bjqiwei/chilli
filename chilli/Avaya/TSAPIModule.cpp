@@ -842,7 +842,6 @@ namespace chilli {
 							const char * calling = queued.callingDevice.deviceID;
 							const char * called = queued.calledDevice.deviceID;
 							const char * queue = queued.queue.deviceID;
-							queued.queuedConnection;
 
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
@@ -855,6 +854,30 @@ namespace chilli {
 							event["queued"]["called"] = called;
 							event["queued"]["queue"] = queue;
 							event["queued"]["numberQueued"] = queued.numberQueued;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+										  break;
+						case CSTA_FAILED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_FAILED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAFailedEvent_t failed = cstaEvent.event.cstaUnsolicited.u.failed;
+							const char * failing = failed.failingDevice.deviceID;
+							const char * called = failed.calledDevice.deviceID;
+						
+	
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "FAILED";
+							event["failed"]["cause"] = AvayaAPI::cstaEventCauseString(failed.cause);
+							event["failed"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(failed.localConnectionInfo);
+							event["failed"]["connection"] = AvayaAPI::cstaConnectionIDJson(failed.failedConnection);
+							event["failed"]["failing"] = failing;
+							event["failed"]["called"] = called;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);

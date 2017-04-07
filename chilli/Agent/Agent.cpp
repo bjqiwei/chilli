@@ -71,7 +71,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				model::ConnectAdapter::Send(m_curConnectId, sendData.c_str(), sendData.length());
 
 				if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "logon") {
-					if (jsonData["param"]["status"].isString() && jsonData["param"]["status"].asString() == "0")
+					if (jsonData["param"]["status"].isInt() && jsonData["param"]["status"].asInt() == 0)
 					{
 						//登陆成功
 						model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
