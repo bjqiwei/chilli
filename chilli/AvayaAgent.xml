@@ -2,6 +2,7 @@
 <fsm name="avayaAgent" initial="init">
 <datamodel>
 	<data id="connection"/>
+	<data id="consultationNewCall"/>
 </datamodel>
 	<state id="init">
 		<onentry>
@@ -294,6 +295,41 @@
 						</send>
 						<transition  cond = "_event.HoldCall.status == 0" target="hold"/>
 					</event>
+					<event event="cmd" cond="_event.cmd=='agentconsult'">
+						<send target="this" type="cmd" dest="this" event="ConsultationCall">
+							<connection type="script">connection;</connection>
+							<called type="script">_event.num;</called>
+						</send>
+					</event>
+					<event event="ConsultationCall" >
+						<send target="this" type="notify" dest="client" event="agentconsult">
+							<type>agentconsult</type>
+							<status type="script">_event.ConsultationCall.status;</status>
+							<reason type="script">_event.ConsultationCall.reason; </reason>
+						</send>
+						<transition  cond = "_event.ConsultationCall.status == 0" target="consultation"/>
+					</event>
+					<state id="consultation">
+						<onentry>
+							<script>
+								consultationNewCall = _event.ConsultationCall.newCall;
+							</script>
+						</onentry>
+						<event event="cmd" cond="_event.cmd=='agentconsultback'">
+							<send target="this" type="cmd" dest="this" event="ReconnectCall">
+								<activeCall type="script">consultationNewCall;</activeCall>
+								<heldCall type="script">connection;</heldCall>
+							</send>
+						</event>
+						<event event="ReconnectCall">
+							<send target="this" type="notify" dest="client" event="agentconsultback">
+								<type>agentconsultback</type>
+								<status type="script">_event.ReconnectCall.status;</status>
+								<reason type="script">_event.ReconnectCall.reason; </reason>
+							</send>
+							<transition cond="_event.ReconnectCall.status==0" target="answer"/>
+						</event>
+					</state>
 					<state  id="hold">
 						<event event="cmd" cond="_event.cmd=='unmute'">
 							<send target="this" type="cmd" dest="this" event="RetrieveCall">

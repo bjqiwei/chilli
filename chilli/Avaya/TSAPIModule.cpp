@@ -432,9 +432,19 @@ namespace chilli {
 														break;
 						case CSTA_CONSULTATION_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_CONSULTATION_CALL_CONF:");
-							ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.consultationCall.newCall;
-							LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
-								<< "," << newCall.deviceID << "," << newCall.devIDType);
+							CSTAConsultationCallConfEvent_t consultationCall = cstaEvent.event.cstaConfirmation.u.consultationCall;
+							ConnectionID_t newCall = consultationCall.newCall;
+
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName] = Json::objectValue;
+							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
+							event[eventName]["status"] = 0;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 														  break;
 						case CSTA_DEFLECT_CALL_CONF: {
@@ -490,6 +500,15 @@ namespace chilli {
 													break;
 						case CSTA_RECONNECT_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_RECONNECT_CALL_CONF");
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
+							event[eventName]["reconnectCall"] = Json::nullValue;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 													   break;
 						case CSTA_RETRIEVE_CALL_CONF: {
@@ -815,6 +834,32 @@ namespace chilli {
 							this->PushEvent(evt);
 						}
 											 break;
+						case CSTA_QUEUED: {
+							LOG4CPLUS_DEBUG(log, "CSTA_QUEUED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAQueuedEvent_t queued = cstaEvent.event.cstaUnsolicited.u.queued;
+							const char * calling = queued.callingDevice.deviceID;
+							const char * called = queued.calledDevice.deviceID;
+							const char * queue = queued.queue.deviceID;
+							queued.queuedConnection;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "QUEUED";
+							event["queued"]["cause"] = AvayaAPI::cstaEventCauseString(queued.cause);
+							event["queued"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(queued.localConnectionInfo);
+							event["queued"]["connection"] = AvayaAPI::cstaConnectionIDJson(queued.queuedConnection);
+							event["queued"]["calling"] = calling;
+							event["queued"]["called"] = called;
+							event["queued"]["queue"] = queue;
+							event["queued"]["numberQueued"] = queued.numberQueued;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+										  break;
 						default: {
 							LOG4CPLUS_WARN(log, "Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
