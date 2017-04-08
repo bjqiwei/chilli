@@ -114,8 +114,7 @@ lwsclose:
 		case LWS_CALLBACK_SERVER_WRITEABLE: {
 			//LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_SERVER_WRITEABLE");
 		ws_write:
-			auto & it = WSClientSet.find(wsi);
-			if (it != WSClientSet.end() && wsclient) {
+			if ( wsclient && wsclient->m_state != CLOSING) {
 				wsclient->OnSend();
 				int bufLen = wsclient->m_sendBuf.size() - LWS_PRE;
 				if (bufLen > 0)
@@ -404,6 +403,8 @@ lwsclose:
 		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end())
 			Close();
+
+		WSClientSet.erase(this->wsi);
 		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
@@ -455,7 +456,7 @@ lwsclose:
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
 		{
 			this->m_state = CLOSING;
-			WSClientSet.erase(this->wsi);
+			//WSClientSet.erase(this->wsi);
 			lws_callback_on_writable(wsi);
 			lws_cancel_service(m_Context);
 		}
