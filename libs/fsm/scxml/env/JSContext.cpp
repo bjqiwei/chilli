@@ -84,8 +84,8 @@ namespace env
 		}
 
 
-		std::string out = value.toStyledString();
-		helper::string::trim(out);
+		//std::string out = value.toStyledString();
+		//helper::string::trim(out);
 		//LOG4CPLUS_TRACE(log, m_strSessionID << ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
 
 		if (!JS_DefineProperty(m_jsctx, obj, _name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
