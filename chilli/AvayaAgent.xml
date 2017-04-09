@@ -4,6 +4,9 @@
 	<data id="connection"/>
 	<data id="consultationNewCall"/>
 </datamodel>
+<scriptmodel>
+	<script src="./cmpObject.js" />
+</scriptmodel>
 	<state id="init">
 		<onentry>
 			<send target="this" type="notify" dest="extension" event="AgentLogout">
@@ -164,7 +167,7 @@
 						<called type="script">_event.delivered.called;</called>
 						<nowgroupid type="script"> -1;</nowgroupid>
 					</send>
-					<transition  target="inringing"/>
+					<transition  target="Alerting"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='makecall'">
 					<send target="this" type="cmd" dest="this" event="MakeCall">
@@ -243,7 +246,7 @@
 						</event>
 					</state>
 				</state>
-				<state id="inringing">
+				<state id="Alerting">
 					<onentry>
 						<script>connection = _event.delivered.connection;</script>
 					</onentry>
@@ -253,10 +256,10 @@
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">_event.established.called;</called>
 						</send>
-						<transition target="answer"/>
+						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 					</event>
 					<event event="CONNECTION_CLEARED">
-						<transition target="after"/>
+						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -269,7 +272,7 @@
 						</send>
 					</event>
 				</state>
-				<state id="after">
+				<state id="ACW">
 					<onentry>
 						<send target="this" type="notify" dest="client" event="after">
 							<type>after</type>
@@ -278,9 +281,9 @@
 						</send>
 					</onentry>
 				</state>
-				<state id="answer">
+				<state id="established">
 					<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == connection.callID">
-						<transition target="after"/>
+						<transition target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -376,15 +379,13 @@
 							<transition cond="_event.ReconnectCall.status==0" target="answer"/>
 						</event>
 						<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == consultationNewCall.callID">
-							<send target="this" type="notify" dest="client" event="agentconsultback">
-								<type>agentconsultback</type>
-								<status type="script">0;</status>
-							</send>
-							<transition target="answer"/>
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" dest="this" event="ClearCall">
 								<connection type="script">connection;</connection>
+							</send>
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">consultationNewCall;</connection>
 							</send>
 						</event>
 						<event event="DELIVERED" cond="_event.delivered.localConnect == 'Connect'">
