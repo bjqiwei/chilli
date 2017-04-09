@@ -411,6 +411,16 @@ namespace chilli {
 														break;
 						case CSTA_CLEAR_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_CLEAR_CALL_CONF");
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["status"] = 0;
+							event[eventName]["clearCall"] = Json::nullValue;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+
 						}
 												   break;
 						case CSTA_CLEAR_CONNECTION_CONF: {
@@ -419,15 +429,23 @@ namespace chilli {
 														 break;
 						case CSTA_CONFERENCE_CALL_CONF: {
 							LOG4CPLUS_DEBUG(log, "CSTA_CONFERENCE_CALL_CONF:");
-							ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.conferenceCall.newCall;
-							LOG4CPLUS_DEBUG(log, "newCall:" << newCall.callID
-								<< "," << newCall.deviceID << "," << newCall.devIDType);
-							ConnectionList_t connList = cstaEvent.event.cstaConfirmation.u.conferenceCall.connList;
-							for (int i = 0; i < connList.count; i++) {
-								ConnectionID_t party = connList.connection[i].party;
-								LOG4CPLUS_DEBUG(log, "party[" << i << "]:" << party.callID
-									<< "," << party.deviceID << "," << party.devIDType);
+							CSTAConferenceCallConfEvent_t conferenceCall = cstaEvent.event.cstaConfirmation.u.conferenceCall;
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(conferenceCall.newCall);
+							event[eventName]["status"] = 0;
+
+							for (int i = 0; i < conferenceCall.connList.count; i++)
+							{
+								event[eventName]["connList"].append(
+									AvayaAPI::cstaConnectionIDJson(
+										conferenceCall.connList.connection[i].party));
 							}
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
 						}
 														break;
 						case CSTA_CONSULTATION_CALL_CONF: {
@@ -911,6 +929,38 @@ namespace chilli {
 							event["transferred"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(transferred.localConnectionInfo);
 							event["transferred"]["transferring"] = transferring;
 							event["transferred"]["transferred"] = ctransferred;
+
+							model::EventType_t evt(event.toStyledString());
+							this->PushEvent(evt);
+						}
+											   break;
+						case CSTA_CONFERENCED: {
+							
+							LOG4CPLUS_DEBUG(log, "CSTA_CONFERENCED");
+
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTAConferencedEvent_t conferenced = cstaEvent.event.cstaUnsolicited.u.conferenced;
+
+							const char * controller = conferenced.confController.deviceID;
+							const char * addedParty = conferenced.addedParty.deviceID;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "CONFERENCED";
+							event["conferenced"]["cause"] = AvayaAPI::cstaEventCauseString(conferenced.cause);
+							event["conferenced"]["controller"] = controller;
+							event["conferenced"]["addedParty"] = addedParty;
+							event["conferenced"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(conferenced.localConnectionInfo);
+							event["conferenced"]["primaryOldCall"] = AvayaAPI::cstaConnectionIDJson(conferenced.primaryOldCall);
+							event["conferenced"]["secondaryOldCall"] = AvayaAPI::cstaConnectionIDJson(conferenced.secondaryOldCall);
+							
+							for (int i = 0; i < conferenced.conferenceConnections.count; i++)
+							{
+								event["conferenced"]["connections"].append(
+									AvayaAPI::cstaConnectionIDJson(
+										conferenced.conferenceConnections.connection[i].party));
+							}
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);

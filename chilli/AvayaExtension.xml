@@ -213,7 +213,23 @@
 								<monitorId type="script">_event.monitorId;</monitorId>
 								<established type="script">_event.established;</established>
 							</send>
+							<transition target="heldAndestablished"/>
 						</event>
+						<state id="heldAndestablished">
+							<event event="CONFERENCED">
+								<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+									<event type="script">_event._name;</event>
+									<extension type="script">agentId;</extension>
+									<monitorId type="script">_event.monitorId;</monitorId>
+									<conferenced type="script">_event.conferenced;</conferenced>
+								</send>
+								<script>connection = _event.conferenced.secondaryOldCall;</script>
+								<transition target="conferenced"/>
+							</event>
+							<state id="conferenced">
+								
+							</state>
+						</state>
 					</state>
 				</state>
 			</state>

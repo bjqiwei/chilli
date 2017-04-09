@@ -3,6 +3,7 @@
 <datamodel>
 	<data id="connection"/>
 	<data id="consultationNewCall"/>
+	<date id="conferenceCall"/>
 </datamodel>
 <scriptmodel>
 	<script src="./cmpObject.js" />
@@ -437,6 +438,23 @@
 								<event event="TRANSFERRED">
 									<transition target="ACW"/>
 								</event>
+								<event event="cmd" cond="_event.cmd=='tripartitetalk'">
+									<send target="this" type="cmd" dest="this" event="ConferenceCall">
+										<activeCall type="script">consultationNewCall;</activeCall>
+										<heldCall type="script">connection;</heldCall>
+									</send>
+								</event>
+								<event event="ConferenceCall" cond="_event.ConferenceCall.status == 0">
+									<script>conferenceCall = _event.ConferenceCall.newCall;</script>
+								</event>
+								<event event="CONFERENCED">
+									<send target="this" type="notify" dest="client" event="tripartitetalk">
+										<type>tripartitetalk</type>
+										<status type="script">0;</status>
+										<reason type="script">''; </reason>
+									</send>
+									<transition target="conferenced"/>
+								</event>
 							</state>
 						</state>
 						<state id="consultationReconnecting">
@@ -468,6 +486,16 @@
 								<reason type="script">_event.RetrieveCall.reason; </reason>
 							</send>
 							<transition  cond = "_event.RetrieveCall.status == 0" target="established"/>
+						</event>
+					</state>
+					<state id="conferenced">
+						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">conferenceCall;</connection>
+							</send>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,conferenceCall)">
+							<transition target="ACW"/>
 						</event>
 					</state>
 				</state>
