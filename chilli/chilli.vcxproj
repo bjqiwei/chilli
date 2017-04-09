@@ -80,6 +80,7 @@ xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
 xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
+xcopy /Y *.js $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
@@ -119,6 +120,7 @@ xcopy /Y ACD.xml $(OutDir)
 xcopy /Y Agent.xml $(OutDir)
 xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
+xcopy /Y *.js $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
     </PostBuildEvent>
