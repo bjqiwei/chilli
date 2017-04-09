@@ -159,8 +159,32 @@
 						<monitorId type="script">_event.monitorId;</monitorId>
 						<held type="script">_event.held;</held>
 					</send>
-					<transition cond="_event.held.connection.callID == connection.callID" target="heldedandheld"/>
+					<transition cond="_event.held.connection.callID == connection.callID" target="heldedAndheld"/>
 				</event>
+				<event event="SERVICE_INITIATED">
+					<script>newCall = _event.serviceInitiated.connection;</script>
+					<transition target="heldAndserviceInitiated"/>
+				</event>
+				<state id="heldAndserviceInitiated">
+					<event event="FAILED">
+						<!--transition cond="_event.failed.connection.callID == newCall.callID" target="held"/-->
+					</event>
+					<event event="HELD" cond="cmp(_event.held.connection,newCall)">
+					</event>
+					<event event="ORIGINATED">
+						<transition cond="cmp(_event.originated.connection,newCall)" target="heldAndoriginated"/>
+					</event>
+					<state id="heldAndoriginated">
+						<event event="DELIVERED">
+							<transition cond="_event.delivered.connection.callID == newCall.callID" target="heldAnddelivered"/>
+						</event>
+					</state>
+					<state id="heldAnddelivered">
+						<event event="TRANSFERRED">
+							<transition target="init"/>
+						</event>
+					</state>
+				</state>
 			</state>
 			<state id="helded">
 				<event event="RETRIEVED">
@@ -179,10 +203,10 @@
 						<monitorId type="script">_event.monitorId;</monitorId>
 						<held type="script">_event.held;</held>
 					</send>
-					<transition cond="cmp(_event.held.connection,connection)" target="heldedandheld"/>
+					<transition cond="cmp(_event.held.connection,connection)" target="heldedAndheld"/>
 				</event>
 			</state>
-			<state id="heldedandheld">
+			<state id="heldedAndheld">
 				<event event="RETRIEVED">
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
