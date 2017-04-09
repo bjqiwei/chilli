@@ -278,7 +278,7 @@
 					<onentry>
 						<send target="this" type="notify" dest="client" event="after">
 							<type>after</type>
-							<callid type="script">_event.connectionCleared.connection.callID;</callid>
+							<callid type="script">connection.callID;</callid>
 							<called type="script">_agent.Extension;</called>
 						</send>
 					</onentry>
@@ -367,7 +367,6 @@
 							</send>
 						</event>
 						<event event ="TRANSFERRED">
-							<script>_event.connectionCleared = {}; _event.connectionCleared.connection = connection;</script>
 							<transition target="ACW"/>
 						</event>
 						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
@@ -427,6 +426,17 @@
 								<transition target="consultationed"/>
 							</event>
 							<state id="consultationed">
+								<event event="cmd" cond="_event.cmd=='agentshift'">
+									<send target="this" type="cmd" dest="this" event="TransferCall">
+										<activeCall type="script">consultationNewCall;</activeCall>
+										<heldCall type="script">connection;</heldCall>
+									</send>
+								</event>
+								<event event="TransferCall">
+								</event>
+								<event event="TRANSFERRED">
+									<transition target="ACW"/>
+								</event>
 							</state>
 						</state>
 						<state id="consultationReconnecting">
