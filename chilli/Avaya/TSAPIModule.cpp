@@ -832,10 +832,10 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "RETRIEVED";
-							event["held"]["cause"] = AvayaAPI::cstaEventCauseString(retrieved.cause);
-							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
-							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
-							event["held"]["retrievingDevice"] = retrievingDevice;
+							event["retrieved"]["cause"] = AvayaAPI::cstaEventCauseString(retrieved.cause);
+							event["retrieved"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
+							event["retrieved"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
+							event["retrieved"]["retrievingDevice"] = retrievingDevice;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);

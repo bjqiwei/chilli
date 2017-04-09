@@ -132,6 +132,68 @@
 				</send>
 				<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
 			</event>
+			<event event="HELD">
+				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+					<event type="script">_event._name;</event>
+					<extension type="script">agentId;</extension>
+					<monitorId type="script">_event.monitorId;</monitorId>
+					<held type="script">_event.held;</held>
+				</send>
+				<transition cond="cmp(_event.held.connection,connection)" target="held"/>
+				<transition cond="_event.held.connection.callID == connection.callID" target="helded"/>
+			</event>
+			<state id="held">
+				<event event="RETRIEVED">
+					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<retrieved type="script">_event.retrieved;</retrieved>
+					</send>
+					<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
+				</event>
+				<event event="HELD">
+					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<held type="script">_event.held;</held>
+					</send>
+					<transition cond="_event.held.connection.callID == connection.callID" target="heldedandheld"/>
+				</event>
+			</state>
+			<state id="helded">
+				<event event="RETRIEVED">
+					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<retrieved type="script">_event.retrieved;</retrieved>
+					</send>
+					<transition cond="_event.retrieved.connection.callID == connection.callID" target="established"/>
+				</event>
+				<event event="HELD">
+					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<held type="script">_event.held;</held>
+					</send>
+					<transition cond="cmp(_event.held.connection,connection)" target="heldedandheld"/>
+				</event>
+			</state>
+			<state id="heldedandheld">
+				<event event="RETRIEVED">
+					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+						<event type="script">_event._name;</event>
+						<extension type="script">agentId;</extension>
+						<monitorId type="script">_event.monitorId;</monitorId>
+						<retrieved type="script">_event.retrieved;</retrieved>
+					</send>
+					<transition cond="cmp(_event.retrieved.connection,connection)" target="helded"/>
+					<transition cond="_event.retrieved.connection.callID == connection.callID" target="held"/>
+				</event>
+			</state>
 		</state>
 		<!--event event="timer">
 			<log level="debug" type="script">_event.id;</log>
