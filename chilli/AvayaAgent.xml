@@ -181,8 +181,8 @@
 						<type>makecall</type>
 						<reason type="script">_event.MakeCall.reason;</reason>
 					</send>
-					<transition cond="_event.MakeCall.status==0" target="makecalling"/>
-					<transition target="after"/>
+					<transition cond="_event.MakeCall.status==0" target="originated"/>
+					<transition target="ACW"/>
 				</event>
 				<state id="NotReady">
 				</state>
@@ -207,10 +207,12 @@
 				</state>
 				<state id="WorkReady">
 				</state>
-				<state id="makecalling">
+				<state id="originated">
 					<onentry>
 						<script>connection = _event.MakeCall.newCall;</script>
 					</onentry>
+					<event event="ORIGINATED">
+					</event>
 					<event event="DELIVERED">
 						<send target="this" type="notify" dest="client" event="calledringing">
 							<type>calledringing</type>
@@ -220,24 +222,24 @@
 							<called type="script">_event.delivered.called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
 						</send>
-						<transition  target="calledringing"/>
+						<transition  cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 					</event>
 					<event event="CONNECTION_CLEARED">
-						<transition target="after"/>
+						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
-					<state id ="calledringing">
+					<state id ="delivered">
 						<event event="ESTABLISHED">
 							<send target="this" type="notify" dest="client" event="answer">
 								<type>answer</type>
 								<callid type="script">_event.established.connection.callID;</callid>
 								<called type="script">_event.established.called;</called>
 							</send>
-							<transition target="answer"/>
+							<transition target="established"/>
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -282,6 +284,8 @@
 					</onentry>
 				</state>
 				<state id="established">
+					<event event="cmd" cond="_event.cmd=='makecall'">
+					</event>
 					<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == connection.callID">
 						<transition target="ACW"/>
 					</event>
