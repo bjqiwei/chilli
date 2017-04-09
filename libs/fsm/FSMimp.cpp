@@ -291,8 +291,10 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 
 		if (isTransition(actionNode))
 		{
-			processTransition(actionNode)? doneSomething = true:NULL;
-			break;//transition 元素下的元素将不再执行
+			if (processTransition(actionNode)){
+				doneSomething = true;
+				break;//transition 元素下的元素将不再执行
+			}
 		}
 		else if (isLog(actionNode))
 		{
@@ -765,6 +767,7 @@ void fsm::StateMachineimp::mainEventLoop()
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 {
 	using namespace helper::xml;
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ",processEvent:" << event.getEventName());
 	if (getRootContext()){
 		for(auto & it : m_currentEvt.getVars())
 		{
