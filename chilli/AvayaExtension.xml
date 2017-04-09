@@ -167,7 +167,12 @@
 				</event>
 				<state id="heldAndserviceInitiated">
 					<event event="FAILED">
-						<!--transition cond="_event.failed.connection.callID == newCall.callID" target="held"/-->
+						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+							<event type="script">_event._name;</event>
+							<extension type="script">agentId;</extension>
+							<monitorId type="script">_event.monitorId;</monitorId>
+							<failed type="script">_event.failed;</failed>
+						</send>
 					</event>
 					<event event="HELD" cond="cmp(_event.held.connection,newCall)">
 					</event>
@@ -200,6 +205,14 @@
 								<transferred type="script">_event.transferred;</transferred>
 							</send>
 							<transition target="init"/>
+						</event>
+						<event event="ESTABLISHED" cond="_event.established.connection.callID == newCall.callID">
+							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+								<event type="script">_event._name;</event>
+								<extension type="script">agentId;</extension>
+								<monitorId type="script">_event.monitorId;</monitorId>
+								<established type="script">_event.established;</established>
+							</send>
 						</event>
 					</state>
 				</state>

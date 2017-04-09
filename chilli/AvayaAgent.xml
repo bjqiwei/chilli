@@ -314,14 +314,7 @@
 							<connection type="script">connection;</connection>
 							<called type="script">_event.num;</called>
 						</send>
-					</event>
-					<event event="ConsultationCall" >
-						<send target="this" type="notify" dest="client" event="agentconsult">
-							<type>agentconsult</type>
-							<status type="script">_event.ConsultationCall.status;</status>
-							<reason type="script">_event.ConsultationCall.reason; </reason>
-						</send>
-						<transition  cond = "_event.ConsultationCall.status == 0" target="consultationing"/>
+						<transition target="consultationing"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='transfercall'">
 						<send target="this" type="cmd" dest="this" event="ConsultationCall">
@@ -384,26 +377,33 @@
 						</event>
 					</state>
 					<state id="consultationing">
-						<onentry>
-							<script>
-								consultationNewCall = _event.ConsultationCall.newCall;
-							</script>
-						</onentry>
+					
+						<event event="HELD">
+						</event>
+						<event event="FAILED">
+						</event>
+						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
+						</event>
+						<event event="DELIVERED" cond="cmp(_event.originated.connection,consultationNewCall)">
+							<transition target="consultationDelivered"/>
+						</event>
+						<event event="ConsultationCall" >
+							<send target="this" type="notify" dest="client" event="agentconsult">
+								<type>agentconsult</type>
+								<status type="script">_event.ConsultationCall.status;</status>
+								<reason type="script">_event.ConsultationCall.reason; </reason>
+							</send>
+							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
+							<transition  cond = "_event.ConsultationCall.status != 0" target="established"/>
+						</event>
 						<event event="cmd" cond="_event.cmd=='agentconsultback'">
 							<send target="this" type="cmd" dest="this" event="ReconnectCall">
 								<activeCall type="script">consultationNewCall;</activeCall>
 								<heldCall type="script">connection;</heldCall>
 							</send>
+							<transition target="consultationReconnecting"/>
 						</event>
-						<event event="ReconnectCall">
-							<send target="this" type="notify" dest="client" event="agentconsultback">
-								<type>agentconsultback</type>
-								<status type="script">_event.ReconnectCall.status;</status>
-								<reason type="script">_event.ReconnectCall.reason; </reason>
-							</send>
-							<transition cond="_event.ReconnectCall.status==0" target="answer"/>
-						</event>
-						<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == consultationNewCall.callID">
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -413,8 +413,33 @@
 								<connection type="script">consultationNewCall;</connection>
 							</send>
 						</event>
-						<event event="DELIVERED" cond="_event.delivered.localConnect == 'Connect'">
+
+						<event event="RETRIEVED" >
+							<transition cond="cmp(_event.retrieved.connection, connection)" target="established"/>
 						</event>
+						<state id="consultationDelivered">
+							<event event="ESTABLISHED" cond="_event.established.connection.callID == consultationNewCall.callID">
+								<send target="this" type="notify" dest="client" event="consultationcalls">
+									<type>consultationcalls</type>
+									<status type="script">_event.established.status;</status>
+									<reason type="script">_event.established.reason; </reason>
+								</send>
+								<transition target="consultationed"/>
+							</event>
+							<state id="consultationed">
+							</state>
+						</state>
+						<state id="consultationReconnecting">
+							<event event="ReconnectCall">
+								<send target="this" type="notify" dest="client" event="agentconsultback">
+									<type>agentconsultback</type>
+									<status type="script">_event.ReconnectCall.status;</status>
+									<reason type="script">_event.ReconnectCall.reason; </reason>
+								</send>
+							</event>
+							<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
+							</event>
+						</state>
 					</state>
 					<state  id="held">
 						<event event="cmd" cond="_event.cmd=='mute'">
