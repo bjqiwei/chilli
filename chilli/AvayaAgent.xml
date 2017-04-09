@@ -286,8 +286,8 @@
 				<state id="established">
 					<event event="cmd" cond="_event.cmd=='makecall'">
 					</event>
-					<event event="CONNECTION_CLEARED" cond="_event.connectionCleared.connection.callID == connection.callID">
-						<transition target="ACW"/>
+					<event event="CONNECTION_CLEARED">
+						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -305,7 +305,9 @@
 							<status type="script">_event.HoldCall.status;</status>
 							<reason type="script">_event.HoldCall.reason; </reason>
 						</send>
-						<transition  cond = "_event.HoldCall.status == 0" target="hold"/>
+						<transition  cond = "_event.HoldCall.status == 0" target="held"/>
+					</event>
+					<event event="RETRIEVED" cond="cmp(_event.retrieved.connection,connection)">
 					</event>
 					<event event="cmd" cond="_event.cmd=='agentconsult'">
 						<send target="this" type="cmd" dest="this" event="ConsultationCall">
@@ -395,7 +397,11 @@
 						<event event="DELIVERED" cond="_event.delivered.localConnect == 'Connect'">
 						</event>
 					</state>
-					<state  id="hold">
+					<state  id="held">
+						<event event="cmd" cond="_event.cmd=='mute'">
+						</event>
+						<event event="HELD" cond="cmp(_event.held.connection,connection)">
+						</event>
 						<event event="cmd" cond="_event.cmd=='unmute'">
 							<send target="this" type="cmd" dest="this" event="RetrieveCall">
 								<connection type="script">connection;</connection>
@@ -407,7 +413,7 @@
 								<status type="script">_event.RetrieveCall.status;</status>
 								<reason type="script">_event.RetrieveCall.reason; </reason>
 							</send>
-							<transition  cond = "_event.RetrieveCall.status == 0" target="answer"/>
+							<transition  cond = "_event.RetrieveCall.status == 0" target="established"/>
 						</event>
 					</state>
 				</state>
