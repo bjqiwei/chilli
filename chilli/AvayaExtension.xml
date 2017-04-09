@@ -172,15 +172,33 @@
 					<event event="HELD" cond="cmp(_event.held.connection,newCall)">
 					</event>
 					<event event="ORIGINATED">
+						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+							<event type="script">_event._name;</event>
+							<extension type="script">agentId;</extension>
+							<monitorId type="script">_event.monitorId;</monitorId>
+							<originated type="script">_event.originated;</originated>
+						</send>
 						<transition cond="cmp(_event.originated.connection,newCall)" target="heldAndoriginated"/>
 					</event>
 					<state id="heldAndoriginated">
 						<event event="DELIVERED">
+							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+								<event type="script">_event._name;</event>
+								<extension type="script">agentId;</extension>
+								<monitorId type="script">_event.monitorId;</monitorId>
+								<delivered type="script">_event.delivered;</delivered>
+							</send>
 							<transition cond="_event.delivered.connection.callID == newCall.callID" target="heldAnddelivered"/>
 						</event>
 					</state>
 					<state id="heldAnddelivered">
 						<event event="TRANSFERRED">
+							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+								<event type="script">_event._name;</event>
+								<extension type="script">agentId;</extension>
+								<monitorId type="script">_event.monitorId;</monitorId>
+								<transferred type="script">_event.transferred;</transferred>
+							</send>
 							<transition target="init"/>
 						</event>
 					</state>

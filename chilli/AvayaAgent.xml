@@ -338,16 +338,18 @@
 								<reason type="script">_event.ConsultationCall.reason; </reason>
 							</send>
 							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
-							
-							<transition cond = "_event.ConsultationCall.status != 0" target="answer"/>
-							
-						</event>
-						
-						<event event="DELIVERED">
+
 							<send target="this" type="cmd" dest="client" event="TransferCall">
 								<activeCall type="script">consultationNewCall;</activeCall>
 								<heldCall type="script">connection;</heldCall>
 							</send>
+							
+							<transition cond = "_event.ConsultationCall.status != 0" target="established"/>
+							
+						</event>
+						<event event="HELD">
+						</event>
+						<event event="DELIVERED">
 						</event>
 						<event event="FAILED">
 							<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -357,11 +359,28 @@
 								<connection type="script">connection;</connection>
 							</send>
 						</event>
-						<event event ="TRANSFERRED">
-							<transition target="after"/>
+						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
 						</event>
-						<event event="CONNECTION_CLEARED">
-							<transition target="after"/>
+						
+						<event event="TransferCall" cond="_event.TransferCall.status==0">
+						</event>
+						
+						<event event="TransferCall">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">consultationNewCall;</connection>
+							</send>
+						</event>
+						<event event ="TRANSFERRED">
+							<script>_event.connectionCleared = {}; _event.connectionCleared.connection = connection;</script>
+							<transition target="ACW"/>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
+						</event>
+						<event event="RETRIEVED" >
+							<transition cond="cmp(_event.retrieved.connection, connection)" target="established"/>
 						</event>
 					</state>
 					<state id="consultationing">

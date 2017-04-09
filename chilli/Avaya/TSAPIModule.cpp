@@ -533,6 +533,8 @@ namespace chilli {
 							std::string eventName = this->m_InvokeID2Event[invokeId];
 							event["event"] = eventName;
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(transferCall.newCall);
+							event[eventName]["status"] = 0;
+
 							for (int i = 0; i < transferCall.connList.count; i++)
 							{
 								event[eventName]["connList"].append(
