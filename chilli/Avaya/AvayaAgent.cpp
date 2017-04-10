@@ -7,6 +7,7 @@
 namespace chilli{
 namespace Avaya{
 
+ATTPrivateData_t g_stPrivateData;
 
 AvayaAgent::AvayaAgent(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
 	:m_model(model), Agent(model, ext, smFileName)
@@ -68,16 +69,19 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 			if (jsonEvent["param"]["password"].isString())
 				password = jsonEvent["param"]["password"].asCString();
 
-
+			RetCode_t nRetCode = AvayaAPI::attV6SetAgentState(&g_stPrivateData, wmManualIn, 0, false);
 			uint32_t uInvodeId = ++(m_model->m_ulInvokeID);
-			RetCode_t nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
-				uInvodeId,
-				(DeviceID_t *)deviceId,
-				amLogIn,
-				(AgentID_t *)agentid,
-				(AgentGroup_t *)group,
-				(AgentPassword_t *)password,
-				NULL);
+
+			if (nRetCode == ACSPOSITIVE_ACK) {
+				nRetCode = AvayaAPI::cstaSetAgentState(m_model->m_lAcsHandle,
+					uInvodeId,
+					(DeviceID_t *)deviceId,
+					amLogIn,
+					(AgentID_t *)agentid,
+					(AgentGroup_t *)group,
+					(AgentPassword_t *)password,
+					NULL);
+			}
 			if (nRetCode != ACSPOSITIVE_ACK) {
 				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 				Json::Value event;
@@ -187,7 +191,7 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 				(AgentID_t *)agentid,
 				(AgentGroup_t *)"",
 				(AgentPassword_t *)"",
-				NULL);
+				(PrivateData_t *)&g_stPrivateData);
 
 			if (nRetCode != ACSPOSITIVE_ACK) {
 				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
@@ -225,7 +229,7 @@ void AvayaAgent::processSend(const std::string & strContent, const void * param,
 				(AgentID_t *)agentid,
 				(AgentGroup_t *)"",
 				(AgentPassword_t *)"",
-				NULL);
+				(PrivateData_t *)&g_stPrivateData);
 
 			if (nRetCode != ACSPOSITIVE_ACK) {
 				LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
