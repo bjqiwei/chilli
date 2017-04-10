@@ -23,7 +23,7 @@ namespace Avaya {
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 		if (!bHandled) {
-			ExtensionImp::processSend(strContent, param, bHandled);
+			ExtensionImp::fireSend(strContent, param);
 		}
 	}
 

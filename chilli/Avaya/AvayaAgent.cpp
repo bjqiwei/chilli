@@ -25,7 +25,7 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 	bool bHandled = false;
 	this->processSend(strContent, param, bHandled);
 	if (!bHandled) {
-		Agent::processSend(strContent, param, bHandled);
+		Agent::fireSend(strContent, param);
 	}
 	
 }
