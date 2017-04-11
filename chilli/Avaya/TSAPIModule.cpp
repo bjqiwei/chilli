@@ -185,6 +185,35 @@ namespace chilli {
 				}
 			}
 
+			// Group 
+			XMLElement * group = avaya->FirstChildElement("Groups");
+
+			for (XMLElement *child = group->FirstChildElement("Group");
+				child != nullptr;
+				child = child->NextSiblingElement("Group"))
+			{
+
+				const char * num = child->Attribute("ExtensionNumber");
+				const char * sm = child->Attribute("StateMachine");
+				const char * avayaExtension = child->Attribute("avayaExtension");
+
+				num = num ? num : "";
+				sm = sm ? sm : "";
+				avayaExtension = avayaExtension ? avayaExtension : "";
+
+				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				{
+					model::ExtensionPtr ext(new AvayaGroup(this, num, sm));
+					this->g_Extensions[num] = ext;
+					this->m_Extensions[num] = ext;
+					ext->setVar("_extension.Extension", num);
+					ext->setVar("_avaya.Extension", avayaExtension);
+				}
+				else {
+					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+				}
+			}
+
 			return true;
 		}
 
@@ -286,12 +315,21 @@ namespace chilli {
 
 			std::string eventName;
 			std::string typeName;
+			std::string dest;
 
 			if (jsonEvent["type"].isString()) {
 				typeName = jsonEvent["type"].asString();
 			}
 
 			if (typeName != "cmd") {
+				return;
+			}
+
+			if (jsonEvent["dest"].isString()) {
+				dest = jsonEvent["dest"].asString();
+			}
+
+			if (dest != "this"){
 				return;
 			}
 
@@ -318,7 +356,7 @@ namespace chilli {
 				if (jsonEvent["param"]["password"].isString())
 					password = jsonEvent["param"]["password"].asCString();
 
-				RetCode_t nRetCode = AvayaAPI::attV6SetAgentState(&g_stPrivateData, wmManualIn, 0, false);
+				RetCode_t nRetCode = AvayaAPI::attSetAgentState(&g_stPrivateData, wmManualIn);
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
 
 				if (nRetCode == ACSPOSITIVE_ACK) {
@@ -972,6 +1010,43 @@ namespace chilli {
 				else {
 					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorStop";
+				}
+				bHandled = true;
+			}
+			else if (eventName == "MonitorCallsViaDevice")
+			{
+				const char* deviceId = nullptr;
+
+				if (jsonEvent["param"]["deviceId"].isString())
+					deviceId = jsonEvent["param"]["deviceId"].asCString();
+
+				CSTAMonitorFilter_t noFilter;
+				noFilter.agent = 0;
+				noFilter.call = 0;
+				noFilter.feature = 0;
+				noFilter.maintenance = 0;
+				noFilter.privateFilter = 0;
+
+				uint32_t uInvodeId = ++(this->m_ulInvokeID);
+				RetCode_t nRetCode = AvayaAPI::cstaMonitorCallsViaDevice(this->m_lAcsHandle,
+					uInvodeId,
+					(DeviceID_t *)deviceId,
+					&noFilter,
+					NULL);
+
+				if (nRetCode != ACSPOSITIVE_ACK) {
+					LOG4CPLUS_ERROR(log, "cstaMonitorCallsViaDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					Json::Value event;
+					event["extension"] = ext->getExtNumber();
+					event["event"] = "MonitorCallsViaDevice";
+					event["status"] = nRetCode;
+					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+					model::EventType_t evt(event.toStyledString());
+					this->PushEvent(evt);
+				}
+				else {
+					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
 				}
 				bHandled = true;
 			}

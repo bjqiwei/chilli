@@ -148,6 +148,9 @@
     <ClInclude Include="Avaya\AvayaExtension.h">
       <Filter>Avaya</Filter>
     </ClInclude>
+    <ClInclude Include="Avaya\AvayaGroup.h">
+      <Filter>Avaya</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -216,6 +219,9 @@
     <ClCompile Include="Avaya\AvayaExtension.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
+    <ClCompile Include="Avaya\AvayaGroup.cpp">
+      <Filter>Avaya</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="log4cplus.properties">
@@ -236,6 +242,12 @@
       <Filter>Resource Files</Filter>
     </Xml>
     <Xml Include="AvayaAgent.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="AvayaACD.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="AvayaGroup.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

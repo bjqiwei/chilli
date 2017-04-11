@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" ?>
+<fsm>
+	<functionmodel>
+		<function >function log(var1){logging(var1);}</function>
+	</functionmodel>
+	<state id="init">
+		<onentry>
+			<log level = "info">enter init state.</log>
+			<transition  target="idle"/>
+		</onentry>
+		<state id="idle">
+			<onentry>
+				<log level = "info">enter idle state.</log>
+				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
+			</onentry>
+			<event event="transfer">
+				<script>forward = extension.eventData; log(extension.number+':'+forward);</script>
+				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
+				<transition  target="waitingForAnswer"/>
+			</event>
+		</state>
+		
+		<state id="waitingForAnswer">
+			<onentry>
+				<log level = "info">enter waitingForAnswer state.</log>
+			</onentry>
+			<event event="talking">
+				<transition  target="welcome"/>
+			</event>
+		</state> 
+		
+		<state id="welcome">
+			<onentry>
+				<log level = "info">enter welcome state.</log>
+				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
+					<file>'./wav/welcome.wav'</file>
+				</send>
+			</onentry>
+		</state> 
+	
+	 <event event="onhook"><transition  target="idle"/></event>
+    </state>
+
+</fsm>
+

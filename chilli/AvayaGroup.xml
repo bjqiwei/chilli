@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" ?>
+<fsm name ="AvayaGroup" initial="init">
+<datamodel>
+	<data id="monitorId"/>
+	<data id="connectsArray"/>
+</datamodel>
+	<state id="init">
+		<onentry>
+			<script>connectsArray = new Array();</script>
+		</onentry>
+		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
+			<send target="this" type="cmd" dest="this" event="MonitorCallsViaDevice">
+				<deviceId type="script">_avaya.Extension</deviceId>
+			</send>
+		</event>
+		<event event="MonitorCallsViaDevice">
+			<script>monitorId=_event.monitorId;</script>
+			<!--timer idexpr="_extension.Extension" interval="10000"/-->
+		</event>
+		<event event="DELIVERED">
+		</event>
+		<event event="CONNECTION_CLEARED">
+		</event>
+    </state>
+</fsm>
+

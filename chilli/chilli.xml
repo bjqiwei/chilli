@@ -53,5 +53,8 @@
 			<Extension ExtensionNumber="8006" StateMachine="./AvayaExtension.xml" avayaExtension="8006"></Extension>
 			<Extension ExtensionNumber="8007" StateMachine="./AvayaExtension.xml" avayaExtension="8007"></Extension>
 		</Extensions>
+    <Groups>
+      <Group ExtensionNumber="5099" StateMachine="./AvayaGroup.xml" avayaExtension="5099"/>
+    </Groups>
 	</Avaya>
 </Config>
