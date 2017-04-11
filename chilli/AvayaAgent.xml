@@ -244,7 +244,7 @@
 								<callid type="script">_event.established.connection.callID;</callid>
 								<called type="script">_event.established.called;</called>
 							</send>
-							<transition target="established"/>
+							<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" dest="this" event="ClearCall">
