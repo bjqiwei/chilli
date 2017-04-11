@@ -9,7 +9,7 @@ namespace ShDev{
 using namespace SHAPI;
 
 ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-	:Extension(model, ext, smFileName), m_ExtNumber(ext)
+	:Extension(model, ext, smFileName)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDev.Extension");
 	LOG4CPLUS_DEBUG(log,"new a extension object.");
@@ -20,23 +20,6 @@ ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, c
 ShExtension::~ShExtension(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a extension object.");
-}
-
-const std::string & ShExtension::getExtensionNumber() const
-{
-	// TODO: insert return statement here
-	return m_ExtNumber;
-}
-
-void ShExtension::setSessionId(const std::string & sessinId)
-{
-	m_SessionId = sessinId;
-}
-
-const std::string & ShExtension::getSessionId()
-{
-	// TODO: insert return statement here
-	return m_SessionId;
 }
 
 int ShExtension::pushEvent(const model::EventType_t & evt)

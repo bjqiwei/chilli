@@ -11,10 +11,6 @@ namespace chilli{
 			ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 			virtual ~ExtensionImp();
 
-			virtual const std::string & getExtensionNumber() const override;
-			virtual void setSessionId(const std::string & sessinId) override;
-			virtual const std::string & getSessionId() override;
-
 			virtual int pushEvent(const model::EventType_t &evt) override;
 
 			//inherit from SendInterface
@@ -27,9 +23,6 @@ namespace chilli{
 
 		protected:
 			void processSend(const std::string &strContent, const void * param, bool & bHandled);
-
-			std::string m_ExtNumber;
-			std::string m_SessionId;
 
 		};
 		typedef std::shared_ptr<ExtensionImp>  ExtensionImpPtr;

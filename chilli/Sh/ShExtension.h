@@ -16,9 +16,6 @@ public:
 	ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~ShExtension(void);
 
-	virtual const std::string & getExtensionNumber() const override;
-	virtual void setSessionId(const std::string & sessinId) override;
-	virtual const std::string & getSessionId() override;
 	virtual int pushEvent(const model::EventType_t &evt) override;
 
 	virtual int getChannelID();
@@ -33,8 +30,6 @@ public:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:
-	std::string m_ExtNumber;
-	std::string m_SessionId;
 	int ch;
 		
 };

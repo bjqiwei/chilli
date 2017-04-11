@@ -9,7 +9,7 @@ namespace Agent{
 
 
 Agent::Agent(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
-	:Extension(model, ext, smFileName), m_ExtNumber(ext)
+	:Extension(model, ext, smFileName)
 {
 	std::string logName= "Agent.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -19,24 +19,6 @@ Agent::Agent(model::ProcessModule * model, const std::string &ext, const std::st
 Agent::~Agent(){
 	LOG4CPLUS_DEBUG(log,"destruction a Agent object.");
 }
-
-
-const std::string & Agent::getExtensionNumber() const
-{
-	return m_ExtNumber;
-}
-
-
-void Agent::setSessionId(const std::string & sessinId)
-{
-	this->m_SessionId = sessinId;
-}
-
-const std::string & Agent::getSessionId()
-{
-	return this->m_SessionId;
-}
-
 
 int Agent::Answer()
 {
@@ -77,7 +59,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 						model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
 						model::ConnectAdapter::Close(m_ConnectId); //关闭原有连接
 						m_ConnectId = m_curConnectId;//更新为当前连接
-						model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtensionNumber());//为当前连接设置坐席工号
+						model::ConnectAdapter::SetExtension(m_ConnectId, this->getExtNumber());//为当前连接设置坐席工号
 					}
 					else {
 						//登陆失败

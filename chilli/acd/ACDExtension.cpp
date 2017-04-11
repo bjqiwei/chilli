@@ -17,23 +17,6 @@ ACDExtension::~ACDExtension(){
 	LOG4CPLUS_DEBUG(log,"destruction a ACD extension object.");
 }
 
-
-const std::string & ACDExtension::getExtensionNumber() const
-{
-	return m_ExtNumber;
-}
-
-
-void ACDExtension::setSessionId(const std::string & sessinId)
-{
-	this->m_SessionId = sessinId;
-}
-
-const std::string & ACDExtension::getSessionId()
-{
-	return this->m_SessionId;
-}
-
 int ACDExtension::Answer()
 {
 	LOG4CPLUS_WARN(log, "not implement.");

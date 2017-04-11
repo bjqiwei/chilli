@@ -7,7 +7,7 @@ namespace chilli {
 	namespace Extension {
 
 		ExtensionImp::ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-			:Extension(model, ext, smFileName), m_ExtNumber(ext)
+			:Extension(model, ext, smFileName)
 		{
 			std::string logName = "ExtensionImp.";
 			log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -17,23 +17,6 @@ namespace chilli {
 		ExtensionImp::~ExtensionImp() {
 			LOG4CPLUS_DEBUG(log, "destruction a extension object.");
 		}
-
-		const std::string & ExtensionImp::getExtensionNumber() const
-		{
-			return m_ExtNumber;
-		}
-
-
-		void ExtensionImp::setSessionId(const std::string & sessinId)
-		{
-			this->m_SessionId = sessinId;
-		}
-
-		const std::string & ExtensionImp::getSessionId()
-		{
-			return this->m_SessionId;
-		}
-
 
 		int ExtensionImp::Answer()
 		{

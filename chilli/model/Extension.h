@@ -17,7 +17,7 @@ class Extension: public fsm::SendInterface
 {
 public:
 	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName):
-		m_model(model), SendInterface("this")
+		m_model(model), m_ExtNumber(ext), SendInterface("this")
 	{
 		m_SM = new fsm::StateMachine(ext,smFileName);
 	};
@@ -52,10 +52,19 @@ public:
 		return m_SM->setVar(name, value);
 	}
 
-	virtual const std::string & getExtensionNumber() const = 0;
+	virtual const std::string & getExtNumber() final {
+		return m_ExtNumber;
+	};
+
 	virtual int pushEvent(const EventType_t &evt) = 0;
-	virtual void setSessionId(const std::string & sessinId) = 0;
-	virtual const std::string & getSessionId() = 0;
+
+	virtual void setSessionId(const std::string & sessinId) final {
+		m_SessionId = sessinId;
+	}
+
+	virtual const std::string & getSessionId()final {
+		return m_SessionId;
+	}
 
 //media interface
 	virtual int Answer() = 0;
@@ -87,6 +96,8 @@ protected:
 	fsm::StateMachine * m_SM = nullptr;
 	class ProcessModule * const m_model = nullptr;
 	log4cplus::Logger log;
+	std::string m_ExtNumber;
+	std::string m_SessionId;
 
 };
 typedef std::shared_ptr<model::Extension> ExtensionPtr;
