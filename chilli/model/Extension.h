@@ -66,6 +66,10 @@ public:
 		return m_SessionId;
 	}
 
+	virtual log4cplus::Logger getLogger()final {
+		return log;
+	}
+
 //media interface
 	virtual int Answer() = 0;
 	virtual int PlayFile(const std::string &fileName) = 0;
