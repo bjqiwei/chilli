@@ -56,7 +56,7 @@ namespace chilli {
 
 		void ExtensionImp::fireSend(const std::string &strContent, const void * param)
 		{
-			LOG4CPLUS_TRACE(log, " recive a Send event from stateMachine:" << strContent);
+			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
 			bool bHandled = false;
 			processSend(strContent, param, bHandled);
 		}

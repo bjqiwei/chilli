@@ -233,6 +233,10 @@
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
+					<event event="FAILED">
+					</event>
+					<event event="ClearCall">
+					</event>
 					<state id ="delivered">
 						<event event="ESTABLISHED">
 							<send target="this" type="notify" dest="client" event="answer">

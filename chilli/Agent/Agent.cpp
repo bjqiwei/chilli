@@ -94,7 +94,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 
 void Agent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_DEBUG(log," recive a Send event from stateMachine:" << strContent);
+	LOG4CPLUS_DEBUG(log, "fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
