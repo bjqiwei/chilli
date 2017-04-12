@@ -148,7 +148,7 @@
     <ClInclude Include="Avaya\AvayaExtension.h">
       <Filter>Avaya</Filter>
     </ClInclude>
-    <ClInclude Include="Avaya\AvayaGroup.h">
+    <ClInclude Include="Avaya\AvayaVDN.h">
       <Filter>Avaya</Filter>
     </ClInclude>
   </ItemGroup>
@@ -219,7 +219,7 @@
     <ClCompile Include="Avaya\AvayaExtension.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="Avaya\AvayaGroup.cpp">
+    <ClCompile Include="Avaya\AvayaVDN.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
   </ItemGroup>
@@ -247,7 +247,7 @@
     <Xml Include="AvayaACD.xml">
       <Filter>Resource Files</Filter>
     </Xml>
-    <Xml Include="AvayaGroup.xml">
+    <Xml Include="AvayaVDN.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

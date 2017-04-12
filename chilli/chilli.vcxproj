@@ -81,7 +81,7 @@ xcopy /Y Agent.xml $(OutDir)
 xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y AvayaACD.xml $(OutDir)
-xcopy /Y AvayaGroup.xml $(OutDir)
+xcopy /Y AvayaVDN.xml $(OutDir)
 xcopy /Y *.js $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
@@ -123,7 +123,7 @@ xcopy /Y Agent.xml $(OutDir)
 xcopy /Y AvayaAgent.xml $(OutDir)
 xcopy /Y AvayaExtension.xml $(OutDir)
 xcopy /Y AvayaACD.xml $(OutDir)
-xcopy /Y AvayaGroup.xml $(OutDir)
+xcopy /Y AvayaVDN.xml $(OutDir)
 xcopy /Y *.js $(OutDir)
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
@@ -153,7 +153,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="Avaya\AvayaAgent.h" />
     <ClInclude Include="Avaya\AvayaAPI.h" />
     <ClInclude Include="Avaya\AvayaExtension.h" />
-    <ClInclude Include="Avaya\AvayaGroup.h" />
+    <ClInclude Include="Avaya\AvayaVDN.h" />
     <ClInclude Include="Avaya\TSAPIModule.h" />
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Dynamiclibrary.h" />
@@ -184,7 +184,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="Avaya\AvayaAgent.cpp" />
     <ClCompile Include="Avaya\AvayaAPI.cpp" />
     <ClCompile Include="Avaya\AvayaExtension.cpp" />
-    <ClCompile Include="Avaya\AvayaGroup.cpp" />
+    <ClCompile Include="Avaya\AvayaVDN.cpp" />
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
     <ClCompile Include="Extension\ExtensionImp.cpp" />
     <ClCompile Include="Extension\ExtensionModule.cpp" />
@@ -207,7 +207,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <Xml Include="AvayaACD.xml" />
     <Xml Include="AvayaAgent.xml" />
     <Xml Include="AvayaExtension.xml" />
-    <Xml Include="AvayaGroup.xml" />
+    <Xml Include="AvayaVDN.xml" />
     <Xml Include="chilli.xml">
       <SubType>Designer</SubType>
     </Xml>

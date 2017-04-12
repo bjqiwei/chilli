@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<fsm name ="AvayaGroup" initial="init">
+<fsm name ="AvayaVDN" initial="init">
 <datamodel>
 	<data id="monitorId"/>
 	<data id="connectsArray"/>

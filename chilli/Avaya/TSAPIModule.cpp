@@ -1,7 +1,7 @@
 #include "TSAPIModule.h"
 #include "AvayaAgent.h"
 #include "AvayaExtension.h"
-#include "AvayaGroup.h"
+#include "AvayaVDN.h"
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
@@ -185,17 +185,16 @@ namespace chilli {
 				}
 			}
 
-			// Group 
-			XMLElement * group = avaya->FirstChildElement("Groups");
-
-			for (XMLElement *child = group->FirstChildElement("Group");
-				child != nullptr;
-				child = child->NextSiblingElement("Group"))
+			// VDN 
+		
+			for (XMLElement * vdn = avaya->FirstChildElement("VDN");
+				vdn != nullptr;
+				vdn = avaya->NextSiblingElement("VDN"))
 			{
 
-				const char * num = child->Attribute("ExtensionNumber");
-				const char * sm = child->Attribute("StateMachine");
-				const char * avayaExtension = child->Attribute("avayaExtension");
+				const char * num = vdn->Attribute("ExtensionNumber");
+				const char * sm = vdn->Attribute("StateMachine");
+				const char * avayaExtension = vdn->Attribute("avayaExtension");
 
 				num = num ? num : "";
 				sm = sm ? sm : "";
@@ -203,7 +202,7 @@ namespace chilli {
 
 				if (this->g_Extensions.find(num) == this->g_Extensions.end())
 				{
-					model::ExtensionPtr ext(new AvayaGroup(this, num, sm));
+					model::ExtensionPtr ext(new AvayaVDN(this, num, sm));
 					this->g_Extensions[num] = ext;
 					this->m_Extensions[num] = ext;
 					ext->setVar("_extension.Extension", num);

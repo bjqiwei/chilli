@@ -46,7 +46,7 @@ namespace chilli {
 			void run();
 			friend class AvayaAgent;
 			friend class AvayaExtension;
-			friend class AvayaGroup;
+			friend class AvayaVDN;
 
 		};
 	}

@@ -7,10 +7,10 @@ namespace chilli{
 	namespace Avaya {
 
 		class TSAPIModule;
-		class AvayaGroup :public Extension::ExtensionImp {
+		class AvayaVDN :public Extension::ExtensionImp {
 		public:
-			AvayaGroup(TSAPIModule * model, const std::string &ext, const std::string &smFileName);
-			virtual ~AvayaGroup();
+			AvayaVDN(TSAPIModule * model, const std::string &ext, const std::string &smFileName);
+			virtual ~AvayaVDN();
 
 			//inherit from SendInterface
 			virtual void fireSend(const std::string &strContent, const void * param) override;
@@ -21,6 +21,6 @@ namespace chilli{
 			TSAPIModule * m_model;
 
 		};
-		typedef std::shared_ptr<AvayaGroup>  AvayaGroupPtr;
+		typedef std::shared_ptr<AvayaVDN>  AvayaVDNPtr;
 	}
 }
