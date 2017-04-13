@@ -1614,7 +1614,7 @@ namespace chilli {
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAHeldEvent_t held = cstaEvent.event.cstaUnsolicited.u.held;
-							const char * holdingDevice = held.holdingDevice.deviceID;
+							const char * holding = held.holdingDevice.deviceID;
 
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
@@ -1623,7 +1623,7 @@ namespace chilli {
 							event["held"]["cause"] = AvayaAPI::cstaEventCauseString(held.cause);
 							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(held.localConnectionInfo);
 							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(held.heldConnection);
-							event["held"]["holdingDevice"] = holdingDevice;
+							event["held"]["holding"] = holding;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
@@ -1634,7 +1634,7 @@ namespace chilli {
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTARetrievedEvent_t retrieved = cstaEvent.event.cstaUnsolicited.u.retrieved;
-							const char * retrievingDevice = retrieved.retrievingDevice.deviceID;
+							const char * retrieving = retrieved.retrievingDevice.deviceID;
 
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
@@ -1643,7 +1643,7 @@ namespace chilli {
 							event["retrieved"]["cause"] = AvayaAPI::cstaEventCauseString(retrieved.cause);
 							event["retrieved"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
 							event["retrieved"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
-							event["retrieved"]["retrievingDevice"] = retrievingDevice;
+							event["retrieved"]["retrieving"] = retrieving;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
@@ -1657,6 +1657,7 @@ namespace chilli {
 							const char * calling = queued.callingDevice.deviceID;
 							const char * called = queued.calledDevice.deviceID;
 							const char * queue = queued.queue.deviceID;
+							const char * last = queued.lastRedirectionDevice.deviceID;
 
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
@@ -1668,6 +1669,7 @@ namespace chilli {
 							event["queued"]["calling"] = calling;
 							event["queued"]["called"] = called;
 							event["queued"]["queue"] = queue;
+							event["queued"]["last"] = last;
 							event["queued"]["numberQueued"] = queued.numberQueued;
 
 							model::EventType_t evt(event.toStyledString());
@@ -1706,6 +1708,8 @@ namespace chilli {
 				
 							const char * transferring = transferred.transferringDevice.deviceID;
 							const char * ctransferred = transferred.transferredDevice.deviceID;
+							const char * primary = transferred.primaryOldCall.deviceID;
+							const char * secondary = transferred.secondaryOldCall.deviceID;
 
 
 
@@ -1717,6 +1721,8 @@ namespace chilli {
 							event["transferred"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(transferred.localConnectionInfo);
 							event["transferred"]["transferring"] = transferring;
 							event["transferred"]["transferred"] = ctransferred;
+							event["transferred"]["primary"] = primary;
+							event["transferred"]["secondary"] = secondary;
 
 							model::EventType_t evt(event.toStyledString());
 							this->PushEvent(evt);
