@@ -17,10 +17,17 @@
 			<script>monitorId=_event.monitorId;</script>
 			<!--timer idexpr="_extension.Extension" interval="10000"/-->
 		</event>
-		<event event="DELIVERED">
+		<event event="DELIVERED" cond="_event.delivered.connection.deviceID == _avaya.Extension">
+			<send target="this" type="notify" dest="extension" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension >5000</extension>
+				<delivered type="script">_event.delivered;</delivered>
+			</send>
 		</event>
 		<event event="CONNECTION_CLEARED">
 		</event>
+    <event event=".*">
+    </event>
     </state>
 </fsm>
 

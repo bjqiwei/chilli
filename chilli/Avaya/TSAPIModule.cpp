@@ -213,6 +213,31 @@ namespace chilli {
 				}
 			}
 
+			// ACD 
+			XMLElement * acd = avaya->FirstChildElement("ACD");
+
+			for (XMLElement *child = acd->FirstChildElement("Extension");
+				child != nullptr;
+				child = child->NextSiblingElement("Extension"))
+			{
+
+				const char * num = child->Attribute("ExtensionNumber");
+				const char * sm = child->Attribute("StateMachine");
+
+				num = num ? num : "";
+				sm = sm ? sm : "";
+
+				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				{
+					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+					this->g_Extensions[num] = ext;
+					this->m_Extensions[num] = ext;
+					ext->setVar("_extension.Extension", num);
+				}
+				else {
+					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+				}
+			}
 			return true;
 		}
 
@@ -1046,6 +1071,50 @@ namespace chilli {
 				else {
 					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
+				}
+				bHandled = true;
+			}
+			else if (eventName == "MonitorCall")
+			{
+				ConnectionID_t connection;
+
+				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				if (jsonConnection["callID"].isInt())
+					connection.callID = jsonConnection["callID"].asInt();
+
+				if (jsonConnection["devIDType"].isString())
+					connection.devIDType = AvayaAPI::cstaStringConnectionIDDevice(jsonConnection["devIDType"].asString());
+
+				if (jsonConnection["deviceID"].isString())
+					strncpy(connection.deviceID, jsonConnection["deviceID"].asCString(), sizeof(DeviceID_t));
+
+				CSTAMonitorFilter_t noFilter;
+				noFilter.agent = 0;
+				noFilter.call = 0;
+				noFilter.feature = 0;
+				noFilter.maintenance = 0;
+				noFilter.privateFilter = 0;
+
+				uint32_t uInvodeId = ++(this->m_ulInvokeID);
+				RetCode_t nRetCode = AvayaAPI::cstaMonitorCall(this->m_lAcsHandle,
+					uInvodeId,
+					&connection,
+					&noFilter,
+					NULL);
+
+				if (nRetCode != ACSPOSITIVE_ACK) {
+					LOG4CPLUS_ERROR(log, "cstaMonitorCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					Json::Value event;
+					event["extension"] = ext->getExtNumber();
+					event["event"] = "MonitorCall";
+					event["MonitorCall"]["status"] = nRetCode;
+					event["MonitorCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
+					model::EventType_t evt(event);
+					this->PushEvent(evt);
+				}
+				else {
+					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Event[uInvodeId] = "MonitorCall";
 				}
 				bHandled = true;
 			}

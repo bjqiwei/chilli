@@ -44,6 +44,7 @@ namespace chilli {
 				if (jsonData["type"].asString() == "notify")
 				{
 					std::string dest = jsonData["dest"].asString();
+					jsonData["param"]["from"] = m_ExtNumber;
 					chilli::model::EventType_t sendData(jsonData["param"]);
 					this->m_model->PushEvent(sendData);
 					bHandled = true;

@@ -1,45 +1,62 @@
 ﻿<?xml version="1.0" ?>
-<fsm>
-	<functionmodel>
-		<function >function log(var1){logging(var1);}</function>
-	</functionmodel>
-	<state id="init">
-		<onentry>
-			<log level = "info">enter init state.</log>
-			<transition  target="idle"/>
-		</onentry>
-		<state id="idle">
-			<onentry>
-				<log level = "info">enter idle state.</log>
-				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
-			</onentry>
-			<event event="transfer">
-				<script>forward = extension.eventData; log(extension.number+':'+forward);</script>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
-				<transition  target="waitingForAnswer"/>
-			</event>
-		</state>
-		
-		<state id="waitingForAnswer">
-			<onentry>
-				<log level = "info">enter waitingForAnswer state.</log>
-			</onentry>
-			<event event="talking">
-				<transition  target="welcome"/>
-			</event>
-		</state> 
-		
-		<state id="welcome">
-			<onentry>
-				<log level = "info">enter welcome state.</log>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
-					<file>'./wav/welcome.wav'</file>
-				</send>
-			</onentry>
-		</state> 
+<fsm name ="AvayaACD" initial="Idle">
+<datamodel>
+	<data id="groupArray" expr='new Array();'/>
+	<data id="monitorId"/>
+</datamodel>
+
+<state id="init">
+	<event event="GroupControl">
+		<script>groupArray.push(_event.GroupControl.originate);</script>
+		<log type="script">groupArray.toString();</log>
+		<send target="this" type="notify" dest="extension" event="StateChange">
+			<event>StateChange</event>
+			<extension type="script">groupArray;</extension>
+			<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
+		</send>
+	</event>
 	
-	 <event event="onhook"><transition  target="idle"/></event>
-    </state>
+	<state id="Idle">
+		<onentry>
+			<send target="this" type="notify" dest="extension" event="StateChange">
+				<event>StateChange</event>
+				<extension type="script">groupArray;</extension>
+				<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
+			</send>
+		</onentry>
+		<event event= "DELIVERED">
+			<send target="this" type="cmd" dest="this" event="MonitorCall">
+				<connection type="script">_event.delivered.connection;</connection>
+			</send>
+			<transition target="Busy"/>
+		</event>
+	</state>
+	
+	<state id="Busy">
+		<onentry>
+			<send target="this" type="notify" dest="extension" event="StateChange">
+				<event>StateChange</event>
+				<extension type="script">groupArray;</extension>
+				<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
+			</send>
+		</onentry>
+		<event event= "DELIVERED" cond="_event.monitorId != monitorId">
+			<send target="this" type="notify" dest="extension" event="FAILED">
+				<event>FAILED</event>
+				<extension type="script">_event.from;</extension>
+				<failed type="script">var failed={}; failed.reason='Busy'; failed;</failed>
+			</send>
+		</event>
+		<event event="MonitorCall">
+			<script>monitorId = _event.MonitorCall.monitorId;</script>
+			<transition cond="_event.MonitorCall.status !=0" target="Idle"/>
+		</event>
+		<event event="MONITOR_ENDED">
+			<transition target="Idle"/>
+		</event>
+	</state>
+	
+</state>
 
 </fsm>
 

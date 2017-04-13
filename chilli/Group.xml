@@ -1,13 +1,39 @@
 ﻿<?xml version="1.0" ?>
 <fsm name="Group" initial="init">
+<datamodel>
+	<data id="extensionArray"/>
+	<data id="idleExtension"/>
+</datamodel>
+
 	<state id="init">
 		<onentry>
+			<script>extensionArray = {};</script>
 			<send target="this" type="cmd" dest="extension" event="GroupControl">
 				<event>GroupControl</event>
 				<extension type="script">_extension.Extensions;</extension>
-				<originate type="script">_extension.Extension;</originate>
+				<GroupControl type="script">var GroupControl = {}; GroupControl.originate = _extension.Extension; GroupControl;</GroupControl>
 			</send>
 		</onentry>
+		<event event="StateChange">
+			<script>extensionArray[_event.StateChange.extension] = _event.StateChange.state;</script>
+			<log type="script">extensionArray.toString();</log>
+		</event>
+		<event event= "DELIVERED">
+			<script>
+				for(var ext in extensionArray){
+				 if(extensionArray[ext] == 'Idle'){
+					idleExtension = ext;
+				 }
+				 else
+					idleExtension = '';
+				}
+			</script>
+			<send cond="idleExtension!=''" target="this" type="notify" dest="extension" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">idleExtension;</extension>
+				<delivered type="script">_event.delivered;</delivered>
+			</send>
+		</event>
     </state>
 
 </fsm>

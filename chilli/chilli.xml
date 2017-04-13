@@ -54,5 +54,8 @@
 			<Extension ExtensionNumber="8007" StateMachine="./AvayaExtension.xml" avayaExtension="8007"></Extension>
 		</Extensions>
     <VDN ExtensionNumber="5099" StateMachine="./AvayaVDN.xml" avayaExtension="5099"/>
+    <ACD>
+      <Extension ExtensionNumber="0100" StateMachine="./AvayaACD.xml"></Extension>
+    </ACD>
 	</Avaya>
 </Config>

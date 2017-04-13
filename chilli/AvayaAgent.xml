@@ -12,7 +12,7 @@
 		<onentry>
 			<send target="this" type="notify" dest="extension" event="AgentLogout">
 				<event>AgentLogout</event>
-				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId = agentId;</AgentLogout>
+				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId;</AgentLogout>
 				<extension type="script">_agent.Extension</extension>
 			</send>
 		</onentry>

@@ -81,6 +81,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				bHandled = true;
 			}
 			else {
+				jsonData["param"]["from"] = m_ExtNumber;
 				chilli::model::EventType_t  sendData(jsonData["param"]);
 				this->m_model->PushEvent(sendData);
 				bHandled = true;

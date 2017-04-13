@@ -25,6 +25,7 @@ namespace Group {
 		if (jsonReader.parse(strContent, jsonData)) {
 			if (jsonData["type"].asString() == "cmd" && jsonData["dest"].asString() == "extension")
 			{
+				jsonData["param"]["from"] = m_ExtNumber;
 				chilli::model::EventType_t sendData(jsonData["param"]);
 				this->m_model->PushEvent(sendData);
 				bHandled = true;
