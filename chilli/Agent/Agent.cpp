@@ -81,8 +81,9 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				bHandled = true;
 			}
 			else {
-				std::string sendData = jsonData["param"].toStyledString();
+				chilli::model::EventType_t  sendData(jsonData["param"]);
 				this->m_model->PushEvent(sendData);
+				bHandled = true;
 			}
 		}
 	}
@@ -105,28 +106,22 @@ int Agent::pushEvent(const model::EventType_t & Event)
 	if (Event.connect != 0)
 		this->m_curConnectId = Event.connect;
 
-	Json::Value jsonEvent;
-	Json::Reader jsonReader;
-	if (jsonReader.parse(Event.event, jsonEvent)){
-		std::string eventName;
+	const Json::Value & jsonEvent = Event.event;
+	
+	std::string eventName;
 
-		if (jsonEvent["event"].isString()){
-			eventName = jsonEvent["event"].asString();
-		}
-
-		fsm::TriggerEvent evt(eventName);
-
-		for (auto & it : jsonEvent.getMemberNames()) {
-			evt.addVars(it, jsonEvent[it]);
-		}
-
-		LOG4CPLUS_INFO(log, " Recived a event," << Event.event);
-		m_SM->pushEvent(evt);
-
+	if (jsonEvent["event"].isString()){
+		eventName = jsonEvent["event"].asString();
 	}
-	else{
-		LOG4CPLUS_ERROR(log, ",event:" << Event.event << " not json data.");
+
+	fsm::TriggerEvent evt(eventName);
+
+	for (auto & it : jsonEvent.getMemberNames()) {
+		evt.addVars(it, jsonEvent[it]);
 	}
+
+	LOG4CPLUS_INFO(log, " Recived a event," << Event.event.toStyledString());
+	m_SM->pushEvent(evt);
 
 	return 0;
 }

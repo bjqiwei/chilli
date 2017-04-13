@@ -375,7 +375,7 @@ namespace chilli {
 					event["event"] = "AgentLogin";
 					event["AgentLogin"]["status"] = nRetCode;
 					event["AgentLogin"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -420,7 +420,7 @@ namespace chilli {
 					event["event"] = "AgentLogout";
 					event["AgentLogout"]["status"] = nRetCode;
 					event["AgentLogout"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -448,7 +448,7 @@ namespace chilli {
 					event["event"] = "AgentGetState";
 					event["AgentGetState"]["status"] = nRetCode;
 					event["AgentGetState"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -486,7 +486,7 @@ namespace chilli {
 					event["event"] = "AgentSetFree";
 					event["AgentSetFree"]["status"] = nRetCode;
 					event["AgentSetFree"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -524,7 +524,7 @@ namespace chilli {
 					event["event"] = "AgentSetBusy";
 					event["AgentSetBusy"]["status"] = nRetCode;
 					event["AgentSetBusy"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -561,7 +561,7 @@ namespace chilli {
 					event["event"] = "ClearConnection";
 					event["ClearConnection"]["status"] = nRetCode;
 					event["ClearConnection"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -598,7 +598,7 @@ namespace chilli {
 					event["event"] = "ClearCall";
 					event["ClearCall"]["status"] = nRetCode;
 					event["ClearCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -635,7 +635,7 @@ namespace chilli {
 					event["event"] = "AnswerCall";
 					event["AnswerCall"]["status"] = nRetCode;
 					event["AnswerCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -670,7 +670,7 @@ namespace chilli {
 					event["event"] = "MakeCall";
 					event["MakeCall"]["status"] = nRetCode;
 					event["MakeCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -708,7 +708,7 @@ namespace chilli {
 					event["event"] = "HoldCall";
 					event["HoldCall"]["status"] = nRetCode;
 					event["HoldCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -745,7 +745,7 @@ namespace chilli {
 					event["event"] = "RetrieveCall";
 					event["RetrieveCall"]["status"] = nRetCode;
 					event["RetrieveCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -786,7 +786,7 @@ namespace chilli {
 					event["event"] = "ConsultationCall";
 					event["ConsultationCall"]["status"] = nRetCode;
 					event["ConsultationCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -836,7 +836,7 @@ namespace chilli {
 					event["event"] = "ReconnectCall";
 					event["ReconnectCall"]["status"] = nRetCode;
 					event["ReconnectCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -886,7 +886,7 @@ namespace chilli {
 					event["event"] = "TransferCall";
 					event["TransferCall"]["status"] = nRetCode;
 					event["TransferCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -936,7 +936,7 @@ namespace chilli {
 					event["event"] = "ConferenceCall";
 					event["ConferenceCall"]["status"] = nRetCode;
 					event["ConferenceCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -973,7 +973,7 @@ namespace chilli {
 					event["event"] = "MonitorDevice";
 					event["status"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -1003,7 +1003,7 @@ namespace chilli {
 					event["event"] = "MonitorStop";
 					event["status"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -1040,7 +1040,7 @@ namespace chilli {
 					event["event"] = "MonitorCallsViaDevice";
 					event["status"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event.toStyledString());
+					model::EventType_t evt(event);
 					this->PushEvent(evt);
 				}
 				else {
@@ -1115,7 +1115,7 @@ namespace chilli {
 							event["event"] = "ACS_OPEN_STREAM_CONF";
 							event["OpenStream"] = Json::objectValue;
 							event["OpenStream"]["status"] = 0;
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							for (auto &it: this->m_Extensions){
 								it.second->pushEvent(evt);
 							}
@@ -1198,7 +1198,7 @@ namespace chilli {
 							event[eventName]["status"] = 0;
 							event[eventName]["clearCall"] = Json::nullValue;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 
 						}
@@ -1224,7 +1224,7 @@ namespace chilli {
 										conferenceCall.connList.connection[i].party));
 							}
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 														break;
@@ -1241,7 +1241,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
 							event[eventName]["status"] = 0;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1263,7 +1263,7 @@ namespace chilli {
 							event[eventName]["status"] = 0;
 							event[eventName]["holdCall"] = Json::nullValue;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 												  break;
@@ -1280,7 +1280,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
 							event[eventName]["status"] = 0;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						
 						}
@@ -1305,7 +1305,7 @@ namespace chilli {
 							event[eventName]["status"] = 0;
 							event[eventName]["reconnectCall"] = Json::nullValue;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													   break;
@@ -1318,7 +1318,7 @@ namespace chilli {
 							event[eventName]["status"] = 0;
 							event[eventName]["retrieveCall"] = Json::nullValue;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1340,7 +1340,7 @@ namespace chilli {
 										transferCall.connList.connection[i].party));
 							}
 						
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1364,7 +1364,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName] = Json::objectValue;
 							event[eventName]["status"] = 0;
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 														break;
@@ -1400,7 +1400,7 @@ namespace chilli {
 							event[eventName] = Json::objectValue;
 							event[eventName]["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
 							event[eventName]["status"] = 0;
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1424,7 +1424,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName]["status"] = error;
 							event[eventName]["reason"] = AvayaAPI::cstaErrorString(error);
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1440,7 +1440,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName]["status"] = 0;
 							event[eventName]["monitorId"] = monitorId;
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 								  break;
@@ -1451,7 +1451,7 @@ namespace chilli {
 							std::string eventName = this->m_InvokeID2Event[invokeId];
 							event["event"] = eventName;
 							event[eventName]["status"] = 0;
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													 break;
@@ -1476,7 +1476,7 @@ namespace chilli {
 							event["event"] = "MONITOR_ENDED";
 							event["monitorEnded"]["cause"] = AvayaAPI::cstaEventCauseString(cause);
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 							this->m_monitorID2Extension.erase(monitorId);
 
@@ -1503,7 +1503,7 @@ namespace chilli {
 							event["connectionCleared"]["releasing"] = releasing;
 
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1534,7 +1534,7 @@ namespace chilli {
 
 							event["delivered"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 
 						}
@@ -1564,7 +1564,7 @@ namespace chilli {
 							event["established"]["last"] = last;
 							event["established"]["answering"] = answering;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 
 						}
@@ -1583,7 +1583,7 @@ namespace chilli {
 							event["serviceInitiated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(serviceInitiated.localConnectionInfo);
 							event["serviceInitiated"]["connection"] = AvayaAPI::cstaConnectionIDJson(serviceInitiated.initiatedConnection);
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 													 break;
@@ -1605,7 +1605,7 @@ namespace chilli {
 							event["originated"]["calling"] = calling;
 							event["originated"]["called"] = called;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 											  break;
@@ -1625,7 +1625,7 @@ namespace chilli {
 							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(held.heldConnection);
 							event["held"]["holding"] = holding;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 										break;
@@ -1645,7 +1645,7 @@ namespace chilli {
 							event["retrieved"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
 							event["retrieved"]["retrieving"] = retrieving;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 											 break;
@@ -1672,7 +1672,7 @@ namespace chilli {
 							event["queued"]["last"] = last;
 							event["queued"]["numberQueued"] = queued.numberQueued;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 										  break;
@@ -1696,7 +1696,7 @@ namespace chilli {
 							event["failed"]["failing"] = failing;
 							event["failed"]["called"] = called;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 										  break;
@@ -1724,7 +1724,7 @@ namespace chilli {
 							event["transferred"]["primary"] = primary;
 							event["transferred"]["secondary"] = secondary;
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 											   break;
@@ -1756,7 +1756,7 @@ namespace chilli {
 										conferenced.conferenceConnections.connection[i].party));
 							}
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 											   break;
@@ -1782,7 +1782,7 @@ namespace chilli {
 
 							event["diverted"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 
-							model::EventType_t evt(event.toStyledString());
+							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
 										   break;

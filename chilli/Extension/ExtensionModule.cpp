@@ -52,7 +52,8 @@ namespace chilli {
 		{
 			if (m_bRunning) {
 				m_bRunning = false;
-				PushEvent(std::string());
+				chilli::model::EventType_t stopEvent(Json::nullValue);
+				this->PushEvent(stopEvent);
 
 				for (auto & it : m_Extensions) {
 					it.second->Stop();
@@ -117,22 +118,14 @@ namespace chilli {
 			while (m_bRunning)
 			{
 				model::EventType_t Event;
-				if (g_recEvtBuffer.Get(Event) && !Event.event.empty())
+				if (g_recEvtBuffer.Get(Event) && !Event.event.isNull())
 				{
-					Json::Value jsonEvent;
-					Json::Reader jsonReader;
-					if (jsonReader.parse(Event.event, jsonEvent)) {
-						std::string eventName;
-						std::string sessionId;
+					const Json::Value & jsonEvent = Event.event;					
+
+					if (!jsonEvent["extension"].isArray())
+					{
+
 						std::string ext;
-
-						if (jsonEvent["event"].isString()) {
-							eventName = jsonEvent["event"].asString();
-						}
-
-						if (jsonEvent["sessionid"].isString()) {
-							sessionId = jsonEvent["sessionid"].asString();
-						}
 
 						if (jsonEvent["extension"].isString()) {
 							ext = jsonEvent["extension"].asString();
@@ -145,12 +138,30 @@ namespace chilli {
 							it->second->pushEvent(Event);
 						}
 						else {
-							LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event);
+							LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event.toStyledString());
 						}
-
 					}
 					else {
-						LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << Event.event << " not json data.");
+						for (int i = 0; i < jsonEvent["extension"].size();i++) {
+
+							std::string ext;
+							if (jsonEvent["extension"][i].isString()){
+								ext = jsonEvent["extension"][i].asString();
+							}
+
+							chilli::model::EventType_t newEvent(Event.event);
+							newEvent.event["extension"] = ext;
+
+							auto &it = g_Extensions.find(ext);
+
+							if (it != g_Extensions.end()) {
+
+								it->second->pushEvent(newEvent);
+							}
+							else {
+								LOG4CPLUS_ERROR(log, " not find extension by event:" << newEvent.event.toStyledString());
+							}
+						}
 					}
 				}
 			}

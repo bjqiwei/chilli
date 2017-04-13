@@ -291,7 +291,7 @@ public:
 		event["extension"] = m_Extension;
 		event["event"] = "ConnectClose";
 		event["errorCode"] = errorCode;
-		model::EventType_t evt(event.toStyledString(), GetId());
+		model::EventType_t evt(event, GetId());
 		m_module->PushEvent(evt);
 		delete this;
 	};
@@ -302,7 +302,7 @@ public:
 		event["extension"] = m_Extension;
 		event["event"] = "ConnectError";
 		event["errorCode"] = errorCode;
-		model::EventType_t evt(event.toStyledString(), GetId());
+		model::EventType_t evt(event, GetId());
 		m_module->PushEvent(evt);
 		delete this;
 	};
@@ -322,7 +322,7 @@ public:
 				jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
 		}
 
-		model::EventType_t evt(jsonEvent.toStyledString(), GetId());
+		model::EventType_t evt(jsonEvent, GetId());
 		m_module->PushEvent(evt);
 	};
 

@@ -2,7 +2,7 @@
 
 #ifndef _CHILLI_SHDEV_SHEXTENSION_HEADER_
 #define _CHILLI_SHDEV_SHEXTENSION_HEADER_
-#include "..\model\Extension.h"
+#include "..\Extension\ExtensionImp.h"
 #include <log4cplus\logger.h>
 #include <memory>
 
@@ -10,13 +10,12 @@ namespace chilli{
 namespace ShDev{
 
 
-class ShExtension :public model::Extension
+class ShExtension :public Extension::ExtensionImp
 {
 public:
 	ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~ShExtension(void);
 
-	virtual int pushEvent(const model::EventType_t &evt) override;
 
 	virtual int getChannelID();
 	bool setType(const std::string & strType);

@@ -9,7 +9,7 @@ namespace ShDev{
 using namespace SHAPI;
 
 ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-	:Extension(model, ext, smFileName)
+	:ExtensionImp(model, ext, smFileName)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDev.Extension");
 	LOG4CPLUS_DEBUG(log,"new a extension object.");
@@ -20,34 +20,6 @@ ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, c
 ShExtension::~ShExtension(void)
 {
 	LOG4CPLUS_DEBUG(log,"destruction a extension object.");
-}
-
-int ShExtension::pushEvent(const model::EventType_t & evt)
-{
-	Json::Value jsonEvent;
-	Json::Reader jsonReader;
-	if (jsonReader.parse(evt.event, jsonEvent)) {
-		std::string eventName;
-		std::string _from;
-		if (jsonEvent["event"].isString()) {
-			eventName = jsonEvent["event"].asString();
-		}
-
-		if (jsonEvent["from"].isString()) {
-			_from = jsonEvent["from"].asString();
-		}
-
-
-		fsm::TriggerEvent evt(eventName, _from);
-		LOG4CPLUS_INFO(log, " Recived a event," << "from " << _from << "event=" << evt.ToString());
-		m_SM->pushEvent(evt);
-
-	}
-	else {
-		LOG4CPLUS_ERROR(log, __FUNCTION__ ",event:" << evt.event << " not json data.");
-	}
-
-	return 0;
 }
 
 bool ShExtension::setType(const std::string & strType)
