@@ -464,15 +464,20 @@ namespace env
 				JS::RootedValue v(this->m_jsctx);
 
 				if (JS_GetPropertyById(this->m_jsctx, obj, props[i], &v)) {
-
-					JS::RootedValue idname(this->m_jsctx, IdToValue(props[i]));
-					JSString *str = JS::ToString(this->m_jsctx, idname);
-					if (str) {
-						JSAutoByteString bytes(this->m_jsctx, str);
-						if (bytes.ptr()) {
-							Json::Value val = JsvalToJsonValue(v);
-							result[bytes.ptr()] = val;
+				
+					if (JSID_IS_STRING(props[i])) {
+						JSString *str = JSID_TO_STRING(props[i]);
+						if (str) {
+							JSAutoByteString bytes(this->m_jsctx, str);
+							if (bytes.ptr()) {
+								Json::Value val = JsvalToJsonValue(v);
+								result[bytes.ptr()] = val;
+							}
 						}
+					}
+					else if(JSID_IS_INT(props[i])) {
+						result[JSID_TO_INT(props[i])] = JsvalToJsonValue(v);
+
 					}
 				}
 
