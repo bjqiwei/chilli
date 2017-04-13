@@ -10,6 +10,7 @@
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
 #include "Extension/ExtensionModule.h"
+#include "Group/GroupModule.h"
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
 #include "Avaya/TSAPIModule.h"
@@ -22,6 +23,7 @@
 #define  AVAYANODE      "Avaya"
 #define  AGENTNODE      "Agents"
 #define  EXTENSIONS		"Extensions"
+#define  GROUPS			"Groups"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -275,6 +277,14 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				extension->LoadConfig(printer.CStr());
 				m_Modules.push_back(extension);
 
+			}
+			else if (nodeName == GROUPS)
+			{
+				model::ProcessModulePtr group(new chilli::Group::GroupModule(modelid));
+				XMLPrinter printer;
+				e->Accept(&printer);
+				group->LoadConfig(printer.CStr());
+				m_Modules.push_back(group);
 			}
 
 			e = e->NextSiblingElement();

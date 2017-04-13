@@ -160,10 +160,11 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClInclude Include="Extension\ExtensionImp.h" />
     <ClInclude Include="Extension\ExtensionModule.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
+    <ClInclude Include="Group\GroupImp.h" />
+    <ClInclude Include="Group\GroupModule.h" />
     <ClInclude Include="IVR\IVRModule.h" />
     <ClInclude Include="model\ConnectAdapter.h" />
     <ClInclude Include="model\Extension.h" />
-    <ClInclude Include="model\Group.h" />
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="model\TypeDef.h" />
     <ClInclude Include="ServiceModule.h" />
@@ -189,9 +190,10 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <ClCompile Include="Extension\ExtensionImp.cpp" />
     <ClCompile Include="Extension\ExtensionModule.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
+    <ClCompile Include="Group\GroupImp.cpp" />
+    <ClCompile Include="Group\GroupModule.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
     <ClCompile Include="model\ConnectAdapter.cpp" />
-    <ClCompile Include="model\Group.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />

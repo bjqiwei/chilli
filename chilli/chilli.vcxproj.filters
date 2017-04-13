@@ -43,6 +43,9 @@
     <Filter Include="Extension">
       <UniqueIdentifier>{e74a7c9f-a71a-4955-819f-415cf4ebb6b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Group">
+      <UniqueIdentifier>{62aa6b3b-c07f-4462-ae0d-700f87ba1f53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -84,9 +87,6 @@
     </ClInclude>
     <ClInclude Include="ACD\ACDModule.h">
       <Filter>ACD</Filter>
-    </ClInclude>
-    <ClInclude Include="model\Group.h">
-      <Filter>model</Filter>
     </ClInclude>
     <ClInclude Include="chilli.h">
       <Filter>Header Files</Filter>
@@ -151,6 +151,12 @@
     <ClInclude Include="Avaya\AvayaVDN.h">
       <Filter>Avaya</Filter>
     </ClInclude>
+    <ClInclude Include="Group\GroupModule.h">
+      <Filter>Group</Filter>
+    </ClInclude>
+    <ClInclude Include="Group\GroupImp.h">
+      <Filter>Group</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -167,9 +173,6 @@
     </ClCompile>
     <ClCompile Include="chilli.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="model\Group.cpp">
-      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="tinyxml2\tinyxml2.cpp">
       <Filter>tinyxml2</Filter>
@@ -221,6 +224,12 @@
     </ClCompile>
     <ClCompile Include="Avaya\AvayaVDN.cpp">
       <Filter>Avaya</Filter>
+    </ClCompile>
+    <ClCompile Include="Group\GroupModule.cpp">
+      <Filter>Group</Filter>
+    </ClCompile>
+    <ClCompile Include="Group\GroupImp.cpp">
+      <Filter>Group</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

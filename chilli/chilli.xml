@@ -23,20 +23,20 @@
       <Conf ChannelID="6" Type="BASE" Enable="1"></Conf>
       <Conf ChannelID="7" Type="BASE" Enable="1"></Conf>
    </Conferences>
-   <groups>
-      <group ExtensionNumber ="5000" name ="IVR"  Enable="1" StateMachine="./Group.xml">
-        <Extension>5001</Extension>
-        <Extension>5002</Extension>
-        <Extension>5003</Extension>
-        <Extension>5004</Extension>
-        <Extension>5005</Extension>
-        <Extension>5006</Extension>
-        <Extension>5007</Extension>
-        <Extension>5008</Extension>
-        <Extension>5009</Extension>
-        <Extension>5010</Extension>
-    </group>
-   </groups>
+   <Groups id="group001">
+      <Group ExtensionNumber ="5000" StateMachine="./Group.xml">
+        <Extension>0100</Extension>
+        <Extension>0101</Extension>
+        <Extension>0102</Extension>
+        <Extension>0103</Extension>
+        <Extension>0104</Extension>
+        <Extension>0105</Extension>
+        <Extension>0106</Extension>
+        <Extension>0107</Extension>
+        <Extension>0108</Extension>
+        <Extension>0109</Extension>
+    </Group>
+   </Groups>
   <!--<FreeSwitch id = "freeswitch001" host="123.56.241.85" port ="18021" password="qiwei">
 	</FreeSwitch>-->
 	<Avaya id = "tsapi001">
