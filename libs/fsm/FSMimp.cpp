@@ -777,7 +777,6 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 
 		getRootContext()->setVar("_event._name", m_currentEvt.getEventName());
 		getRootContext()->setVar("_event._type", m_currentEvt.getMsgType());
-		getRootContext()->setVar("_event._data", m_currentEvt.getData());
 		for(auto & it : m_currentEvt.getVars())
 		{
 			getRootContext()->setVar("_event." + it.first, it.second);

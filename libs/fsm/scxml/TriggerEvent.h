@@ -18,26 +18,23 @@ namespace fsm
 		//根据事件名称和事件类型生成一个事件。
 		TriggerEvent(const std::string &name); //this(name,nullptr);
 		//根据事件名称，数据，事件类型生成一个事件。
-		TriggerEvent(const std::string &name, const std::string &data); 
+		TriggerEvent(const std::string &name, const std::string & type); 
 
 		
 	private:
 		std::string m_strEventName;
 		std::string m_strMsgType;
-		std::string m_strData;
 		const void * m_ParamPtr;
 		std::map<std::string, Json::Value> m_eventVars;
 		
 		
 	public:
 		void setEventName(const std::string &strEventName){m_strEventName = strEventName;}
-		void setData(const std::string &strData){m_strData = strData;}
 		void setMsgType(const std::string &strMsgtype){m_strMsgType = strMsgtype;}
 		void setParam(const void * param){m_ParamPtr = param;}
-		void addVars(const std::string & name, Json::Value & value);
+		void addVars(const std::string & name, const Json::Value & value);
 
 		const std::string &getEventName()const{return m_strEventName;}
-		const std::string &getData(){return m_strData;}
 		const std::string &getMsgType(){return m_strMsgType;}
 		const void * getParam(){return m_ParamPtr;}
 		const std::map <std::string,Json::Value> &getVars() { return m_eventVars; };
