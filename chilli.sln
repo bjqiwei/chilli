@@ -41,6 +41,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testlibevent", "test\testli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libeventtcpclient", "test\libeventtcpclient\libeventtcpclient.vcxproj", "{0D040586-2090-47E5-95EC-A3C0DB7E015F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testmysql", "test\testmysql\testmysql.vcxproj", "{57D0D391-0980-4D8A-ACF0-78839F72E36A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Unicode|Win32 = Debug_Unicode|Win32
@@ -415,6 +417,30 @@ Global
 		{0D040586-2090-47E5-95EC-A3C0DB7E015F}.RelWithDebInfo|Win32.Build.0 = Release|Win32
 		{0D040586-2090-47E5-95EC-A3C0DB7E015F}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{0D040586-2090-47E5-95EC-A3C0DB7E015F}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug_Unicode|Win32.ActiveCfg = Debug|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug_Unicode|Win32.Build.0 = Debug|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug_Unicode|x64.ActiveCfg = Debug|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug_Unicode|x64.Build.0 = Debug|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug|Win32.Build.0 = Debug|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug|x64.ActiveCfg = Debug|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Debug|x64.Build.0 = Debug|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.MinSizeRel|Win32.ActiveCfg = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.MinSizeRel|Win32.Build.0 = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.MinSizeRel|x64.ActiveCfg = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.MinSizeRel|x64.Build.0 = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release_Unicode|Win32.ActiveCfg = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release_Unicode|Win32.Build.0 = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release_Unicode|x64.ActiveCfg = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release_Unicode|x64.Build.0 = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release|Win32.ActiveCfg = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release|Win32.Build.0 = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release|x64.ActiveCfg = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.Release|x64.Build.0 = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.RelWithDebInfo|Win32.ActiveCfg = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.RelWithDebInfo|Win32.Build.0 = Release|Win32
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A}.RelWithDebInfo|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -436,5 +462,6 @@ Global
 		{7BD82078-0049-4B2F-843E-2F7C018F426A} = {89F619D1-A76B-4A83-B545-53AC38412F68}
 		{7C7CC7E2-BEA5-4F4E-BDF0-3FE717109923} = {C0940163-A25F-4916-A891-1BF17B02149F}
 		{0D040586-2090-47E5-95EC-A3C0DB7E015F} = {C0940163-A25F-4916-A891-1BF17B02149F}
+		{57D0D391-0980-4D8A-ACF0-78839F72E36A} = {C0940163-A25F-4916-A891-1BF17B02149F}
 	EndGlobalSection
 EndGlobal
