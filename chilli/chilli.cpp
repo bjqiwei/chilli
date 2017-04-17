@@ -14,6 +14,7 @@
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
 #include "Avaya/TSAPIModule.h"
+#include "mysql/MySqlModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
@@ -24,6 +25,7 @@
 #define  AGENTNODE      "Agents"
 #define  EXTENSIONS		"Extensions"
 #define  GROUPS			"Groups"
+#define  MYSQL			"MySql"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -286,7 +288,14 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				group->LoadConfig(printer.CStr());
 				m_Modules.push_back(group);
 			}
-
+			else if (nodeName == MYSQL)
+			{
+				model::ProcessModulePtr mysql(new chilli::DataBase::MySqlModule(modelid));
+				XMLPrinter printer;
+				e->Accept(&printer);
+				mysql->LoadConfig(printer.CStr());
+				m_Modules.push_back(mysql);
+			}
 			e = e->NextSiblingElement();
 		}
 

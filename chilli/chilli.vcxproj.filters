@@ -46,6 +46,9 @@
     <Filter Include="Group">
       <UniqueIdentifier>{62aa6b3b-c07f-4462-ae0d-700f87ba1f53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="mysql">
+      <UniqueIdentifier>{87f16a24-4bd7-4d44-935e-1a7147cc4e38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Group.xml">
@@ -157,6 +160,9 @@
     <ClInclude Include="Group\GroupImp.h">
       <Filter>Group</Filter>
     </ClInclude>
+    <ClInclude Include="mysql\MySqlModule.h">
+      <Filter>mysql</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -230,6 +236,9 @@
     </ClCompile>
     <ClCompile Include="Group\GroupImp.cpp">
       <Filter>Group</Filter>
+    </ClCompile>
+    <ClCompile Include="mysql\MySqlModule.cpp">
+      <Filter>mysql</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

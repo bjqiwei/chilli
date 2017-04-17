@@ -13,5 +13,14 @@ namespace model {
 		Json::Value event;
 		uint64_t connect = 0;
 	}EventType_t;
+
+	typedef struct _SQLEventType
+	{
+		_SQLEventType() {};
+		explicit _SQLEventType(const std::string & sql) :m_sql(sql) {};
+		explicit _SQLEventType(const std::string & sql, const std::string & ext) :m_sql(sql), m_ExtNumber(ext) {};
+		std::string m_sql;
+		std::string m_ExtNumber;
+	}SQLEventType_t;
 }
 }
