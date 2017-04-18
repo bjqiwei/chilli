@@ -6,7 +6,7 @@
 
 namespace WebSocket {
 	static std::map<struct lws *, WebSocketClient *> WSClientSet;
-	static std::recursive_mutex wsClientSetMtx;
+	//static std::recursive_mutex wsClientSetMtx;
 
 	/*
 	* dumb_increment protocol
@@ -22,7 +22,7 @@ namespace WebSocket {
 		WebSocketClient * wsclient = nullptr;
 		WebSocketServer * This = reinterpret_cast<WebSocketServer*>(lws_context_user(lws_get_context(wsi)));
 
-		std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
 		auto & it = WSClientSet.find(wsi);
 		if (it != WSClientSet.end())
 			wsclient = it->second;
@@ -339,7 +339,7 @@ lwsclose:
 	bool WebSocketServer::UnInitInstance()
 	{
 		bool result = true;
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (m_Context) {
 			lws_context_destroy(m_Context);
 			m_Context = nullptr;
@@ -400,7 +400,7 @@ lwsclose:
 
 	WebSocketClient::~WebSocketClient()
 	{
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end())
 			Close();
 
@@ -440,7 +440,7 @@ lwsclose:
 		con_info.host = con_info.address;
 		con_info.origin = con_info.address;
 		con_info.userdata = this;
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		wsi = lws_client_connect_via_info(&con_info);
 		LOG4CPLUS_TRACE(log, m_SessionId << "wsi:" << wsi);
 
@@ -452,7 +452,7 @@ lwsclose:
 
 	void WebSocketClient::Close()
 	{
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
 		{
 			this->m_state = CLOSING;
@@ -465,7 +465,7 @@ lwsclose:
 
 	int WebSocketClient::Send(const char* lpBuf, int nBufLen)
 	{
-		std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
+		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		m_sendBuf.insert(m_sendBuf.end(), lpBuf, lpBuf + nBufLen);
 
 		LOG4CPLUS_DEBUG(log, m_SessionId << "Send:" << std::string(m_sendBuf.begin() + LWS_PRE, m_sendBuf.end()));
