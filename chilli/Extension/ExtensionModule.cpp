@@ -1,5 +1,6 @@
 #include "ExtensionModule.h"
 #include "ExtensionImp.h"
+#include "../model/ConnectAdapter.h"
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
@@ -138,6 +139,14 @@ namespace chilli {
 							it->second->pushEvent(Event);
 						}
 						else {
+							
+							Json::Value originEvent = Event.event;
+							originEvent["status"] = 1;
+							originEvent["mem"] = "not find this extension";
+							Json::FastWriter writer;
+							std::string errorStr = writer.write(originEvent);
+							chilli::model::ConnectAdapter::Send(Event.connect, errorStr.c_str(), errorStr.length());
+							
 							LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event.toStyledString());
 						}
 					}

@@ -319,7 +319,7 @@ public:
 			if (jsonEvent["extension"].isNull())
 				jsonEvent["extension"] = jsonEvent.removeMember("agentid");
 			if (jsonEvent["extension"].isNull())
-				jsonEvent["extension"] = jsonEvent.removeMember("operatorid");
+				jsonEvent["extension"] = jsonEvent["operatorid"];
 		}
 
 		model::EventType_t evt(jsonEvent, GetId());
