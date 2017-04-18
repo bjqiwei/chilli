@@ -93,6 +93,66 @@ const model::ExtensionMap & MySqlModule::GetExtension()
 	return m_Extensions;
 }
 
+Json::Value MySqlModule::executeQuery(const std::string & sql)
+{
+	sql::mysql::MySQL_Driver driver;
+	std::shared_ptr<sql::Connection> connect;
+	Json::Value result;
+
+	try {
+		connect.reset(driver.connect(m_Host, m_UserID, m_Password));
+
+		/* select appropriate database schema */
+		if (!m_DataBase.empty()) {
+			connect->setSchema(m_DataBase);
+		}
+		if (sql.empty())
+			return Json::Value();
+
+		/* create a statement object */
+		std::auto_ptr<sql::Statement> stmt(connect->createStatement());
+		std::auto_ptr<sql::ResultSet> resultset(stmt->executeQuery(sql));
+		
+		Json::Value data;
+
+		/*The following commented statement won't work with Connector/C++ 1.0.5 and later */
+		//auto_ptr < ResultSetMetaData > res_meta ( rs -> getMetaData() );  
+		sql::ResultSetMetaData *res_meta = resultset->getMetaData();
+
+		int numcols = res_meta->getColumnCount();
+
+		while (resultset->next())
+		{
+			Json::Value record;
+
+			for (int i = 1; i <= numcols; ++i) {
+				switch (res_meta->getColumnType(i)) {
+				default:
+					record[res_meta->getColumnLabel(i).asStdString()] = resultset->getString(i).asStdString();
+				}
+
+			}
+			data.append(record);
+		} // while  
+		result = data;
+		
+	}
+	catch (sql::SQLException &e) {
+		std::ostringstream oss;
+		oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+		LOG4CPLUS_DEBUG(log, oss.str());
+
+	}
+	catch (std::runtime_error &e) {
+		LOG4CPLUS_ERROR(log, "ERROR: " << e.what());
+	}
+
+	if (connect && !connect->isClosed())
+		connect->close();
+
+	return result;
+}
+
 void MySqlModule::fireSend(const std::string &strContent, const void * param)
 {
 	LOG4CPLUS_DEBUG(log, "fireSend:" << strContent);
@@ -198,7 +258,7 @@ void MySqlModule::executeSql()
 
 		try {
 			connect.reset(driver.connect(m_Host, m_UserID, m_Password));
-			connect->setAutoCommit(0);
+			//connect->setAutoCommit(0);
 			LOG4CPLUS_DEBUG(log, "Database connection  autocommit mode = " << connect->getAutoCommit());
 
 			/* select appropriate database schema */

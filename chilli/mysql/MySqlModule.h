@@ -16,6 +16,7 @@ public:
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
 	virtual const model::ExtensionMap & GetExtension() override;
+	Json::Value executeQuery(const std::string & sql);
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
