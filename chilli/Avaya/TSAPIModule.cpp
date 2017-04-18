@@ -116,77 +116,80 @@ namespace chilli {
 			}
 			// agents 
 			XMLElement * agents = avaya->FirstChildElement("Agents");
-			
-			for (XMLElement *child = agents->FirstChildElement("Agent");
-				child != nullptr;
-				child = child->NextSiblingElement("Agent"))
-			{
+			if (agents != nullptr) {
 
-				const char * num = child->Attribute("ExtensionNumber");
-				const char * sm = child->Attribute("StateMachine");
-				const char * password = child->Attribute("password");
-				const char * extension = child->Attribute("Extension");
-				const char * avayaAgentId = child->Attribute("avayaAgentId");
-				const char * avayaPassword = child->Attribute("avayaPassword");
-				const char * avayaExtension = child->Attribute("avayaExtension");
-
-				num = num ? num : "";
-				sm = sm ? sm : "";
-				password = password ? password : "";
-				extension = extension ? extension : "";
-				avayaAgentId = avayaAgentId ? avayaAgentId : "";
-				avayaPassword = avayaPassword ? avayaPassword : "";
-				avayaExtension = avayaExtension ? avayaExtension : "";
-
-				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				for (XMLElement *child = agents->FirstChildElement("Agent");
+					child != nullptr;
+					child = child->NextSiblingElement("Agent"))
 				{
-					model::ExtensionPtr ext(new AvayaAgent(this, num, sm));
-					this->g_Extensions[num] = ext;
-					this->m_Extensions[num] = ext;
-					ext->setVar("_agent.AgentId", num);
-					ext->setVar("_agent.Password", password);
-					ext->setVar("_agent.Extension", extension);
-					ext->setVar("_avaya.AgentId", avayaAgentId);
-					ext->setVar("_avaya.Password", avayaPassword);
-					ext->setVar("_avaya.Extension", avayaExtension);
-				}
-				else {
-					LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
+
+					const char * num = child->Attribute("ExtensionNumber");
+					const char * sm = child->Attribute("StateMachine");
+					const char * password = child->Attribute("password");
+					const char * extension = child->Attribute("Extension");
+					const char * avayaAgentId = child->Attribute("avayaAgentId");
+					const char * avayaPassword = child->Attribute("avayaPassword");
+					const char * avayaExtension = child->Attribute("avayaExtension");
+
+					num = num ? num : "";
+					sm = sm ? sm : "";
+					password = password ? password : "";
+					extension = extension ? extension : "";
+					avayaAgentId = avayaAgentId ? avayaAgentId : "";
+					avayaPassword = avayaPassword ? avayaPassword : "";
+					avayaExtension = avayaExtension ? avayaExtension : "";
+
+					if (this->g_Extensions.find(num) == this->g_Extensions.end())
+					{
+						model::ExtensionPtr ext(new AvayaAgent(this, num, sm));
+						this->g_Extensions[num] = ext;
+						this->m_Extensions[num] = ext;
+						ext->setVar("_agent.AgentId", num);
+						ext->setVar("_agent.Password", password);
+						ext->setVar("_agent.Extension", extension);
+						ext->setVar("_avaya.AgentId", avayaAgentId);
+						ext->setVar("_avaya.Password", avayaPassword);
+						ext->setVar("_avaya.Extension", avayaExtension);
+					}
+					else {
+						LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
+					}
 				}
 			}
 
-			
 			// extensions 
 			XMLElement * extensions = avaya->FirstChildElement("Extensions");
 
-			for (XMLElement *child = extensions->FirstChildElement("Extension");
-				child != nullptr;
-				child = child->NextSiblingElement("Extension"))
-			{
+			if (extensions != nullptr) {
 
-				const char * num = child->Attribute("ExtensionNumber");
-				const char * sm = child->Attribute("StateMachine");
-				const char * avayaExtension = child->Attribute("avayaExtension");
-
-				num = num ? num : "";
-				sm = sm ? sm : "";
-				avayaExtension = avayaExtension ? avayaExtension : "";
-
-				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				for (XMLElement *child = extensions->FirstChildElement("Extension");
+					child != nullptr;
+					child = child->NextSiblingElement("Extension"))
 				{
-					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
-					this->g_Extensions[num] = ext;
-					this->m_Extensions[num] = ext;
-					ext->setVar("_extension.Extension", num);
-					ext->setVar("_avaya.Extension", avayaExtension);
-				}
-				else {
-					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+
+					const char * num = child->Attribute("ExtensionNumber");
+					const char * sm = child->Attribute("StateMachine");
+					const char * avayaExtension = child->Attribute("avayaExtension");
+
+					num = num ? num : "";
+					sm = sm ? sm : "";
+					avayaExtension = avayaExtension ? avayaExtension : "";
+
+					if (this->g_Extensions.find(num) == this->g_Extensions.end())
+					{
+						model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+						this->g_Extensions[num] = ext;
+						this->m_Extensions[num] = ext;
+						ext->setVar("_extension.Extension", num);
+						ext->setVar("_avaya.Extension", avayaExtension);
+					}
+					else {
+						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+					}
 				}
 			}
-
 			// VDN 
-		
+
 			for (XMLElement * vdn = avaya->FirstChildElement("VDN");
 				vdn != nullptr;
 				vdn = avaya->NextSiblingElement("VDN"))
@@ -216,29 +219,33 @@ namespace chilli {
 			// ACD 
 			XMLElement * acd = avaya->FirstChildElement("ACD");
 
-			for (XMLElement *child = acd->FirstChildElement("Extension");
-				child != nullptr;
-				child = child->NextSiblingElement("Extension"))
-			{
+			if (acd != nullptr) {
 
-				const char * num = child->Attribute("ExtensionNumber");
-				const char * sm = child->Attribute("StateMachine");
-
-				num = num ? num : "";
-				sm = sm ? sm : "";
-
-				if (this->g_Extensions.find(num) == this->g_Extensions.end())
+				for (XMLElement *child = acd->FirstChildElement("Extension");
+					child != nullptr;
+					child = child->NextSiblingElement("Extension"))
 				{
-					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
-					this->g_Extensions[num] = ext;
-					this->m_Extensions[num] = ext;
-					ext->setVar("_extension.Extension", num);
+
+					const char * num = child->Attribute("ExtensionNumber");
+					const char * sm = child->Attribute("StateMachine");
+
+					num = num ? num : "";
+					sm = sm ? sm : "";
+
+					if (this->g_Extensions.find(num) == this->g_Extensions.end())
+					{
+						model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+						this->g_Extensions[num] = ext;
+						this->m_Extensions[num] = ext;
+						ext->setVar("_extension.Extension", num);
+					}
+					else {
+						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+					}
 				}
-				else {
-					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
-				}
+				return true;
 			}
-			return true;
+
 		}
 
 		const model::ExtensionMap & TSAPIModule::GetExtension()
