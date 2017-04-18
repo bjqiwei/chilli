@@ -1137,8 +1137,11 @@ namespace chilli {
 			LOG4CPLUS_INFO(log, "Starting...");
 
 			while (m_bRunning) {
-
+				LOG4CPLUS_DEBUG(log, "ServiceID:" << m_ServiceID << ",UserID:" << m_UserID << ",Password:" << m_Password);
 				bool ret = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
+				
+				if (ret == false)
+					continue;
 
 				usEventBufSize = sizeof(CSTAEvent_t);
 				m_stPrivateData.length = ATT_MAX_PRIVATE_DATA;
