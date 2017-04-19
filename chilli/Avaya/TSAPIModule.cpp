@@ -1140,8 +1140,10 @@ namespace chilli {
 				LOG4CPLUS_DEBUG(log, "ServiceID:" << m_ServiceID << ",UserID:" << m_UserID << ",Password:" << m_Password);
 				bool ret = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
 				
-				if (ret == false)
+				if (ret == false) {
+					std::this_thread::sleep_for(std::chrono::seconds(5));
 					continue;
+				}
 
 				usEventBufSize = sizeof(CSTAEvent_t);
 				m_stPrivateData.length = ATT_MAX_PRIVATE_DATA;
@@ -1165,7 +1167,7 @@ namespace chilli {
 
 					if (nRetCode < 0) {
 						LOG4CPLUS_ERROR(log, "acsGetEventBlock:" << AvayaAPI::acsReturnCodeString(nRetCode));
-						std::this_thread::sleep_for(std::chrono::seconds(1));
+						std::this_thread::sleep_for(std::chrono::seconds(5));
 						break;
 					}
 
