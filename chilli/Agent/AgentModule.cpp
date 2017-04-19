@@ -100,6 +100,19 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLElement * eAgent = config.FirstChildElement();
 	eAgent->QueryIntAttribute("TCPPort", &this->m_tcpPort);
 	eAgent->QueryIntAttribute("WSPort", &this->m_wsPort);
+	if (eAgent->Attribute("WSUrl"))
+		this->m_wsUrl = eAgent->Attribute("WSUrl");
+
+	if (m_wsPort == -1)
+	{
+		const char * prot = nullptr;
+		const char *address = nullptr;
+		const char *path = nullptr;
+		char urlbuff[1024];
+		memset(urlbuff, 0, sizeof(urlbuff));
+		strncpy_s(urlbuff, m_wsUrl.c_str(), sizeof(urlbuff));
+		lws_parse_uri(urlbuff, &prot, &address, &m_wsPort, &path);
+	}
 
 	for (XMLElement *child = eAgent->FirstChildElement("Agent");
 		child != nullptr;
@@ -309,7 +322,7 @@ public:
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		//LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
+		LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
 		Json::Value jsonEvent;
 		Json::Reader jsonReader;
 		if (jsonReader.parse(message, jsonEvent)) {

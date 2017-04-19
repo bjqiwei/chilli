@@ -31,6 +31,7 @@ private:
 	struct event_base * m_Base = nullptr;
 	int m_tcpPort = -1;
 	int m_wsPort = -1;
+	std::string m_wsUrl;
 
 	bool listenTCP(int port);
 	bool listenWS(int port);
