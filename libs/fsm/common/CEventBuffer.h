@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 #ifndef INFINITE
-#define INFINITE -1
+#define INFINITE 0xFFFFFFFF
 #endif
 
 namespace helper{

@@ -8,7 +8,7 @@
 #include <atomic>
 
 #ifndef INFINITE
-#define  INFINITE  (0x7fffffffffffffff)
+#define  INFINITE  (0xFFFFFFFF)
 #endif
 
 //thread data Including thread handle and thread id
