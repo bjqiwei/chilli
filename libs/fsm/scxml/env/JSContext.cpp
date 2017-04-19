@@ -459,7 +459,6 @@ namespace env
 			}
 
 			size_t length = props.length();
-			length %=  256;
 			for (size_t i = 0; i < length; i++) {
 				JS::RootedValue v(this->m_jsctx);
 

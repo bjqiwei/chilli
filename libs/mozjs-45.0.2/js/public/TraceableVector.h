@@ -30,7 +30,7 @@ namespace js {
 // it does not itself know when to barrier or trace items. To function properly
 // it must either be used with Rooted, or barriered and traced manually.
 template <typename T,
-          size_t MinInlineCapacity = 256,
+          size_t MinInlineCapacity = 1024,
           typename AllocPolicy = TempAllocPolicy,
           typename GCPolicy = DefaultGCPolicy<T>>
 class TraceableVector : public JS::Traceable
