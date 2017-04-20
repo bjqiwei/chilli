@@ -87,8 +87,6 @@
 					</send>
 					<transition cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 				</event>
-			</state>
-			<state id="delivered">
 				<event event ="ESTABLISHED">
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
@@ -98,7 +96,11 @@
 					</send>
 					<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
 				</event>
+				<state id="delivered">
+					
+				</state>
 			</state>
+			
 		</state>
 
 		<state id ="Alerting">
