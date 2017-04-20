@@ -1503,7 +1503,7 @@ namespace chilli {
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
 							event["event"] = eventName;
-							event[eventName]["status"] = error;
+							event[eventName]["status"] = error + 1000;
 							event[eventName]["reason"] = AvayaAPI::cstaErrorString(error);
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
