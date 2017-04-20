@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 		LOG4CPLUS_INFO(log, "Command parameter is uninstall,unregister server begin...");
 		return chilli::ServiceModule::UnregisterServer();
 	}
-	else if (parameter == "version") {
+	else if (parameter == "version" || parameter == "v") {
 		std::cout << VERSION << std::endl;
 		return 0;
 	}
