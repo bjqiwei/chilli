@@ -64,7 +64,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 					else {
 						//µÇÂ½Ê§°Ü
 						std::this_thread::sleep_for(std::chrono::milliseconds(1));
-						model::ConnectAdapter::Close(m_curConnectId);
+						//model::ConnectAdapter::Close(m_curConnectId);
 					}
 				}
 				bHandled = true;
@@ -120,8 +120,10 @@ int Agent::pushEvent(const model::EventType_t & Event)
 	for (auto & it : jsonEvent.getMemberNames()) {
 		evt.addVars(it, jsonEvent[it]);
 	}
-
-	LOG4CPLUS_INFO(log, " Recived a event," << Event.event.toStyledString());
+	if (jsonEvent["cmd"].isString() && jsonEvent["cmd"].asString() == "ping"){
+	}
+	else
+		LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 	m_SM->pushEvent(evt);
 
 	return 0;

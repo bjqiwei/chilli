@@ -300,29 +300,34 @@ public:
 
 	virtual void OnClose(const std::string & errorCode) override
 	{
-		Json::Value event;
-		event["extension"] = m_Extension;
-		event["event"] = "ConnectClose";
-		event["errorCode"] = errorCode;
-		model::EventType_t evt(event, GetId());
-		m_module->PushEvent(evt);
+		if (!m_Extension.empty())
+		{
+			Json::Value event;
+			event["extension"] = m_Extension;
+			event["event"] = "ConnectClose";
+			event["errorCode"] = errorCode;
+			model::EventType_t evt(event, GetId());
+			m_module->PushEvent(evt);
+		}
 		delete this;
 	};
 
 	virtual void OnError(const std::string & errorCode) override
 	{
-		Json::Value event;
-		event["extension"] = m_Extension;
-		event["event"] = "ConnectError";
-		event["errorCode"] = errorCode;
-		model::EventType_t evt(event, GetId());
-		m_module->PushEvent(evt);
+		if (!m_Extension.empty())
+		{
+			Json::Value event;
+			event["extension"] = m_Extension;
+			event["event"] = "ConnectError";
+			event["errorCode"] = errorCode;
+			model::EventType_t evt(event, GetId());
+			m_module->PushEvent(evt);
+		}
 		delete this;
 	};
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
 		Json::Value jsonEvent;
 		Json::Reader jsonReader;
 		if (jsonReader.parse(message, jsonEvent)) {
@@ -333,10 +338,20 @@ public:
 				jsonEvent["extension"] = jsonEvent.removeMember("agentid");
 			if (jsonEvent["extension"].isNull())
 				jsonEvent["extension"] = jsonEvent["operatorid"];
+
+			if (jsonEvent["cmd"].isString() && jsonEvent["cmd"].asString() == "ping") {
+
+			}
+			else {
+				LOG4CPLUS_TRACE(log, m_SessionId << " OnMessage:" << message);
+			}
+			model::EventType_t evt(jsonEvent, GetId());
+			m_module->PushEvent(evt);
+		}
+		else {
+			LOG4CPLUS_ERROR(log, m_SessionId << " OnMessage not json string:" << message);
 		}
 
-		model::EventType_t evt(jsonEvent, GetId());
-		m_module->PushEvent(evt);
 	};
 
 	virtual int Send(const char * lpBuf, int nBufLen) override
