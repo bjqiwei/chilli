@@ -65,6 +65,7 @@ namespace helper{
 		//定时器队列
 		typedef std::priority_queue<Timer *,std::vector<Timer *>, TimerComp> TIMER_QUEUE;
 		TIMER_QUEUE m_timer; 
+		std::map<unsigned long, unsigned long> m_rvtimer;
 
 		std::mutex m_mtx;
 		std::atomic_bool m_Running = false;
@@ -122,7 +123,10 @@ namespace helper{
 							break;
 						}
 
-						this->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+						if (m_rvtimer.find(timer->getTimerId()) == m_rvtimer.end())
+							this->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+						else
+							m_rvtimer.erase(timer->getTimerId());
 
 						this->m_timer.pop();
 						delete timer;
@@ -153,16 +157,7 @@ namespace helper{
 		void RemoveTimer(unsigned long timerID){
 
 			std::unique_lock<std::mutex> lck(m_mtx);
-			TIMER_QUEUE temp;
-			m_timer.swap(temp);
-			while(!temp.empty()){
-				Timer * timer = temp.top();
-				temp.pop();
-				if (timer->getTimerId() != timerID){
-					m_timer.push(timer);
-				}
-			}
-			m_cv.notify_one();
+			m_rvtimer.insert(std::make_pair(timerID, timerID));
 		}
 	};
 
