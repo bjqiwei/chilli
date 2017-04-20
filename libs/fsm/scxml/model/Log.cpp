@@ -33,26 +33,26 @@ namespace model{
 		}
 
 		if (m_strLevel.compare("trace") == 0){
-			LOG4CPLUS_TRACE(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_TRACE(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else if (m_strLevel.compare("debug") == 0){
-			LOG4CPLUS_DEBUG(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_DEBUG(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else if (m_strLevel.compare("info") == 0){
-			LOG4CPLUS_INFO(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_INFO(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else if (m_strLevel.compare("warn") == 0){
-			LOG4CPLUS_WARN(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_WARN(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else if (m_strLevel.compare("error") == 0){
-			LOG4CPLUS_ERROR(log,m_strSession << "," << m_strExpr);
+			LOG4CPLUS_ERROR(log,m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else if (m_strLevel.compare("fatal") == 0){
-			LOG4CPLUS_FATAL(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_FATAL(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 		else{
 
-			LOG4CPLUS_INFO(log, m_strSession << "," << m_strExpr);
+			LOG4CPLUS_INFO(log, m_strSession << m_strFileName << ":" << m_node->line << "," << m_strExpr);
 		}
 	}
 	const std::string & Log::getExpr() const
