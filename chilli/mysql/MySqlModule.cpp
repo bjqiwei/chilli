@@ -2,8 +2,8 @@
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
-#include <mysql_driver.h>
-#include <mysql_connection.h>
+#include <cppconn/driver.h>
+#include <cppconn/connection.h>
 #include <cppconn/metadata.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
@@ -95,12 +95,12 @@ const model::ExtensionMap & MySqlModule::GetExtension()
 
 Json::Value MySqlModule::executeQuery(const std::string & sql)
 {
-	sql::mysql::MySQL_Driver driver;
+	sql::Driver * driver = get_driver_instance();
 	std::shared_ptr<sql::Connection> connect;
 	Json::Value result;
 
 	try {
-		connect.reset(driver.connect(m_Host, m_UserID, m_Password));
+		connect.reset(driver->connect(m_Host.c_str(), m_UserID.c_str(), m_Password.c_str()));
 
 		/* select appropriate database schema */
 		if (!m_DataBase.empty()) {
@@ -139,7 +139,7 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 	}
 	catch (sql::SQLException &e) {
 		std::ostringstream oss;
-		oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+		oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLStateCStr() << ")";
 		LOG4CPLUS_DEBUG(log, oss.str());
 
 	}
@@ -253,11 +253,11 @@ void MySqlModule::executeSql()
 	LOG4CPLUS_INFO(log, "Starting...");
 	while (m_bRunning)
 	{
-		sql::mysql::MySQL_Driver driver;
+		sql::Driver *driver = get_driver_instance();
 		std::shared_ptr<sql::Connection> connect;
 
 		try {
-			connect.reset(driver.connect(m_Host, m_UserID, m_Password));
+			driver->connect(m_Host.c_str(), m_UserID.c_str(), m_Password.c_str());
 			//connect->setAutoCommit(0);
 			LOG4CPLUS_DEBUG(log, "Database connection  autocommit mode = " << connect->getAutoCommit());
 
@@ -357,7 +357,7 @@ void MySqlModule::executeSql()
 		}
 		catch (sql::SQLException &e) {
 			std::ostringstream oss;
-			oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+			oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLStateCStr() << ")";
 			LOG4CPLUS_DEBUG(log, oss.str());
 
 			if (connect && connect->isClosed()){

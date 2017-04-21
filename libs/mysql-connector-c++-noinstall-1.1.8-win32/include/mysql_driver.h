@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #ifndef _MYSQL_DRIVER_H_
 #define _MYSQL_DRIVER_H_
 
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 
 #include <cppconn/driver.h>
 
@@ -49,7 +49,7 @@ namespace NativeAPI
 
 class CPPCONN_PUBLIC_FUNC MySQL_Driver : public sql::Driver
 {
-	std::shared_ptr< ::sql::mysql::NativeAPI::NativeDriverWrapper > proxy;
+	boost::scoped_ptr< ::sql::mysql::NativeAPI::NativeDriverWrapper > proxy;
 
 public:
 	MySQL_Driver();
