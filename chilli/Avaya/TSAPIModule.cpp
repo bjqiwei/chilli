@@ -243,9 +243,9 @@ namespace chilli {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 					}
 				}
-				return true;
+				
 			}
-
+			return true;
 		}
 
 		const model::ExtensionMap & TSAPIModule::GetExtension()
