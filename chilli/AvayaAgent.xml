@@ -303,6 +303,9 @@
 							<called type="script">_agent.Extension;</called>
 						</send>
 					</onentry>
+					<event event="ORIGINATED">
+						<transition target="originated"/>
+					</event>
 				</state>
 				<state id="established">
 					<event event="cmd" cond="_event.cmd=='makecall'">
