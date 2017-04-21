@@ -37,9 +37,9 @@
         <Extension>0109</Extension>
     </Group>
    </Groups>
-  <!--<FreeSwitch id = "freeswitch001" host="123.56.241.85" port ="18021" password="qiwei">
-	</FreeSwitch>-->
-	<Avaya id = "tsapi001">
+  <FreeSwitch id = "freeswitch001" host="123.56.241.85" port ="18021" password="qiwei">
+	</FreeSwitch>
+  <!--Avaya id = "tsapi001">
 		<TSAPI>
 			<TLink>AVAYA#CM#CSTA#AES</TLink>
 			<UserID>ctiadaptor</UserID>
@@ -57,6 +57,6 @@
     <ACD>
       <Extension ExtensionNumber="0100" StateMachine="./AvayaACD.xml"></Extension>
     </ACD>
-	</Avaya>
+	</Avaya-->
   <MySql id="mysql" Host="127.0.0.1:3306" UserID="root" Password="deduct" DataBase="CTI"/>
 </Config>

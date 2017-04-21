@@ -23,6 +23,7 @@ namespace FreeSwitch{
 		log4cplus::Logger log;
 		std::thread m_Thread;
 		std::atomic_bool m_bRunning = false;
+		model::ExtensionMap m_Extensions;
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;

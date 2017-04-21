@@ -70,7 +70,7 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 
 const model::ExtensionMap & FreeSwtichModule::GetExtension()
 {
-	return  model::ExtensionMap();
+	return  m_Extensions;
 }
 
 void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)
