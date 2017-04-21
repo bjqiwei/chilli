@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 #ifdef WIN32
@@ -34,7 +35,12 @@ public:
 #else				
 			const char * err = dlerror();
 #endif
+			std::ostringstream oss;
+			oss << m_LibName << " load library failed with \"" << err << "\"";
+			std::cout << oss.str();
+			::MessageBox(nullptr, oss.str().c_str(), "chilli", MB_OK);
 			LOG4CPLUS_ERROR(log, m_LibName << " load library failed with \"" << std::hex << err << "\"");
+			exit(-1);
 			return false;
 		}
 		return true;
