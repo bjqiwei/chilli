@@ -71,7 +71,7 @@ namespace WebSocket {
 		struct lws_client_connect_info con_info;
 		struct lws *wsi;
 		std::string m_url;
-		std::vector<unsigned char> m_sendBuf;
+		std::vector<std::vector<unsigned char>> m_sendBuf;
 	};
 }
 

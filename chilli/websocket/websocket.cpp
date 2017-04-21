@@ -116,21 +116,26 @@ lwsclose:
 		ws_write:
 			if ( wsclient && wsclient->m_state != CLOSING) {
 				wsclient->OnSend();
-				int bufLen = wsclient->m_sendBuf.size() - LWS_PRE;
-				if (bufLen > 0)
-				{
-					int len = lws_write(wsi, wsclient->m_sendBuf.data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
-					if (len > 0)
+				if (wsclient->m_sendBuf.size() > 0) {
+					int bufLen = wsclient->m_sendBuf.at(0).size() - LWS_PRE;
+					if (bufLen > 0)
 					{
-						wsclient->m_sendBuf.erase(wsclient->m_sendBuf.begin() + LWS_PRE, wsclient->m_sendBuf.begin() + LWS_PRE + len);
+						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
+						if (len > 0){
+							wsclient->m_sendBuf.at(0).erase(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).begin() + LWS_PRE + len);
+						}
+						else {
+							return -1;
+						}
 					}
-					else {
-						return -1;
+
+					if (wsclient->m_sendBuf.at(0).size() - LWS_PRE <= 0) {
+						wsclient->m_sendBuf.erase(wsclient->m_sendBuf.begin());
 					}
-					if (wsclient->m_sendBuf.size() - LWS_PRE > 0)
-					{
-						lws_callback_on_writable(wsi);
-					}
+				}
+
+				if (wsclient->m_sendBuf.size() > 0) {
+					lws_callback_on_writable(wsi);
 				}
 			}
 			else {
@@ -349,7 +354,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -365,7 +370,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -380,7 +385,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi), m_sendBuf(LWS_PRE)
+	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -466,9 +471,11 @@ lwsclose:
 	int WebSocketClient::Send(const char* lpBuf, int nBufLen)
 	{
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
-		m_sendBuf.insert(m_sendBuf.end(), lpBuf, lpBuf + nBufLen);
+		std::vector<unsigned char> data(LWS_PRE);
+		data.insert(data.end(), lpBuf, lpBuf + nBufLen);
+		m_sendBuf.push_back(data);
 
-		LOG4CPLUS_DEBUG(log, m_SessionId << "Send:" << std::string(m_sendBuf.begin() + LWS_PRE, m_sendBuf.end()));
+		LOG4CPLUS_DEBUG(log, m_SessionId << "Send:" << std::string(data.begin() + LWS_PRE, data.end()));
 
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi) {
 			lws_callback_on_writable(this->wsi);
