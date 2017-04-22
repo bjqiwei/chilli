@@ -3,8 +3,8 @@
 #include <string>  
 #include <memory>  
 
-#include "mysql_driver.h"  
-#include "mysql_connection.h"  
+#include "cppconn/driver.h"  
+#include "cppconn/connection.h"  
 #include "cppconn/driver.h"  
 #include "cppconn/statement.h"  
 #include "cppconn/prepared_statement.h"  
@@ -21,7 +21,6 @@
 
 using namespace std;
 using namespace sql;
-using namespace sql::mysql;
 
 #pragma comment(lib, "mysqlcppconn.lib")  
 
@@ -54,8 +53,8 @@ static void GetDBMetaData(Connection *dbcon)
 	DatabaseMetaData *dbcon_meta = dbcon->getMetaData();
 
 	cout << "Database Product Name: " << dbcon_meta->getDatabaseProductName() << endl;
-	cout << "Database Product Version: " << dbcon_meta->getDatabaseProductVersion() << endl;
-	cout << "Database User Name: " << dbcon_meta->getUserName() << endl << endl;
+	cout << "Database Product Version: " << dbcon_meta->getDatabaseProductVersion().c_str() << endl;
+	cout << "Database User Name: " << dbcon_meta->getUserName().c_str() << endl << endl;
 
 	cout << "Driver name: " << dbcon_meta->getDriverName() << endl;
 	cout << "Driver version: " << dbcon_meta->getDriverVersion() << endl << endl;
@@ -125,14 +124,14 @@ static void GetResultDataMetaBata(ResultSet *rs)
 		cout.width(20);
 		cout << res_meta->getColumnLabel(i + 1);
 		cout.width(20);
-		cout << res_meta->getColumnTypeName(i + 1);
+		cout << res_meta->getColumnTypeName(i + 1).c_str();
 		cout.width(20);
 		cout << res_meta->getColumnDisplaySize(i + 1) << endl << endl;
 	}
 
-	cout << "/nColumn \"" << res_meta -> getColumnLabel(1);  
-		cout << "\" belongs to the Table : \"" << res_meta->getTableName(1);
-	cout << "\" which belongs to the Schema : \"" << res_meta->getSchemaName(1) << "\"" << endl << endl;  
+	cout << "/nColumn \"" << res_meta -> getColumnLabel(1).c_str();  
+		cout << "\" belongs to the Table : \"" << res_meta->getTableName(1).c_str();
+	cout << "\" which belongs to the Schema : \"" << res_meta->getSchemaName(1).c_str() << "\"" << endl << endl;  
 }
 
 /* 打印结果集中的数据 */
@@ -150,11 +149,11 @@ static void RetrieveDataAndPrint(ResultSet *rs, int type, int colidx, string col
 	{
 		if (type == NUMOFFSET)
 		{
-			cout << rs->getString(colidx) << endl;
+			cout << rs->getString(colidx).c_str() << endl;
 		}
 		else if (type == COLNAME)
 		{
-			cout << rs->getString(colname) << endl;
+			cout << rs->getString(colname).c_str() << endl;
 		} // if-else  
 	} // while  
 
@@ -164,7 +163,7 @@ static void RetrieveDataAndPrint(ResultSet *rs, int type, int colidx, string col
 void Demo()
 {
 
-	MySQL_Driver driver;
+	Driver * driver = get_driver_instance();
 	Connection *con;
 	Statement *stmt;
 	ResultSet *res;
@@ -184,7 +183,7 @@ void Demo()
 		//driver = get_mysql_driver_instance();
 
 		/* create a database connection using the Driver */
-		con = driver.connect(url, user, password);
+		con = driver->connect(url, user, password);
 
 		/* alternate syntax using auto_ptr to create the db connection */
 		//auto_ptr  con (driver -> connect(url, user, password));  
@@ -195,7 +194,7 @@ void Demo()
 		cout << "\nDatabase connection/'s autocommit mode = " << con->getAutoCommit() << endl;
 
 		/* select appropriate database schema */
-		con->setSchema(database);
+		con->setSchema(database.c_str());
 
 		/* retrieve and display the database metadata */
 		GetDBMetaData(con);
