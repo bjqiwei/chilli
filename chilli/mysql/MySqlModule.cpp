@@ -104,14 +104,14 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 
 		/* select appropriate database schema */
 		if (!m_DataBase.empty()) {
-			connect->setSchema(m_DataBase);
+			connect->setSchema(m_DataBase.c_str());
 		}
 		if (sql.empty())
 			return Json::Value();
 
 		/* create a statement object */
 		std::auto_ptr<sql::Statement> stmt(connect->createStatement());
-		std::auto_ptr<sql::ResultSet> resultset(stmt->executeQuery(sql));
+		std::auto_ptr<sql::ResultSet> resultset(stmt->executeQuery(sql.c_str()));
 		
 		Json::Value data;
 
@@ -128,7 +128,7 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 			for (int i = 1; i <= numcols; ++i) {
 				switch (res_meta->getColumnType(i)) {
 				default:
-					record[res_meta->getColumnLabel(i).asStdString()] = resultset->getString(i).asStdString();
+					record[res_meta->getColumnLabel(i).c_str()] = resultset->getString(i).c_str();
 				}
 
 			}
@@ -209,8 +209,8 @@ static std::string  MetadataInfo(sql::DatabaseMetaData *dbcon_meta)
 	oss << "Database Metadata" << boolalpha << endl;
 
 	oss << "Database Product Name: " << dbcon_meta->getDatabaseProductName() << endl;
-	oss << "Database Product Version: " << dbcon_meta->getDatabaseProductVersion() << endl;
-	oss << "Database User Name: " << dbcon_meta->getUserName() << endl << endl;
+	oss << "Database Product Version: " << dbcon_meta->getDatabaseProductVersion().c_str() << endl;
+	oss << "Database User Name: " << dbcon_meta->getUserName().c_str() << endl << endl;
 
 	oss << "Driver name: " << dbcon_meta->getDriverName() << endl;
 	oss << "Driver version: " << dbcon_meta->getDriverVersion() << endl << endl;
@@ -241,7 +241,7 @@ static std::string  MetadataInfo(sql::DatabaseMetaData *dbcon_meta)
 	int row = 1;
 
 	while (rs->next()) {
-		oss << row << ". " << rs->getString("TABLE_SCHEM") << endl;
+		oss << row << ". " << rs->getString("TABLE_SCHEM").c_str() << endl;
 		++row;
 	} // while 
 
@@ -257,13 +257,13 @@ void MySqlModule::executeSql()
 		std::shared_ptr<sql::Connection> connect;
 
 		try {
-			driver->connect(m_Host.c_str(), m_UserID.c_str(), m_Password.c_str());
+			connect.reset(driver->connect(m_Host.c_str(), m_UserID.c_str(), m_Password.c_str()));
 			//connect->setAutoCommit(0);
 			LOG4CPLUS_DEBUG(log, "Database connection  autocommit mode = " << connect->getAutoCommit());
 
 			/* select appropriate database schema */
 			if (!m_DataBase.empty()) {
-				connect->setSchema(m_DataBase);
+				connect->setSchema(m_DataBase.c_str());
 			}
 
 			LOG4CPLUS_DEBUG(log, MetadataInfo(connect->getMetaData()));
