@@ -17,12 +17,15 @@ namespace env
 	static const size_t gMaxStackSize = 128 * sizeof(size_t) * 1024;
 #endif
 
+	static std::mutex g_InitMtx;
+
 	static void reportError(::JSContext *cx, const char *message, JSErrorReport *report);
 
 	JSEvaluator::JSEvaluator()
 	{
 		log = log4cplus::Logger::getInstance("fsm.JSEvaluator");
 
+		std::unique_lock<std::mutex> lck(g_InitMtx);
 		if (g_JSEvaluatorReferce.fetch_add(1) == 0) {
 			if (!JS_Init()) {
 				LOG4CPLUS_ERROR(log, ",JS_Init error.");
@@ -45,6 +48,7 @@ namespace env
 	}
 	JSEvaluator::~JSEvaluator(){
 		
+		std::unique_lock<std::mutex> lck(g_InitMtx);
 		if (!m_contexts.empty())
 			LOG4CPLUS_WARN(log, "has " << m_contexts.size() << " context when evaluator delete.");
 
