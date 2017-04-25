@@ -1,11 +1,55 @@
-#include "jsapi.h"
-#include "js/Initialization.h"
-#include <sstream>
-#include <iostream>
-#include <jsperf.h>
-#include <list>
-#include <time.h>
+#include "mozilla/ArrayUtils.h"
+#include "mozilla/Atomics.h"
+#include "mozilla/DebugOnly.h"
+#include "mozilla/GuardObjects.h"
+#include "mozilla/mozalloc.h"
+#include "mozilla/PodOperations.h"
 
+#ifdef XP_WIN
+# include <direct.h>
+# include <process.h>
+#endif
+#include <errno.h>
+#include <fcntl.h>
+#if defined(XP_WIN)
+# include <io.h>     /* for isatty() */
+#endif
+#include <locale.h>
+#if defined(MALLOC_H)
+# include MALLOC_H    /* for malloc_usable_size, malloc_size, _msize */
+#endif
+#include <math.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#ifdef XP_UNIX
+# include <sys/mman.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <unistd.h>
+#endif
+
+#include "jsapi.h"
+#include "jsprf.h"
+#include "jstypes.h"
+
+#ifdef XP_WIN
+# include "jswin.h"
+#endif
+#include "jswrapper.h"
+
+#include "js/Debug.h"
+#include "js/GCAPI.h"
+#include "js/Initialization.h"
+#include "js/StructuredClone.h"
+#include "js/TrackedOptimizationInfo.h"
+
+
+
+#include<iostream>
 
 
 bool compileAndRepeat(JSContext *cx, JSObject *global,const char * script,const char *filename);
@@ -66,7 +110,7 @@ int run(JSContext *cx) {
 	options.setFileAndLine(__FILE__, __LINE__);
 
 	JS::RootedValue rv(cx);
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 
 		if (JS::Evaluate(cx, options, script, strlen(script), &rv)) {

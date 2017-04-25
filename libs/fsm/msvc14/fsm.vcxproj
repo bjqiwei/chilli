@@ -60,7 +60,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;XP_WIN;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;STATIC_JS_API;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -80,7 +80,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;XP_WIN;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;STATIC_JS_API;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
