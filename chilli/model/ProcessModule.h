@@ -29,6 +29,7 @@ public:
 	{
 		g_recEvtBuffer.Put(event);
 	};
+	static void OnTimerExpiredFunc(unsigned long timerId, const std::string & attr, void * userdata);
 protected:
 	static helper::CEventBuffer<EventType_t> g_recEvtBuffer;
 	static model::ExtensionMap g_Extensions;

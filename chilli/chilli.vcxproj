@@ -202,6 +202,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClCompile Include="Group\GroupModule.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
     <ClCompile Include="model\ConnectAdapter.cpp" />
+    <ClCompile Include="model\Extension.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
     <ClCompile Include="mysql\MySqlModule.cpp" />
     <ClCompile Include="ServiceModule.cpp" />

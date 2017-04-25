@@ -16,59 +16,27 @@ namespace model{
 class Extension: public fsm::SendInterface
 {
 public:
-	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName):
-		m_model(model), m_ExtNumber(ext), SendInterface("this")
-	{
-		m_SM = new fsm::StateMachine(ext,smFileName);
-	};
+	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName);
 
-	virtual ~Extension(){
-		if (m_thread.joinable()){
-			Stop();
-		}
-		delete m_SM;
-	};
+	virtual ~Extension();
 
-	virtual void Start() final {
-		if (!m_thread.joinable()) {
-			m_thread = std::thread(&Extension::run, this);
-		}
-	};
+	virtual void Start() final;
 
-	virtual void Stop() final {
+	virtual void Stop() final;
 
-		if (m_thread.joinable()){
-			m_SM->stop();
-			m_thread.join();
-		}
-	};
+	bool AddSendImplement(SendInterface * evtDsp);
 
-	bool AddSendImplement(SendInterface * evtDsp){
-		return m_SM->addSendImplement(evtDsp);
-	}
+	bool setVar(const std::string &name, const Json::Value &value);
 
-	bool setVar(const std::string &name, const Json::Value &value)
-	{
-		return m_SM->setVar(name, value);
-	}
-
-	virtual const std::string & getExtNumber() final {
-		return m_ExtNumber;
-	};
+	virtual const std::string & getExtNumber() final;
 
 	virtual int pushEvent(const EventType_t &evt) = 0;
 
-	virtual void setSessionId(const std::string & sessinId) final {
-		m_SessionId = sessinId;
-	}
+	virtual void setSessionId(const std::string & sessinId) final;
 
-	virtual const std::string & getSessionId()final {
-		return m_SessionId;
-	}
+	virtual const std::string & getSessionId()final;
 
-	virtual log4cplus::Logger getLogger()final {
-		return log;
-	}
+	virtual log4cplus::Logger getLogger()final;
 
 //media interface
 	virtual int Answer() = 0;
@@ -79,20 +47,7 @@ public:
 	Extension(const Extension &) = delete;
 	Extension & operator=(const Extension &) = delete;
 private:
-	void run()
-	{
-		try
-		{
-			m_SM->addSendImplement(this);
-			m_SM->start();
-			m_SM->mainEventLoop();
-		}
-		catch (std::exception & e)
-		{
-			LOG4CPLUS_ERROR(log, e.what());
-		}
-		log4cplus::threadCleanup();
-	};
+	void run();
 
 	std::atomic_bool m_Running = false;
 	std::thread m_thread;
