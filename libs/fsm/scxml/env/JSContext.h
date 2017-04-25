@@ -72,7 +72,7 @@ namespace env
 		::JSContext * m_jsctx = nullptr;
 		::JSObject * m_global = nullptr;
 	public:
-		JsContext(const std::string &sessionid, Evaluator * eval,Context * parent);
+		JsContext(::JSRuntime * rt, const std::string &sessionid, Evaluator * eval,Context * parent);
 		virtual ~JsContext();
 
 		virtual void setVar(const std::string & name, const Json::Value & value) override;
