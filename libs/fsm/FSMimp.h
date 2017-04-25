@@ -2,6 +2,7 @@
 #define _INTERPRETERIMP_HEADER_
 #include "common/xmlHelper.h"
 #include "common/CEventBuffer.h"
+#include "common/Timer.h"
 #include <string>
 #include <map>
 #include <queue>
@@ -21,9 +22,8 @@ namespace fsm{
 	class Context;
 	class  StateMachineimp {
 		friend class StateMachine;
-		friend class MyTimer;
 	protected:
-		StateMachineimp(const std::string &sessionid, const string &xml, int xtype);
+		StateMachineimp(const std::string &sessionid, const string &xml, int xtype, helper::OnTimerExpiredFunc func);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;
@@ -62,6 +62,7 @@ namespace fsm{
 		Context *  m_Context = nullptr;
 		std::string m_strSessionID;
 		std::string m_strName;
+		helper::OnTimerExpiredFunc m_TimeOutFunc = nullptr;
 
 	private:
 		TriggerEvent m_currentEvt;
@@ -111,6 +112,7 @@ namespace fsm{
 		void exitStates() const;
 
 		Context * getRootContext() const; 
+		void deleteContext(Context * ctx);
 		xmlNodePtr getState(const string& stateId) const;
 		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
 

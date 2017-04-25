@@ -14,6 +14,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "common/stringHelper.h"
 #include "common/Timer.h"
+#include "common/tls.h"
 
 
 using namespace std;
@@ -23,48 +24,16 @@ enum xmlType{
 	Memory,
 };
 namespace fsm {
-	static std::atomic_ulong g_StateMachineReferce = 0;
-	static Evaluator * g_Evaluator = nullptr;
+	//static std::atomic_ulong g_StateMachineReferce = 0;
+	//static Evaluator * g_Evaluator = nullptr;
 	static std::map<StateMachineimp*, StateMachineimp*>g_StateMachines;
 	static std::mutex g_StateMtx;
+	static tls_key_type g_tls_storage_key = 0;
+	static helper::TimerServer * g_TimerServer = nullptr;
 }
 
-namespace fsm {
-	class MyTimer : public helper::CTimerNotify {
-	public:
-		MyTimer(){
-			this->log = log4cplus::Logger::getInstance("fsm.TServer");
-		}
-
-		void OnTimerExpired(unsigned long timerId, const std::string & attr, void * userdata) override
-		{
-			StateMachineimp * stateMachine = reinterpret_cast<StateMachineimp*>(userdata);
-			
-			std::unique_lock<std::mutex> lck(g_StateMtx);
-			if (g_StateMachines.find(stateMachine) != g_StateMachines.end())
-			{
-				TriggerEvent evt;
-				evt.setEventName("timer");
-				Json::Value jsonAttr;
-				Json::Reader jsonReader;
-				if (jsonReader.parse(attr, jsonAttr)) {
-					for (auto & it : jsonAttr.getMemberNames()) {
-						evt.addVars(it, jsonAttr[it]);
-					}
-				}
-				stateMachine->pushEvent(evt);
-			}
-		}
-	private:
-		log4cplus::Logger log;
-	};
-
-	static MyTimer * g_myTimer = nullptr;
-	static helper::TimerServer * g_TimerServer  = nullptr;
-}
-
-fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype) 
-	:m_xmlType(xtype),m_strSessionID(sessionid)
+fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerExpiredFunc func)
+	:m_xmlType(xtype), m_strSessionID(sessionid), m_TimeOutFunc(func)
 {
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");
 
@@ -76,16 +45,18 @@ fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string
 		m_strStateContent = xml;
 	}
 
-	if (g_StateMachineReferce.fetch_add(1) == 0) {
-		g_Evaluator = new fsm::env::JSEvaluator();
+	std::unique_lock<std::mutex> lck(g_StateMtx);
+	if (g_tls_storage_key == 0){
+		g_tls_storage_key = tls_init(nullptr);
+	}
 
-		g_myTimer = new MyTimer();
-		g_TimerServer = new helper::TimerServer(g_myTimer);
+	if (g_StateMachines.empty()){
+		g_TimerServer = new helper::TimerServer();
 		g_TimerServer->Start();
 	}
 
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",creat a fsm object." << this);
-	std::unique_lock<std::mutex> lck(g_StateMtx);
+
 	g_StateMachines.insert(std::make_pair(this, this));
 
 }
@@ -97,16 +68,15 @@ fsm::StateMachineimp::~StateMachineimp()
 	std::unique_lock<std::mutex> lck(g_StateMtx);
 	g_StateMachines.erase(this);
 
-	if (g_StateMachineReferce.fetch_sub(1) == 1) {
-		delete g_Evaluator;
-		g_Evaluator = nullptr;
+	if (g_StateMachines.empty()) {
+
+		tls_cleanup(g_tls_storage_key);
+		g_tls_storage_key = 0;
 
 		g_TimerServer->Stop();
 		delete g_TimerServer;
 		g_TimerServer = nullptr;
 
-		delete g_myTimer;
-		g_myTimer = nullptr;
 	}
 	LOG4CPLUS_DEBUG(log, m_strSessionID << ",destruction a smscxml object." << this);
  }
@@ -115,7 +85,6 @@ bool fsm::StateMachineimp::Init(void)
 {
 	using namespace helper::xml;
 	if (parse()) {
-
 
 		xmlNodePtr rootNode =  xmlDocGetRootElement(m_xmlDocPtr._xDocPtr);
 		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
@@ -400,7 +369,7 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	Json::Value vars;
 	vars["sessionId"] = this->m_strSessionID;
 	vars["timerId"] = timer.getId();
-	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), const_cast<StateMachineimp *>(this));
+	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc , const_cast<StateMachineimp *>(this));
 
 	return true;
 }
@@ -651,10 +620,33 @@ const std::string & fsm::StateMachineimp::getSessionId()const {
 
 
 fsm::Context  *  fsm::StateMachineimp::getRootContext() const{
-	if (m_Context == nullptr)
-		const_cast<StateMachineimp*>(this)->m_Context = g_Evaluator->newContext(m_strSessionID, nullptr);
+	if (m_Context == nullptr) {
+		Evaluator * evaluator = reinterpret_cast<Evaluator *>(tls_get_value(g_tls_storage_key));
 
+		if (evaluator == nullptr) {
+			evaluator = new fsm::env::JSEvaluator();
+			tls_set_value(g_tls_storage_key, evaluator);
+		}
+
+		const_cast<StateMachineimp*>(this)->m_Context = evaluator->newContext(m_strSessionID, nullptr);
+	}
 	return m_Context;
+}
+
+void fsm::StateMachineimp::deleteContext(Context * ctx)
+{
+	Evaluator * evaluator = reinterpret_cast<Evaluator *>(tls_get_value(g_tls_storage_key));
+
+	if (evaluator != nullptr) {
+
+		evaluator->deleteContext(m_Context);
+		m_Context = nullptr;
+
+		if (!evaluator->hasContext()) {
+			delete evaluator;
+			tls_set_value(g_tls_storage_key, nullptr);
+		}
+	}
 }
 
 void fsm::StateMachineimp::setLog(log4cplus::Logger log)
@@ -718,8 +710,7 @@ void fsm::StateMachineimp::stop()
 	pushEvent(trigEvent);
 
 	if (!m_Block) {
-		g_Evaluator->deleteContext(m_Context);
-		m_Context = nullptr;
+		this->deleteContext(m_Context);
 	}
 }
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
@@ -770,8 +761,7 @@ void fsm::StateMachineimp::mainEventLoop()
 	} while (m_Running && m_Block);
 
 	if (m_Block){
-		g_Evaluator->deleteContext(m_Context);
-		m_Context = nullptr;
+		this->deleteContext(m_Context);
 	}
 }
 

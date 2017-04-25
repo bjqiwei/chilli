@@ -5,9 +5,9 @@
 
 using namespace std;
 
-fsm::StateMachine::StateMachine(const std::string &sessionid, const string  &xml, xmlType xtype) :imp(nullptr)
+fsm::StateMachine::StateMachine(const std::string &sessionid, const string  &xml, OnTimerExpiredFunc func, xmlType xtype) :imp(nullptr)
 {
-	imp = new fsm::StateMachineimp(sessionid, xml, xtype);
+	imp = new fsm::StateMachineimp(sessionid, xml, xtype, func);
 }
 
 fsm::StateMachine::~StateMachine()

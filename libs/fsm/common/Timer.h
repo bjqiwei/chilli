@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <thread>
 #include <atomic>
+#include <map>
 
 #ifndef INFINITE
 #define  INFINITE  (0xFFFFFFFF)
@@ -16,12 +17,8 @@
 namespace helper{
 
 	//定时器超时通知接口
-	class CTimerNotify
-	{
-	public:
-		virtual void OnTimerExpired(unsigned long timerId, const std::string & attr, void * userdata) = 0;
-	};
 
+	typedef void(*OnTimerExpiredFunc)(unsigned long timerId, const std::string & attr, void * userdata);
 	// 定时器
 	class TimerServer{
 	private:
@@ -29,8 +26,8 @@ namespace helper{
 		class  Timer{
 		public:
 			//生成一个定时器对象，时间间隔，定时器id，
-			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, void * userdata) :
-				m_nTimerId(timerId), m_interval(interval), m_attr(attr), m_userdata(userdata)
+			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, OnTimerExpiredFunc fun, void * userdata) :
+				m_nTimerId(timerId), m_interval(interval), m_attr(attr), m_TimeOutFuc(fun), m_userdata(userdata)
 			  {
 				  ftime(&m_startTime);
 			  }
@@ -45,11 +42,13 @@ namespace helper{
 			unsigned long getTimerId(){return m_nTimerId;};
 			const std::string & getAttr(){ return m_attr;};
 			void * getUserData() { return m_userdata; };
+			OnTimerExpiredFunc getFunction() { return m_TimeOutFuc; };
 		private:
 			const unsigned long m_nTimerId;
 			const std::string m_attr;
 			const unsigned long m_interval;
 			struct timeb m_startTime;
+			OnTimerExpiredFunc m_TimeOutFuc = nullptr;
 			void * m_userdata;
 			Timer & operator=( const Timer & ) = delete;
 		};
@@ -71,9 +70,8 @@ namespace helper{
 		std::atomic_bool m_Running = false;
 		std::condition_variable m_cv;
 		std::thread m_thread;
-		CTimerNotify* m_Observer;
 	public:
-		TimerServer(CTimerNotify* observer): m_Observer(observer){
+		TimerServer(){
 			
 		}
 
@@ -123,8 +121,10 @@ namespace helper{
 							break;
 						}
 
-						if (m_rvtimer.find(timer->getTimerId()) == m_rvtimer.end())
-							this->m_Observer->OnTimerExpired(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+						if (m_rvtimer.find(timer->getTimerId()) == m_rvtimer.end()) {
+							if (timer->getFunction() != nullptr)
+								timer->getFunction()(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+						}
 						else
 							m_rvtimer.erase(timer->getTimerId());
 
@@ -144,10 +144,10 @@ namespace helper{
 		}
 
 	public:
-		unsigned long SetTimer(unsigned long delay, const std::string & attr, void * userdata){
+		unsigned long SetTimer(unsigned long delay, const std::string & attr, OnTimerExpiredFunc func, void * userdata){
 
 			unsigned long timerId = GenerateTimerID();
-			Timer * _timer = new Timer(timerId, delay, attr, userdata);
+			Timer * _timer = new Timer(timerId, delay, attr, func, userdata);
 			std::unique_lock<std::mutex> lck(m_mtx);
 			m_timer.push(_timer);
 			m_cv.notify_one();

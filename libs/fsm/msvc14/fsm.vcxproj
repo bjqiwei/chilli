@@ -119,6 +119,7 @@
     <ClInclude Include="..\common\CEventBuffer.h" />
     <ClInclude Include="..\common\stringHelper.h" />
     <ClInclude Include="..\common\Timer.h" />
+    <ClInclude Include="..\common\tls.h" />
     <ClInclude Include="..\common\xmlHelper.h" />
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\FSM.h" />

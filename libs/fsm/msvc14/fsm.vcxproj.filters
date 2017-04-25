@@ -185,5 +185,8 @@
     <ClInclude Include="..\common\CEventBuffer.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\tls.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
