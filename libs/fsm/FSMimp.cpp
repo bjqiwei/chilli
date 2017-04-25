@@ -369,6 +369,8 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	Json::Value vars;
 	vars["sessionId"] = this->m_strSessionID;
 	vars["timerId"] = timer.getId();
+	vars["interval"] = timer.getInterval();
+	
 	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc , const_cast<StateMachineimp *>(this));
 
 	return true;
