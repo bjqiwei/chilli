@@ -38,7 +38,7 @@ public:
 	virtual void Stop() final {
 
 		if (m_thread.joinable()){
-			m_SM->termination();
+			m_SM->stop();
 			m_thread.join();
 		}
 	};
@@ -84,7 +84,7 @@ private:
 		try
 		{
 			m_SM->addSendImplement(this);
-			m_SM->go();
+			m_SM->start();
 			m_SM->mainEventLoop();
 		}
 		catch (std::exception & e)

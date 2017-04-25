@@ -42,14 +42,14 @@ const std::string & fsm::StateMachine::getSessionId()const {
 	return imp->getSessionId();
 }
 
-bool fsm::StateMachine::go()
+bool fsm::StateMachine::start(bool block)
 {
-	return imp->go();
+	return imp->start(block);
 }
 
-void fsm::StateMachine::termination()
+void fsm::StateMachine::stop()
 {
-	return imp->termination();
+	return imp->stop();
 }
 
 void fsm::StateMachine::setSessionID(const std::string &strSessionid)

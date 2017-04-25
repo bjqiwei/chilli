@@ -28,9 +28,9 @@ namespace fsm{
 		StateMachine & operator=(const StateMachine & other) = delete;
 		
 		//开始进入初始化状态
-		bool go();
+		bool start(bool block = true);
 		//停止运行
-		void termination();
+		void stop();
 
 		const std::string getCurrentStateID(void) const;
 

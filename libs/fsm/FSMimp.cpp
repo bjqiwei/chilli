@@ -662,8 +662,10 @@ void fsm::StateMachineimp::setLog(log4cplus::Logger log)
 	this->log = log;
 }
 
-bool fsm::StateMachineimp::go()
+bool fsm::StateMachineimp::start(bool block)
 {
+	m_Block = block;
+
 	if (Init()){
 		fsm::Context *ctx = getRootContext();
 
@@ -698,7 +700,7 @@ bool fsm::StateMachineimp::go()
 			}
 		}
 		m_Running = true;
-		LOG4CPLUS_INFO(log, m_strSessionID << ",go");
+		LOG4CPLUS_INFO(log, m_strSessionID << ", start");
 		enterStates(this->m_initState);
 		return true;
 	}
@@ -708,12 +710,17 @@ bool fsm::StateMachineimp::go()
 	return false;
 }
 
-void fsm::StateMachineimp::termination()
+void fsm::StateMachineimp::stop()
 {
-	LOG4CPLUS_INFO(log, m_strSessionID << ",termination");
+	LOG4CPLUS_INFO(log, m_strSessionID << ", stop");
 	m_Running = false;
 	TriggerEvent trigEvent;
 	pushEvent(trigEvent);
+
+	if (!m_Block) {
+		g_Evaluator->deleteContext(m_Context);
+		m_Context = nullptr;
+	}
 }
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
 {
@@ -726,11 +733,11 @@ void fsm::StateMachineimp::mainEventLoop()
 
 	//外部事件队列循环
 
-	while (m_Running) {
+	do {
 		try {
 			//如果外部事件队列不为空，执行一个外部事件
 			TriggerEvent trigEvent;
-			if (m_externalQueue.Get(trigEvent)) {
+			if (m_externalQueue.Get(trigEvent, 1000)) {
 
 				for_each(m_globalVars.begin(), m_globalVars.end(), [&](auto & it) {getRootContext()->setVar(it.first, it.second); });
 				m_globalVars.clear();
@@ -759,9 +766,13 @@ void fsm::StateMachineimp::mainEventLoop()
 		{
 			LOG4CPLUS_ERROR(log, e.what());
 		}
+
+	} while (m_Running && m_Block);
+
+	if (m_Block){
+		g_Evaluator->deleteContext(m_Context);
+		m_Context = nullptr;
 	}
-	g_Evaluator->deleteContext(m_Context);
-	m_Context = nullptr;
 }
 
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)

@@ -30,9 +30,9 @@ namespace fsm{
 		StateMachineimp & operator=(const StateMachineimp & other) = delete;
 
 		//开始进入初始化状态
-		bool go();
+		bool start(bool block = true);
 		//停止运行
-		void termination();
+		void stop();
 		//const xmlNodePtr getCurrentState(void) const;
 		const std::string getCurrentStateID(void) const;
 
@@ -67,6 +67,7 @@ namespace fsm{
 		TriggerEvent m_currentEvt;
 
 		std::atomic_bool m_Running = false;
+		std::atomic_bool m_Block = false;
 		std::queue<TriggerEvent> m_internalQueue;
 		helper::CEventBuffer<TriggerEvent> m_externalQueue;
 		std::list<std::pair<std::string, Json::Value>> m_globalVars;
