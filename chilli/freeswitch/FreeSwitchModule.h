@@ -15,15 +15,11 @@ namespace FreeSwitch{
 		virtual int Start() override;
 		virtual int Stop() override;
 		virtual bool LoadConfig(const std::string & config) override;
-		virtual const model::ExtensionMap & GetExtension() override;
 	private:
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;
 	private:
-		log4cplus::Logger log;
 		std::thread m_Thread;
-		std::atomic_bool m_bRunning = false;
-		model::ExtensionMap m_Extensions;
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;

@@ -32,25 +32,17 @@ AgentModule::~AgentModule(void)
 		Stop();
 	}
 
-	for (auto & it : m_Extensions) {
-		g_Extensions.erase(it.first);
-	}
-
 	LOG4CPLUS_DEBUG(log, "Destruction a Agent module.");
 }
 
 int AgentModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log, "Stop  Agent module");
 
 	if (m_bRunning){
+		ProcessModule::Stop();
 		m_bRunning = false;
 
 		event_base_loopexit(m_Base, nullptr);
-
-		for (auto & it : m_Extensions) {
-			it.second->Stop();
-		}
 
 		for (auto & it : this->m_Threads) {
 			if (it.joinable()) {
@@ -64,14 +56,10 @@ int AgentModule::Stop(void)
 
 int AgentModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, "Start  Agent module");
-
+	
 	if(!m_bRunning){
+		ProcessModule::Start();
 		m_bRunning = true;
-
-		for (auto & it : m_Extensions) {
-			it.second->Start();
-		}
 
 		if (this->m_tcpPort !=-1){
 			std::thread th(&AgentModule::listenTCP, this, this->m_tcpPort);
@@ -146,10 +134,6 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-const model::ExtensionMap & AgentModule::GetExtension()
-{
-	return m_Extensions;
-}
 
 void AgentModule::fireSend(const std::string & strContent, const void * param)
 {

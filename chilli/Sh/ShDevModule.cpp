@@ -62,6 +62,7 @@ bool ShDevModule::Init()
 
 int ShDevModule::Start()
 {
+	ProcessModule::Start();
 	if (!Init())
 		return -1;
 
@@ -83,6 +84,7 @@ int ShDevModule::Start()
 int ShDevModule::Stop()
 {
 	LOG4CPLUS_DEBUG(log,"Close a Sanhuid device");
+	ProcessModule::Stop();
 	if(SsmCloseCti() == -1)									 
 	{
 		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
@@ -90,11 +92,6 @@ int ShDevModule::Stop()
 	return 0;
 }
 
-
-const model::ExtensionMap & ShDevModule::GetExtension()
-{
-	return m_Extensions;
-}
 
 int ShDevModule::getDeviceTypeByName(const std::string & strChType)
 {

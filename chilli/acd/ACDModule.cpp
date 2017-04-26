@@ -18,40 +18,9 @@ ACDModule::ACDModule(const std::string & id):ProcessModule(id)
 
 ACDModule::~ACDModule(void)
 {
-	if (m_bRunning){
-		Stop();
-	}
-
-	for (auto & it : m_Extensions) {
-		g_Extensions.erase(it.first);
-	}
-
 	LOG4CPLUS_DEBUG(log,"Destruction a ACD module.");
 }
 
-int ACDModule::Stop(void)
-{
-	LOG4CPLUS_DEBUG(log,"Stop  ACD module");
-	if (m_bRunning) {
-		m_bRunning = false;
-		for (auto & it : m_Extensions) {
-			it.second->Stop();
-		}
-	}
-	return 0;
-}
-
-int ACDModule::Start()
-{
-	LOG4CPLUS_DEBUG(log, "Start  ACD module");
-	if (!m_bRunning) {
-		m_bRunning = true;
-		for (auto & it : m_Extensions) {
-			it.second->Start();
-		}
-	}
-	return 0;
-}
 
 bool ACDModule::LoadConfig(const std::string & configContext)
 {
@@ -86,10 +55,6 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-const model::ExtensionMap & ACDModule::GetExtension()
-{
-	return m_Extensions;
-}
 
 void ACDModule::fireSend(const std::string & strContent, const void * param)
 {

@@ -31,6 +31,7 @@ int FreeSwtichModule::Stop(void)
 	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
 	if (m_bRunning)
 	{
+		ProcessModule::Stop();
 		m_bRunning = false;
 
 		if (m_Thread.joinable()) {
@@ -44,6 +45,7 @@ int FreeSwtichModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start...  FreeSwitch module");
 	if(!m_bRunning){
+		ProcessModule::Start();
 		m_bRunning = true;
 		m_Thread = std::thread(&FreeSwtichModule::ConnectFS, this);
 	}
@@ -66,11 +68,6 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 	m_Password = eConfig->Attribute("password") ? eConfig->Attribute("password") : "";
 
 	return true;
-}
-
-const model::ExtensionMap & FreeSwtichModule::GetExtension()
-{
-	return  m_Extensions;
 }
 
 void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)

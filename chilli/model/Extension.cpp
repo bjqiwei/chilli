@@ -12,24 +12,15 @@ namespace model {
 	}
 
 	Extension::~Extension() {
-		if (m_thread.joinable()) {
-			Stop();
-		}
 		delete m_SM;
 	}
 
 	void Extension::Start() {
-		if (!m_thread.joinable()) {
-			m_thread = std::thread(&Extension::run, this);
-		}
+		m_SM->start(false);
 	}
 
 	void Extension::Stop() {
-
-		if (m_thread.joinable()) {
-			m_SM->stop();
-			m_thread.join();
-		}
+		m_SM->stop();
 	}
 
 	bool Extension::AddSendImplement(SendInterface * evtDsp) {
@@ -57,19 +48,5 @@ namespace model {
 		return log;
 	}
 
-	void Extension::run()
-	{
-		try
-		{
-			m_SM->addSendImplement(this);
-			m_SM->start();
-			m_SM->mainEventLoop();
-		}
-		catch (std::exception & e)
-		{
-			LOG4CPLUS_ERROR(log, e.what());
-		}
-		log4cplus::threadCleanup();
-	};
 }
 }

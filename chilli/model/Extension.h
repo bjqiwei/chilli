@@ -46,14 +46,11 @@ public:
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	Extension(const Extension &) = delete;
 	Extension & operator=(const Extension &) = delete;
-private:
-	void run();
+	friend class ProcessModule;
 
-	std::atomic_bool m_Running = false;
-	std::thread m_thread;
 protected:
 	fsm::StateMachine * m_SM = nullptr;
-	class ProcessModule * const m_model = nullptr;
+	class ProcessModule * m_model = nullptr;
 	log4cplus::Logger log;
 	std::string m_ExtNumber;
 	std::string m_SessionId;

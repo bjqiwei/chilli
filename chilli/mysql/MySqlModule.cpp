@@ -30,10 +30,6 @@ MySqlModule::~MySqlModule(void)
 		Stop();
 	}
 
-	for (auto & it : m_Extensions) {
-		g_Extensions.erase(it.first);
-	}
-
 	LOG4CPLUS_DEBUG(log, "Destruction a module.");
 }
 
@@ -41,10 +37,8 @@ int MySqlModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log,"Stop module");
 	if (m_bRunning) {
+		ProcessModule::Stop();
 		m_bRunning = false;
-		for (auto & it : m_Extensions) {
-			it.second->Stop();
-		}
 
 		chilli::model::SQLEventType_t stopEvent("");
 		m_SqlBuffer.Put(stopEvent);
@@ -59,10 +53,8 @@ int MySqlModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start module");
 	if (!m_bRunning){
+		ProcessModule::Start();
 		m_bRunning = true;
-		for (auto & it : m_Extensions) {
-			it.second->Start();
-		}
 		m_thread = std::thread(&MySqlModule::executeSql, this);
 	}
 	return 0;
@@ -86,11 +78,6 @@ bool MySqlModule::LoadConfig(const std::string & configContext)
 	m_Password = password ? password : std::string();
 	m_DataBase = db ? db : std::string();
 	return true;
-}
-
-const model::ExtensionMap & MySqlModule::GetExtension()
-{
-	return m_Extensions;
 }
 
 Json::Value MySqlModule::executeQuery(const std::string & sql)

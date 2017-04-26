@@ -17,16 +17,11 @@ public:
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
-	virtual const model::ExtensionMap & GetExtension() override;
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
-public:
-	log4cplus::Logger log;
 private:
 	std::vector<std::thread> m_Threads;
-	std::atomic<bool> m_bRunning = false;
-	model::ExtensionMap m_Extensions;
 
 	struct event_base * m_Base = nullptr;
 	int m_tcpPort = -1;

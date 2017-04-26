@@ -18,39 +18,7 @@ IVRModule::IVRModule(const std::string & id):ProcessModule(id)
 
 IVRModule::~IVRModule(void)
 {
-	if (m_bRunning){
-		Stop();
-	}
-
-	for (auto & it : m_Extensions) {
-		g_Extensions.erase(it.first);
-	}
-
 	LOG4CPLUS_DEBUG(log, "Destruction a IVR module.");
-}
-
-int IVRModule::Stop(void)
-{
-	LOG4CPLUS_DEBUG(log,"Stop  IVR module");
-	if (m_bRunning) {
-		m_bRunning = false;
-		for (auto & it : m_Extensions) {
-			it.second->Stop();
-		}
-	}
-	return 0;
-}
-
-int IVRModule::Start()
-{
-	LOG4CPLUS_DEBUG(log, "Start  IVR module");
-	if (!m_bRunning){
-		m_bRunning = true;
-		for (auto & it : m_Extensions) {
-			it.second->Start();
-		}
-	}
-	return 0;
 }
 
 bool IVRModule::LoadConfig(const std::string & configContext)
@@ -82,11 +50,6 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		}
 	}
 	return true;
-}
-
-const model::ExtensionMap & IVRModule::GetExtension()
-{
-	return m_Extensions;
 }
 
 void IVRModule::fireSend(const std::string &strContent, const void * param)

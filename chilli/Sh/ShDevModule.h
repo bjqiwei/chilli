@@ -29,7 +29,6 @@ public:
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
-	virtual const model::ExtensionMap & GetExtension() override;
 
 private:
 	//inherit from SendInterface
@@ -44,9 +43,6 @@ private:
 	static const char *GetString_EventType ( int nEvent );
 	static const char *GetString_State ( int state );
 	static const char *GetString_PengdingReason(int nReason);
-private:
-	log4cplus::Logger log;
-	model::ExtensionMap m_Extensions;
 
 };
 typedef ShDevModule * ShDevModulePtr;

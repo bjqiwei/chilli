@@ -28,20 +28,15 @@ namespace chilli {
 				Stop();
 			}
 
-			for (auto & it : m_Extensions) {
-				g_Extensions.erase(it.first);
-			}
-
 			LOG4CPLUS_DEBUG(log, "Destruction a module.");
 		}
 
 		int TSAPIModule::Start()
 		{
+
 			if (!m_bRunning) {
+				ProcessModule::Start();
 				m_bRunning = true;
-				for (auto & it : m_Extensions) {
-					it.second->Start();
-				}
 
 				if (!InitAvayaAPI())
 					return -1;
@@ -56,11 +51,11 @@ namespace chilli {
 
 		int TSAPIModule::Stop()
 		{
+
 			if (m_bRunning) {
+
+				ProcessModule::Stop();
 				m_bRunning = false;
-				for (auto & it : m_Extensions) {
-					it.second->Stop();
-				}
 
 				if (m_thread.joinable()) {
 
@@ -246,12 +241,6 @@ namespace chilli {
 				
 			}
 			return true;
-		}
-
-		const model::ExtensionMap & TSAPIModule::GetExtension()
-		{
-			// TODO: insert return statement here
-			return m_Extensions;
 		}
 
 		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
@@ -1196,9 +1185,11 @@ namespace chilli {
 							event["event"] = "ACS_OPEN_STREAM_CONF";
 							event["OpenStream"] = Json::objectValue;
 							event["OpenStream"]["status"] = 0;
-							model::EventType_t evt(event);
+							
 							for (auto &it: this->m_Extensions){
-								it.second->pushEvent(evt);
+								event["extension"] = it.first;
+								model::EventType_t evt(event);
+								this->PushEvent(evt);
 							}
 						}
 												   break;

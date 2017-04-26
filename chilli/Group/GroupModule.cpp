@@ -19,44 +19,7 @@ namespace Group {
 	// Destructor of GroupModule
 	GroupModule::~GroupModule()
 	{
-		if (m_bRunning) {
-			Stop();
-		}
-
-		for (auto & it : m_Extensions) {
-			g_Extensions.erase(it.first);
-		}
-
 		LOG4CPLUS_DEBUG(log, "Destruction a module.");
-	}
-
-	int GroupModule::Start()
-	{
-		if (!m_bRunning) {
-			m_bRunning = true;
-
-			for (auto & it : m_Extensions) {
-				it.second->Start();
-			}
-		}
-		else {
-			LOG4CPLUS_WARN(log, "already running for this module.");
-		}
-		return 0;
-	}
-
-	int GroupModule::Stop()
-	{
-		if (m_bRunning) {
-			m_bRunning = false;
-			chilli::model::EventType_t stopEvent(Json::nullValue);
-			this->PushEvent(stopEvent);
-
-			for (auto & it : m_Extensions) {
-				it.second->Stop();
-			}
-		}
-		return 0;
 	}
 
 	bool GroupModule::LoadConfig(const std::string & configContext)
@@ -100,12 +63,6 @@ namespace Group {
 		}
 
 		return true;
-	}
-
-	const model::ExtensionMap & GroupModule::GetExtension()
-	{
-		// TODO: insert return statement here
-		return m_Extensions;
 	}
 
 	void GroupModule::fireSend(const std::string & strContent, const void * param)
