@@ -694,7 +694,7 @@ bool fsm::StateMachineimp::start(bool block)
 			}
 		}
 		m_Running = true;
-		LOG4CPLUS_INFO(log, m_strSessionID << ", start");
+		LOG4CPLUS_DEBUG(log, m_strSessionID << ", start");
 		enterStates(this->m_initState);
 		return true;
 	}
@@ -706,7 +706,7 @@ bool fsm::StateMachineimp::start(bool block)
 
 void fsm::StateMachineimp::stop()
 {
-	LOG4CPLUS_INFO(log, m_strSessionID << ", stop");
+	LOG4CPLUS_DEBUG(log, m_strSessionID << ", stop");
 	m_Running = false;
 	TriggerEvent trigEvent;
 	pushEvent(trigEvent);
