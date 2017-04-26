@@ -28,12 +28,9 @@ namespace env
 	void JsContext::setVar(const std::string & name, const Json::Value & value)
 	{
 		JSAutoRequest ar(this->m_jsctx);
-		
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
-
+		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value));
-
-		JS::RootedObject  obj(this->m_jsctx, this->m_global);
 		
 		std::string _name = name;
 		std::string::size_type pos;
@@ -82,10 +79,11 @@ namespace env
 
 	Json::Value JsContext::getVar(const std::string &name)
 	{
+		JSAutoRequest ar(this->m_jsctx);
+		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
+
 		JS::RootedValue rval(this->m_jsctx);
-		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
-		JS::RootedObject  obj(this->m_jsctx, this->m_global);
 
 		bool has = false;
 		if (JS_AlreadyHasOwnProperty(m_jsctx, obj, name.c_str(), &has) && has) {
@@ -101,9 +99,8 @@ namespace env
 	void JsContext::deleteVar(const std::string & name)
 	{
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
-
-		JS::RootedObject obj (this->m_jsctx, this->m_global);
+		JS::RootedObject obj (this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		//LOG4CPLUS_TRACE(log, m_strSessionID << ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
 
@@ -126,7 +123,8 @@ namespace env
 		//JS_DumpNamedRoots(JS_GetRuntime(ctx), JsGlobal::dumpRoot, NULL);
 		
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
 		options.setFileAndLine(filename.c_str(), line);
@@ -142,7 +140,8 @@ namespace env
 	{
 
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
 		options.setFileAndLine(filename.c_str(), line);
@@ -158,7 +157,8 @@ namespace env
 	void JsContext::ExecuteFile(const std::string &fileName)
 	{
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JSAutoCompartment ac(this->m_jsctx, this->m_global);
+		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
 
@@ -211,10 +211,10 @@ namespace env
 			LOG4CPLUS_ERROR(log, m_strSessionID << ",JS_NewContext error.");
 			throw std::exception("JS_NewContext error.");
 		}
-		
-		JS_SetContextPrivate(m_jsctx, this);
+
 		/* Enter a request before running anything in the context */
 		JSAutoRequest ar(m_jsctx);
+		JS_SetContextPrivate(m_jsctx, this);
 
 		// Create the global object and a new compartment.
 
@@ -222,44 +222,45 @@ namespace env
 		options.setVersion(JSVERSION_DEFAULT);
 		options.setInvisibleToDebugger(true);
 		
-		m_global = JS_NewGlobalObject(m_jsctx, &global_class, nullptr,
-			JS::DontFireOnNewGlobalHook, options);
+		m_global = new JS::RootedObject(m_jsctx, JS_NewGlobalObject(m_jsctx, &global_class, nullptr,
+			JS::DontFireOnNewGlobalHook, options));
 
-		JS::RootedObject global(m_jsctx, m_global);
-
-		if (!global)
+		if (!(*m_global))
 			throw std::exception("JS_NewGlobalObject error.") ;
 
 		// Enter the new global object's compartment.
-		JSAutoCompartment ac(m_jsctx, global);
+		JSAutoCompartment ac(m_jsctx, *m_global);
 
 		/* Populate the global object with the standard globals, like Object and Array. */
-		if (!JS_InitStandardClasses(m_jsctx, global))
+		if (!JS_InitStandardClasses(m_jsctx, *m_global))
 			throw std::exception("JS_InitStandardClasses error.");
 
 #ifdef JS_HAS_CTYPES
 		if (!JS_InitCTypesClass(m_jsctx, global))
 			throw std::exception("JS_InitCTypesClass error.");
 #endif
-		if (!JS_InitReflectParse(m_jsctx, global))
+		if (!JS_InitReflectParse(m_jsctx, *m_global))
 			throw std::exception("JS_InitReflectParse error.");
 
-		if (!JS_DefineDebuggerObject(m_jsctx, global))
+		if (!JS_DefineDebuggerObject(m_jsctx, *m_global))
 			throw std::exception("JS_DefineDebuggerObject error.");
 
-		if (!JS::RegisterPerfMeasurement(m_jsctx, global))
+		if (!JS::RegisterPerfMeasurement(m_jsctx, *m_global))
 			throw std::exception("RegisterPerfMeasurement error.");
 
 		bool succeeded;
-		if (!JS_SetImmutablePrototype(m_jsctx, global, &succeeded))
+		if (!JS_SetImmutablePrototype(m_jsctx, *m_global, &succeeded))
 			throw std::exception("JS_SetImmutablePrototype error.");
 
-		JS_FireOnNewGlobalObject(m_jsctx, global);
+		JS_FireOnNewGlobalObject(m_jsctx, *m_global);
 	}
 
 	JsContext::~JsContext()
 	{
 		//LOG4CPLUS_DEBUG(log, m_strSessionID << ",Destroy SpiderMonkey Context." );
+		if (m_global)
+			delete m_global;
+
 		if (m_jsctx) 
 			JS_DestroyContext(m_jsctx);
 

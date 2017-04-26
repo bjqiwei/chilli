@@ -70,7 +70,7 @@ namespace env
 	private:
 		::JSRuntime * m_jsrt = nullptr;
 		::JSContext * m_jsctx = nullptr;
-		::JSObject * m_global = nullptr;
+		JS::RootedObject * m_global = nullptr;
 	public:
 		JsContext(::JSRuntime * rt, const std::string &sessionid, Evaluator * eval,Context * parent);
 		virtual ~JsContext();
