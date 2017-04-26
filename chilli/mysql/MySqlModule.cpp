@@ -195,12 +195,12 @@ static std::string  MetadataInfo(sql::DatabaseMetaData *dbcon_meta)
 
 	oss << "Database Metadata" << boolalpha << endl;
 
-	oss << "Database Product Name: " << dbcon_meta->getDatabaseProductName() << endl;
+	oss << "Database Product Name: " << dbcon_meta->getDatabaseProductName().c_str() << endl;
 	oss << "Database Product Version: " << dbcon_meta->getDatabaseProductVersion().c_str() << endl;
 	oss << "Database User Name: " << dbcon_meta->getUserName().c_str() << endl << endl;
 
-	oss << "Driver name: " << dbcon_meta->getDriverName() << endl;
-	oss << "Driver version: " << dbcon_meta->getDriverVersion() << endl << endl;
+	oss << "Driver name: " << dbcon_meta->getDriverName().c_str() << endl;
+	oss << "Driver version: " << dbcon_meta->getDriverVersion().c_str() << endl << endl;
 
 	oss << "Database in Read-Only Mode?: " << dbcon_meta->isReadOnly() << endl;
 	oss << "Supports Transactions?: " << dbcon_meta->supportsTransactions() << endl;

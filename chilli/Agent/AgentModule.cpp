@@ -42,7 +42,8 @@ int AgentModule::Stop(void)
 		ProcessModule::Stop();
 		m_bRunning = false;
 
-		event_base_loopexit(m_Base, nullptr);
+		if(m_Base)
+			event_base_loopexit(m_Base, nullptr);
 
 		for (auto & it : this->m_Threads) {
 			if (it.joinable()) {
