@@ -8,7 +8,6 @@
 <state id="init">
 	<event event="GroupControl">
 		<script>groupArray.push(_event.GroupControl.originate);</script>
-		<log type="script">groupArray.toString();</log>
 		<send target="this" type="notify" dest="extension" event="StateChange">
 			<event>StateChange</event>
 			<extension type="script">groupArray;</extension>

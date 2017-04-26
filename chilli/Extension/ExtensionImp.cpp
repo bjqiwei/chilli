@@ -79,7 +79,7 @@ namespace chilli {
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_INFO(log, " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 			m_SM->pushEvent(evt);
 
 			return 0;

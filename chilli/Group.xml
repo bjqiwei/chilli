@@ -16,7 +16,7 @@
 		</onentry>
 		<event event="StateChange">
 			<script>extensionArray[_event.StateChange.extension] = _event.StateChange.state;</script>
-			<log type="script">extensionArray.toString();</log>
+			<log level="debug" type="script">extensionArray.toString();</log>
 		</event>
 		<event event= "DELIVERED">
 			<script>
