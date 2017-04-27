@@ -1,5 +1,6 @@
 #include "Extension.h"
 #include "ProcessModule.h"
+#include <log4cplus/loggingmacros.h>
 
 namespace chilli {
 namespace model {
@@ -17,10 +18,12 @@ namespace model {
 
 	void Extension::Start() {
 		m_SM->start(false);
+		LOG4CPLUS_INFO(log, " Start.");
 	}
 
 	void Extension::Stop() {
 		m_SM->stop();
+		LOG4CPLUS_INFO(log, " Stop.");
 	}
 
 	bool Extension::AddSendImplement(SendInterface * evtDsp) {

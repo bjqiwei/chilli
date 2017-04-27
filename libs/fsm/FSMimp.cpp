@@ -699,7 +699,7 @@ bool fsm::StateMachineimp::start(bool block)
 		return true;
 	}
 	else{
-		throw std::exception("Error: unable init statemachine.");
+		throw std::exception("Error: init statemachine.");
 	}
 	return false;
 }
