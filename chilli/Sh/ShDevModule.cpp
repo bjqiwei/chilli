@@ -38,7 +38,7 @@ bool ShDevModule::Init()
 {
 
 	//load configuration file and initialize system
-	if (SsmStartCti("ShConfig.ini", "ShIndex.ini") == -1)
+	if (SsmStartCti("conf/ShConfig.ini", "conf/ShIndex.ini") == -1)
 	{
 		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
 		return false;

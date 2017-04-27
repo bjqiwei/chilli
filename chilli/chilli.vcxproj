@@ -71,21 +71,11 @@
       <AdditionalDependencies>mysqlcppconn.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y log4cplus.properties $(OutDir)
-xcopy /Y $(TargetName).xml $(OutDir)
-xcopy /Y Sh\ShIndex.ini $(OutDir)
-xcopy /Y Sh\ShConfig.ini $(OutDir)
-xcopy /Y Analog_Trunk.xml $(OutDir)
-xcopy /Y Anolog_User.xml $(OutDir)
-xcopy /Y Group.xml $(OutDir)
-xcopy /Y IVR.xml $(OutDir)
-xcopy /Y ACD.xml $(OutDir)
-xcopy /Y Agent.xml $(OutDir)
-xcopy /Y AvayaAgent.xml $(OutDir)
-xcopy /Y AvayaExtension.xml $(OutDir)
-xcopy /Y AvayaACD.xml $(OutDir)
-xcopy /Y AvayaVDN.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
+      <Command>xcopy /Y conf\* $(OutDir)conf\
+xcopy /Y $(TargetName).xml $(OutDir)conf\
+xcopy /Y Sh\ShIndex.ini $(OutDir)conf\
+xcopy /Y Sh\ShConfig.ini $(OutDir)conf\
+xcopy /Y *.js $(OutDir)conf\
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll $(OutDir)</Command>
@@ -116,39 +106,21 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /Y log4cplus.properties $(OutDir)
-xcopy /Y $(TargetName).xml $(OutDir)
-xcopy /Y Sh\ShIndex.ini $(OutDir)
-xcopy /Y Sh\ShConfig.ini $(OutDir)
-xcopy /Y Analog_Trunk.xml $(OutDir)
-xcopy /Y Anolog_User.xml $(OutDir)
-xcopy /Y Group.xml $(OutDir)
-xcopy /Y IVR.xml $(OutDir)
-xcopy /Y ACD.xml $(OutDir)
-xcopy /Y Agent.xml $(OutDir)
-xcopy /Y AvayaAgent.xml $(OutDir)
-xcopy /Y AvayaExtension.xml $(OutDir)
-xcopy /Y AvayaACD.xml $(OutDir)
-xcopy /Y AvayaVDN.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
+      <Command>xcopy /Y conf\* $(OutDir)conf\
+xcopy /Y $(TargetName).xml $(OutDir)conf\
+xcopy /Y Sh\ShIndex.ini $(OutDir)conf\
+xcopy /Y Sh\ShConfig.ini $(OutDir)conf\
+xcopy /Y *.js $(OutDir)conf\
 xcopy /Y welcome.wav $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="log4cplus.properties">
-      <FileType>Document</FileType>
-    </CustomBuild>
     <None Include="AgentClient.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Analog_Trunk.xml" />
-    <None Include="Analog_User.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Group.xml" />
-    <None Include="IVR.xml" />
+    <None Include="conf\log4cplus.properties" />
     <None Include="ReadMe.txt" />
     <None Include="welcome.wav" />
   </ItemGroup>
@@ -214,17 +186,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClCompile Include="websocket\websocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="ACD.xml" />
-    <Xml Include="Agent.xml" />
-    <Xml Include="AvayaACD.xml" />
-    <Xml Include="AvayaAgent.xml" />
-    <Xml Include="AvayaExtension.xml" />
-    <Xml Include="AvayaVDN.xml" />
-    <Xml Include="chilli.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\libs\freeswitch\esl\esl.2015.vcxproj">
       <Project>{cf405366-9558-4ae8-90ef-5e21b51ccb4e}</Project>
     </ProjectReference>
@@ -243,6 +204,19 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ProjectReference Include="..\libs\log4cplus-1.2.0\msvc14\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="conf\ACD.xml" />
+    <Xml Include="conf\Agent.xml" />
+    <Xml Include="conf\Analog_Trunk.xml" />
+    <Xml Include="conf\Analog_User.xml" />
+    <Xml Include="conf\AvayaACD.xml" />
+    <Xml Include="conf\AvayaAgent.xml" />
+    <Xml Include="conf\AvayaExtension.xml" />
+    <Xml Include="conf\AvayaVDN.xml" />
+    <Xml Include="conf\chilli.xml" />
+    <Xml Include="conf\Group.xml" />
+    <Xml Include="conf\IVR.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

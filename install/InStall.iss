@@ -38,11 +38,11 @@ Name: "chinese"; MessagesFile: "ChineseSimplified.isl"
 
 [Files]
 ;Source: "..\bin\CloopenAgent.htm"; DestDir: "{app}"; Flags: ignoreversion 32bit
-Source: "..\Win32\bin.Release\*.xml"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit
-Source: "..\Win32\bin.Release\*.js"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit
+Source: "..\Win32\bin.Release\conf\*.xml"; DestDir: "{app}\conf\"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit
+Source: "..\Win32\bin.Release\conf\*.js"; DestDir: "{app}\conf\"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit
 Source: "..\Win32\bin.Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit
 Source: "..\Win32\bin.Release\chilli.exe"; DestDir: "{app}"; Flags: replacesameversion restartreplace uninsrestartdelete 32bit 
-Source: "..\Win32\bin.Release\log4cplus.properties"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit 
+Source: "..\Win32\bin.Release\conf\log4cplus.properties"; DestDir: "{app}\conf\"; Flags: ignoreversion restartreplace uninsrestartdelete 32bit 
 
 ; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
 

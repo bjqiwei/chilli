@@ -49,25 +49,19 @@
     <Filter Include="mysql">
       <UniqueIdentifier>{87f16a24-4bd7-4d44-935e-1a7147cc4e38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="conf">
+      <UniqueIdentifier>{991e0369-59ea-40b2-862e-7f1aec0420f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Group.xml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="IVR.xml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Analog_Trunk.xml">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="welcome.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Analog_User.xml">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ReadMe.txt" />
     <None Include="AgentClient.htm" />
+    <None Include="conf\log4cplus.properties">
+      <Filter>conf</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -245,31 +239,38 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="log4cplus.properties">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="chilli.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\ACD.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="ACD.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\Agent.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="Agent.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\Analog_Trunk.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="AvayaExtension.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\Analog_User.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="AvayaAgent.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\AvayaACD.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="AvayaACD.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\AvayaAgent.xml">
+      <Filter>conf</Filter>
     </Xml>
-    <Xml Include="AvayaVDN.xml">
-      <Filter>Resource Files</Filter>
+    <Xml Include="conf\AvayaExtension.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\AvayaVDN.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\chilli.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\Group.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\IVR.xml">
+      <Filter>conf</Filter>
     </Xml>
   </ItemGroup>
 </Project>

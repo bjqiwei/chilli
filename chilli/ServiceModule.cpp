@@ -229,7 +229,7 @@ void WINAPI chilli::ServiceModule::Start(DWORD  dwArgc, LPTSTR* lpszArgv)
 #ifdef DEBUG
 	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
 #endif
-	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
+	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("conf/log4cplus.properties"), 10 * 1000);
 
 	chilli::App::Start();
 

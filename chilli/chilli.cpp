@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
 	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
 #endif
-	log4cplus::PropertyConfigurator::doConfigure("log4cplus.properties");
+	log4cplus::PropertyConfigurator::doConfigure("conf/log4cplus.properties");
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 
 	std::string parameter;
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
 		log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
 #endif
-		log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("./log4cplus.properties"), 10 * 1000);
+		log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("conf/log4cplus.properties"), 10 * 1000);
 
 		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 		chilli::App::Start();
@@ -337,7 +337,7 @@ void chilli::App::Start()
 {
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	std::string strConfigFile = strFileNameNoExtension + ".xml";
+	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
 
 	for (auto & it : m_Modules) {
