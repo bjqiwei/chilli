@@ -142,10 +142,12 @@
 					<transition  target="logining"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='logon'">
-					<send target="this" type="response" dest="client" event="logon">
+					<send target="this" type="notify" dest="client" event="kick">
 						<status>1</status>
-						<type>logon</type>
+						<type>kick</type>
+						<reason>账号在其他地方登陆</reason>
 					</send>
+					<transition  target="logined"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
 					<send target="this" type="cmd" dest="this" event="AgentSetFree">
@@ -195,6 +197,9 @@
 					</event>
 					<event event="CONNECTION_CLEARED">
 						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
+					</event>
+					<event event="CALL_CLEARED">
+						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
 					</event>
 				</state>
 				<state id="NotReady">
@@ -249,6 +254,9 @@
 					<event event="CONNECTION_CLEARED">
 						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
+					<event event="CALL_CLEARED">
+						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
+					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
 							<connection type="script">connection;</connection>
@@ -284,6 +292,9 @@
 					<event event="CONNECTION_CLEARED">
 						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
+					<event event="CALL_CLEARED">
+						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
+					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
 							<connection type="script">connection;</connection>
@@ -313,6 +324,9 @@
 					<event event="CONNECTION_CLEARED">
 						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 					</event>
+					<event event="CALL_CLEARED">
+						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
+					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
 							<connection type="script">connection;</connection>
@@ -322,16 +336,10 @@
 						<send target="this" type="cmd" dest="this" event="HoldCall">
 							<connection type="script">connection;</connection>
 						</send>
+						<transition target="helding"/>
 					</event>
-					<event event="HoldCall" >
-						<send target="this" type="notify" dest="client" event="mute">
-							<type>mute</type>
-							<status type="script">_event.HoldCall.status;</status>
-							<reason type="script">_event.HoldCall.reason; </reason>
-						</send>
-						<transition  cond = "_event.HoldCall.status == 0" target="held"/>
-					</event>
-					<event event="RETRIEVED" cond="cmp(_event.retrieved.connection,connection)">
+					<event event="RETRIEVED">
+						<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='agentconsult'">
 						<send target="this" type="cmd" dest="this" event="ConsultationCall">
@@ -492,24 +500,43 @@
 							</event>
 						</state>
 					</state>
-					<state  id="held">
+					<state id="helding">
 						<event event="cmd" cond="_event.cmd=='mute'">
 						</event>
+						<event event="HoldCall">
+							<send target="this" type="notify" dest="client" event="mute">
+								<type>mute</type>
+								<status type="script">_event.HoldCall.status;</status>
+								<reason type="script">_event.HoldCall.reason; </reason>
+							</send>
+							<transition cond = "_event.HoldCall.status != 0" target="established"/>
+						</event>
 						<event event="HELD" cond="cmp(_event.held.connection,connection)">
+							<transition target="held"/>
 						</event>
-						<event event="cmd" cond="_event.cmd=='unmute'">
-							<send target="this" type="cmd" dest="this" event="RetrieveCall">
-								<connection type="script">connection;</connection>
-							</send>
-						</event>
-						<event event="RetrieveCall" >
-							<send target="this" type="notify" dest="client" event="unmute">
-								<type>unmute</type>
-								<status type="script">_event.RetrieveCall.status;</status>
-								<reason type="script">_event.RetrieveCall.reason; </reason>
-							</send>
-							<transition  cond = "_event.RetrieveCall.status == 0" target="established"/>
-						</event>
+						<state  id="held">
+							<event event="cmd" cond="_event.cmd=='unmute'">
+								<send target="this" type="cmd" dest="this" event="RetrieveCall">
+									<connection type="script">connection;</connection>
+								</send>
+								<transition target="retrieveCalling"/>
+							</event>
+							<state id="retrieveCalling">
+								<event event="cmd" cond="_event.cmd=='unmute'">
+								</event>
+								<event event="RetrieveCall" >
+									<send target="this" type="notify" dest="client" event="unmute">
+										<type>unmute</type>
+										<status type="script">_event.RetrieveCall.status;</status>
+										<reason type="script">_event.RetrieveCall.reason; </reason>
+									</send>
+									<transition  cond = "_event.RetrieveCall.status != 0" target="held"/>
+								</event>
+								<event event="RETRIEVED">
+									<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
+								</event>
+							</state>
+						</state>
 					</state>
 					<state id="conferenced">
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
@@ -519,6 +546,9 @@
 						</event>
 						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,conferenceCall)">
 							<transition target="ACW"/>
+						</event>
+						<event event="CALL_CLEARED">
+							<transition cond="cmp(_event.callCleared.connection,conferenceCall)" target="ACW"/>
 						</event>
 					</state>
 				</state>

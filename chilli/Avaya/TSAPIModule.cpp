@@ -1255,7 +1255,7 @@ namespace chilli {
 						}
 													break;
 						case CSTA_QUERY_CALL_MONITOR_CONF: {
-							LOG4CPLUS_INFO(log, "CSTA_QUERY_CALL_MONITOR_CONF:" << (int)cstaEvent.event.cstaConfirmation.u.queryCallMonitor.callMonitor);
+							LOG4CPLUS_DEBUG(log, "CSTA_QUERY_CALL_MONITOR_CONF:" << (int)cstaEvent.event.cstaConfirmation.u.queryCallMonitor.callMonitor);
 						}
 														   break;
 						case CSTA_GET_DEVICE_LIST_CONF: {
@@ -1574,7 +1574,20 @@ namespace chilli {
 						}
 												 break;
 						case CSTA_CALL_CLEARED: {
-							LOG4CPLUS_DEBUG(log, "CSTA_CALL_CLEARED");
+							LOG4CPLUS_TRACE(log, "CSTA_CALL_CLEARED");
+							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
+							CSTACallClearedEvent_t	callCleared = cstaEvent.event.cstaUnsolicited.u.callCleared;
+
+							Json::Value event;
+							event["extension"] = this->m_monitorID2Extension[monitorId];
+							event["monitorId"] = monitorId;
+							event["event"] = "CALL_CLEARED";
+							event["callCleared"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(callCleared.localConnectionInfo);
+							event["callCleared"]["connection"] = AvayaAPI::cstaConnectionIDJson(callCleared.clearedCall);
+							event["callCleared"]["cause"] = AvayaAPI::cstaEventCauseString(callCleared.cause);
+
+							model::EventType_t evt(event);
+							this->PushEvent(evt);
 						}
 												break;
 						case CSTA_CONNECTION_CLEARED: {

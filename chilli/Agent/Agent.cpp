@@ -79,6 +79,11 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				std::string sendData = writer.write(jsonData["param"]);
 				model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
 				bHandled = true;
+				
+				if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "kick"){
+					//踢出坐席
+					model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
+				}
 			}
 			else {
 				jsonData["param"]["from"] = m_ExtNumber;

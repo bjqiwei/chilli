@@ -59,6 +59,15 @@
 			</send>
 			<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
 		</event>
+		<event event ="CALL_CLEARED">
+			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">agentId;</extension>
+				<monitorId type="script">_event.monitorId;</monitorId>
+				<connectionCleared type="script">_event.callCleared;</connectionCleared>
+			</send>
+			<transition cond="cmp(_event.callCleared.connection,connection)" target="init"/>
+		</event>
 		<state id="serviceInitiated">
 			<event event="ORIGINATED">
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
