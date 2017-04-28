@@ -8,7 +8,7 @@
 	<date id="newCall"/>
 </datamodel>
 <scriptmodel>
-	<script src="./cmpObject.js" />
+	<script src="./conf/cmpObject.js" />
 </scriptmodel>
 	<state id="init">
 		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
@@ -50,6 +50,15 @@
 			</send>
 			<transition target="Alerting"/>
 		</event>
+		<event event ="CONNECTION_CLEARED">
+			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">agentId;</extension>
+				<monitorId type="script">_event.monitorId;</monitorId>
+				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
+			</send>
+			<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
+		</event>
 		<state id="serviceInitiated">
 			<event event="ORIGINATED">
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
@@ -67,15 +76,6 @@
 					<monitorId type="script">_event.monitorId;</monitorId>
 					<failed type="script">_event.failed;</failed>
 				</send>
-			</event>
-			<event event ="CONNECTION_CLEARED">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
-					<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
-				</send>
-				<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
 			</event>
 			<state id="originated">
 				<event event ="DELIVERED">
@@ -113,27 +113,9 @@
 				</send>
 				<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 			</event>
-			<event event ="CONNECTION_CLEARED">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
-					<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
-				</send>
-				<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
-			</event>
 		</state>
 		
 		<state id="established">
-			<event event ="CONNECTION_CLEARED">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
-					<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
-				</send>
-				<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
-			</event>
 			<event event="HELD">
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>

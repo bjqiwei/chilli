@@ -6,7 +6,7 @@
 	<date id="conferenceCall"/>
 </datamodel>
 <scriptmodel>
-	<script src="./cmpObject.js" />
+	<script src="./conf/cmpObject.js" />
 </scriptmodel>
 	<state id="init">
 		<onentry>
