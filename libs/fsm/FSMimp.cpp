@@ -770,7 +770,7 @@ void fsm::StateMachineimp::mainEventLoop()
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 {
 	using namespace helper::xml;
-	LOG4CPLUS_DEBUG(log, m_strSessionID << ",processEvent:" << event.getEventName());
+	LOG4CPLUS_TRACE(log, m_strSessionID << ",processEvent:" << event.getEventName());
 	if (getRootContext()){
 		for(auto & it : m_currentEvt.getVars())
 		{
@@ -820,7 +820,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 
 	if (!foundEvent)
 	{
-		LOG4CPLUS_ERROR(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
+		LOG4CPLUS_WARN(log, m_strSessionID << ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
 	}
 	return foundEvent;
 }
