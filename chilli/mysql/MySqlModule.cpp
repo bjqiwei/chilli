@@ -171,10 +171,6 @@ void MySqlModule::fireSend(const std::string &strContent, const void * param)
 		eventName = jsonEvent["event"].asString();
 	}
 
-	if (jsonEvent["event"].isString()) {
-		eventName = jsonEvent["event"].asString();
-	}
-
 	if (jsonEvent["from"].isString()) {
 		from = jsonEvent["from"].asString();
 	}
@@ -258,6 +254,7 @@ void MySqlModule::executeSql()
 			model::SQLEventType_t Event;
 			while (m_SqlBuffer.Get(Event) && !Event.m_sql.empty())
 			{
+				LOG4CPLUS_DEBUG(log, Event.m_ExtNumber << " executeSql:" << Event.m_sql);
 				if (Event.m_sql.empty())
 					break;
 

@@ -631,8 +631,8 @@ namespace AvayaAPI {
 			addATTPrivate = nullptr;
 			getATTPrivate = nullptr;
 
-			ATTPRV32.Close();
-			CSTA32.Close();
+			//ATTPRV32.Close();
+			//CSTA32.Close();
 		}
 		
 		return true;

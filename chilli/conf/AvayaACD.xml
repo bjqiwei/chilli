@@ -3,8 +3,12 @@
 <datamodel>
 	<data id="groupArray" expr='new Array();'/>
 	<data id="monitorId"/>
+	<data id="callUUID"/>
+	<data id="connection"/>
 </datamodel>
-
+<scriptmodel>
+	<script src="./conf/uuid.js" />
+</scriptmodel>
 <state id="init">
 	<event event="GroupControl">
 		<script>groupArray.push(_event.GroupControl.originate);</script>
@@ -27,12 +31,17 @@
 			<send target="this" type="cmd" dest="this" event="MonitorCall">
 				<connection type="script">_event.delivered.connection;</connection>
 			</send>
+			<script>connection = _event.delivered.connection;</script>
 			<transition target="Busy"/>
 		</event>
 	</state>
 	
 	<state id="Busy">
 		<onentry>
+			<script>callUUID = uuid();</script>
+			<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var sql='INSERT INTO call_cdr(id,callid,device) VALUES(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\')'; sql;</sql>
+			</send>
 			<send target="this" type="notify" dest="extension" event="StateChange">
 				<event>StateChange</event>
 				<extension type="script">groupArray;</extension>
