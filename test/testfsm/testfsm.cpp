@@ -28,14 +28,15 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
-		fsm::StateMachine mysmscxml("0123456",strStateFile);
+		fsm::StateMachine mysmscxml("0123456",strStateFile, nullptr);
 		SendImp mySend;
 
 		std::thread th([&]() {
 			mysmscxml.addSendImplement(&mySend);
 
-			mysmscxml.go();
+			mysmscxml.start();
 			mysmscxml.mainEventLoop();
+			std::cout << mysmscxml.isInFinalState() << endl;
 		});
 
 		
@@ -45,9 +46,8 @@ int main(int argc, _TCHAR* argv[])
 			fsm::TriggerEvent evt(strEvent,"");
 			mysmscxml.pushEvent(evt);
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
-			//std::cout << stateid << endl;
 		}
-		mysmscxml.termination();
+		mysmscxml.stop();
 		th.join();
 	}
 	catch(exception & e)

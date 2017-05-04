@@ -113,6 +113,9 @@ bool fsm::StateMachineimp::Init(void)
 				m_initState = getXmlChildNode(m_rootNode,"state");
 			 }
 
+			 string strFinalState = getXmlNodeAttributesValue(m_rootNode, "final");
+			 m_finalState = getState(strFinalState);
+
 			 LOG4CPLUS_TRACE(log, m_strSessionID << ", set initState=" << getXmlNodeAttributesValue(m_initState, "id"));
 			 
 		 }
@@ -765,6 +768,11 @@ void fsm::StateMachineimp::mainEventLoop()
 	if (m_Block){
 		this->deleteContext(m_Context);
 	}
+}
+
+bool fsm::StateMachineimp::isInFinalState()
+{
+	return m_currentStateNode == m_finalState;
 }
 
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)

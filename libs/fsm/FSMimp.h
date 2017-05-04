@@ -49,6 +49,7 @@ namespace fsm{
 
 		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
+		bool isInFinalState();
 	private:
 		std::string m_strStateFile;
 		std::string m_strStateContent;
@@ -57,6 +58,7 @@ namespace fsm{
 		helper::xml::CXPathContextPtr xpathCtx = nullptr;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
 		xmlNodePtr  m_initState = nullptr;
+		xmlNodePtr  m_finalState = nullptr;
 		xmlNodePtr m_currentStateNode = nullptr;
 		xmlNodePtr m_rootNode = nullptr;
 		Context *  m_Context = nullptr;

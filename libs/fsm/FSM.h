@@ -48,6 +48,7 @@ namespace fsm{
 
 		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
+		bool isInFinalState();
 
 	private:
 		StateMachineimp * imp;

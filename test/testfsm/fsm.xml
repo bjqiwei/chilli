@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<fsm name="testfsm" initial="state1">
+<fsm name="testfsm" initial="state1" final="final">
   <datamodel>
     <data id="globalVar" expr=""></data>
   </datamodel>
@@ -55,6 +55,9 @@
 		<event event="sleep">
 			<sleep interval="19999"></sleep>
 		</event>
+		<event event="final">
+			<transition target="final"/>
+		</event>
 		<onexit>
 			<log level = "info" >exit Init state.</log>
 		</onexit>
@@ -69,8 +72,8 @@
 				<transition  target="init"/>
 			</event>
 			<event event="timer">
-			<transition target="timertest1"/>
-		</event>
+				<transition target="timertest1"/>
+			</event>
 		</state>
 
     </state>
@@ -97,6 +100,8 @@
 		<event event="event1">
 			<transition target="state1"/>
 		</event>
+	</state>
+	<state id="final">
 	</state>
 </fsm>
 

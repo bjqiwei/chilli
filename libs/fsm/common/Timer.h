@@ -115,7 +115,7 @@ namespace helper{
 					while (!this->m_timer.empty()) {
 						Timer * timer = this->m_timer.top();
 
-						millisec = this->m_timer.top()->getInterval();
+						millisec = timer->getInterval();
 						//LOG4CPLUS_DEBUG(log,"timer event . interval=" << millisec );
 						if (millisec > 0) {
 							break;
@@ -130,6 +130,8 @@ namespace helper{
 
 						this->m_timer.pop();
 						delete timer;
+
+						millisec = INFINITE;
 					}
 				}
 				else {

@@ -62,6 +62,11 @@ void fsm::StateMachine::mainEventLoop()
 	return imp->mainEventLoop();
 }
 
+bool fsm::StateMachine::isInFinalState()
+{
+	return imp->isInFinalState();
+}
+
 bool fsm::StateMachine::setVar(const std::string &name, const Json::Value & value)
 {  
 	return imp->setVar(name, value);
