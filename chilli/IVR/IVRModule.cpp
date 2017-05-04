@@ -8,6 +8,9 @@
 namespace chilli{
 namespace IVR{
 
+enum ExtType {
+	IVRType = 0,
+};
 
 IVRModule::IVRModule(const std::string & id):ProcessModule(id)
 {
@@ -39,17 +42,28 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		const char * sm = child->Attribute("StateMachine");
 		num = num ? num : "";
 		sm = sm ? sm : "";
-		if (this->g_Extensions.find(num) == this->g_Extensions.end())
-		{
-			model::ExtensionPtr ext(new Extension::ExtensionImp(this, num, sm));
-			this->g_Extensions[num] = ext;
-			this->m_Extensions[num] = ext;
+
+		model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::IVRType);
+		if (extConfig != nullptr) {
+			extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 		}
 	}
 	return true;
+}
+
+model::ExtensionPtr IVRModule::newExtension(const model::ExtensionConfigPtr & config)
+{
+	if (config != nullptr)
+	{
+		if (config->m_ExtType == ExtType::IVRType) {
+			model::ExtensionPtr ext(new Extension::ExtensionImp(this, config->m_ExtNumber, config->m_SMFileName));
+			return ext;
+		}
+	}
+	return nullptr;
 }
 
 void IVRModule::fireSend(const std::string &strContent, const void * param)

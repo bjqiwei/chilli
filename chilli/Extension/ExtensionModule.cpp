@@ -10,6 +10,11 @@
 namespace chilli {
 	namespace Extension {
 
+		enum ExtType {
+			ExtensionType = 0,
+		};
+
+
 		// Constructor of the ExtensionModule 
 		ExtensionModule::ExtensionModule(const std::string & id) :ProcessModule(id)
 		{
@@ -43,11 +48,10 @@ namespace chilli {
 				const char * sm = child->Attribute("StateMachine");
 				num = num ? num : "";
 				sm = sm ? sm : "";
-				if (this->g_Extensions.find(num) == this->g_Extensions.end())
-				{
-					model::ExtensionPtr ext(new ExtensionImp(this, num, sm));
-					this->g_Extensions[num] = ext;
-					this->m_Extensions[num] = ext;
+
+				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::ExtensionType);
+				if (extConfig != nullptr) {
+					extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 				}
 				else {
 					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -55,6 +59,18 @@ namespace chilli {
 			}
 
 			return true;
+		}
+
+		model::ExtensionPtr ExtensionModule::newExtension(const model::ExtensionConfigPtr & config)
+		{
+			if (config != nullptr)
+			{
+				if (config->m_ExtType == ExtType::ExtensionType) {
+					model::ExtensionPtr ext(new ExtensionImp(this, config->m_ExtNumber, config->m_SMFileName));
+					return ext;
+				}
+			}
+			return nullptr;
 		}
 
 

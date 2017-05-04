@@ -11,6 +11,13 @@
 namespace chilli {
 	namespace Avaya {
 
+		enum ExtType {
+			AvayaAgentType = 0,
+			AvayaExtType,
+			AvayaVDNType,
+			AvayaACDType,
+		};
+
 		ATTPrivateData_t g_stPrivateData;
 		using namespace AvayaAPI;
 		// Constructor of the TSAPIModule 
@@ -134,17 +141,14 @@ namespace chilli {
 					avayaPassword = avayaPassword ? avayaPassword : "";
 					avayaExtension = avayaExtension ? avayaExtension : "";
 
-					if (this->g_Extensions.find(num) == this->g_Extensions.end())
-					{
-						model::ExtensionPtr ext(new AvayaAgent(this, num, sm));
-						this->g_Extensions[num] = ext;
-						this->m_Extensions[num] = ext;
-						ext->setVar("_agent.AgentId", num);
-						ext->setVar("_agent.Password", password);
-						ext->setVar("_agent.Extension", extension);
-						ext->setVar("_avaya.AgentId", avayaAgentId);
-						ext->setVar("_avaya.Password", avayaPassword);
-						ext->setVar("_avaya.Extension", avayaExtension);
+					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaAgentType);
+					if (extConfig != nullptr) {
+						extConfig->m_Vars.push_back(std::make_pair("_agent.AgentId", num));
+						extConfig->m_Vars.push_back(std::make_pair("_agent.Password", password));
+						extConfig->m_Vars.push_back(std::make_pair("_agent.Extension", extension)); 
+						extConfig->m_Vars.push_back(std::make_pair("_avaya.AgentId", avayaAgentId));
+						extConfig->m_Vars.push_back(std::make_pair("_avaya.Password", avayaPassword));
+						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -170,13 +174,10 @@ namespace chilli {
 					sm = sm ? sm : "";
 					avayaExtension = avayaExtension ? avayaExtension : "";
 
-					if (this->g_Extensions.find(num) == this->g_Extensions.end())
-					{
-						model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
-						this->g_Extensions[num] = ext;
-						this->m_Extensions[num] = ext;
-						ext->setVar("_extension.Extension", num);
-						ext->setVar("_avaya.Extension", avayaExtension);
+					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaExtType);
+					if (extConfig != nullptr) {
+						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -198,14 +199,12 @@ namespace chilli {
 				sm = sm ? sm : "";
 				avayaExtension = avayaExtension ? avayaExtension : "";
 
-				if (this->g_Extensions.find(num) == this->g_Extensions.end())
-				{
-					model::ExtensionPtr ext(new AvayaVDN(this, num, sm));
-					this->g_Extensions[num] = ext;
-					this->m_Extensions[num] = ext;
-					ext->setVar("_extension.Extension", num);
-					ext->setVar("_avaya.Extension", avayaExtension);
+				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaVDNType);
+				if (extConfig != nullptr) {
+					extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+					extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
 				}
+				
 				else {
 					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 				}
@@ -227,12 +226,9 @@ namespace chilli {
 					num = num ? num : "";
 					sm = sm ? sm : "";
 
-					if (this->g_Extensions.find(num) == this->g_Extensions.end())
-					{
-						model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
-						this->g_Extensions[num] = ext;
-						this->m_Extensions[num] = ext;
-						ext->setVar("_extension.Extension", num);
+					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaACDType);
+					if (extConfig != nullptr) {
+						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -241,6 +237,33 @@ namespace chilli {
 				
 			}
 			return true;
+		}
+
+		model::ExtensionPtr TSAPIModule::newExtension(const model::ExtensionConfigPtr & config)
+		{
+			if (config != nullptr)
+			{
+				if (config->m_ExtType == ExtType::AvayaAgentType) {
+					model::ExtensionPtr ext(new AvayaAgent(this, config->m_ExtNumber, config->m_SMFileName));
+					return ext;
+				}
+				else if (config->m_ExtType == ExtType::AvayaExtType)
+				{
+					model::ExtensionPtr ext(new AvayaExtension(this, config->m_ExtNumber, config->m_SMFileName));
+					return ext;
+				}
+				else if (config->m_ExtType == ExtType::AvayaVDNType)
+				{
+					model::ExtensionPtr ext(new AvayaVDN(this, config->m_ExtNumber, config->m_SMFileName));
+					return ext;
+				}
+				else if (config->m_ExtType == ExtType::AvayaACDType)
+				{
+					model::ExtensionPtr ext(new AvayaExtension(this, config->m_ExtNumber, config->m_SMFileName));
+					return ext;
+				}
+			}
+			return nullptr;
 		}
 
 		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
@@ -1205,7 +1228,7 @@ namespace chilli {
 							event["OpenStream"] = Json::objectValue;
 							event["OpenStream"]["status"] = 0;
 							
-							for (auto &it: this->m_Extensions){
+							for (auto &it: this->GetExtension()){
 								event["extension"] = it.first;
 								model::EventType_t evt(event);
 								this->PushEvent(evt);

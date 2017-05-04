@@ -80,6 +80,11 @@ bool MySqlModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
+model::ExtensionPtr MySqlModule::newExtension(const model::ExtensionConfigPtr & config)
+{
+	return nullptr;
+}
+
 Json::Value MySqlModule::executeQuery(const std::string & sql)
 {
 	sql::Driver * driver = get_driver_instance();

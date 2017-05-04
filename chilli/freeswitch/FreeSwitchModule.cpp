@@ -70,6 +70,12 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
+
+model::ExtensionPtr FreeSwtichModule::newExtension(const model::ExtensionConfigPtr & config)
+{
+	return nullptr;
+}
+
 void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)
 {
 	LOG4CPLUS_WARN(log, "fireSend not implement.");

@@ -15,6 +15,7 @@ public:
 	virtual int Start() override;
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
+	virtual model::ExtensionPtr newExtension(const model::ExtensionConfigPtr & config) override;
 
 	Json::Value executeQuery(const std::string & sql);
 private:

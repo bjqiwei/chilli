@@ -26,6 +26,11 @@ namespace model {
 		LOG4CPLUS_INFO(log, " Stop.");
 	}
 
+	bool Extension::IsFinalState()
+	{
+		return m_SM->isInFinalState();
+	}
+
 	bool Extension::AddSendImplement(SendInterface * evtDsp) {
 		return m_SM->addSendImplement(evtDsp);
 	}
@@ -49,6 +54,12 @@ namespace model {
 
 	log4cplus::Logger Extension::getLogger() {
 		return log;
+	}
+
+	ExtensionConfig::ExtensionConfig(ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type) :
+		m_model(model), m_ExtNumber(ext), m_SMFileName(smFileName), m_ExtType(type)
+	{
+
 	}
 
 }

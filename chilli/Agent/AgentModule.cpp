@@ -19,6 +19,10 @@
 namespace chilli{
 namespace Agent{
 
+enum ExtType {
+	AgentType = 0,
+};
+
 AgentModule::AgentModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
@@ -118,14 +122,11 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 		password = password ? password : "";
 		extension = extension ? extension : "";
 
-		if (this->g_Extensions.find(num) == this->g_Extensions.end())
-		{
-			model::ExtensionPtr ext(new Agent(this, num, sm));
-			this->g_Extensions[num] = ext;
-			this->m_Extensions[num] = ext;
-			ext->setVar("_agent.AgentId", num);
-			ext->setVar("_agent.Password", password);
-			ext->setVar("_agent.Extension", extension);
+		model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AgentType);
+		if (extConfig != nullptr) {
+			extConfig->m_Vars.push_back(std::make_pair("_agent.AgentId", num));
+			extConfig->m_Vars.push_back(std::make_pair("_agent.Password", password));
+			extConfig->m_Vars.push_back(std::make_pair("_agent.Extension", extension));
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -135,6 +136,18 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
+
+model::ExtensionPtr AgentModule::newExtension(const model::ExtensionConfigPtr & config)
+{
+	if (config != nullptr)
+	{
+		if (config->m_ExtType == ExtType::AgentType) {
+			model::ExtensionPtr ext(new Agent(this, config->m_ExtNumber, config->m_SMFileName));
+			return ext;
+		}
+	}
+	return nullptr;
+}
 
 void AgentModule::fireSend(const std::string & strContent, const void * param)
 {

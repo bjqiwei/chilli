@@ -15,6 +15,7 @@ public:
 	explicit IVRModule(const std::string & id);
 	virtual ~IVRModule(void);
 	virtual bool LoadConfig(const std::string & configContext) override;
+	virtual model::ExtensionPtr newExtension(const model::ExtensionConfigPtr & config) override;
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;

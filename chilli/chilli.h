@@ -21,7 +21,6 @@ namespace chilli
 	private:
 		static std::string strFileDir;
 		static std::string strFileNameNoExtension;
-		static std::vector<model::ProcessModulePtr> m_Modules;
 	};
 }//end namespace KeygoeAdapter
 

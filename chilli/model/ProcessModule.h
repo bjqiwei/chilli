@@ -12,6 +12,7 @@ namespace chilli{
 namespace model{
 
 typedef std::map<std::string, ExtensionPtr> ExtensionMap;
+typedef std::map<std::string, ExtensionConfigPtr> ExtensionConfigMap;
 class ProcessModule :public fsm::SendInterface
 {
 public:
@@ -21,7 +22,7 @@ public:
 	virtual bool LoadConfig(const std::string & configContext) = 0;
 	virtual int Start();
 	virtual int Stop();
-	virtual const ExtensionMap & GetExtension() final;
+	virtual ExtensionMap GetExtension() final;
 
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other) = delete;
@@ -29,13 +30,26 @@ public:
 	virtual void PushEvent(const EventType_t & event) final;
 	static void OnTimerExpiredFunc(unsigned long timerId, const std::string & attr, void * userdata);
 
+	ExtensionConfigPtr newExtensionConfig(ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type);
+	void deleteExtensionConfig(const std::string &ext);
+	ExtensionConfigPtr getExtensionConfig(const std::string & ext);
+	virtual ExtensionPtr newExtension(const ExtensionConfigPtr & config) = 0;
+	bool addExtension(const std::string &ext, ExtensionPtr & extptr);
+	void removeExtension(const std::string & ext);
+	ExtensionPtr getExtension(const std::string & ext);
+
 public:
 	log4cplus::Logger log;
-protected:
+	static std::vector<std::shared_ptr<model::ProcessModule>> g_Modules;
+private:
+	static std::recursive_mutex g_ExtMtx;
 	static model::ExtensionMap g_Extensions;
-	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
+	static model::ExtensionConfigMap g_ExtensionConfigs;
 	model::ExtensionMap m_Extensions;
+	model::ExtensionConfigMap m_ExtensionConfigs;
 
+protected:
+	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
 	std::atomic<bool> m_bRunning = false;
 	std::thread m_thread;
 	void run();

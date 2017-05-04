@@ -9,9 +9,24 @@
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 #include "TypeDef.h"
+#include <json/json.h>
+#include <list>
 
 namespace chilli{
 namespace model{
+
+class ExtensionConfig {
+public:
+	ExtensionConfig(class ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type);
+
+	uint32_t m_ExtType = 0;
+	class ProcessModule * m_model = nullptr;
+	std::string m_ExtNumber;
+	std::string m_SMFileName;
+	std::list<std::pair<std::string, Json::Value>>  m_Vars;
+};
+
+typedef std::shared_ptr<model::ExtensionConfig> ExtensionConfigPtr;
 
 class Extension: public fsm::SendInterface
 {
@@ -23,6 +38,7 @@ public:
 	virtual void Start() final;
 
 	virtual void Stop() final;
+	virtual bool IsFinalState() final;
 
 	bool AddSendImplement(SendInterface * evtDsp);
 

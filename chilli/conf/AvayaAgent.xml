@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<fsm name="avayaAgent" initial="init">
+<fsm name="avayaAgent" initial="init" final="final">
 <datamodel>
 	<data id="connection"/>
 	<data id="consultationNewCall"/>
@@ -9,13 +9,6 @@
 	<script src="./conf/cmpObject.js" />
 </scriptmodel>
 	<state id="init">
-		<onentry>
-			<send target="this" type="notify" dest="extension" event="AgentLogout">
-				<event>AgentLogout</event>
-				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId;</AgentLogout>
-				<extension type="script">_agent.Extension</extension>
-			</send>
-		</onentry>
 		<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
 			<transition  target="logining"/>
 		</event>
@@ -26,7 +19,7 @@
 			</send>
 		</event>
 		<event event="AgentLogout">
-			<transition  target="init"/>
+			<transition  target="final"/>
 		</event>
 		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
 		</event>
@@ -60,7 +53,7 @@
 					<type>logon</type>
 					<reason type="script">_event.AgentLogin.reason</reason>
 				</send>
-				<transition  target="init"/>
+				<transition  target="final"/>
 			</event>
 			<event event="ConnectError">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
@@ -68,7 +61,7 @@
 					<password type="script">_avaya.Password</password>
 					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
-				<transition  target="init"/>
+				<transition  target="final"/>
 			</event>
 			<event event="ConnectClose">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
@@ -76,7 +69,7 @@
 					<password type="script">_avaya.Password</password>
 					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
-				<transition  target="init"/>
+				<transition  target="final"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='logout'">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
@@ -85,7 +78,7 @@
 					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
-				<transition  target="init"/>
+				<transition  target="final"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='ping'">
 				<log level="trace"> ping message</log>
@@ -565,6 +558,14 @@
 
 		
     </state>
-
+	<state id="final">
+		<onentry>
+			<send target="this" type="notify" dest="extension" event="AgentLogout">
+				<event>AgentLogout</event>
+				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId;</AgentLogout>
+				<extension type="script">_agent.Extension</extension>
+			</send>
+		</onentry>
+	</state>
 </fsm>
 

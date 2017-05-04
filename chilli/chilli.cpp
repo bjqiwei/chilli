@@ -209,7 +209,6 @@ int main(int argc, char* argv[])
 
 std::string chilli::App::strFileDir;
 std::string chilli::App::strFileNameNoExtension;
-std::vector<chilli::model::ProcessModulePtr> chilli::App::m_Modules;
 
 
 void chilli::App::AppInit(void)
@@ -251,7 +250,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				freeswtich->LoadConfig(printer.CStr());
-				m_Modules.push_back(freeswtich);
+				model::ProcessModule::g_Modules.push_back(freeswtich);
 			}
 			else if (nodeName == AVAYANODE)
 			{
@@ -259,7 +258,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				tsapi->LoadConfig(printer.CStr());
-				m_Modules.push_back(tsapi);
+				model::ProcessModule::g_Modules.push_back(tsapi);
 
 			}
 			else if (nodeName == AGENTNODE)
@@ -268,7 +267,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				agent->LoadConfig(printer.CStr());
-				m_Modules.push_back(agent);
+				model::ProcessModule::g_Modules.push_back(agent);
 
 			}
 			else if (nodeName == EXTENSIONS)
@@ -277,7 +276,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				extension->LoadConfig(printer.CStr());
-				m_Modules.push_back(extension);
+				model::ProcessModule::g_Modules.push_back(extension);
 
 			}
 			else if (nodeName == GROUPS)
@@ -286,7 +285,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				group->LoadConfig(printer.CStr());
-				m_Modules.push_back(group);
+				model::ProcessModule::g_Modules.push_back(group);
 			}
 			else if (nodeName == MYSQL)
 			{
@@ -294,7 +293,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				XMLPrinter printer;
 				e->Accept(&printer);
 				mysql->LoadConfig(printer.CStr());
-				m_Modules.push_back(mysql);
+				model::ProcessModule::g_Modules.push_back(mysql);
 			}
 			e = e->NextSiblingElement();
 		}
@@ -340,16 +339,7 @@ void chilli::App::Start()
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
 
-	for (auto & it : m_Modules) {
-		for (auto &ext: it->GetExtension())
-		{
-			for (auto & it : m_Modules) {
-				ext.second->AddSendImplement(it.get());
-			}
-		}
-	}
-
-	for (auto & it:m_Modules){
+	for (auto & it:model::ProcessModule::g_Modules){
 		it->Start();
 	}
 
@@ -361,10 +351,10 @@ void chilli::App::Stop()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
-	for (auto & it : m_Modules){
+	for (auto & it : model::ProcessModule::g_Modules){
 		it->Stop();
 	}
-	m_Modules.clear();
+	model::ProcessModule::g_Modules.clear();
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 
 }

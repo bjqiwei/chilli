@@ -4,7 +4,10 @@
 
 namespace chilli{
 namespace model{
+	std::recursive_mutex ProcessModule::g_ExtMtx;
 	model::ExtensionMap ProcessModule::g_Extensions;
+	model::ExtensionConfigMap ProcessModule::g_ExtensionConfigs;
+	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId)
 	{
@@ -16,11 +19,20 @@ namespace model{
 			Stop();
 		}
 
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+
 		for (auto & it : m_Extensions) {
-			g_Extensions.erase(it.first);
+			removeExtension(it.first);
 		}
 
 		m_Extensions.clear();
+
+		for (auto & it: m_ExtensionConfigs)
+		{
+			deleteExtensionConfig(it.first);
+		}
+
+		m_ExtensionConfigs.clear();
 	}
 
 	int ProcessModule::Start()
@@ -49,9 +61,10 @@ namespace model{
 		return 0;
 	}
 
-	const ExtensionMap & ProcessModule::GetExtension()
+	ExtensionMap  ProcessModule::GetExtension()
 	{
 		// TODO: insert return statement here
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
 		return m_Extensions;
 	}
 
@@ -67,16 +80,17 @@ namespace model{
 				ext = jsonEvent["extension"].asString();
 			}
 
-			auto &it = m_Extensions.find(ext);
+			auto extptr = getExtension(ext);
 
-			if (it != m_Extensions.end()) {
-				m_RecEvtBuffer.Put(Event);
+			if (extptr != nullptr) {
+				extptr->m_model->m_RecEvtBuffer.Put(Event);
 				return;
 			}
 			
-			it = g_Extensions.find(ext);
-			if (it != g_Extensions.end()) {
-				it->second->m_model->m_RecEvtBuffer.Put(Event);
+			//
+			auto extconfigptr = getExtensionConfig(ext);
+			if (extconfigptr != nullptr){
+				extconfigptr->m_model->m_RecEvtBuffer.Put(Event);
 				return;
 			}
 			else {
@@ -103,15 +117,16 @@ namespace model{
 				chilli::model::EventType_t newEvent(Event.event);
 				newEvent.event["extension"] = ext;
 
-				auto & it = m_Extensions.find(ext);
-				if (it != m_Extensions.end()){
-					this->m_RecEvtBuffer.Put(newEvent);
+				auto extptr = getExtension(ext);
+
+				if (extptr != nullptr) {
+					extptr->m_model->m_RecEvtBuffer.Put(Event);
 					continue;
 				}
-				it = g_Extensions.find(ext);
 
-				if (it != g_Extensions.end()) {
-					it->second->m_model->m_RecEvtBuffer.Put(newEvent);
+				auto extconfigptr = getExtensionConfig(ext);
+				if (extconfigptr != nullptr) {
+					extconfigptr->m_model->m_RecEvtBuffer.Put(Event);
 					continue;
 				}
 				else {
@@ -127,10 +142,6 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Starting...");
 		try
 		{
-			for (auto & it : m_Extensions){
-				it.second->AddSendImplement(it.second.get());
-				it.second->Start();
-			}
 
 			while (m_bRunning)
 			{
@@ -145,12 +156,43 @@ namespace model{
 							ext = jsonEvent["extension"].asString();
 						}
 
-						auto &it = m_Extensions.find(ext);
 
-						if (it != m_Extensions.end()) {
+						auto & it = m_Extensions.find(ext);
+						ExtensionPtr extptr = nullptr;
+						if (it != m_Extensions.end())
+						{
+							extptr = it->second;
+						}
 
-							it->second->pushEvent(Event);
-							it->second->m_SM->mainEventLoop();
+						
+						if (extptr == nullptr) {
+							ExtensionConfigPtr config = getExtensionConfig(ext);
+							extptr = newExtension(config);
+							if (extptr != nullptr && addExtension(ext, extptr)){
+
+								for (auto & it : config->m_Vars)
+								{
+									extptr->setVar(it.first,it.second);
+								}
+
+								for (auto & it : g_Modules) {
+									extptr->AddSendImplement(it.get());
+								}
+
+								extptr->AddSendImplement(extptr.get());
+								extptr->Start();
+
+							}
+						}
+
+						if (extptr != nullptr) {
+
+							extptr->pushEvent(Event);
+							extptr->m_SM->mainEventLoop();
+							if (extptr->IsFinalState()) {
+								removeExtension(ext);
+								extptr->Stop();
+							}
 						}
 					}
 				}
@@ -188,15 +230,81 @@ namespace model{
 			}
 		}
 		chilli::model::EventType_t evt(jsonEvent);
+		{
+			std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+			auto & it = g_Extensions.find(ext);
 
-		auto & it = g_Extensions.find(ext);
-
-		if (it != g_Extensions.end()){
-			it->second->m_model->PushEvent(evt);
-		}
-		else{
-			LOG4CPLUS_ERROR(log, " not find extension by event:" << attr);
+			if (it != g_Extensions.end()) {
+				it->second->m_model->PushEvent(evt);
+			}
+			else {
+				LOG4CPLUS_ERROR(log, " not find extension by event:" << attr);
+			}
 		}
 	}
+
+	ExtensionConfigPtr ProcessModule::newExtensionConfig(ProcessModule * model, const std::string & ext, const std::string & smFileName, uint32_t type)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		if (g_ExtensionConfigs.find(ext) == g_ExtensionConfigs.end())
+		{
+			model::ExtensionConfigPtr extptr(new model::ExtensionConfig(model, ext, smFileName, type));
+			g_ExtensionConfigs[ext] = extptr;
+			m_ExtensionConfigs[ext] = extptr;
+			return extptr;
+		}
+		return nullptr;
+	}
+
+	void ProcessModule::deleteExtensionConfig(const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		g_ExtensionConfigs.erase(ext);
+	}
+
+	ExtensionConfigPtr ProcessModule::getExtensionConfig(const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		auto & it = g_ExtensionConfigs.find(ext);
+		if (it != g_ExtensionConfigs.end()){
+			return it->second;
+		}
+		return nullptr;
+	}
+
+	bool ProcessModule::addExtension(const std::string &ext, ExtensionPtr & extptr)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		if (this->g_Extensions.find(ext) == this->g_Extensions.end()){
+			this->g_Extensions[ext] = extptr;
+			this->m_Extensions[ext] = extptr;
+			return true;
+		}
+		return false;
+	}
+
+	void ProcessModule::removeExtension(const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		this->g_Extensions.erase(ext);
+		this->m_Extensions.erase(ext);
+	}
+
+	chilli::model::ExtensionPtr ProcessModule::getExtension(const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		auto & it = this->m_Extensions.find(ext);
+		if (it != this->m_Extensions.end()) {
+			return it->second;
+		}
+
+		it = this->g_Extensions.find(ext);
+		if (it != this->g_Extensions.end()) {
+			return it->second;
+		}
+
+		return nullptr;
+	}
+
 }
 }

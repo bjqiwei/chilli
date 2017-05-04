@@ -15,6 +15,7 @@ namespace FreeSwitch{
 		virtual int Start() override;
 		virtual int Stop() override;
 		virtual bool LoadConfig(const std::string & config) override;
+		virtual model::ExtensionPtr newExtension(const model::ExtensionConfigPtr & config) override;
 	private:
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;

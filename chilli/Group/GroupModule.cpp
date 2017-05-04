@@ -9,6 +9,9 @@
 namespace chilli {
 namespace Group {
 
+	enum ExtType {
+		GroupType = 0,
+	};
 	// Constructor of the GroupModule 
 	GroupModule::GroupModule(const std::string & id) :ProcessModule(id)
 	{
@@ -42,20 +45,18 @@ namespace Group {
 			const char * sm = child->Attribute("StateMachine");
 			num = num ? num : "";
 			sm = sm ? sm : "";
-			if (this->g_Extensions.find(num) == this->g_Extensions.end())
-			{
-				model::ExtensionPtr ext(new GroupImp(this, num, sm));
-				this->g_Extensions[num] = ext;
-				this->m_Extensions[num] = ext;
-				ext->setVar("_extension.Extension", num);
+
+			model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::GroupType);
+			if (extConfig != nullptr) {
+				extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 				Json::Value extensions;
-				for (XMLElement *extptr = child->FirstChildElement("Extension"); extptr!=nullptr;
+				for (XMLElement *extptr = child->FirstChildElement("Extension"); extptr != nullptr;
 					extptr = extptr->NextSiblingElement("Extension"))
 				{
 					std::string extension = extptr->GetText() ? extptr->GetText() : "";
 					extensions.append(extension);
 				}
-				ext->setVar("_extension.Extensions", extensions);
+				extConfig->m_Vars.push_back(std::make_pair("_extension.Extensions", extensions));
 			}
 			else {
 				LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -63,6 +64,18 @@ namespace Group {
 		}
 
 		return true;
+	}
+
+	model::ExtensionPtr GroupModule::newExtension(const model::ExtensionConfigPtr & config)
+	{
+		if (config != nullptr)
+		{
+			if (config->m_ExtType == ExtType::GroupType) {
+				model::ExtensionPtr ext(new GroupImp(this, config->m_ExtNumber, config->m_SMFileName));
+				return ext;
+			}
+		}
+		return nullptr;
 	}
 
 	void GroupModule::fireSend(const std::string & strContent, const void * param)
