@@ -88,7 +88,7 @@
 				<transition  target="init"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='ping'">
-				<log level="debug"> ping message</log>
+				<log level="trace"> ping message</log>
 			</event>
 			<event event=".*">
 				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
@@ -503,15 +503,19 @@
 					<state id="helding">
 						<event event="cmd" cond="_event.cmd=='mute'">
 						</event>
-						<event event="HoldCall">
+						<event event="HoldCall" cond = "_event.HoldCall.status != 0">
 							<send target="this" type="notify" dest="client" event="mute">
 								<type>mute</type>
 								<status type="script">_event.HoldCall.status;</status>
 								<reason type="script">_event.HoldCall.reason; </reason>
 							</send>
-							<transition cond = "_event.HoldCall.status != 0" target="established"/>
+							<transition target="established"/>
 						</event>
 						<event event="HELD" cond="cmp(_event.held.connection,connection)">
+							<send target="this" type="notify" dest="client" event="mute">
+								<type>mute</type>
+								<status type="script">0</status>
+							</send>
 							<transition target="held"/>
 						</event>
 						<state  id="held">
@@ -524,16 +528,20 @@
 							<state id="retrieveCalling">
 								<event event="cmd" cond="_event.cmd=='unmute'">
 								</event>
-								<event event="RetrieveCall" >
+								<event event="RetrieveCall" cond = "_event.RetrieveCall.status != 0">
 									<send target="this" type="notify" dest="client" event="unmute">
 										<type>unmute</type>
 										<status type="script">_event.RetrieveCall.status;</status>
 										<reason type="script">_event.RetrieveCall.reason; </reason>
 									</send>
-									<transition  cond = "_event.RetrieveCall.status != 0" target="held"/>
+									<transition target="held"/>
 								</event>
-								<event event="RETRIEVED">
-									<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
+								<event event="RETRIEVED" cond="cmp(_event.retrieved.connection,connection)">
+									<send target="this" type="notify" dest="client" event="unmute">
+										<type>unmute</type>
+										<status type="script">0</status>
+									</send>
+									<transition target="established"/>
 								</event>
 							</state>
 						</state>

@@ -496,7 +496,7 @@ lwsclose:
 
 	void WebSocketClient::OnSend()
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << "OnSend");
+		LOG4CPLUS_TRACE(log, m_SessionId << "OnSend");
 	}
 
 	void WebSocketClient::OnClose(const std::string & ErrorCode)
