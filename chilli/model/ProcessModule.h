@@ -40,6 +40,11 @@ public:
 	void removeExtension(const std::string & ext);
 	ExtensionPtr getExtension(const std::string & ext);
 
+	void addExtToGroup(const std::string &group, const std::string & ext);
+	void addGroupToExt(const std::string &ext, const std::string & group);
+	std::vector<std::string> getExtByGroup(const std::string & group);
+	std::vector<std::string> getGroupByExt(const std::string & ext);
+
 public:
 	log4cplus::Logger log;
 	static std::vector<std::shared_ptr<model::ProcessModule>> g_Modules;
@@ -47,12 +52,14 @@ private:
 	static std::recursive_mutex g_ExtMtx;
 	static model::ExtensionMap g_Extensions;
 	static model::ExtensionConfigMap g_ExtensionConfigs;
+
+	static std::recursive_mutex g_GroupMtx;
+	static std::map<std::string, std::vector<std::string>> g_ExtBelongGroup;
+	static std::map<std::string, std::vector<std::string>> g_GroupHasExt;
 	model::ExtensionMap m_Extensions;
 	model::ExtensionConfigMap m_ExtensionConfigs;
 
 protected:
-	static std::map<std::string, std::vector<std::string>> g_ExtBelongGroup;
-	static std::map<std::string, std::vector<std::string>> g_GroupHasExt;
 	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
 	std::atomic<bool> m_bRunning = false;
 	std::thread m_thread;

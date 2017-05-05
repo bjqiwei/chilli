@@ -74,8 +74,8 @@ namespace Group {
 					extptr = extptr->NextSiblingElement("Extension"))
 				{
 					std::string extension = extptr->GetText() ? extptr->GetText() : "";
-					ProcessModule::g_GroupHasExt[num].push_back(extension);
-					ProcessModule::g_ExtBelongGroup[extension].push_back(num);
+					this->addExtToGroup(num, extension);
+					this->addGroupToExt(extension, num);
 				}				
 			}
 			else {

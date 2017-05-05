@@ -8,6 +8,8 @@ namespace model{
 	model::ExtensionMap ProcessModule::g_Extensions;
 	model::ExtensionConfigMap ProcessModule::g_ExtensionConfigs;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
+
+	std::recursive_mutex ProcessModule::g_GroupMtx;
 	std::map<std::string, std::vector<std::string>> ProcessModule::g_ExtBelongGroup;
 	std::map<std::string, std::vector<std::string>> ProcessModule::g_GroupHasExt;
 
@@ -182,28 +184,26 @@ namespace model{
 								}
 								// Group has extensions
 								{
-									auto & it = g_GroupHasExt.find(ext);
+									auto & it = getExtByGroup(ext);
 									Json::Value extensions;
 
-									if (it != g_GroupHasExt.end()) {
-										for (auto & it2 : it->second) {
-											extensions.append(it2);
-										}
-										extptr->setVar("_extension.Extensions", extensions);
+									for (auto & it2 : it) {
+										extensions.append(it2);
 									}
+									extptr->setVar("_extension.Extensions", extensions);
+									
 								}
 
 								// extension belong group
 								{
-									auto & it = g_ExtBelongGroup.find(ext);
+									auto & it = getGroupByExt(ext);
 									Json::Value groups;
 
-									if (it != g_ExtBelongGroup.end()) {
-										for (auto & it2 : it->second) {
-											groups.append(it2);
-										}
-										extptr->setVar("_extension.Groups", groups);
+									for (auto & it2 : it) {
+										groups.append(it2);
 									}
+									extptr->setVar("_extension.Groups", groups);
+									
 								}
 
 								for (auto & it : g_Modules) {
@@ -342,6 +342,38 @@ namespace model{
 		}
 
 		return nullptr;
+	}
+
+	void ProcessModule::addExtToGroup(const std::string & group, const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
+		g_GroupHasExt[group].push_back(ext);
+	}
+
+	void ProcessModule::addGroupToExt(const std::string & ext, const std::string & group)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
+		g_ExtBelongGroup[ext].push_back(group);
+	}
+
+	std::vector<std::string> ProcessModule::getExtByGroup(const std::string & group)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
+		auto & it = g_GroupHasExt.find(group);
+		if (it != g_GroupHasExt.end())
+			return it->second;
+
+		return std::vector<std::string>();
+	}
+
+	std::vector<std::string> ProcessModule::getGroupByExt(const std::string & ext)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
+		auto & it = g_ExtBelongGroup.find(ext);
+		if (it != g_ExtBelongGroup.end())
+			return it->second;
+
+		return std::vector<std::string>();
 	}
 
 }
