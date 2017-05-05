@@ -31,6 +31,7 @@
 			<send cond="idleExtension!=''" target="this" type="notify" dest="extension" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<extension type="script">idleExtension;</extension>
+				<companyid type="script">_event.companyid;</companyid>
 				<delivered type="script">_event.delivered;</delivered>
 			</send>
 		</event>

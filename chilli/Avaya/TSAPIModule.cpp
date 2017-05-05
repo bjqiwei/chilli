@@ -132,6 +132,7 @@ namespace chilli {
 					const char * avayaAgentId = child->Attribute("avayaAgentId");
 					const char * avayaPassword = child->Attribute("avayaPassword");
 					const char * avayaExtension = child->Attribute("avayaExtension");
+					const char * companyid = child->Attribute("companyid");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
@@ -140,6 +141,7 @@ namespace chilli {
 					avayaAgentId = avayaAgentId ? avayaAgentId : "";
 					avayaPassword = avayaPassword ? avayaPassword : "";
 					avayaExtension = avayaExtension ? avayaExtension : "";
+					companyid = companyid ? companyid : "";
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaAgentType);
 					if (extConfig != nullptr) {
@@ -149,6 +151,7 @@ namespace chilli {
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.AgentId", avayaAgentId));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Password", avayaPassword));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
+						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -169,15 +172,18 @@ namespace chilli {
 					const char * num = child->Attribute("ExtensionNumber");
 					const char * sm = child->Attribute("StateMachine");
 					const char * avayaExtension = child->Attribute("avayaExtension");
+					const char * companyid = child->Attribute("companyid");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
 					avayaExtension = avayaExtension ? avayaExtension : "";
+					companyid = companyid ? companyid : "";
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaExtType);
 					if (extConfig != nullptr) {
 						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
+						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -194,15 +200,18 @@ namespace chilli {
 				const char * num = vdn->Attribute("ExtensionNumber");
 				const char * sm = vdn->Attribute("StateMachine");
 				const char * avayaExtension = vdn->Attribute("avayaExtension");
+				const char * companyid = vdn->Attribute("companyid");
 
 				num = num ? num : "";
 				sm = sm ? sm : "";
 				avayaExtension = avayaExtension ? avayaExtension : "";
+				companyid = companyid ? companyid : "";
 
 				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaVDNType);
 				if (extConfig != nullptr) {
 					extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
 					extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
+					extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 				}
 				
 				else {
@@ -222,13 +231,16 @@ namespace chilli {
 
 					const char * num = child->Attribute("ExtensionNumber");
 					const char * sm = child->Attribute("StateMachine");
+					const char * companyid = child->Attribute("companyid");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
+					companyid = companyid ? companyid : "";
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaACDType);
 					if (extConfig != nullptr) {
 						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);

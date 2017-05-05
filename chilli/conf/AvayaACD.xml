@@ -40,7 +40,7 @@
 		<onentry>
 			<script>callUUID = uuid();</script>
 			<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
-				<sql type="script">var sql='INSERT INTO call_cdr(id,callid,device) VALUES(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\')'; sql;</sql>
+				<sql type="script">var sql='INSERT INTO call_cdr(id,callid,device,companyid) VALUES(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\','+_event.companyid+')'; sql;</sql>
 			</send>
 			<send target="this" type="notify" dest="extension" event="StateChange">
 				<event>StateChange</event>
