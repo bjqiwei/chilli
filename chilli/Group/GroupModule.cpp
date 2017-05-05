@@ -25,6 +25,25 @@ namespace Group {
 		LOG4CPLUS_DEBUG(log, "Destruction a module.");
 	}
 
+	int GroupModule::Start()
+	{
+		int result = ProcessModule::Start();
+		for (auto & it : GetExtensionConfig()) {
+			Json::Value start;
+			start["extension"] = it.first;
+			start["event"] = "Start";
+			chilli::model::EventType_t evt(start);
+			this->PushEvent(evt);
+		}
+
+		return result;
+	}
+
+	int GroupModule::Stop()
+	{
+		return ProcessModule::Stop();
+	}
+
 	bool GroupModule::LoadConfig(const std::string & configContext)
 	{
 		using namespace tinyxml2;

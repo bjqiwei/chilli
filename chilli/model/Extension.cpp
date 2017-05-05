@@ -17,8 +17,8 @@ namespace model {
 	}
 
 	void Extension::Start() {
-		m_SM->start(false);
 		LOG4CPLUS_INFO(log, " Start.");
+		m_SM->start(false);
 	}
 
 	void Extension::Stop() {

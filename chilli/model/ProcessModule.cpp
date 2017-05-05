@@ -115,13 +115,13 @@ namespace model{
 				auto extptr = getExtension(ext);
 
 				if (extptr != nullptr) {
-					extptr->m_model->m_RecEvtBuffer.Put(Event);
+					extptr->m_model->m_RecEvtBuffer.Put(newEvent);
 					continue;
 				}
 
 				auto extconfigptr = getExtensionConfig(ext);
 				if (extconfigptr != nullptr) {
-					extconfigptr->m_model->m_RecEvtBuffer.Put(Event);
+					extconfigptr->m_model->m_RecEvtBuffer.Put(newEvent);
 					continue;
 				}
 				else {
@@ -137,6 +137,13 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Starting...");
 		try
 		{
+			for (auto & it : m_Extensions) {
+				for (auto & it2 : g_Modules) {
+					it.second->AddSendImplement(it2.get());
+				}
+				it.second->AddSendImplement(it.second.get());
+				it.second->Start();
+			}
 
 			while (m_bRunning)
 			{
