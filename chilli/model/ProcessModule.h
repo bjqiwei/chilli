@@ -33,6 +33,8 @@ public:
 	ExtensionConfigPtr newExtensionConfig(ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type);
 	void deleteExtensionConfig(const std::string &ext);
 	ExtensionConfigPtr getExtensionConfig(const std::string & ext);
+	virtual ExtensionConfigMap GetExtensionConfig() final;
+
 	virtual ExtensionPtr newExtension(const ExtensionConfigPtr & config) = 0;
 	bool addExtension(const std::string &ext, ExtensionPtr & extptr);
 	void removeExtension(const std::string & ext);

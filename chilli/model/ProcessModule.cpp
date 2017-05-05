@@ -19,20 +19,15 @@ namespace model{
 			Stop();
 		}
 
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-
 		for (auto & it : m_Extensions) {
 			removeExtension(it.first);
 		}
-
-		m_Extensions.clear();
 
 		for (auto & it: m_ExtensionConfigs)
 		{
 			deleteExtensionConfig(it.first);
 		}
 
-		m_ExtensionConfigs.clear();
 	}
 
 	int ProcessModule::Start()
@@ -168,8 +163,9 @@ namespace model{
 						if (extptr == nullptr) {
 							ExtensionConfigPtr config = getExtensionConfig(ext);
 							extptr = newExtension(config);
-							if (extptr != nullptr && addExtension(ext, extptr)){
+							if (extptr != nullptr ){
 
+								addExtension(ext, extptr);
 								for (auto & it : config->m_Vars)
 								{
 									extptr->setVar(it.first,it.second);
@@ -260,6 +256,7 @@ namespace model{
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
 		g_ExtensionConfigs.erase(ext);
+		m_ExtensionConfigs.erase(ext);
 	}
 
 	ExtensionConfigPtr ProcessModule::getExtensionConfig(const std::string & ext)
@@ -270,6 +267,12 @@ namespace model{
 			return it->second;
 		}
 		return nullptr;
+	}
+
+	ExtensionConfigMap ProcessModule::GetExtensionConfig()
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
+		return m_ExtensionConfigs;
 	}
 
 	bool ProcessModule::addExtension(const std::string &ext, ExtensionPtr & extptr)

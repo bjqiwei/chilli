@@ -1228,10 +1228,13 @@ namespace chilli {
 							event["OpenStream"] = Json::objectValue;
 							event["OpenStream"]["status"] = 0;
 							
-							for (auto &it: this->GetExtension()){
-								event["extension"] = it.first;
-								model::EventType_t evt(event);
-								this->PushEvent(evt);
+							for (auto &it: this->GetExtensionConfig()){
+								if (it.second->m_ExtType != ExtType::AvayaAgentType
+									&& it.second->m_ExtType != ExtType::AvayaACDType) {
+									event["extension"] = it.first;
+									model::EventType_t evt(event);
+									this->PushEvent(evt);
+								}
 							}
 						}
 												   break;
