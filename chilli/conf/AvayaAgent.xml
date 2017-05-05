@@ -61,7 +61,7 @@
 					<password type="script">_avaya.Password</password>
 					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
-				<transition  target="final"/>
+				<transition target="logouting"/>
 			</event>
 			<event event="ConnectClose">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
@@ -69,7 +69,7 @@
 					<password type="script">_avaya.Password</password>
 					<agentId type="script">_avaya.AgentId</agentId>
 				</send>
-				<transition  target="final"/>
+				<transition target="logouting"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='logout'">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
@@ -78,7 +78,7 @@
 					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
-				<transition  target="final"/>
+				<transition target="logouting"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='ping'">
 				<log level="trace"> ping message</log>
@@ -556,7 +556,14 @@
 			</state>
 		</state>
 
-		
+		<state id="logouting">
+			<event event="AgentLogout">
+				<transition  target="final"/>
+			</event>
+			<event event=".*">
+				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
+			</event>
+		</state>
     </state>
 	<state id="final">
 		<onentry>
