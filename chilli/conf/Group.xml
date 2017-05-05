@@ -7,16 +7,14 @@
 
 	<state id="init">
 		<onentry>
-			<script>extensionArray = {};</script>
-			<send target="this" type="cmd" dest="extension" event="GroupControl">
-				<event>GroupControl</event>
-				<extension type="script">_extension.Extensions;</extension>
-				<GroupControl type="script">var GroupControl = {}; GroupControl.originate = _extension.Extension; GroupControl;</GroupControl>
-			</send>
+			<script>extensionArray = {};
+				for(var index in _extension.Extensions){
+					extensionArray[_extension.Extensions[index]]='Idle';
+				}
+			</script>
 		</onentry>
 		<event event="StateChange">
 			<script>extensionArray[_event.StateChange.extension] = _event.StateChange.state;</script>
-			<log level="debug" type="script">extensionArray.toString();</log>
 		</event>
 		<event event= "DELIVERED">
 			<script>

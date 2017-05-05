@@ -28,6 +28,7 @@ namespace Group {
 	int GroupModule::Start()
 	{
 		int result = ProcessModule::Start();
+		/*
 		for (auto & it : GetExtensionConfig()) {
 			Json::Value start;
 			start["extension"] = it.first;
@@ -35,7 +36,7 @@ namespace Group {
 			chilli::model::EventType_t evt(start);
 			this->PushEvent(evt);
 		}
-
+		*/
 		return result;
 	}
 
@@ -68,14 +69,14 @@ namespace Group {
 			model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::GroupType);
 			if (extConfig != nullptr) {
 				extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
-				Json::Value extensions;
+				
 				for (XMLElement *extptr = child->FirstChildElement("Extension"); extptr != nullptr;
 					extptr = extptr->NextSiblingElement("Extension"))
 				{
 					std::string extension = extptr->GetText() ? extptr->GetText() : "";
-					extensions.append(extension);
-				}
-				extConfig->m_Vars.push_back(std::make_pair("_extension.Extensions", extensions));
+					ProcessModule::g_GroupHasExt[num].push_back(extension);
+					ProcessModule::g_ExtBelongGroup[extension].push_back(num);
+				}				
 			}
 			else {
 				LOG4CPLUS_ERROR(log, "alredy had extension:" << num);

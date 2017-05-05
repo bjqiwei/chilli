@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" ?>
-<fsm name ="AvayaACD" initial="Idle">
+<fsm name ="AvayaACD" initial="init" final="Idle">
 <datamodel>
-	<data id="groupArray" expr='new Array();'/>
 	<data id="monitorId"/>
 	<data id="callUUID"/>
 	<data id="connection"/>
@@ -10,30 +9,23 @@
 	<script src="./conf/uuid.js" />
 </scriptmodel>
 <state id="init">
-	<event event="GroupControl">
-		<script>groupArray.push(_event.GroupControl.originate);</script>
-		<send target="this" type="notify" dest="extension" event="StateChange">
-			<event>StateChange</event>
-			<extension type="script">groupArray;</extension>
-			<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
+	
+	<event event= "DELIVERED">
+		<send target="this" type="cmd" dest="this" event="MonitorCall">
+			<connection type="script">_event.delivered.connection;</connection>
 		</send>
+		<script>connection = _event.delivered.connection;</script>
+		<transition target="Busy"/>
 	</event>
 	
 	<state id="Idle">
 		<onentry>
 			<send target="this" type="notify" dest="extension" event="StateChange">
 				<event>StateChange</event>
-				<extension type="script">groupArray;</extension>
+				<extension type="script">_extension.Groups;</extension>
 				<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
 			</send>
 		</onentry>
-		<event event= "DELIVERED">
-			<send target="this" type="cmd" dest="this" event="MonitorCall">
-				<connection type="script">_event.delivered.connection;</connection>
-			</send>
-			<script>connection = _event.delivered.connection;</script>
-			<transition target="Busy"/>
-		</event>
 	</state>
 	
 	<state id="Busy">
@@ -44,7 +36,7 @@
 			</send>
 			<send target="this" type="notify" dest="extension" event="StateChange">
 				<event>StateChange</event>
-				<extension type="script">groupArray;</extension>
+				<extension type="script">_extension.Groups;</extension>
 				<StateChange type="script">var StateChange = {}; StateChange.extension = _extension.Extension;StateChange.state=_state._id;StateChange;</StateChange>
 			</send>
 		</onentry>

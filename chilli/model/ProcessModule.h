@@ -51,6 +51,8 @@ private:
 	model::ExtensionConfigMap m_ExtensionConfigs;
 
 protected:
+	static std::map<std::string, std::vector<std::string>> g_ExtBelongGroup;
+	static std::map<std::string, std::vector<std::string>> g_GroupHasExt;
 	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
 	std::atomic<bool> m_bRunning = false;
 	std::thread m_thread;

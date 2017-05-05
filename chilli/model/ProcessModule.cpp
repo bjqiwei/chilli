@@ -8,6 +8,8 @@ namespace model{
 	model::ExtensionMap ProcessModule::g_Extensions;
 	model::ExtensionConfigMap ProcessModule::g_ExtensionConfigs;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
+	std::map<std::string, std::vector<std::string>> ProcessModule::g_ExtBelongGroup;
+	std::map<std::string, std::vector<std::string>> ProcessModule::g_GroupHasExt;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId)
 	{
@@ -137,6 +139,7 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Starting...");
 		try
 		{
+			/*
 			for (auto & it : m_Extensions) {
 				for (auto & it2 : g_Modules) {
 					it.second->AddSendImplement(it2.get());
@@ -144,7 +147,7 @@ namespace model{
 				it.second->AddSendImplement(it.second.get());
 				it.second->Start();
 			}
-
+			*/
 			while (m_bRunning)
 			{
 				try
@@ -176,6 +179,31 @@ namespace model{
 								for (auto & it : config->m_Vars)
 								{
 									extptr->setVar(it.first,it.second);
+								}
+								// Group has extensions
+								{
+									auto & it = g_GroupHasExt.find(ext);
+									Json::Value extensions;
+
+									if (it != g_GroupHasExt.end()) {
+										for (auto & it2 : it->second) {
+											extensions.append(it2);
+										}
+										extptr->setVar("_extension.Extensions", extensions);
+									}
+								}
+
+								// extension belong group
+								{
+									auto & it = g_ExtBelongGroup.find(ext);
+									Json::Value groups;
+
+									if (it != g_ExtBelongGroup.end()) {
+										for (auto & it2 : it->second) {
+											groups.append(it2);
+										}
+										extptr->setVar("_extension.Groups", groups);
+									}
 								}
 
 								for (auto & it : g_Modules) {
