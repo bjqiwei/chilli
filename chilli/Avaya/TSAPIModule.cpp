@@ -1223,17 +1223,59 @@ namespace chilli {
 							AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_CALL_DEVICE_MONITOR);
 
-							Json::Value event;
-							event["event"] = "ACS_OPEN_STREAM_CONF";
-							event["OpenStream"] = Json::objectValue;
-							event["OpenStream"]["status"] = 0;
 							
 							for (auto &it: this->GetExtensionConfig()){
-								if (it.second->m_ExtType != ExtType::AvayaAgentType
-									&& it.second->m_ExtType != ExtType::AvayaACDType) {
-									event["extension"] = it.first;
-									model::EventType_t evt(event);
-									this->PushEvent(evt);
+								if (it.second->m_ExtType == ExtType::AvayaExtType)
+								{
+									const char* deviceId = it.first.c_str();
+
+									CSTAMonitorFilter_t noFilter;
+									noFilter.agent = 0;
+									noFilter.call = 0;
+									noFilter.feature = 0;
+									noFilter.maintenance = 0;
+									noFilter.privateFilter = 0;
+
+									uint32_t uInvodeId = ++(this->m_ulInvokeID);
+									RetCode_t nRetCode = AvayaAPI::cstaMonitorDevice(this->m_lAcsHandle,
+										uInvodeId,
+										(DeviceID_t *)deviceId,
+										&noFilter,
+										NULL);
+
+									if (nRetCode != ACSPOSITIVE_ACK) {
+										LOG4CPLUS_ERROR(log, it.first << " cstaMonitorDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
+									}
+									else {
+										LOG4CPLUS_DEBUG(log, "MonitorDevice:" << it.first);
+										this->m_InvokeID2Extension[uInvodeId] = it.first;
+									}
+								}
+								else if (it.second->m_ExtType == ExtType::AvayaVDNType)
+								{
+									const char* deviceId = it.first.c_str();
+
+									CSTAMonitorFilter_t noFilter;
+									noFilter.agent = 0;
+									noFilter.call = 0;
+									noFilter.feature = 0;
+									noFilter.maintenance = 0;
+									noFilter.privateFilter = 0;
+
+									uint32_t uInvodeId = ++(this->m_ulInvokeID);
+									RetCode_t nRetCode = AvayaAPI::cstaMonitorCallsViaDevice(this->m_lAcsHandle,
+										uInvodeId,
+										(DeviceID_t *)deviceId,
+										&noFilter,
+										NULL);
+
+									if (nRetCode != ACSPOSITIVE_ACK) {
+										LOG4CPLUS_ERROR(log, it.first << " cstaMonitorCallsViaDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
+									}
+									else {
+										LOG4CPLUS_DEBUG(log, "MonitorCallsViaDevice:" << it.first);
+										this->m_InvokeID2Extension[uInvodeId] = it.first;
+									}
 								}
 							}
 						}
@@ -1551,14 +1593,16 @@ namespace chilli {
 
 							this->m_monitorID2Extension[monitorId] = this->m_InvokeID2Extension[invokeId];
 
-							Json::Value event;
-							event["extension"] = this->m_InvokeID2Extension[invokeId];
-							std::string eventName = this->m_InvokeID2Event[invokeId];
-							event["event"] = eventName;
-							event[eventName]["status"] = 0;
-							event[eventName]["monitorId"] = monitorId;
-							model::EventType_t evt(event);
-							this->PushEvent(evt);
+							if (this->m_InvokeID2Event.find(invokeId) != this->m_InvokeID2Event.end()) {
+								Json::Value event;
+								event["extension"] = this->m_InvokeID2Extension[invokeId];
+								std::string eventName = this->m_InvokeID2Event[invokeId];
+								event["event"] = eventName;
+								event[eventName]["status"] = 0;
+								event[eventName]["monitorId"] = monitorId;
+								model::EventType_t evt(event);
+								this->PushEvent(evt);
+							}
 						}
 								  break;
 						case CSTA_MONITOR_STOP_CONF: {

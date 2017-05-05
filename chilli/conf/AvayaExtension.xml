@@ -2,7 +2,6 @@
 
 <fsm name ="AvayaExtension" initial="init">
 <datamodel>
-	<data id="monitorId"/>
 	<data id="agentId" expr="''"/>
 	<date id="connection"/>
 	<date id="newCall"/>
@@ -11,15 +10,6 @@
 	<script src="./conf/cmpObject.js" />
 </scriptmodel>
 	<state id="init">
-		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
-			<send target="this" type="cmd" dest="this" event="MonitorDevice">
-				<deviceId type="script">_avaya.Extension</deviceId>
-			</send>
-		</event>
-		<event event="MonitorDevice">
-			<script>monitorId=_event.monitorId;</script>
-			<!--timer idexpr="_extension.Extension" interval="10000"/-->
-		</event>
 		<event event="AgentLogin" cond="_event.AgentLogin.agentId != ''">
 			<script>agentId = _event.AgentLogin.agentId;</script>	
 		</event>
