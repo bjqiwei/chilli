@@ -9,7 +9,7 @@
 	<script src="./conf/cmpObject.js" />
 </scriptmodel>
 	<state id="init">
-		<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
+		<event event="cmd" cond="_event.cmd=='logon'">
 			<transition  target="logining"/>
 		</event>
 		<event event="cmd" cond="_event.cmd=='logon'">
@@ -44,8 +44,26 @@
 					<extension type="script">_agent.Extension</extension>
 				</send>
 			</onentry>
+			<event event="AgentLogout" cond="_event.AgentLogout.status==0">
+				<transition target="logining"/>
+			</event>
+			<event event="AgentLogout">
+				<send target="this" type="response" dest="client" event="logon">
+					<status type="script">_event.AgentLogout.status</status>
+					<type>logon</type>
+					<reason type="script">_event.AgentLogout.reason</reason>
+				</send>
+				<transition  target="final"/>
+			</event>
 			<event event="AgentLogin" cond="_event.AgentLogin.status==0">
 				<transition  target="logined"/>
+			</event>
+			<event event="AgentLogin" cond="_event.AgentLogin.status==1001">
+				<send target="this" type="cmd" dest="this" event="AgentLogout">
+					<deviceId type="script">_avaya.Extension</deviceId>
+					<password type="script">_avaya.Password</password>
+					<agentId type="script">_avaya.AgentId</agentId>
+				</send>
 			</event>
 			<event event="AgentLogin">
 				<send target="this" type="response" dest="client" event="logon">
