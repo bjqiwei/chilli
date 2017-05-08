@@ -309,7 +309,7 @@ namespace chilli {
 				, (Passwd_t *)(password)  // CTI LoginID password
 				, (AppName_t *)"CHILLI-SERVER"
 				, ACS_LEVEL1
-				, (Version_t *) "TS1-2" // private Data version in use 8 in our case
+				, (Version_t *) "TS1-5" // private Data version in use 8 in our case
 				, 10
 				, 5
 				, 50
@@ -1181,9 +1181,9 @@ namespace chilli {
 
 			while (m_bRunning) {
 				LOG4CPLUS_DEBUG(log, "ServiceID:" << m_ServiceID << ",UserID:" << m_UserID << ",Password:" << m_Password);
-				bool ret = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
+				bool connected = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
 				
-				if (ret == false) {
+				if (connected == false) {
 					std::this_thread::sleep_for(std::chrono::seconds(5));
 					continue;
 				}
@@ -1191,7 +1191,7 @@ namespace chilli {
 				usEventBufSize = sizeof(CSTAEvent_t);
 				m_stPrivateData.length = ATT_MAX_PRIVATE_DATA;
 
-				while (m_bRunning) {
+				while (m_bRunning && connected) {
 					// Method for retrieving the entire response event structure
 
 					RetCode_t nRetCode = AvayaAPI::acsGetEventBlock(m_lAcsHandle, (void *)&cstaEvent, &usEventBufSize,
@@ -1230,6 +1230,7 @@ namespace chilli {
 							LOG4CPLUS_INFO(log, "Lib Version:" << cstaEvent.event.acsConfirmation.u.acsopen.libVer);
 							LOG4CPLUS_INFO(log, "Tsrv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.tsrvVer);
 							LOG4CPLUS_INFO(log, "Drv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.drvrVer);
+							LOG4CPLUS_INFO(log, "vendor:" << m_stPrivateData.vendor);
 
 							AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
@@ -1298,7 +1299,7 @@ namespace chilli {
 						}
 													break;
 						case ACS_UNIVERSAL_FAILURE_CONF: {
-							LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
+							LOG4CPLUS_WARN(log, "ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
 						}
 														 break;
 						default: {
@@ -1312,6 +1313,7 @@ namespace chilli {
 						switch (cstaEvent.eventHeader.eventType) {
 						case ACS_UNIVERSAL_FAILURE: {
 							LOG4CPLUS_INFO(log, "ACS_UNIVERSAL_FAILURE:" << AvayaAPI::acsErrorString(cstaEvent.event.acsUnsolicited.u.failureEvent.error));
+							connected = false;
 						}
 													break;
 						default: {
