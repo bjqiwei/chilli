@@ -5,22 +5,11 @@
 #include <cstdint>
 #include <json/json.h>
 
-#if defined ( TSLIB_WINDOWS_32 )
-#define TSAPIPROC           RetCode_t (pascal *
-#elif defined ( TSLIB_LINUX )
-#define TSAPIPROC           RetCode_t
-#endif
-
 namespace AvayaAPI{
-	//CSTA32
 
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif  
 
-		typedef TSAPIPROC Proc_acsOpenStream)(ACSHandle_t                     FAR *acsHandle,
-		InvokeIDType_t                  invokeIDType,
+	TSAPI acsOpenStream(ACSHandle_t                     FAR *acsHandle,
+			InvokeIDType_t                  invokeIDType,
 			InvokeID_t                      invokeID,
 			StreamType_t                    streamType,
 			CONST_PARAM ServerID_t      FAR *serverID,
@@ -36,849 +25,673 @@ namespace AvayaAPI{
 			CONST_PARAM PrivateData_t   FAR *priv);
 
 
-		typedef TSAPIPROC Proc_acsCloseStream)(ACSHandle_t                     acsHandle,
-		InvokeID_t                      invokeID,
+	TSAPI acsCloseStream(ACSHandle_t                     acsHandle,
+			InvokeID_t                      invokeID,
 			CONST_PARAM PrivateData_t   FAR *priv);
 
 
-		typedef TSAPIPROC Proc_acsAbortStream)(ACSHandle_t                     acsHandle,
-		CONST_PARAM PrivateData_t   FAR *priv);
+	TSAPI acsAbortStream(ACSHandle_t                     acsHandle,
+			CONST_PARAM PrivateData_t   FAR *priv);
 
 
-		typedef TSAPIPROC Proc_acsFlushEventQueue)(ACSHandle_t                 acsHandle);
+	TSAPI acsFlushEventQueue(ACSHandle_t                 acsHandle);
 
 
-		typedef TSAPIPROC Proc_acsGetEventPoll)(ACSHandle_t                 acsHandle,
-		void                    FAR *eventBuf,
+	TSAPI acsGetEventPoll(ACSHandle_t                 acsHandle,
+			void                    FAR *eventBuf,
 			unsigned short          FAR *eventBufSize,
 			PrivateData_t           FAR *privData,
 			unsigned short          FAR *numEvents);
 
 
-		typedef TSAPIPROC Proc_acsGetEventBlock)(ACSHandle_t                 acsHandle,
-		void                    FAR *eventBuf,
+	TSAPI acsGetEventBlock(ACSHandle_t                 acsHandle,
+			void                    FAR *eventBuf,
 			unsigned short          FAR *eventBufSize,
 			PrivateData_t           FAR *privData,
 			unsigned short          FAR *numEvents);
 
-		/* 32-bit Windows-specific prototypes */
+	/* 32-bit Windows-specific prototypes */
 
 #if defined ( TSLIB_WINDOWS_32 )
 
-		typedef TSAPIPROC Proc_acsEventNotify)(ACSHandle_t acsHandle, HWND hwnd, UINT msg, Boolean notifyAll);
+	TSAPI acsEventNotify(ACSHandle_t acsHandle, HWND hwnd, UINT msg, Boolean notifyAll);
 
 
-		typedef TSAPIPROC Proc_acsSetESR)(ACSHandle_t     acsHandle,
-		void            (far pascal *esr)(unsigned long esrParam),
+	TSAPI acsSetESR(ACSHandle_t     acsHandle,
+			void            (far pascal *esr)(unsigned long esrParam),
 			unsigned long   esrParam,
 			Boolean         notifyAll);
 
-		typedef Boolean(*EnumServerNamesCB) (char  *serverName,
-			unsigned long lParam);
+	typedef Boolean(*EnumServerNamesCB) (char  *serverName,
+		unsigned long lParam);
 
-		/* Linux-specific prototypes */
+	/* Linux-specific prototypes */
 
 #elif defined ( TSLIB_LINUX )
 
-		typedef TSAPIPROC Proc_acsGetFile)(ACSHandle_t acsHandle);
+	TSAPI acsGetFile(ACSHandle_t acsHandle);
 
-		typedef Boolean(*EnumServerNamesCB) (char *serverName,
-			unsigned long lParam);
+	typedef Boolean(*EnumServerNamesCB) (char *serverName,
+		unsigned long lParam);
 
 #endif
 
 
-		typedef TSAPIPROC Proc_acsEnumServerNames)(StreamType_t        streamType,
-		EnumServerNamesCB   userCB,
+	TSAPI acsEnumServerNames(StreamType_t        streamType,
+			EnumServerNamesCB   userCB,
 			unsigned long       lParam);
 
 
 
-		typedef TSAPIPROC Proc_acsQueryAuthInfo)(CONST_PARAM ServerID_t      FAR *serverID,
-		ACSAuthInfo_t               FAR *authInfo);
+	TSAPI acsQueryAuthInfo(CONST_PARAM ServerID_t      FAR *serverID,
+			ACSAuthInfo_t               FAR *authInfo);
 
 
-		typedef TSAPIPROC Proc_acsGetServerID)(ACSHandle_t         acsHandle,
-		ServerID_t          *serverID);
+	TSAPI acsGetServerID(ACSHandle_t         acsHandle,
+			ServerID_t          *serverID);
 
-		typedef TSAPIPROC Proc_acsSetHeartbeatInterval)(ACSHandle_t             acsHandle,
-		InvokeID_t              invokeID,
+	TSAPI acsSetHeartbeatInterval(ACSHandle_t             acsHandle,
+			InvokeID_t              invokeID,
 			unsigned short          heartbeatInterval,
 			PrivateData_t           *privData);
 
-		typedef const char *
-			(*Proc_acsReturnCodeString)(RetCode_t returnCode);
+	const char * acsReturnCodeString(RetCode_t returnCode);
 
-		typedef const char *
-			(*Proc_acsReturnCodeVerboseString)(RetCode_t returnCode);
+	const char * acsReturnCodeVerboseString(RetCode_t returnCode);
 
-		typedef const char *
-			(*Proc_acsErrorString)(ACSUniversalFailure_t error);
+	const char * acsErrorString(ACSUniversalFailure_t error);
 
-#ifdef __cplusplus
-	}
-#endif 
+	const char * cstaErrorString(CSTAUniversalFailure_t error);
 
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
+	/* Basic Call Control Services */
 
-		/* Utility functions */
+	TSAPI cstaAlternateCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			CONST_PARAM ConnectionID_t	FAR	*otherCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef const char *
-			(*Proc_cstaErrorString)(CSTAUniversalFailure_t error);
 
-		/* Basic Call Control Services */
+	TSAPI cstaAnswerCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*alertingCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaAlternateCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				CONST_PARAM ConnectionID_t	FAR	*otherCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaCallCompletion(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			Feature_t						feature,
+			CONST_PARAM ConnectionID_t	FAR	*call,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaAnswerCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*alertingCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaClearCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*call,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaCallCompletion)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				Feature_t						feature,
-				CONST_PARAM ConnectionID_t	FAR	*call,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaClearConnection(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*call,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaClearCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*call,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaConferenceCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*heldCall,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaClearConnection)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*call,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaConsultationCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			CONST_PARAM DeviceID_t		FAR	*calledDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaConferenceCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*heldCall,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaDeflectCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*deflectCall,
+			CONST_PARAM DeviceID_t		FAR	*calledDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaConsultationCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				CONST_PARAM DeviceID_t		FAR	*calledDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaGroupPickupCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*deflectCall,
+			CONST_PARAM DeviceID_t		FAR	*pickupDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaDeflectCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*deflectCall,
-				CONST_PARAM DeviceID_t		FAR	*calledDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaHoldCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			Boolean							reservation,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaGroupPickupCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*deflectCall,
-				CONST_PARAM DeviceID_t		FAR	*pickupDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaMakeCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*callingDevice,
+			CONST_PARAM DeviceID_t		FAR	*calledDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaHoldCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				Boolean							reservation,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaMakePredictiveCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*callingDevice,
+			CONST_PARAM DeviceID_t		FAR	*calledDevice,
+			AllocationState_t				allocationState,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMakeCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*callingDevice,
-				CONST_PARAM DeviceID_t		FAR	*calledDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaPickupCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*deflectCall,
+			CONST_PARAM DeviceID_t		FAR	*calledDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMakePredictiveCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*callingDevice,
-				CONST_PARAM DeviceID_t		FAR	*calledDevice,
-				AllocationState_t				allocationState,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaReconnectCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			CONST_PARAM ConnectionID_t	FAR	*heldCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaPickupCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*deflectCall,
-				CONST_PARAM DeviceID_t		FAR	*calledDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaRetrieveCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*heldCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaReconnectCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				CONST_PARAM ConnectionID_t	FAR	*heldCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaTransferCall(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*heldCall,
+			CONST_PARAM ConnectionID_t	FAR	*activeCall,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaRetrieveCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*heldCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Telephony Supplementary Services */
 
-		typedef TSAPIPROC Proc_cstaTransferCall)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*heldCall,
-				CONST_PARAM ConnectionID_t	FAR	*activeCall,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaSetMsgWaitingInd(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			Boolean							messages,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
 
-		/* Telephony Supplementary Services */
+	TSAPI cstaSetDoNotDisturb(ACSHandle_t						acsHandle,
+			InvokeID_t					invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			Boolean							doNotDisturb,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSetMsgWaitingInd)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				Boolean							messages,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSetForwarding(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			ForwardingType_t				forwardingType,
+			Boolean							forwardingOn,
+			CONST_PARAM DeviceID_t		FAR	*forwardingDestination,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSetDoNotDisturb)(ACSHandle_t						acsHandle,
-				InvokeID_t					invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				Boolean							doNotDisturb,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSetAgentState(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			AgentMode_t						agentMode,
+			CONST_PARAM AgentID_t		FAR	*agentID,
+			CONST_PARAM AgentGroup_t	FAR	*agentGroup,
+			CONST_PARAM AgentPassword_t	FAR	*agentPassword,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSetForwarding)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				ForwardingType_t				forwardingType,
-				Boolean							forwardingOn,
-				CONST_PARAM DeviceID_t		FAR	*forwardingDestination,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryMsgWaitingInd(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSetAgentState)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				AgentMode_t						agentMode,
-				CONST_PARAM AgentID_t		FAR	*agentID,
-				CONST_PARAM AgentGroup_t	FAR	*agentGroup,
-				CONST_PARAM AgentPassword_t	FAR	*agentPassword,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryDoNotDisturb(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaQueryMsgWaitingInd)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryForwarding(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaQueryDoNotDisturb)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryAgentState(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaQueryForwarding)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryLastNumber(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaQueryAgentState)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaQueryDeviceInfo(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*device,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaQueryLastNumber)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Monitor Services */
 
-		typedef TSAPIPROC Proc_cstaQueryDeviceInfo)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*device,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaMonitorDevice(ACSHandle_t							acsHandle,
+			InvokeID_t							invokeID,
+			CONST_PARAM DeviceID_t			FAR	*deviceID,
+			CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
+			CONST_PARAM PrivateData_t		FAR	*privateData);
 
 
-		/* Monitor Services */
+	TSAPI cstaMonitorCall(ACSHandle_t							acsHandle,
+			InvokeID_t							invokeID,
+			CONST_PARAM ConnectionID_t		FAR	*call,
+			CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
+			CONST_PARAM PrivateData_t		FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMonitorDevice)(ACSHandle_t							acsHandle,
-				InvokeID_t							invokeID,
-				CONST_PARAM DeviceID_t			FAR	*deviceID,
-				CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
-				CONST_PARAM PrivateData_t		FAR	*privateData);
 
+	TSAPI cstaMonitorCallsViaDevice(ACSHandle_t							acsHandle,
+			InvokeID_t							invokeID,
+			CONST_PARAM DeviceID_t			FAR	*deviceID,
+			CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
+			CONST_PARAM PrivateData_t		FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMonitorCall)(ACSHandle_t							acsHandle,
-				InvokeID_t							invokeID,
-				CONST_PARAM ConnectionID_t		FAR	*call,
-				CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
-				CONST_PARAM PrivateData_t		FAR	*privateData);
 
+	TSAPI cstaChangeMonitorFilter(ACSHandle_t							acsHandle,
+			InvokeID_t							invokeID,
+			CSTAMonitorCrossRefID_t				monitorCrossRefID,
+			CONST_PARAM CSTAMonitorFilter_t	FAR	*filterlist,
+			CONST_PARAM PrivateData_t		FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMonitorCallsViaDevice)(ACSHandle_t							acsHandle,
-				InvokeID_t							invokeID,
-				CONST_PARAM DeviceID_t			FAR	*deviceID,
-				CONST_PARAM CSTAMonitorFilter_t	FAR	*monitorFilter,
-				CONST_PARAM PrivateData_t		FAR	*privateData);
 
+	TSAPI cstaMonitorStop(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CSTAMonitorCrossRefID_t			monitorCrossRefID,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaChangeMonitorFilter)(ACSHandle_t							acsHandle,
-				InvokeID_t							invokeID,
-				CSTAMonitorCrossRefID_t				monitorCrossRefID,
-				CONST_PARAM CSTAMonitorFilter_t	FAR	*filterlist,
-				CONST_PARAM PrivateData_t		FAR	*privateData);
+	/* Snapshot Services */
 
+	TSAPI cstaSnapshotCallReq(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM ConnectionID_t	FAR	*snapshotObj,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaMonitorStop)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CSTAMonitorCrossRefID_t			monitorCrossRefID,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		/* Snapshot Services */
+	TSAPI cstaSnapshotDeviceReq(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*snapshotObj,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSnapshotCallReq)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM ConnectionID_t	FAR	*snapshotObj,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Routing Services */
 
-		typedef TSAPIPROC Proc_cstaSnapshotDeviceReq)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*snapshotObj,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaRouteRegisterReq(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM DeviceID_t		FAR	*routingDevice,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
 
-		/* Routing Services */
+	TSAPI cstaRouteRegisterCancel(ACSHandle_t					acsHandle,
+			InvokeID_t					invokeID,
+			RouteRegisterReqID_t		routeRegisterReqID,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaRouteRegisterReq)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM DeviceID_t		FAR	*routingDevice,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	/* Release 1 calls, w/o invokeID, for backward compatibility */
 
+	TSAPI cstaRouteSelect(ACSHandle_t						acsHandle,
+			RouteRegisterReqID_t			routeRegisterReqID,
+			RoutingCrossRefID_t				routingCrossRefID,
+			CONST_PARAM DeviceID_t		FAR	*routeSelected,
+			RetryValue_t					remainRetry,
+			CONST_PARAM SetUpValues_t	FAR *setupInformation,
+			Boolean							routeUsedReq,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaRouteRegisterCancel)(ACSHandle_t					acsHandle,
-				InvokeID_t					invokeID,
-				RouteRegisterReqID_t		routeRegisterReqID,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		/* Release 1 calls, w/o invokeID, for backward compatibility */
+	TSAPI cstaRouteEnd(ACSHandle_t						acsHandle,
+			RouteRegisterReqID_t			routeRegisterReqID,
+			RoutingCrossRefID_t				routingCrossRefID,
+			CSTAUniversalFailure_t			errorValue,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaRouteSelect)(ACSHandle_t						acsHandle,
-				RouteRegisterReqID_t			routeRegisterReqID,
-				RoutingCrossRefID_t				routingCrossRefID,
-				CONST_PARAM DeviceID_t		FAR	*routeSelected,
-				RetryValue_t					remainRetry,
-				CONST_PARAM SetUpValues_t	FAR *setupInformation,
-				Boolean							routeUsedReq,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Release 2 calls, with invokeID */
 
-		typedef TSAPIPROC Proc_cstaRouteEnd)(ACSHandle_t						acsHandle,
-				RouteRegisterReqID_t			routeRegisterReqID,
-				RoutingCrossRefID_t				routingCrossRefID,
-				CSTAUniversalFailure_t			errorValue,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaRouteSelectInv(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			RouteRegisterReqID_t			routeRegisterReqID,
+			RoutingCrossRefID_t				routingCrossRefID,
+			CONST_PARAM DeviceID_t		FAR	*routeSelected,
+			RetryValue_t					remainRetry,
+			CONST_PARAM SetUpValues_t	FAR *setupInformation,
+			Boolean							routeUsedReq,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
 
-		/* Release 2 calls, with invokeID */
+	TSAPI cstaRouteEndInv(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			RouteRegisterReqID_t			routeRegisterReqID,
+			RoutingCrossRefID_t				routingCrossRefID,
+			CSTAUniversalFailure_t			errorValue,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaRouteSelectInv)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				RouteRegisterReqID_t			routeRegisterReqID,
-				RoutingCrossRefID_t				routingCrossRefID,
-				CONST_PARAM DeviceID_t		FAR	*routeSelected,
-				RetryValue_t					remainRetry,
-				CONST_PARAM SetUpValues_t	FAR *setupInformation,
-				Boolean							routeUsedReq,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Escape Services */
 
-		typedef TSAPIPROC Proc_cstaRouteEndInv)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				RouteRegisterReqID_t			routeRegisterReqID,
-				RoutingCrossRefID_t				routingCrossRefID,
-				CSTAUniversalFailure_t			errorValue,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaEscapeService(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
 
-		/* Escape Services */
+	TSAPI cstaEscapeServiceConf(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CSTAUniversalFailure_t			error,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaEscapeService)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSendPrivateEvent(ACSHandle_t						acsHandle,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaEscapeServiceConf)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CSTAUniversalFailure_t			error,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	/* Maintenance Services */
 
-		typedef TSAPIPROC Proc_cstaSendPrivateEvent)(ACSHandle_t						acsHandle,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
+	TSAPI cstaSysStatReq(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
 
-		/* Maintenance Services */
+	TSAPI cstaSysStatStart(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			SystemStatusFilter_t			statusFilter,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSysStatReq)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSysStatStop(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSysStatStart)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				SystemStatusFilter_t			statusFilter,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaChangeSysStatFilter(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			SystemStatusFilter_t			statusFilter,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSysStatStop)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSysStatReqConf(ACSHandle_t						acsHandle,
+			InvokeID_t						invokeID,
+			SystemStatus_t					systemStatus,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaChangeSysStatFilter)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				SystemStatusFilter_t			statusFilter,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaSysStatEvent(ACSHandle_t						acsHandle,
+			SystemStatus_t					systemStatus,
+			CONST_PARAM PrivateData_t	FAR	*privateData);
 
-		typedef TSAPIPROC Proc_cstaSysStatReqConf)(ACSHandle_t						acsHandle,
-				InvokeID_t						invokeID,
-				SystemStatus_t					systemStatus,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaGetAPICaps(ACSHandle_t acsHandle, InvokeID_t invokeID);
 
-		typedef TSAPIPROC Proc_cstaSysStatEvent)(ACSHandle_t						acsHandle,
-				SystemStatus_t					systemStatus,
-				CONST_PARAM PrivateData_t	FAR	*privateData);
 
+	TSAPI cstaGetDeviceList(ACSHandle_t	acsHandle,
+			InvokeID_t	invokeID,
+			long		index,
+			CSTALevel_t	level);
 
-		typedef TSAPIPROC Proc_cstaGetAPICaps)(ACSHandle_t acsHandle, InvokeID_t invokeID);
 
+	TSAPI cstaQueryCallMonitor(ACSHandle_t acsHandle, InvokeID_t invokeID);
 
-		typedef TSAPIPROC Proc_cstaGetDeviceList)(ACSHandle_t	acsHandle,
-				InvokeID_t	invokeID,
-				long		index,
-				CSTALevel_t	level);
+	TSAPI attMakeVersionString(CONST_PARAM char FAR *	requestedVersion,
+			char FAR *				supportedVersion);
 
+	/********* ATT Private Data Encoding Function *******/
+	TSAPI encodePrivate(int						pdunum,
+			CONST_PARAM void FAR *	pdu,
+			ATTPrivateData_t FAR *	priv);
 
-		typedef TSAPIPROC Proc_cstaQueryCallMonitor)(ACSHandle_t acsHandle, InvokeID_t invokeID);
+	/********* ATT Private Data Decoding Function *******/
 
+	TSAPI attPrivateData(CONST_PARAM ATTPrivateData_t FAR *	privateData,
+			ATTEvent_t FAR *					eventBuffer);
 
-#ifdef __cplusplus
-	}
-#endif
 
-	//CSTA32
+	/********* ATT Private Data Encoding Functions *******/
 
-	//ATTPRV32
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
+	TSAPI attClearConnection(ATTPrivateData_t FAR *					privateData,
+			ATTDropResource_t						dropResource,
+			CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attMakeVersionString)(CONST_PARAM char FAR *	requestedVersion,
-				char FAR *				supportedVersion);
 
-		/********* ATT Private Data Encoding Function *******/
-		typedef TSAPIPROC Proc_encodePrivate)(int						pdunum,
-				CONST_PARAM void FAR *	pdu,
-				ATTPrivateData_t FAR *	priv);
+	TSAPI attConsultationCall(ATTPrivateData_t FAR *					privateData,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
-		/********* ATT Private Data Decoding Function *******/
 
-		typedef TSAPIPROC Proc_attPrivateData)(CONST_PARAM ATTPrivateData_t FAR *	privateData,
-				ATTEvent_t FAR *					eventBuffer);
+	TSAPI attMakeCall(ATTPrivateData_t FAR *					privateData,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
 
-		/********* ATT Private Data Encoding Functions *******/
+	TSAPI attDirectAgentCall(ATTPrivateData_t FAR *					privateData,
+			CONST_PARAM DeviceID_t FAR *			split,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attClearConnection)(ATTPrivateData_t FAR *					privateData,
-				ATTDropResource_t						dropResource,
-				CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attMakePredictiveCall(ATTPrivateData_t FAR *					privateData,
+			Boolean									priorityCalling,
+			short									maxRings,
+			ATTAnswerTreat_t						answerTreat,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attConsultationCall)(ATTPrivateData_t FAR *					privateData,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attSupervisorAssistCall(ATTPrivateData_t FAR *					privateData,
+			CONST_PARAM DeviceID_t FAR *			split,
+			CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attMakeCall)(ATTPrivateData_t FAR *					privateData,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
+	TSAPI attReconnectCall(ATTPrivateData_t FAR *					privateData,
+			ATTDropResource_t						dropResource,
+			CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attDirectAgentCall)(ATTPrivateData_t FAR *					privateData,
-				CONST_PARAM DeviceID_t FAR *			split,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
+	TSAPI attSendDTMFTone(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM ConnectionID_t FAR *	sender,
+			CONST_PARAM ATTV4ConnIDList_t FAR *	receivers,
+			CONST_PARAM char FAR *				tones,
+			short								toneDuration,
+			short								pauseDuration);
 
-		typedef TSAPIPROC Proc_attMakePredictiveCall)(ATTPrivateData_t FAR *					privateData,
-				Boolean									priorityCalling,
-				short									maxRings,
-				ATTAnswerTreat_t						answerTreat,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attSetAgentState(ATTPrivateData_t FAR *	privateData,
+			ATTWorkMode_t			workMode);
 
-		typedef TSAPIPROC Proc_attSupervisorAssistCall)(ATTPrivateData_t FAR *					privateData,
-				CONST_PARAM DeviceID_t FAR *			split,
-				CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attQueryAcdSplit(ATTPrivateData_t	FAR *		privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
-		typedef TSAPIPROC Proc_attReconnectCall)(ATTPrivateData_t FAR *					privateData,
-				ATTDropResource_t						dropResource,
-				CONST_PARAM ATTV5UserToUserInfo_t	FAR *	userInfo);
 
+	TSAPI attQueryAgentLogin(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
-		typedef TSAPIPROC Proc_attSendDTMFTone)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM ConnectionID_t FAR *	sender,
-				CONST_PARAM ATTV4ConnIDList_t FAR *	receivers,
-				CONST_PARAM char FAR *				tones,
-				short								toneDuration,
-				short								pauseDuration);
 
+	TSAPI attQueryAgentState(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
-		typedef TSAPIPROC Proc_attSetAgentState)(ATTPrivateData_t FAR *	privateData,
-				ATTWorkMode_t			workMode);
 
+	TSAPI attQueryCallClassifier(ATTPrivateData_t	FAR * privateData);
 
-		typedef TSAPIPROC Proc_attQueryAcdSplit)(ATTPrivateData_t	FAR *		privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
 
+	TSAPI attQueryDeviceName(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
-		typedef TSAPIPROC Proc_attQueryAgentLogin)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
+	TSAPI attQueryStationStatus(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
 
-		typedef TSAPIPROC Proc_attQueryAgentState)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
+	TSAPI attQueryTimeOfDay(ATTPrivateData_t FAR *privateData);
 
 
-		typedef TSAPIPROC Proc_attQueryCallClassifier)(ATTPrivateData_t	FAR * privateData);
+	TSAPI attQueryTrunkGroup(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM DeviceID_t FAR *	device);
 
 
-		typedef TSAPIPROC Proc_attQueryDeviceName)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
+	TSAPI attMonitorFilter(ATTPrivateData_t FAR *		privateData,
+			ATTV4PrivateFilter_t		privateFilter);
 
-		typedef TSAPIPROC Proc_attQueryStationStatus)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
 
+	TSAPI attMonitorStopOnCall(ATTPrivateData_t FAR *				privateData,
+			CSTAMonitorCrossRefID_t				monitorCrossRefID,
+			CONST_PARAM ConnectionID_t FAR *	call);
 
-		typedef TSAPIPROC Proc_attQueryTimeOfDay)(ATTPrivateData_t FAR *privateData);
 
+	TSAPI attRouteSelect(ATTPrivateData_t FAR *					privateData,
+			CONST_PARAM DeviceID_t FAR *			callingDevice,
+			CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
+			Boolean									priorityCalling,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
+			CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
+			CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attQueryTrunkGroup)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM DeviceID_t FAR *	device);
 
+	TSAPI attSysStat(ATTPrivateData_t FAR *	privateData,
+			Boolean					linkStatusReq);
 
-		typedef TSAPIPROC Proc_attMonitorFilter)(ATTPrivateData_t FAR *		privateData,
-				ATTV4PrivateFilter_t		privateFilter);
 
+	TSAPI attSingleStepConferenceCall(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM ConnectionID_t FAR *activeCall,
+			CONST_PARAM DeviceID_t FAR *	deviceToBeJoin,
+			ATTParticipationType_t			participationType,
+			Boolean							alertDestination);
 
-		typedef TSAPIPROC Proc_attMonitorStopOnCall)(ATTPrivateData_t FAR *				privateData,
-				CSTAMonitorCrossRefID_t				monitorCrossRefID,
-				CONST_PARAM ConnectionID_t FAR *	call);
 
+	TSAPI attSelectiveListeningHold(ATTPrivateData_t FAR *			privateData,
+			CONST_PARAM ConnectionID_t FAR *	subjectConnection,
+			Boolean								allParties,
+			CONST_PARAM ConnectionID_t FAR *	selectedParty);
 
-		typedef TSAPIPROC Proc_attRouteSelect)(ATTPrivateData_t FAR *					privateData,
-				CONST_PARAM DeviceID_t FAR *			callingDevice,
-				CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
-				Boolean									priorityCalling,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
-				CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
-				CONST_PARAM ATTV5UserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attSelectiveListeningRetrieve(ATTPrivateData_t FAR *		privateData,
+			CONST_PARAM ConnectionID_t FAR *	subjectConnection,
+			Boolean								allParties,
+			CONST_PARAM ConnectionID_t FAR *	selectedParty);
 
-		typedef TSAPIPROC Proc_attSysStat)(ATTPrivateData_t FAR *	privateData,
-				Boolean					linkStatusReq);
 
+	TSAPI attSetAgentStateExt(ATTPrivateData_t FAR*	privateData,
+			ATTWorkMode_t			workMode,
+			long					reasonCode);
 
-		typedef TSAPIPROC Proc_attSingleStepConferenceCall)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM ConnectionID_t FAR *activeCall,
-				CONST_PARAM DeviceID_t FAR *	deviceToBeJoin,
-				ATTParticipationType_t			participationType,
-				Boolean							alertDestination);
 
+	TSAPI attSetBillRate(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM ConnectionID_t FAR *	call,
+			ATTBillType_t						billType,
+			float								billRate);
 
-		typedef TSAPIPROC Proc_attSelectiveListeningHold)(ATTPrivateData_t FAR *			privateData,
-				CONST_PARAM ConnectionID_t FAR *	subjectConnection,
-				Boolean								allParties,
-				CONST_PARAM ConnectionID_t FAR *	selectedParty);
 
+	TSAPI attQueryUCID(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM ConnectionID_t FAR *	call);
 
-		typedef TSAPIPROC Proc_attSelectiveListeningRetrieve)(ATTPrivateData_t FAR *		privateData,
-				CONST_PARAM ConnectionID_t FAR *	subjectConnection,
-				Boolean								allParties,
-				CONST_PARAM ConnectionID_t FAR *	selectedParty);
 
+	TSAPI attSetAdviceOfCharge(ATTPrivateData_t FAR * privateData, Boolean flag);
 
-		typedef TSAPIPROC Proc_attSetAgentStateExt)(ATTPrivateData_t FAR*	privateData,
-				ATTWorkMode_t			workMode,
-				long					reasonCode);
 
+	TSAPI attSendDTMFToneExt(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM ConnectionID_t FAR *	sender,
+			CONST_PARAM ATTConnIDList_t FAR *	receivers,
+			CONST_PARAM char FAR *				tones,
+			short								toneDuration,
+			short								pauseDuration);
 
-		typedef TSAPIPROC Proc_attSetBillRate)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM ConnectionID_t FAR *	call,
-				ATTBillType_t						billType,
-				float								billRate);
 
+	TSAPI attMonitorFilterExt(ATTPrivateData_t	FAR *	privateData,
+			ATTPrivateFilter_t			privateFilter);
 
-		typedef TSAPIPROC Proc_attQueryUCID)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM ConnectionID_t FAR *	call);
+	/* V6 Private Data */
 
+	TSAPI attV6SetAgentState(ATTPrivateData_t FAR*	privateData,
+			ATTWorkMode_t			workMode,
+			long					reasonCode,
+			Boolean					enablePending);
 
-		typedef TSAPIPROC Proc_attSetAdviceOfCharge)(ATTPrivateData_t FAR * privateData, Boolean flag);
+	TSAPI attV6MakeCall(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
 
+	TSAPI attV6ClearConnection(ATTPrivateData_t FAR *				privateData,
+			ATTDropResource_t						dropResource,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attSendDTMFToneExt)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM ConnectionID_t FAR *	sender,
-				CONST_PARAM ATTConnIDList_t FAR *	receivers,
-				CONST_PARAM char FAR *				tones,
-				short								toneDuration,
-				short								pauseDuration);
+	TSAPI attV6ConsultationCall(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
 
+	TSAPI attV6DirectAgentCall(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			split,
+			Boolean									priorityCalling,
+			CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attMonitorFilterExt)(ATTPrivateData_t	FAR *	privateData,
-				ATTPrivateFilter_t			privateFilter);
+	TSAPI attV6MakePredictiveCall(ATTPrivateData_t FAR *				privateData,
+			Boolean									priorityCalling,
+			short									maxRings,
+			ATTAnswerTreat_t						answerTreat,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
 
-		/* V6 Private Data */
+	TSAPI attV6SupervisorAssistCall(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			split,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attV6SetAgentState)(ATTPrivateData_t FAR*	privateData,
-				ATTWorkMode_t			workMode,
-				long					reasonCode,
-				Boolean					enablePending);
+	TSAPI attV6ReconnectCall(ATTPrivateData_t FAR *					privateData,
+			ATTDropResource_t						dropResource,
+			CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attV6MakeCall)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
+	TSAPI attV6RouteSelect(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			callingDevice,
+			CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
+			Boolean									priorityCalling,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
+			CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
 
-		typedef TSAPIPROC Proc_attV6ClearConnection)(ATTPrivateData_t FAR *				privateData,
-				ATTDropResource_t						dropResource,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
+	TSAPI attV7RouteSelect(ATTPrivateData_t FAR *				privateData,
+			CONST_PARAM DeviceID_t FAR *			callingDevice,
+			CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
+			Boolean									priorityCalling,
+			CONST_PARAM DeviceID_t FAR *			destRoute,
+			CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
+			CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
+			CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo,
+			CONST_PARAM ATTRedirectType_t			networkredirect);
 
-		typedef TSAPIPROC Proc_attV6ConsultationCall)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
+	TSAPI attSingleStepTransferCall(ATTPrivateData_t FAR *	privateData,
+			CONST_PARAM ConnectionID_t FAR *	activeCall,
+			CONST_PARAM DeviceID_t FAR *		transferredTo);
 
-		typedef TSAPIPROC Proc_attV6DirectAgentCall)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			split,
-				Boolean									priorityCalling,
-				CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
+	TSAPI attMonitorCallsViaDevice(ATTPrivateData_t FAR *	privateData,
+			ATTPrivateFilter_t		privateFilter,
+			Boolean					flowPredictiveCallEvents);
 
-		typedef TSAPIPROC Proc_attV6MakePredictiveCall)(ATTPrivateData_t FAR *				privateData,
-				Boolean									priorityCalling,
-				short									maxRings,
-				ATTAnswerTreat_t						answerTreat,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
+	void initATTPrivate(PrivateData_t FAR *priv);
 
-		typedef TSAPIPROC Proc_attV6SupervisorAssistCall)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			split,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
+	void addATTPrivate(UINT16 itemTag, void FAR *itemPtr, PrivateData_t FAR *priv);
 
-		typedef TSAPIPROC Proc_attV6ReconnectCall)(ATTPrivateData_t FAR *					privateData,
-				ATTDropResource_t						dropResource,
-				CONST_PARAM ATTUserToUserInfo_t	FAR *	userInfo);
-
-		typedef TSAPIPROC Proc_attV6RouteSelect)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			callingDevice,
-				CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
-				Boolean									priorityCalling,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
-				CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo);
-
-		typedef TSAPIPROC Proc_attV7RouteSelect)(ATTPrivateData_t FAR *				privateData,
-				CONST_PARAM DeviceID_t FAR *			callingDevice,
-				CONST_PARAM DeviceID_t FAR *			directAgentCallSplit,
-				Boolean									priorityCalling,
-				CONST_PARAM DeviceID_t FAR *			destRoute,
-				CONST_PARAM ATTUserCollectCode_t FAR *	collectCode,
-				CONST_PARAM ATTUserProvidedCode_t FAR *	userProvidedCode,
-				CONST_PARAM ATTUserToUserInfo_t FAR *	userInfo,
-				CONST_PARAM ATTRedirectType_t			networkredirect);
-
-		typedef TSAPIPROC Proc_attSingleStepTransferCall)(ATTPrivateData_t FAR *	privateData,
-				CONST_PARAM ConnectionID_t FAR *	activeCall,
-				CONST_PARAM DeviceID_t FAR *		transferredTo);
-
-		typedef TSAPIPROC Proc_attMonitorCallsViaDevice)(ATTPrivateData_t FAR *	privateData,
-				ATTPrivateFilter_t		privateFilter,
-				Boolean					flowPredictiveCallEvents);
-
-
-#ifdef __cplusplus
-	}
-#endif
-
-
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-
-#if defined _MSDOS || defined __MSDOS__
-#define FPEXPORT	__far __pascal __export
-#else
-#define FPEXPORT
-#endif
-
-		typedef void
-			FPEXPORT
-			(*Proc_initATTPrivate)(PrivateData_t FAR *priv);
-
-		typedef void
-			FPEXPORT
-			(*Proc_addATTPrivate)(UINT16 itemTag, void FAR *itemPtr, PrivateData_t FAR *priv);
-
-		typedef void *
-			FPEXPORT
-			(*Proc_getATTPrivate)(UINT16 tag, PrivateData_t FAR *priv, UINT16 occ);
-
-#ifdef __cplusplus
-	}
-#endif
-	//ATTPRV32
-
-	extern Proc_acsOpenStream acsOpenStream;
-	extern Proc_acsCloseStream acsCloseStream;
-	extern Proc_acsAbortStream acsAbortStream;
-	extern Proc_acsFlushEventQueue acsFlushEventQueue;
-	extern Proc_acsGetEventPoll acsGetEventPoll;
-	extern Proc_acsGetEventBlock acsGetEventBlock;
-#if defined ( TSLIB_WINDOWS_32 )
-	extern Proc_acsEventNotify acsEventNotify;
-	extern Proc_acsSetESR acsSetESR;
-#elif defined ( TSLIB_LINUX )
-	extern Proc_acsGetFile acsGetFile;
-#endif
-	extern Proc_acsEnumServerNames acsEnumServerNames;
-	extern Proc_acsQueryAuthInfo acsQueryAuthInfo;
-	extern Proc_acsGetServerID acsGetServerID;
-	extern Proc_acsSetHeartbeatInterval acsSetHeartbeatInterval;
-	extern Proc_acsReturnCodeString acsReturnCodeString;
-	extern Proc_acsReturnCodeVerboseString acsReturnCodeVerboseString;
-	extern Proc_acsErrorString acsErrorString;
-	extern Proc_cstaErrorString cstaErrorString;
-	extern Proc_cstaAlternateCall cstaAlternateCall;
-	extern Proc_cstaAnswerCall cstaAnswerCall;
-	extern Proc_cstaCallCompletion cstaCallCompletion;
-	extern Proc_cstaClearCall cstaClearCall;
-	extern Proc_cstaClearConnection cstaClearConnection;
-	extern Proc_cstaConferenceCall cstaConferenceCall;
-	extern Proc_cstaConsultationCall cstaConsultationCall;
-	extern Proc_cstaDeflectCall cstaDeflectCall;
-	extern Proc_cstaGroupPickupCall cstaGroupPickupCall;
-	extern Proc_cstaHoldCall cstaHoldCall;
-	extern Proc_cstaMakeCall cstaMakeCall;
-	extern Proc_cstaMakePredictiveCall cstaMakePredictiveCall;
-	extern Proc_cstaPickupCall cstaPickupCall;
-	extern Proc_cstaReconnectCall cstaReconnectCall;
-	extern Proc_cstaRetrieveCall cstaRetrieveCall;
-	extern Proc_cstaTransferCall cstaTransferCall;
-	extern Proc_cstaSetMsgWaitingInd cstaSetMsgWaitingInd;
-	extern Proc_cstaSetDoNotDisturb cstaSetDoNotDisturb;
-	extern Proc_cstaSetForwarding cstaSetForwarding;
-	extern Proc_cstaSetAgentState cstaSetAgentState;
-	extern Proc_cstaQueryMsgWaitingInd cstaQueryMsgWaitingInd;
-	extern Proc_cstaQueryDoNotDisturb cstaQueryDoNotDisturb;
-	extern Proc_cstaQueryForwarding cstaQueryForwarding;
-	extern Proc_cstaQueryAgentState cstaQueryAgentState;
-	extern Proc_cstaQueryLastNumber cstaQueryLastNumber;
-	extern Proc_cstaQueryDeviceInfo cstaQueryDeviceInfo;
-	extern Proc_cstaMonitorDevice cstaMonitorDevice;
-	extern Proc_cstaMonitorCall cstaMonitorCall;
-	extern Proc_cstaMonitorCallsViaDevice cstaMonitorCallsViaDevice;
-	extern Proc_cstaChangeMonitorFilter cstaChangeMonitorFilter;
-	extern Proc_cstaMonitorStop cstaMonitorStop;
-	extern Proc_cstaSnapshotCallReq cstaSnapshotCallReq;
-	extern Proc_cstaSnapshotDeviceReq cstaSnapshotDeviceReq;
-	extern Proc_cstaRouteRegisterReq cstaRouteRegisterReq;
-	extern Proc_cstaRouteRegisterCancel cstaRouteRegisterCancel;
-	extern Proc_cstaRouteSelect cstaRouteSelect;
-	extern Proc_cstaRouteEnd cstaRouteEnd;
-	extern Proc_cstaRouteSelectInv cstaRouteSelectInv;
-	extern Proc_cstaRouteEndInv cstaRouteEndInv;
-	extern Proc_cstaEscapeService cstaEscapeService;
-	extern Proc_cstaEscapeServiceConf cstaEscapeServiceConf;
-	extern Proc_cstaSendPrivateEvent cstaSendPrivateEvent;
-	extern Proc_cstaSysStatReq cstaSysStatReq;
-	extern Proc_cstaSysStatStart cstaSysStatStart;
-	extern Proc_cstaSysStatStop cstaSysStatStop;
-	extern Proc_cstaChangeSysStatFilter cstaChangeSysStatFilter;
-	extern Proc_cstaSysStatReqConf cstaSysStatReqConf;
-	extern Proc_cstaSysStatEvent cstaSysStatEvent;
-	extern Proc_cstaGetAPICaps cstaGetAPICaps;
-	extern Proc_cstaGetDeviceList cstaGetDeviceList;
-	extern Proc_cstaQueryCallMonitor cstaQueryCallMonitor;
-	extern Proc_attMakeVersionString attMakeVersionString;
-	extern Proc_encodePrivate encodePrivate;
-	extern Proc_attPrivateData attPrivateData;
-	extern Proc_attClearConnection attClearConnection;
-	extern Proc_attConsultationCall attConsultationCall;
-	extern Proc_attMakeCall attMakeCall;
-	extern Proc_attDirectAgentCall attDirectAgentCall;
-	extern Proc_attMakePredictiveCall attMakePredictiveCall;
-	extern Proc_attSupervisorAssistCall attSupervisorAssistCall;
-	extern Proc_attReconnectCall attReconnectCall;
-	extern Proc_attSendDTMFTone attSendDTMFTone;
-	extern Proc_attSetAgentState attSetAgentState;
-	extern Proc_attQueryAcdSplit attQueryAcdSplit;
-	extern Proc_attQueryAgentLogin attQueryAgentLogin;
-	extern Proc_attQueryAgentState attQueryAgentState;
-	extern Proc_attQueryCallClassifier attQueryCallClassifier;
-	extern Proc_attQueryDeviceName attQueryDeviceName;
-	extern Proc_attQueryStationStatus attQueryStationStatus;
-	extern Proc_attQueryTimeOfDay attQueryTimeOfDay;
-	extern Proc_attQueryTrunkGroup attQueryTrunkGroup;
-	extern Proc_attMonitorFilter attMonitorFilter;
-	extern Proc_attMonitorStopOnCall attMonitorStopOnCall;
-	extern Proc_attRouteSelect attRouteSelect;
-	extern Proc_attSysStat attSysStat;
-	extern Proc_attSingleStepConferenceCall attSingleStepConferenceCall;
-	extern Proc_attSelectiveListeningHold attSelectiveListeningHold;
-	extern Proc_attSelectiveListeningRetrieve attSelectiveListeningRetrieve;
-	extern Proc_attSetAgentStateExt attSetAgentStateExt;
-	extern Proc_attSetBillRate attSetBillRate;
-	extern Proc_attQueryUCID attQueryUCID;
-	extern Proc_attSetAdviceOfCharge attSetAdviceOfCharge;
-	extern Proc_attSendDTMFToneExt attSendDTMFToneExt;
-	extern Proc_attMonitorFilterExt attMonitorFilterExt;
-	extern Proc_attV6SetAgentState attV6SetAgentState;
-	extern Proc_attV6MakeCall attV6MakeCall;
-	extern Proc_attV6ClearConnection attV6ClearConnection;
-	extern Proc_attV6ConsultationCall attV6ConsultationCall;
-	extern Proc_attV6DirectAgentCall attV6DirectAgentCall;
-	extern Proc_attV6MakePredictiveCall attV6MakePredictiveCall;
-	extern Proc_attV6SupervisorAssistCall attV6SupervisorAssistCall;
-	extern Proc_attV6ReconnectCall attV6ReconnectCall;
-	extern Proc_attV6RouteSelect attV6RouteSelect;
-	extern Proc_attV7RouteSelect attV7RouteSelect;
-	extern Proc_attSingleStepTransferCall attSingleStepTransferCall;
-	extern Proc_attMonitorCallsViaDevice attMonitorCallsViaDevice;
-	extern Proc_initATTPrivate initATTPrivate;
-	extern Proc_addATTPrivate addATTPrivate;
-	extern Proc_getATTPrivate getATTPrivate;
+	void *getATTPrivate(UINT16 tag, PrivateData_t FAR *priv, UINT16 occ);
 
 	const char * cstaAgentStateString(AgentState_t agentState);
 	const char * cstaAPICapsString(uint32_t api);

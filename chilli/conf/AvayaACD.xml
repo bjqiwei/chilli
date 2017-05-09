@@ -47,6 +47,8 @@
 				<failed type="script">var failed={}; failed.reason='Busy'; failed;</failed>
 			</send>
 		</event>
+		<event event= "DELIVERED">
+		</event>
 		<event event="MonitorCall">
 			<script>monitorId = _event.MonitorCall.monitorId;</script>
 			<transition cond="_event.MonitorCall.status !=0" target="Idle"/>

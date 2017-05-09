@@ -4,6 +4,7 @@
 	<data id="connection"/>
 	<data id="consultationNewCall"/>
 	<date id="conferenceCall"/>
+	<date id="called"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
@@ -189,6 +190,7 @@
 						<calling type="script">_agent.Extension;</calling>
 						<called type="script">_event.called;</called>
 					</send>
+					<script>called = _event.called;</script>
 					<transition target="makecalling"/>
 				</event>
 				
@@ -241,7 +243,7 @@
 				</state>
 				<state id="originated">
 					<onentry>
-						<script>connection = _event.originated.connection; </script>
+						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
 						<send target="this" type="notify" dest="client" event="calledringing">
 							<type>calledringing</type>
 							<callid type="script">_event.originated.connection.callID;</callid>
@@ -290,7 +292,7 @@
 				</state>
 				<state id="Alerting">
 					<onentry>
-						<script>connection = _event.delivered.connection;</script>
+						<script>connection = _event.delivered.connection; called = _event.delivered.called;</script>
 					</onentry>
 					<event event="ESTABLISHED">
 						<send target="this" type="notify" dest="client" event="incall">
@@ -322,7 +324,7 @@
 						<send target="this" type="notify" dest="client" event="after">
 							<type>after</type>
 							<callid type="script">connection.callID;</callid>
-							<called type="script">_agent.Extension;</called>
+							<called type="script">called;</called>
 						</send>
 					</onentry>
 					<event event="ORIGINATED">
