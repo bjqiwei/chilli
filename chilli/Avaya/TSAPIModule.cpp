@@ -194,7 +194,7 @@ namespace chilli {
 
 			for (XMLElement * vdn = avaya->FirstChildElement("VDN");
 				vdn != nullptr;
-				vdn = avaya->NextSiblingElement("VDN"))
+				vdn = vdn->NextSiblingElement("VDN"))
 			{
 
 				const char * num = vdn->Attribute("ExtensionNumber");
