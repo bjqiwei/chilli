@@ -28,6 +28,11 @@
 		
 		<event event="SERVICE_INITIATED">
 			<script>connection = _event.serviceInitiated.connection;</script>
+			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+				<event type="script">_event._name;</event>
+				<extension type="script">agentId;</extension>
+				<serviceInitiated type="script">_event.serviceInitiated;</serviceInitiated>
+			</send>
 			<transition target="serviceInitiated"/>
 		</event>
 		<event event ="DELIVERED">
@@ -35,7 +40,6 @@
 			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
 				<delivered type="script">_event.delivered;</delivered>
 			</send>
 			<transition target="Alerting"/>
@@ -44,7 +48,6 @@
 			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
 				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
 			</send>
 			<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
@@ -53,7 +56,6 @@
 			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<extension type="script">agentId;</extension>
-				<monitorId type="script">_event.monitorId;</monitorId>
 				<connectionCleared type="script">_event.callCleared;</connectionCleared>
 			</send>
 			<transition cond="cmp(_event.callCleared.connection,connection)" target="init"/>
@@ -63,7 +65,6 @@
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>
 					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
 					<originated type="script">_event.originated;</originated>
 				</send>
 				<transition cond="cmp(_event.originated.connection,connection)" target="originated"/>
@@ -72,7 +73,6 @@
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>
 					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
 					<failed type="script">_event.failed;</failed>
 				</send>
 			</event>
@@ -81,7 +81,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<delivered type="script">_event.delivered;</delivered>
 					</send>
 					<transition cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
@@ -90,7 +89,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<established type="script">_event.established;</established>
 					</send>
 					<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
@@ -107,7 +105,6 @@
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>
 					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
 					<established type="script">_event.established;</established>
 				</send>
 				<transition cond="cmp(_event.established.connection,connection)" target="established"/>
@@ -119,7 +116,6 @@
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>
 					<extension type="script">agentId;</extension>
-					<monitorId type="script">_event.monitorId;</monitorId>
 					<held type="script">_event.held;</held>
 				</send>
 				<transition cond="cmp(_event.held.connection,connection)" target="held"/>
@@ -130,7 +126,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
@@ -139,7 +134,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<held type="script">_event.held;</held>
 					</send>
 					<transition cond="_event.held.connection.callID == connection.callID" target="heldedAndheld"/>
@@ -153,7 +147,6 @@
 						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 							<event type="script">_event._name;</event>
 							<extension type="script">agentId;</extension>
-							<monitorId type="script">_event.monitorId;</monitorId>
 							<failed type="script">_event.failed;</failed>
 						</send>
 					</event>
@@ -163,7 +156,6 @@
 						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 							<event type="script">_event._name;</event>
 							<extension type="script">agentId;</extension>
-							<monitorId type="script">_event.monitorId;</monitorId>
 							<originated type="script">_event.originated;</originated>
 						</send>
 						<transition cond="cmp(_event.originated.connection,newCall)" target="heldAndoriginated"/>
@@ -173,7 +165,6 @@
 							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 								<event type="script">_event._name;</event>
 								<extension type="script">agentId;</extension>
-								<monitorId type="script">_event.monitorId;</monitorId>
 								<delivered type="script">_event.delivered;</delivered>
 							</send>
 							<transition cond="_event.delivered.connection.callID == newCall.callID" target="heldAnddelivered"/>
@@ -184,7 +175,6 @@
 							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 								<event type="script">_event._name;</event>
 								<extension type="script">agentId;</extension>
-								<monitorId type="script">_event.monitorId;</monitorId>
 								<transferred type="script">_event.transferred;</transferred>
 							</send>
 							<transition target="init"/>
@@ -193,7 +183,6 @@
 							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 								<event type="script">_event._name;</event>
 								<extension type="script">agentId;</extension>
-								<monitorId type="script">_event.monitorId;</monitorId>
 								<established type="script">_event.established;</established>
 							</send>
 							<transition target="heldAndestablished"/>
@@ -203,7 +192,6 @@
 								<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 									<event type="script">_event._name;</event>
 									<extension type="script">agentId;</extension>
-									<monitorId type="script">_event.monitorId;</monitorId>
 									<conferenced type="script">_event.conferenced;</conferenced>
 								</send>
 								<script>connection = _event.conferenced.secondaryOldCall;</script>
@@ -221,7 +209,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="_event.retrieved.connection.callID == connection.callID" target="established"/>
@@ -230,7 +217,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<held type="script">_event.held;</held>
 					</send>
 					<transition cond="cmp(_event.held.connection,connection)" target="heldedAndheld"/>
@@ -241,7 +227,6 @@
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
 						<extension type="script">agentId;</extension>
-						<monitorId type="script">_event.monitorId;</monitorId>
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="cmp(_event.retrieved.connection,connection)" target="helded"/>
