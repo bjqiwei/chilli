@@ -5,11 +5,23 @@
 	<data id="agentId" expr="''"/>
 	<date id="connection"/>
 	<date id="newCall"/>
+	<date id="called"/>
+	<data id="acdGroup" expr="'5000'"/>
+	<data id="callUUID"/>
+	<data id="timestamp"/>
+	<data id="starttime"/>
+	<data id="hangupdir" expr="0"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
+	<script src="./conf/uuid.js" />
+	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
 	<state id="init">
+		<onentry>
+			<script>callUUID = ''; hangupdir=0;</script>
+		</onentry>
+		
 		<event event="AgentLogin" cond="_event.AgentLogin.agentId != ''">
 			<script>agentId = _event.AgentLogin.agentId;</script>	
 		</event>
@@ -18,7 +30,7 @@
 			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
 				<event type="script">_event._name;</event>
 				<extension type="script">_event.agentId;</extension>
-				<AgentLogin type="script">_event.AgentLogin.status = 1; _event.AgentLogin;</AgentLogin>
+				<AgentLogin type="script">_event.AgentLogin.cause = 1; _event.AgentLogin;</AgentLogin>
 			</send>
 		</event>
 		
@@ -26,6 +38,9 @@
 			<script>agentId = '';</script>
 		</event>
 		
+		<event event="SQL">
+			<log level="trace">execute sql result</log>
+		</event>
 		<event event="SERVICE_INITIATED">
 			<script>connection = _event.serviceInitiated.connection;</script>
 			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
@@ -50,6 +65,10 @@
 				<extension type="script">agentId;</extension>
 				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
 			</send>
+			<send cond="cmp(_event.connectionCleared.connection,connection)" fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.connectionCleared.cause + '\',hangupdir=' + hangupdir +'  where id=\'' + callUUID + '\''; sql;</sql>
+			</send>
+			<script> hangupdir = 1;</script>
 			<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
 		</event>
 		<event event ="CALL_CLEARED">
@@ -58,6 +77,10 @@
 				<extension type="script">agentId;</extension>
 				<connectionCleared type="script">_event.callCleared;</connectionCleared>
 			</send>
+			<send cond="cmp(_event.callCleared.connection,connection)" fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.callCleared.cause + '\',hangupdir=' + hangupdir + ' where id=\'' + callUUID + '\''; sql;</sql>
+			</send>
+			<script> hangupdir = 1;</script>
 			<transition cond="cmp(_event.callCleared.connection,connection)" target="init"/>
 		</event>
 		<state id="serviceInitiated">
@@ -67,9 +90,32 @@
 					<extension type="script">agentId;</extension>
 					<originated type="script">_event.originated;</originated>
 				</send>
+		
+				<script>connection = _event.originated.connection; called = _event.originated.called;</script>
+				<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>
+						
+				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+					<sql type="script">var sql='INSERT INTO call_cdr'+
+					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
+					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
+					sql;</sql>
+				</send>
+				
+				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+					<sql type="script">var sql='UPDATE call_cdr SET ringing_stamp=' + Date.parse(new Date())/1000+ ' where id=\'' + callUUID + '\''; sql;</sql>
+				</send>
+				
 				<transition cond="cmp(_event.originated.connection,connection)" target="originated"/>
 			</event>
-			<event event="FAILED">
+			<event event ="FAILED">
+				<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date(); called = _event.failed.called;</script>
+				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+					<sql type="script">var sql='INSERT INTO call_cdr'+
+					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
+					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
+					sql;</sql>
+				</send>
+
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>
 					<extension type="script">agentId;</extension>
@@ -77,6 +123,7 @@
 				</send>
 			</event>
 			<state id="originated">
+			
 				<event event ="DELIVERED">
 					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 						<event type="script">_event._name;</event>
@@ -92,6 +139,9 @@
 						<established type="script">_event.established;</established>
 					</send>
 					<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
+				</event>
+				<event event="FAILED">
+					<script>hangupdir =1;</script>
 				</event>
 				<state id="delivered">
 					
@@ -112,6 +162,12 @@
 		</state>
 		
 		<state id="established">
+			<onentry>				
+				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+					<sql type="script">var sql='UPDATE call_cdr SET answer_stamp=' + Date.parse(new Date())/1000+ ' where id=\'' + callUUID + '\''; sql;</sql>
+				</send>
+			</onentry>
+			
 			<event event="HELD">
 				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 					<event type="script">_event._name;</event>

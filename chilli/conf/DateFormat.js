@@ -1,4 +1,4 @@
-Date.prototype.format=function(fmt) {           
+Date.prototype.Format=function(fmt) {           
     var o = {           
     "M+" : this.getMonth()+1, //ÔÂ·Ý           
     "d+" : this.getDate(), //ÈÕ           
