@@ -95,7 +95,7 @@ namespace model{
 			else {
 
 				Json::Value originEvent = Event.event;
-				originEvent["status"] = 1;
+				originEvent["cause"] = 1;
 				originEvent["mem"] = "not find this extension";
 				Json::FastWriter writer;
 				std::string errorStr = writer.write(originEvent);

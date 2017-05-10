@@ -264,8 +264,8 @@ void MySqlModule::executeSql()
 					break;
 
 				Json::Value result;
-				result["status"] = 0;
-				result["msg"] = "success";
+				result["cause"] = 0;
+				result["reason"] = "success";
 
 				/* create a statement object */
 				std::auto_ptr<sql::Statement> stmt(connect->createStatement());
@@ -326,14 +326,18 @@ void MySqlModule::executeSql()
 					std::ostringstream oss;
 					oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
 					LOG4CPLUS_DEBUG(log, oss.str());
-
-					if (connect->isClosed()) {
+					
+					if (Event.m_times++ < 5){
+						m_SqlBuffer.Put(Event);
+						break;
+					}
+					else if (connect->isClosed()) {
 						m_SqlBuffer.Put(Event);
 						break;
 					}
 					else {
-						result["status"] = e.getErrorCode();
-						result["msg"] = e.what();
+						result["cause"] = e.getErrorCode();
+						result["reason"] = e.what();
 					}
 				}
 
