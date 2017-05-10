@@ -5,9 +5,14 @@
 	<data id="consultationNewCall"/>
 	<date id="conferenceCall"/>
 	<date id="called"/>
+	<data id="callUUID"/>
+	<data id="timestamp"/>
+	<data id="starttime"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
+	<script src="./conf/uuid.js" />
+	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
 	<state id="init">
 		<event event="cmd" cond="_event.cmd=='logon'">
@@ -21,8 +26,6 @@
 		</event>
 		<event event="AgentLogout">
 			<transition  target="final"/>
-		</event>
-		<event event="ACS_OPEN_STREAM_CONF" cond="_event.OpenStream.status==0">
 		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
@@ -45,21 +48,21 @@
 					<extension type="script">_agent.Extension</extension>
 				</send>
 			</onentry>
-			<event event="AgentLogout" cond="_event.AgentLogout.status==0">
+			<event event="AgentLogout" cond="_event.AgentLogout.cause==0">
 				<transition target="logining"/>
 			</event>
 			<event event="AgentLogout">
 				<send target="this" type="response" dest="client" event="logon">
-					<status type="script">_event.AgentLogout.status</status>
+					<status type="script">_event.AgentLogout.cause</status>
 					<type>logon</type>
 					<reason type="script">_event.AgentLogout.reason</reason>
 				</send>
 				<transition  target="final"/>
 			</event>
-			<event event="AgentLogin" cond="_event.AgentLogin.status==0">
+			<event event="AgentLogin" cond="_event.AgentLogin.cause==0">
 				<transition  target="logined"/>
 			</event>
-			<event event="AgentLogin" cond="_event.AgentLogin.status==1001">
+			<event event="AgentLogin" cond="_event.AgentLogin.cause==1001">
 				<send target="this" type="cmd" dest="this" event="AgentLogout">
 					<deviceId type="script">_avaya.Extension</deviceId>
 					<password type="script">_avaya.Password</password>
@@ -68,7 +71,7 @@
 			</event>
 			<event event="AgentLogin">
 				<send target="this" type="response" dest="client" event="logon">
-					<status type="script">_event.AgentLogin.status</status>
+					<status type="script">_event.AgentLogin.cause</status>
 					<type>logon</type>
 					<reason type="script">_event.AgentLogin.reason</reason>
 				</send>
@@ -169,13 +172,13 @@
 				</event>
 				<event event="AgentSetFree">
 					<send target="this" type="notify" dest="client" event="agentidle">
-						<status type="script"> _event.AgentSetFree.status</status>
+						<status type="script"> _event.AgentSetFree.cause</status>
 						<type>agentidle</type>
 					</send>
-					<transition cond="_event.AgentSetFree.status==0" target="Ready"/>
+					<transition cond="_event.AgentSetFree.cause==0" target="Ready"/>
 				</event>
 				<event event="DELIVERED">
-					<script>called = _event.delivered.called;</script>
+					<script>connection = _event.delivered.connection; called = _event.delivered.called;</script>
 					<send target="this" type="notify" dest="client" event="inringing">
 						<type>inringing</type>
 						<callid type="script">_event.delivered.connection.callID;</callid>
@@ -186,6 +189,12 @@
 					</send>
 					<transition  target="Alerting"/>
 				</event>
+				<event event="CONNECTION_CLEARED">
+					<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
+				</event>
+				<event event="CALL_CLEARED">
+					<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
+				</event>
 				<event event="cmd" cond="_event.cmd=='makecall'">
 					<send target="this" type="cmd" dest="this" event="MakeCall">
 						<calling type="script">_agent.Extension;</calling>
@@ -195,16 +204,39 @@
 					<transition target="makecalling"/>
 				</event>
 				
+				<event event="SQL">
+					<log level="trace">execute sql result</log>
+				</event>
 				<state id="makecalling">
 					<event event="cmd" cond="_event.cmd=='makecall'"/>
 					<event event="MakeCall">
-						<script>connection = _event.MakeCall.newCall;</script>
+						<script>
+						if(_event.MakeCall.cause ==0)
+							connection = _event.MakeCall.newCall;
+						else{
+							connection = {};
+							connection.callID =0;
+						}
+						</script>
+						<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>
+						
+						<send cond="_event.MakeCall.cause !=0" fromexpr="_agent.AgentId" target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var sql='INSERT INTO call_cdr'+
+							'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,             origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
+							'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _agent.Extension+ '\','+_extension.companyid + ',\'' + _agent.AgentId + '\',\'' +_agent.Extension + '\',\'' + called +'\',\'' + _agent.Extension +'\',\'' + called + '\',' + Date.parse(timestamp)+ ',1,' +   Date.parse(new Date()) + ',3,      0,' +  Date.parse(timestamp) + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
+							sql;</sql>
+						</send>
+						
+						<send cond="_event.MakeCall.cause !=0" fromexpr="_agent.AgentId" target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())+ ', hangup_cause=\'' + _event.MakeCall.cause + '\',hangupdir=0  where id=\'' + callUUID + '\''; sql;</sql>
+						</send>
+						
 						<send target="this" type="notify" dest="client" event="makecall">
-							<status type="script">_event.MakeCall.status;</status>
+							<status type="script">_event.MakeCall.cause;</status>
 							<type>makecall</type>
 							<reason type="script">_event.MakeCall.reason;</reason>
 						</send>
-						<transition cond="_event.MakeCall.status !=0"  target="ACW"/>
+						<transition cond="_event.MakeCall.cause !=0" target="ACW"/>
 					</event>
 					<event event="SERVICE_INITIATED">
 						<send target="this" type="notify" dest="client" event="outringing">
@@ -220,12 +252,6 @@
 						<script>connection = _event.originated.connection;</script>
 						<transition target="originated"/>
 					</event>
-					<event event="CONNECTION_CLEARED">
-						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
-					</event>
-					<event event="CALL_CLEARED">
-						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
-					</event>
 				</state>
 				<state id="NotReady">
 				</state>
@@ -238,10 +264,10 @@
 					</event>
 					<event event="AgentSetBusy">
 						<send target="this" type="notify" dest="client" event="agentbusy">
-							<status type="script">_event.AgentSetBusy.status</status>
+							<status type="script">_event.AgentSetBusy.cause</status>
 							<type>agentbusy</type>
 						</send>
-						<transition  cond="_event.status==0" target="NotReady"/>
+						<transition  cond="_event.AgentSetBusy.cause==0" target="NotReady"/>
 					</event>
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
@@ -281,12 +307,6 @@
 						</send>
 						<transition  cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 					</event>
-					<event event="CONNECTION_CLEARED">
-						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
-					</event>
-					<event event="CALL_CLEARED">
-						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
-					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
 							<connection type="script">connection;</connection>
@@ -308,9 +328,6 @@
 					</state>
 				</state>
 				<state id="Alerting">
-					<onentry>
-						<script>connection = _event.delivered.connection; called = _event.delivered.called;</script>
-					</onentry>
 					<event event="ESTABLISHED">
 						<send target="this" type="notify" dest="client" event="incall">
 							<type>incall</type>
@@ -318,12 +335,6 @@
 							<called type="script">called;</called>
 						</send>
 						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
-					</event>
-					<event event="CONNECTION_CLEARED">
-						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
-					</event>
-					<event event="CALL_CLEARED">
-						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -351,12 +362,6 @@
 				</state>
 				<state id="established">
 					<event event="cmd" cond="_event.cmd=='makecall'">
-					</event>
-					<event event="CONNECTION_CLEARED">
-						<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
-					</event>
-					<event event="CALL_CLEARED">
-						<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" dest="this" event="ClearCall">
@@ -390,7 +395,7 @@
 						<event event="ConsultationCall" >
 							<send target="this" type="notify" dest="client" event="transfercall">
 								<type>transfercall</type>
-								<status type="script">_event.ConsultationCall.status;</status>
+								<status type="script">_event.ConsultationCall.cause;</status>
 								<reason type="script">_event.ConsultationCall.reason; </reason>
 							</send>
 							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
@@ -400,7 +405,7 @@
 								<heldCall type="script">connection;</heldCall>
 							</send>
 							
-							<transition cond = "_event.ConsultationCall.status != 0" target="established"/>
+							<transition cond = "_event.ConsultationCall.cause != 0" target="established"/>
 							
 						</event>
 						<event event="HELD">
@@ -418,7 +423,7 @@
 						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
 						</event>
 						
-						<event event="TransferCall" cond="_event.TransferCall.status==0">
+						<event event="TransferCall" cond="_event.TransferCall.cause==0">
 						</event>
 						
 						<event event="TransferCall">
@@ -452,11 +457,11 @@
 						<event event="ConsultationCall" >
 							<send target="this" type="notify" dest="client" event="agentconsult">
 								<type>agentconsult</type>
-								<status type="script">_event.ConsultationCall.status;</status>
+								<status type="script">_event.ConsultationCall.cause;</status>
 								<reason type="script">_event.ConsultationCall.reason; </reason>
 							</send>
 							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
-							<transition  cond = "_event.ConsultationCall.status != 0" target="established"/>
+							<transition  cond = "_event.ConsultationCall.cause != 0" target="established"/>
 						</event>
 						<event event="cmd" cond="_event.cmd=='agentconsultback'">
 							<send target="this" type="cmd" dest="this" event="ReconnectCall">
@@ -483,7 +488,7 @@
 							<event event="ESTABLISHED" cond="_event.established.connection.callID == consultationNewCall.callID">
 								<send target="this" type="notify" dest="client" event="consultationcalls">
 									<type>consultationcalls</type>
-									<status type="script">_event.established.status;</status>
+									<status type="script">_event.established.cause;</status>
 									<reason type="script">_event.established.reason; </reason>
 								</send>
 								<transition target="consultationed"/>
@@ -506,7 +511,7 @@
 										<heldCall type="script">connection;</heldCall>
 									</send>
 								</event>
-								<event event="ConferenceCall" cond="_event.ConferenceCall.status == 0">
+								<event event="ConferenceCall" cond="_event.ConferenceCall.cause == 0">
 									<script>conferenceCall = _event.ConferenceCall.newCall;</script>
 								</event>
 								<event event="CONFERENCED">
@@ -523,7 +528,7 @@
 							<event event="ReconnectCall">
 								<send target="this" type="notify" dest="client" event="agentconsultback">
 									<type>agentconsultback</type>
-									<status type="script">_event.ReconnectCall.status;</status>
+									<status type="script">_event.ReconnectCall.cause;</status>
 									<reason type="script">_event.ReconnectCall.reason; </reason>
 								</send>
 							</event>
@@ -534,10 +539,10 @@
 					<state id="helding">
 						<event event="cmd" cond="_event.cmd=='mute'">
 						</event>
-						<event event="HoldCall" cond = "_event.HoldCall.status != 0">
+						<event event="HoldCall" cond = "_event.HoldCall.cause != 0">
 							<send target="this" type="notify" dest="client" event="mute">
 								<type>mute</type>
-								<status type="script">_event.HoldCall.status;</status>
+								<status type="script">_event.HoldCall.cause;</status>
 								<reason type="script">_event.HoldCall.reason; </reason>
 							</send>
 							<transition target="established"/>
@@ -559,10 +564,10 @@
 							<state id="retrieveCalling">
 								<event event="cmd" cond="_event.cmd=='unmute'">
 								</event>
-								<event event="RetrieveCall" cond = "_event.RetrieveCall.status != 0">
+								<event event="RetrieveCall" cond = "_event.RetrieveCall.cause != 0">
 									<send target="this" type="notify" dest="client" event="unmute">
 										<type>unmute</type>
-										<status type="script">_event.RetrieveCall.status;</status>
+										<status type="script">_event.RetrieveCall.cause;</status>
 										<reason type="script">_event.RetrieveCall.reason; </reason>
 									</send>
 									<transition target="held"/>
