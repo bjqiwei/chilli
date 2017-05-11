@@ -16,8 +16,10 @@
 			</send>
 		</event>
 		<event event="CONNECTION_CLEARED">
+			<log level="trace" type="script">" not process event "+_event._name;</log>
 		</event>
     <event event=".*">
+		<log level="trace" type="script">" not process event "+_event._name;</log>
     </event>
     </state>
 </fsm>
