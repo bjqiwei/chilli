@@ -400,7 +400,7 @@
 							</send>
 							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
 
-							<send target="this" type="cmd" dest="client" event="TransferCall">
+							<send target="this" type="cmd" dest="this" event="TransferCall">
 								<activeCall type="script">consultationNewCall;</activeCall>
 								<heldCall type="script">connection;</heldCall>
 							</send>

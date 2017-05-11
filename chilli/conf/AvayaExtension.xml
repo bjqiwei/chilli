@@ -225,8 +225,6 @@
 							</send>
 							<transition cond="_event.delivered.connection.callID == newCall.callID" target="heldAnddelivered"/>
 						</event>
-					</state>
-					<state id="heldAnddelivered">
 						<event event="TRANSFERRED">
 							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 								<event type="script">_event._name;</event>
@@ -235,26 +233,28 @@
 							</send>
 							<transition target="init"/>
 						</event>
-						<event event="ESTABLISHED" cond="_event.established.connection.callID == newCall.callID">
-							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-								<event type="script">_event._name;</event>
-								<extension type="script">agentId;</extension>
-								<established type="script">_event.established;</established>
-							</send>
-							<transition target="heldAndestablished"/>
-						</event>
-						<state id="heldAndestablished">
-							<event event="CONFERENCED">
+						<state id="heldAnddelivered">
+							<event event="ESTABLISHED" cond="_event.established.connection.callID == newCall.callID">
 								<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
 									<event type="script">_event._name;</event>
 									<extension type="script">agentId;</extension>
-									<conferenced type="script">_event.conferenced;</conferenced>
+									<established type="script">_event.established;</established>
 								</send>
-								<script>connection = _event.conferenced.secondaryOldCall;</script>
-								<transition target="conferenced"/>
+								<transition target="heldAndestablished"/>
 							</event>
-							<state id="conferenced">
-								
+							<state id="heldAndestablished">
+								<event event="CONFERENCED">
+									<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
+										<event type="script">_event._name;</event>
+										<extension type="script">agentId;</extension>
+										<conferenced type="script">_event.conferenced;</conferenced>
+									</send>
+									<script>connection = _event.conferenced.secondaryOldCall;</script>
+									<transition target="conferenced"/>
+								</event>
+								<state id="conferenced">
+									
+								</state>
 							</state>
 						</state>
 					</state>
