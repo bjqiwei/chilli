@@ -149,20 +149,13 @@
 					</send>
 					<transition  target="WorkReady"/>
 				</event>
-				<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
-					<send target="this" type="notify" dest="client" event="logon">
-						<status>1</status>
-						<type>logon</type>
-					</send>
-					<transition  target="logining"/>
-				</event>
 				<event event="cmd" cond="_event.cmd=='logon'">
 					<send target="this" type="notify" dest="client" event="kick">
 						<status>1</status>
 						<type>kick</type>
 						<reason>账号在其他地方登陆</reason>
 					</send>
-					<transition  target="logined"/>
+					<transition  target="logining"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
 					<send target="this" type="cmd" dest="this" event="AgentSetFree">
