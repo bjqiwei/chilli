@@ -1,26 +1,6 @@
 ﻿<?xml version="1.0" ?>
 <fsm name ="AvayaVDN" initial="init">
-<datamodel>
-	<data id="connectsArray"/>
-</datamodel>
 	<state id="init">
-		<onentry>
-			<script>connectsArray = new Array();</script>
-		</onentry>
-		<event event="DELIVERED" cond="_event.delivered.connection.deviceID == _avaya.Extension">
-			<send target="this" type="notify" dest="extension" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension >5000</extension>
-				<companyid type="script">_extension.companyid;</companyid>
-				<delivered type="script">_event.delivered;</delivered>
-			</send>
-		</event>
-		<event event="CONNECTION_CLEARED">
-			<log level="trace" type="script">" not process event "+_event._name;</log>
-		</event>
-    <event event=".*">
-		<log level="trace" type="script">" not process event "+_event._name;</log>
-    </event>
     </state>
 </fsm>
 
