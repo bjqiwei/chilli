@@ -157,6 +157,9 @@
     <ClInclude Include="mysql\MySqlModule.h">
       <Filter>mysql</Filter>
     </ClInclude>
+    <ClInclude Include="Avaya\AvayaACD.h">
+      <Filter>Avaya</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -236,6 +239,9 @@
     </ClCompile>
     <ClCompile Include="model\Extension.cpp">
       <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Avaya\AvayaACD.cpp">
+      <Filter>Avaya</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

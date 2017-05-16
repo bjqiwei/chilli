@@ -2,6 +2,7 @@
 #include "AvayaAgent.h"
 #include "AvayaExtension.h"
 #include "AvayaVDN.h"
+#include "AvayaACD.h"
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
@@ -283,7 +284,7 @@ namespace chilli {
 				}
 				else if (config->m_ExtType == ExtType::AvayaACDType)
 				{
-					model::ExtensionPtr ext(new AvayaExtension(this, config->m_ExtNumber, config->m_SMFileName));
+					model::ExtensionPtr ext(new AvayaACD(this, config->m_ExtNumber, config->m_SMFileName));
 					return ext;
 				}
 			}
@@ -1619,16 +1620,15 @@ namespace chilli {
 
 							this->m_monitorID2Extension[monitorId] = this->m_InvokeID2Extension[invokeId];
 
-							if (this->m_InvokeID2Event.find(invokeId) != this->m_InvokeID2Event.end()) {
-								Json::Value event;
-								event["extension"] = this->m_InvokeID2Extension[invokeId];
-								std::string eventName = this->m_InvokeID2Event[invokeId];
-								event["event"] = eventName;
-								event[eventName]["cause"] = 0;
-								event[eventName]["monitorId"] = monitorId;
-								model::EventType_t evt(event);
-								this->PushEvent(evt);
-							}
+							Json::Value event;
+							event["extension"] = this->m_InvokeID2Extension[invokeId];
+							std::string eventName = this->m_InvokeID2Event[invokeId];
+							event["event"] = eventName;
+							event[eventName]["cause"] = 0;
+							event[eventName]["monitorId"] = monitorId;
+							model::EventType_t evt(event);
+							this->PushEvent(evt);
+							
 						}
 								  break;
 						case CSTA_MONITOR_STOP_CONF: {
