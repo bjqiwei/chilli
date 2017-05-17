@@ -48,6 +48,8 @@ public:
 
 	virtual int pushEvent(const EventType_t &evt) = 0;
 
+	virtual void mainEventLoop();
+
 	virtual void setSessionId(const std::string & sessinId) final;
 
 	virtual const std::string & getSessionId()final;

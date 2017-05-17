@@ -219,7 +219,8 @@ namespace model{
 						if (extptr != nullptr) {
 
 							extptr->pushEvent(Event);
-							extptr->m_SM->mainEventLoop();
+							extptr->mainEventLoop();
+
 							if (extptr->IsFinalState()) {
 								removeExtension(ext);
 								extptr->Stop();

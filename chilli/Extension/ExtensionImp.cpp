@@ -80,6 +80,7 @@ namespace chilli {
 			}
 
 			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+
 			m_SM->pushEvent(evt);
 
 			return 0;

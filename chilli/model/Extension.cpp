@@ -44,6 +44,11 @@ namespace model {
 		return m_ExtNumber;
 	}
 
+	void Extension::mainEventLoop()
+	{
+		return m_SM->mainEventLoop();
+	}
+
 	void Extension::setSessionId(const std::string & sessinId) {
 		m_SessionId = sessinId;
 	}

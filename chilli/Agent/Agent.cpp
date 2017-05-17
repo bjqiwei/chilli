@@ -129,6 +129,7 @@ int Agent::pushEvent(const model::EventType_t & Event)
 	}
 	else
 		LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+
 	m_SM->pushEvent(evt);
 
 	return 0;
