@@ -4,6 +4,13 @@
 	<data id="monitorId"/>
 	<data id="callUUID"/>
 	<data id="connection"/>
+	<data id="agentId"/>
+	<data id="caller"/>
+	<data id="called"/>
+	<data id="origcaller"/>
+	<data id="origcaller"/>
+	<data id="timestamp"/>
+	<data id="starttime"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -11,10 +18,14 @@
 <state id="init">
 	
 	<event event= "DELIVERED">
-		<send target="this" type="cmd" dest="this" event="MonitorCall">
-			<connection type="script">_event.delivered.connection;</connection>
+		<script>connection = _event.delivered.connection; callUUID = uuid(); timestamp = Date.parse(new Date())/1000; starttime = Date.parse(new Date())/1000;caller= _event.delivered.calling; origcaller = caller; called = _event.delivered.called; origcalled = called;</script>
+		
+		<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+			<sql type="script">var sql='INSERT INTO call_cdr'+
+			'(id,                     callid,                      device,                    companyid,                   caller,           called,           origcaller,        origcalled,      start_stamp) VALUES'+
+			'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\',' + _event.companyid + ',\'' + caller+ '\',\'' + called + '\',\''+ caller + '\',\'' + called + '\',' + timestamp +')'; 
+			sql;</sql>
 		</send>
-		<script>connection = _event.delivered.connection;</script>
 		<transition target="Busy"/>
 	</event>
 	
@@ -30,10 +41,6 @@
 	
 	<state id="Busy">
 		<onentry>
-			<script>callUUID = uuid();</script>
-			<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
-				<sql type="script">var sql='INSERT INTO call_cdr(id,callid,device,companyid) VALUES(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\','+_event.companyid+')'; sql;</sql>
-			</send>
 			<send target="this" type="notify" dest="extension" event="StateChange">
 				<event>StateChange</event>
 				<extension type="script">_extension.Groups;</extension>
@@ -49,11 +56,8 @@
 		</event>
 		<event event= "DELIVERED">
 		</event>
-		<event event="MonitorCall">
-			<script>monitorId = _event.MonitorCall.monitorId;</script>
-			<transition cond="_event.MonitorCall.status !=0" target="Idle"/>
-		</event>
-		<event event="MONITOR_ENDED">
+
+		<event event="CALL_CLEARED">
 			<transition target="Idle"/>
 		</event>
 	</state>

@@ -266,9 +266,6 @@
     <Xml Include="conf\AvayaExtension.xml">
       <Filter>conf</Filter>
     </Xml>
-    <Xml Include="conf\AvayaVDN.xml">
-      <Filter>conf</Filter>
-    </Xml>
     <Xml Include="conf\chilli.xml">
       <Filter>conf</Filter>
     </Xml>

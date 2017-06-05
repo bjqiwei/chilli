@@ -178,6 +178,7 @@
 						<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
 						<caller type="script">_event.delivered.calling; </caller>
 						<called type="script">called;</called>
+						<userdata type="script">_event.delivered.userdata;</userdata>
 						<nowgroupid type="script"> -1;</nowgroupid>
 					</send>
 					<transition  target="Alerting"/>
@@ -244,6 +245,11 @@
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection;</script>
 						<transition target="originated"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
 					</event>
 				</state>
 				<state id="NotReady">

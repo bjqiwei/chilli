@@ -205,36 +205,20 @@ namespace chilli {
 			{
 
 				const char * num = vdn->Attribute("ExtensionNumber");
-				const char * sm = vdn->Attribute("StateMachine");
 				const char * avayaExtension = vdn->Attribute("avayaExtension");
-				const char * companyid = vdn->Attribute("companyid");
-				const char * stationno = vdn->Attribute("StationNo");
 
 				num = num ? num : "";
-				sm = sm ? sm : "";
 				avayaExtension = avayaExtension ? avayaExtension : "";
-				companyid = companyid ? companyid : "";
-				stationno = stationno ? stationno : "";
 
-				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaVDNType);
-				if (extConfig != nullptr) {
-					extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
-					extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
-					extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
-					extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
-				}
-				
-				else {
+				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, "", ExtType::AvayaVDNType);
+				if (extConfig == nullptr) {
 					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+					continue;
 				}
-			}
 
-			// ACD 
-			XMLElement * acd = avaya->FirstChildElement("ACD");
+				Json::Value acdExts(Json::arrayValue);
 
-			if (acd != nullptr) {
-
-				for (XMLElement *child = acd->FirstChildElement("Extension");
+				for (XMLElement *child = vdn->FirstChildElement("Extension");
 					child != nullptr;
 					child = child->NextSiblingElement("Extension"))
 				{
@@ -249,6 +233,8 @@ namespace chilli {
 					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
 
+					acdExts.append(num);
+
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaACDType);
 					if (extConfig != nullptr) {
 						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
@@ -259,7 +245,7 @@ namespace chilli {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 					}
 				}
-				
+				extConfig->m_Vars.push_back(std::make_pair("m_ACDExts", acdExts));
 			}
 			return true;
 		}
@@ -1275,6 +1261,7 @@ namespace chilli {
 									else {
 										LOG4CPLUS_DEBUG(log, "MonitorDevice:" << it.first);
 										this->m_InvokeID2Extension[uInvodeId] = it.first;
+										//this->m_InvokeID2Event[uInvodeId] = "MonitorDevice";
 									}
 								}
 								else if (it.second->m_ExtType == ExtType::AvayaVDNType)
@@ -1301,6 +1288,7 @@ namespace chilli {
 									else {
 										LOG4CPLUS_DEBUG(log, "MonitorCallsViaDevice:" << it.first);
 										this->m_InvokeID2Extension[uInvodeId] = it.first;
+										//this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
 									}
 								}
 							}
@@ -1683,6 +1671,7 @@ namespace chilli {
 							event["callCleared"]["connection"] = AvayaAPI::cstaConnectionIDJson(callCleared.clearedCall);
 							event["callCleared"]["cause"] = max(callCleared.cause,0);
 							event["callCleared"]["reason"] = AvayaAPI::cstaEventCauseString(callCleared.cause);
+							event["callid"] = callCleared.clearedCall.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1704,6 +1693,7 @@ namespace chilli {
 							event["connectionCleared"]["cause"] = max(connectionCleared.cause,0);
 							event["connectionCleared"]["reason"] = AvayaAPI::cstaEventCauseString(connectionCleared.cause);
 							event["connectionCleared"]["releasing"] = releasing;
+							event["callid"] = connectionCleared.droppedConnection.callID;
 
 
 							model::EventType_t evt(event);
@@ -1736,6 +1726,7 @@ namespace chilli {
 							event["delivered"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(localConnect);
 
 							event["delivered"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
+							event["callid"] = connection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1767,6 +1758,7 @@ namespace chilli {
 							event["established"]["called"] = called;
 							event["established"]["last"] = last;
 							event["established"]["answering"] = answering;
+							event["callid"] = connection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1787,6 +1779,7 @@ namespace chilli {
 							event["serviceInitiated"]["reason"] = AvayaAPI::cstaEventCauseString(serviceInitiated.cause);
 							event["serviceInitiated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(serviceInitiated.localConnectionInfo);
 							event["serviceInitiated"]["connection"] = AvayaAPI::cstaConnectionIDJson(serviceInitiated.initiatedConnection);
+							event["callid"] = serviceInitiated.initiatedConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1810,6 +1803,7 @@ namespace chilli {
 							event["originated"]["connection"] = AvayaAPI::cstaConnectionIDJson(originated.originatedConnection);
 							event["originated"]["calling"] = calling;
 							event["originated"]["called"] = called;
+							event["callid"] = originated.originatedConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1831,6 +1825,7 @@ namespace chilli {
 							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(held.localConnectionInfo);
 							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(held.heldConnection);
 							event["held"]["holding"] = holding;
+							event["callid"] = held.heldConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1852,6 +1847,7 @@ namespace chilli {
 							event["retrieved"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
 							event["retrieved"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
 							event["retrieved"]["retrieving"] = retrieving;
+							event["callid"] = retrieved.retrievedConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1880,6 +1876,7 @@ namespace chilli {
 							event["queued"]["queue"] = queue;
 							event["queued"]["last"] = last;
 							event["queued"]["numberQueued"] = queued.numberQueued;
+							event["callid"] = queued.queuedConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1905,6 +1902,7 @@ namespace chilli {
 							event["failed"]["connection"] = AvayaAPI::cstaConnectionIDJson(failed.failedConnection);
 							event["failed"]["failing"] = failing;
 							event["failed"]["called"] = called;
+							event["callid"] = failed.failedConnection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1934,6 +1932,7 @@ namespace chilli {
 							event["transferred"]["transferred"] = ctransferred;
 							event["transferred"]["primary"] = primary;
 							event["transferred"]["secondary"] = secondary;
+							event["callid"] = transferred.primaryOldCall.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
@@ -1960,6 +1959,7 @@ namespace chilli {
 							event["conferenced"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(conferenced.localConnectionInfo);
 							event["conferenced"]["primaryOldCall"] = AvayaAPI::cstaConnectionIDJson(conferenced.primaryOldCall);
 							event["conferenced"]["secondaryOldCall"] = AvayaAPI::cstaConnectionIDJson(conferenced.secondaryOldCall);
+							event["callid"] = conferenced.primaryOldCall.callID;
 							
 							for (int i = 0; i < conferenced.conferenceConnections.count; i++)
 							{
@@ -1994,6 +1994,7 @@ namespace chilli {
 							event["diverted"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(localConnect);
 
 							event["diverted"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
+							event["callid"] = connection.callID;
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);

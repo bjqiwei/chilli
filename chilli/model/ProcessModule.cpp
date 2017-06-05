@@ -23,13 +23,13 @@ namespace model{
 			Stop();
 		}
 
-		for (auto & it : m_Extensions) {
-			removeExtension(it.first);
+		for (auto & it = m_Extensions.begin(); it != m_Extensions.end();) {
+			removeExtension(it++->first);
 		}
 
-		for (auto & it: m_ExtensionConfigs)
+		for (auto & it = m_ExtensionConfigs.begin(); it != m_ExtensionConfigs.end();)
 		{
-			deleteExtensionConfig(it.first);
+			deleteExtensionConfig(it++->first);
 		}
 
 	}
@@ -79,13 +79,6 @@ namespace model{
 				ext = jsonEvent["extension"].asString();
 			}
 
-			auto extptr = getExtension(ext);
-
-			if (extptr != nullptr) {
-				extptr->m_model->m_RecEvtBuffer.Put(Event);
-				return;
-			}
-			
 			//
 			auto extconfigptr = getExtensionConfig(ext);
 			if (extconfigptr != nullptr){
@@ -115,13 +108,6 @@ namespace model{
 
 				chilli::model::EventType_t newEvent(Event.event);
 				newEvent.event["extension"] = ext;
-
-				auto extptr = getExtension(ext);
-
-				if (extptr != nullptr) {
-					extptr->m_model->m_RecEvtBuffer.Put(newEvent);
-					continue;
-				}
 
 				auto extconfigptr = getExtensionConfig(ext);
 				if (extconfigptr != nullptr) {
@@ -163,14 +149,7 @@ namespace model{
 							ext = jsonEvent["extension"].asString();
 						}
 
-
-						auto & it = m_Extensions.find(ext);
-						ExtensionPtr extptr = nullptr;
-						if (it != m_Extensions.end())
-						{
-							extptr = it->second;
-						}
-
+						auto extptr = getExtension(ext);
 						
 						if (extptr == nullptr) {
 							ExtensionConfigPtr config = getExtensionConfig(ext);

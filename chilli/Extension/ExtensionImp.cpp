@@ -63,28 +63,5 @@ namespace chilli {
 			processSend(strContent, param, bHandled);
 		}
 
-		int ExtensionImp::pushEvent(const model::EventType_t & Event)
-		{
-			const Json::Value & jsonEvent = Event.event;
-			
-			std::string eventName;
-
-			if (jsonEvent["event"].isString()) {
-				eventName = jsonEvent["event"].asString();
-			}
-
-			fsm::TriggerEvent evt(eventName);
-
-			for (auto & it : jsonEvent.getMemberNames()) {
-				evt.addVars(it, jsonEvent[it]);
-			}
-
-			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
-
-			m_SM->pushEvent(evt);
-
-			return 0;
-		}
-
 	}
 }

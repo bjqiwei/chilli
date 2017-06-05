@@ -53,7 +53,10 @@
 			<Extension ExtensionNumber="8006" StateMachine="./conf/AvayaExtension.xml" avayaExtension="8006"></Extension>
 			<Extension ExtensionNumber="8007" StateMachine="./conf/AvayaExtension.xml" avayaExtension="8007"></Extension>
 		</Extensions>
-    <VDN ExtensionNumber="5099" StateMachine="./conf/AvayaVDN.xml" avayaExtension="5099"/>
+    <VDN ExtensionNumber="5099" avayaExtension="5099">
+      <Extension ExtensionNumber="5100" StateMachine="./conf/AvayaACD.xml"></Extension>
+      <Extension ExtensionNumber="5101" StateMachine="./conf/AvayaACD.xml"></Extension>
+    </VDN>
     <ACD>
       <Extension ExtensionNumber="0100" StateMachine="./conf/AvayaACD.xml"></Extension>
     </ACD>

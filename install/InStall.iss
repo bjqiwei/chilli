@@ -6,7 +6,7 @@
 ; 禁止对其他应用程序的安装器使用相同的 AppId 值！
 ; (若要生成一个新的 GUID，请选择“工具 | 生成 GUID”。)
 #define AppName "chilli"
-#define AppVersion "1.0.0.0"
+#define AppVersion "1.0.0.3"
 AppId={{5B303E75-D8B9-4A49-B064-EA2E3FB50ED7}}
 AppName={#AppName}
 AppVersion={#AppVersion}

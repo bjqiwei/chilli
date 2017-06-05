@@ -35,18 +35,18 @@ public:
 
 	virtual ~Extension();
 
-	virtual void Start() final;
+	virtual void Start();
 
-	virtual void Stop() final;
-	virtual bool IsFinalState() final;
+	virtual void Stop();
+	virtual bool IsFinalState();
 
 	bool AddSendImplement(SendInterface * evtDsp);
 
-	bool setVar(const std::string &name, const Json::Value &value);
+	virtual bool setVar(const std::string &name, const Json::Value &value);
 
 	virtual const std::string & getExtNumber() final;
 
-	virtual int pushEvent(const EventType_t &evt) = 0;
+	virtual int pushEvent(const EventType_t &evt);
 
 	virtual void mainEventLoop();
 

@@ -215,7 +215,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <Xml Include="conf\AvayaACD.xml" />
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
-    <Xml Include="conf\AvayaVDN.xml" />
     <Xml Include="conf\chilli.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />

@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" ?>
-<fsm name ="AvayaVDN" initial="init">
-	<state id="init">
-    </state>
-</fsm>
-

@@ -11,8 +11,6 @@ namespace chilli{
 			ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 			virtual ~ExtensionImp();
 
-			virtual int pushEvent(const model::EventType_t &evt) override;
-
 			//inherit from SendInterface
 			virtual void fireSend(const std::string &strContent, const void * param) override;
 
