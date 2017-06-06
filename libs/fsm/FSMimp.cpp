@@ -780,10 +780,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 	using namespace helper::xml;
 	LOG4CPLUS_TRACE(log, m_strSessionID << ",processEvent:" << event.getEventName());
 	if (getRootContext()){
-		for(auto & it : m_currentEvt.getVars())
-		{
-			getRootContext()->deleteVar("_event." + it.first);
-		}
+		getRootContext()->deleteVar("_event");
 		m_currentEvt = event;
 
 		getRootContext()->setVar("_event._name", m_currentEvt.getEventName());
