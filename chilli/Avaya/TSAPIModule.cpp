@@ -1180,16 +1180,37 @@ namespace chilli {
 			
 		}
 
-
-		void TSAPIModule::addcallid2ACD(uint32_t callid, const std::string & ext)
+		std::string TSAPIModule::findIdleACD(uint32_t callid)
 		{
-			m_callid2ACDExtenion[callid] = ext;
-			LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2ACDExtenion.size());
+			for (auto & it : m_ACDExts) {
+				if (it.second == false) {
+					it.second = true;
+
+					m_callid2ACDExtenion[it.first] = callid;
+					LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2ACDExtenion.size());
+					
+					return it.first;
+				}
+			}
+			LOG4CPLUS_ERROR(log, "overload max acd size:" << m_ACDExts.size());
+			return std::string();
 		}
 
-		void TSAPIModule::removecallid2ACD(uint32_t callid)
+		std::string TSAPIModule::findACDByCallid(uint32_t callid)
 		{
-			m_callid2ACDExtenion.erase(callid);
+			for (auto & it : m_callid2ACDExtenion)
+			{
+				if (it.second == callid)
+					return it.first;
+			}
+
+			return std::string();
+		}
+
+		void TSAPIModule::removeAcdExtension(const std::string & ext)
+		{
+			m_callid2ACDExtenion.erase(ext);
+			m_ACDExts[ext] = false;
 			LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2ACDExtenion.size());
 		}
 

@@ -61,36 +61,20 @@ namespace Avaya {
 
 			}
 
-			if (m_model->m_callid2ACDExtenion.find(callid) == m_model->m_callid2ACDExtenion.end())
-			{
-				for (auto & it : m_model->m_ACDExts){
-					if (it.second == false) {
-						it.second = true;
-						m_model->addcallid2ACD(callid, it.first);
-						break;
-					}
-				}
+			std::string ext = m_model->findACDByCallid(callid);
+		
+			if (ext.empty()) {
+				ext = m_model->findIdleACD(callid);
 			}
 
-			auto & ext = m_model->m_callid2ACDExtenion.find(callid);
-
-			if (ext == m_model->m_callid2ACDExtenion.end())
+			if (!ext.empty())
 			{
-				LOG4CPLUS_ERROR(log, "overload max acd size:" << m_model->m_ACDExts.size());
-				return -1;
-			}
+				chilli::model::EventType_t newEvent(jsonEvent);
+				newEvent.event["extension"] = ext;
+				newEvent.event["stationNo"] = m_stationNo;
+				newEvent.event["companyid"] = m_companyid;
 
-			chilli::model::EventType_t newEvent(jsonEvent);
-			newEvent.event["extension"] = ext->second;
-			newEvent.event["stationNo"] = m_stationNo;
-			newEvent.event["companyid"] = m_companyid;
-			
-			this->m_model->PushEvent(newEvent);
-
-			if (jsonEvent["event"].asString() == "CALL_CLEARED")
-			{
-				m_model->m_ACDExts[ext->second] = false;
-				m_model->removecallid2ACD(callid);
+				this->m_model->PushEvent(newEvent);
 			}
 		}
 		return 0;

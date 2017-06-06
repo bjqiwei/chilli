@@ -20,7 +20,35 @@ void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 {
 	LOG4CPLUS_TRACE(log,"fireSend:" << strContent);
 	bool bHandled = false;
-	this->processSend(strContent, param, bHandled);
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (jsonReader.parse(strContent, jsonData)) {
+		if (jsonData["dest"].asString() == "acd")
+		{
+			bHandled = true;
+
+			std::string ext = m_model->findIdleACD();
+			if (ext.empty()){
+
+				Json::Value newEvent;
+				newEvent["event"] = jsonData["event"];
+				newEvent[jsonData["event"].asString()]["cause"] = 1;
+				newEvent[jsonData["event"].asString()]["reason"] = "System Busy";
+				newEvent["extension"] = this->getExtNumber();
+				jsonData = newEvent;
+				
+			}
+			else {
+				jsonData["extension"] = ext;
+			}
+
+			model::EventType_t evt(jsonData);
+			m_model->PushEvent(evt);			
+		}
+	}
+
+	if (!bHandled)
+		this->processSend(strContent, param, bHandled);
 	
 }
 

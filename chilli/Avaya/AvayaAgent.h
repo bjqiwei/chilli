@@ -20,7 +20,7 @@ protected:
 	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
 private:
-	TSAPIModule * m_model;
+	TSAPIModule * m_model = nullptr;
 };
 typedef std::shared_ptr<AvayaAgent>  AvayaAgentPtr;
 }

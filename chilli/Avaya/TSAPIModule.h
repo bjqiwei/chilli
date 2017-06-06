@@ -43,15 +43,17 @@ namespace chilli {
 			std::map<uint32_t, std::string>m_monitorID2Extension;
 
 			std::map<std::string, bool>m_ACDExts;
-			std::map<uint32_t, std::string>m_callid2ACDExtenion;
-			void addcallid2ACD(uint32_t callid, const std::string & ext);
-			void removecallid2ACD(uint32_t callid);
+			std::string findIdleACD(uint32_t callid = 0);
+			std::map<std::string, uint32_t>m_callid2ACDExtenion;
+			std::string findACDByCallid(uint32_t callid);
+			void removeAcdExtension(const std::string & ext);
 
 			std::thread m_thread;
 			void run();
 			friend class AvayaAgent;
 			friend class AvayaExtension;
 			friend class AvayaVDN;
+			friend class AvayaACD;
 
 		};
 	}

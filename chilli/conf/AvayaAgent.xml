@@ -190,46 +190,27 @@
 					<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='makecall'">
-					<send target="this" type="cmd" dest="this" event="MakeCall">
+					<send target="this" type="cmd" dest="acd" event="MakeCall">
 						<calling type="script">_agent.Extension;</calling>
 						<called type="script">_event.called;</called>
+						<agentId type="script">_agent.AgentId;</agentId>
+						<companyid type="script">_event.companyid;</companyid>
 					</send>
 					<script>called = _event.called;</script>
 					<transition target="makecalling"/>
 				</event>
 				
-				<event event="SQL">
-					<log level="trace">execute sql result</log>
-				</event>
 				<state id="makecalling">
 					<event event="cmd" cond="_event.cmd=='makecall'"/>
 					<event event="MakeCall">
-						<script>
-						if(_event.MakeCall.cause ==0)
-							connection = _event.MakeCall.newCall;
-						else{
-							connection = {};
-							connection.callID =0;
-						}
-						</script>
-						<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>
-						
-						<send cond="_event.MakeCall.cause !=0" target="mysql" type="cmd" dest="mysql"  event="sql">
-							<sql type="script">var sql='INSERT INTO call_cdr'+
-							'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,             origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
-							'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _agent.Extension+ '\','+_extension.companyid + ',\'' + _agent.AgentId + '\',\'' +_agent.Extension + '\',\'' + called +'\',\'' + _agent.Extension +'\',\'' + called + '\',' + Date.parse(starttime) / 1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
-							sql;</sql>
-						</send>
-						
-						<send cond="_event.MakeCall.cause !=0" target="mysql" type="cmd" dest="mysql"  event="sql">
-							<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.MakeCall.cause + '\',hangupdir=0  where id=\'' + callUUID + '\''; sql;</sql>
-						</send>
-						
 						<send target="this" type="notify" dest="client" event="makecall">
 							<status type="script">_event.MakeCall.cause;</status>
 							<type>makecall</type>
 							<reason type="script">_event.MakeCall.reason;</reason>
 						</send>
+						<script>
+							connection = _event.MakeCall.newCall;
+						</script>
 						<transition cond="_event.MakeCall.cause !=0" target="ACW"/>
 					</event>
 					<event event="SERVICE_INITIATED">

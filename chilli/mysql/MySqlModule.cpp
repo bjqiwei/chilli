@@ -147,7 +147,7 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 
 void MySqlModule::fireSend(const std::string &strContent, const void * param)
 {
-	LOG4CPLUS_DEBUG(log, "fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (!jsonReader.parse(strContent, jsonEvent)) {
