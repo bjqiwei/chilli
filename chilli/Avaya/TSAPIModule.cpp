@@ -206,9 +206,13 @@ namespace chilli {
 
 				const char * num = vdn->Attribute("ExtensionNumber");
 				const char * avayaExtension = vdn->Attribute("avayaExtension");
+				const char * companyid = vdn->Attribute("companyid");
+				const char * stationno = vdn->Attribute("StationNo");
 
 				num = num ? num : "";
 				avayaExtension = avayaExtension ? avayaExtension : "";
+				companyid = companyid ? companyid : "";
+				stationno = stationno ? stationno : "";
 
 				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, "", ExtType::AvayaVDNType);
 				if (extConfig == nullptr) {
@@ -216,37 +220,43 @@ namespace chilli {
 					continue;
 				}
 
-				Json::Value acdExts(Json::arrayValue);
+				extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
+				extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
 
-				for (XMLElement *child = vdn->FirstChildElement("Extension");
+			}
+
+			// ACD 
+			XMLElement * acd = avaya->FirstChildElement("ACD");
+
+			if (acd != nullptr) {
+
+				for (XMLElement *child = acd->FirstChildElement("Extension");
 					child != nullptr;
 					child = child->NextSiblingElement("Extension"))
 				{
 
 					const char * num = child->Attribute("ExtensionNumber");
 					const char * sm = child->Attribute("StateMachine");
-					const char * companyid = child->Attribute("companyid");
 					const char * stationno = child->Attribute("StationNo");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
-					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
 
-					acdExts.append(num);
+					m_ACDExts[num] = false;
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaACDType);
 					if (extConfig != nullptr) {
 						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
-						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 						extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 					}
 				}
-				extConfig->m_Vars.push_back(std::make_pair("m_ACDExts", acdExts));
+
 			}
+
 			return true;
 		}
 
@@ -1170,6 +1180,18 @@ namespace chilli {
 			
 		}
 
+
+		void TSAPIModule::addcallid2ACD(uint32_t callid, const std::string & ext)
+		{
+			m_callid2ACDExtenion[callid] = ext;
+			LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2ACDExtenion.size());
+		}
+
+		void TSAPIModule::removecallid2ACD(uint32_t callid)
+		{
+			m_callid2ACDExtenion.erase(callid);
+			LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2ACDExtenion.size());
+		}
 
 		void TSAPIModule::run()
 		{

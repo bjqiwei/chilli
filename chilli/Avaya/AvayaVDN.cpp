@@ -31,13 +31,15 @@ namespace Avaya {
 
 	bool AvayaVDN::setVar(const std::string & name, const Json::Value & value)
 	{
-		if (value.isArray())
+		if (name == "_extension.companyid")
 		{
-			for (uint32_t i =0; i< value.size();i++)
-			{
-				if (value[i].isString())
-					m_ACDExts[value[i].asString()] = false;
-			}
+			if (value.isString())
+				m_companyid = value.asString();
+		}
+		else if (name == "_stationNo")
+		{
+			if (value.isString())
+				m_stationNo = value.asString();
 		}
 		return true;
 	}
@@ -59,36 +61,36 @@ namespace Avaya {
 
 			}
 
-			if (m_callid2Extenion.find(callid) == m_callid2Extenion.end())
+			if (m_model->m_callid2ACDExtenion.find(callid) == m_model->m_callid2ACDExtenion.end())
 			{
-				for (auto & it : m_ACDExts){
+				for (auto & it : m_model->m_ACDExts){
 					if (it.second == false) {
 						it.second = true;
-						m_callid2Extenion[callid] = it.first;
+						m_model->addcallid2ACD(callid, it.first);
 						break;
 					}
 				}
-				LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2Extenion.size());
 			}
 
-			auto & ext = m_callid2Extenion.find(callid);
+			auto & ext = m_model->m_callid2ACDExtenion.find(callid);
 
-			if (ext == m_callid2Extenion.end())
+			if (ext == m_model->m_callid2ACDExtenion.end())
 			{
-				LOG4CPLUS_ERROR(log, "overload max acd size:" << m_ACDExts.size());
+				LOG4CPLUS_ERROR(log, "overload max acd size:" << m_model->m_ACDExts.size());
 				return -1;
 			}
 
 			chilli::model::EventType_t newEvent(jsonEvent);
 			newEvent.event["extension"] = ext->second;
+			newEvent.event["stationNo"] = m_stationNo;
+			newEvent.event["companyid"] = m_companyid;
 			
 			this->m_model->PushEvent(newEvent);
 
 			if (jsonEvent["event"].asString() == "CALL_CLEARED")
 			{
-				m_ACDExts[ext->second] = false;
-				m_callid2Extenion.erase(callid);
-				LOG4CPLUS_DEBUG(log, "exist call size:" << m_callid2Extenion.size());
+				m_model->m_ACDExts[ext->second] = false;
+				m_model->removecallid2ACD(callid);
 			}
 		}
 		return 0;

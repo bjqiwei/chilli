@@ -30,8 +30,8 @@ namespace chilli{
 
 		private:
 			TSAPIModule * m_model;
-			std::map<std::string, bool>m_ACDExts;
-			std::map<uint32_t, std::string>m_callid2Extenion;
+			std::string m_stationNo;
+			std::string m_companyid;
 		};
 		typedef std::shared_ptr<AvayaVDN>  AvayaVDNPtr;
 	}
