@@ -65,7 +65,7 @@
 				<extension type="script">agentId;</extension>
 				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
 			</send>
-			<send cond="cmp(_event.connectionCleared.connection,connection)" fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+			<send cond="cmp(_event.connectionCleared.connection,connection)" target="mysql" type="cmd" dest="mysql"  event="sql">
 				<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.connectionCleared.cause + '\',hangupdir=' + hangupdir +'  where id=\'' + callUUID + '\''; sql;</sql>
 			</send>
 			<script> hangupdir = 1;</script>
@@ -77,7 +77,7 @@
 				<extension type="script">agentId;</extension>
 				<connectionCleared type="script">_event.callCleared;</connectionCleared>
 			</send>
-			<send cond="cmp(_event.callCleared.connection,connection)" fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+			<send cond="cmp(_event.callCleared.connection,connection)" target="mysql" type="cmd" dest="mysql"  event="sql">
 				<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.callCleared.cause + '\',hangupdir=' + hangupdir + ' where id=\'' + callUUID + '\''; sql;</sql>
 			</send>
 			<script> hangupdir = 1;</script>
@@ -94,14 +94,14 @@
 				<script>connection = _event.originated.connection; called = _event.originated.called;</script>
 				<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>
 						
-				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='INSERT INTO call_cdr'+
 					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
 					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
 					sql;</sql>
 				</send>
 				
-				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='UPDATE call_cdr SET ringing_stamp=' + Date.parse(new Date())/1000+ ' where id=\'' + callUUID + '\''; sql;</sql>
 				</send>
 				
@@ -109,7 +109,7 @@
 			</event>
 			<event event ="FAILED">
 				<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date(); called = _event.failed.called;</script>
-				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='INSERT INTO call_cdr'+
 					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
 					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
@@ -163,7 +163,7 @@
 		
 		<state id="established">
 			<onentry>				
-				<send fromexpr="_extension.Extension" target="mysql" type="cmd" dest="mysql"  event="sql">
+				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='UPDATE call_cdr SET answer_stamp=' + Date.parse(new Date())/1000+ ' where id=\'' + callUUID + '\''; sql;</sql>
 				</send>
 			</onentry>

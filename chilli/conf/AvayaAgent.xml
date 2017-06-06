@@ -214,14 +214,14 @@
 						</script>
 						<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>
 						
-						<send cond="_event.MakeCall.cause !=0" fromexpr="_agent.AgentId" target="mysql" type="cmd" dest="mysql"  event="sql">
+						<send cond="_event.MakeCall.cause !=0" target="mysql" type="cmd" dest="mysql"  event="sql">
 							<sql type="script">var sql='INSERT INTO call_cdr'+
 							'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,             origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
 							'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _agent.Extension+ '\','+_extension.companyid + ',\'' + _agent.AgentId + '\',\'' +_agent.Extension + '\',\'' + called +'\',\'' + _agent.Extension +'\',\'' + called + '\',' + Date.parse(starttime) / 1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
 							sql;</sql>
 						</send>
 						
-						<send cond="_event.MakeCall.cause !=0" fromexpr="_agent.AgentId" target="mysql" type="cmd" dest="mysql"  event="sql">
+						<send cond="_event.MakeCall.cause !=0" target="mysql" type="cmd" dest="mysql"  event="sql">
 							<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.MakeCall.cause + '\',hangupdir=0  where id=\'' + callUUID + '\''; sql;</sql>
 						</send>
 						

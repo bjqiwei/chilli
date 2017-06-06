@@ -22,8 +22,8 @@ namespace model
 		std::string targetexpr;
 		std::string type;
 		std::string typeexpr;
-		std::string from;
-		std::string fromexpr;
+		//std::string from;
+		//std::string fromexpr;
 		std::string dest;
 		std::string destexpr;
 		std::string _event;
@@ -40,7 +40,7 @@ namespace model
 		const std::string& getType()const;
 		const std::string& getEvent()const;
 		//std::string& getEventExpr();
-		const std::string& getFrom()const;
+		//const std::string& getFrom()const;
 		//std::string& getNamelist();
 		//std::string& getTargetExpr();
 		const std::string& getDestination()const;

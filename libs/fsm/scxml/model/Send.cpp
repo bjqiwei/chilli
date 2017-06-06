@@ -25,8 +25,8 @@ namespace model
 		this->_event = helper::xml::getXmlNodeAttributesValue(m_node,"event");
 		this->eventexpr = helper::xml::getXmlNodeAttributesValue(m_node,"eventexpr");
 		//this->namelist = xmlHelper::getXmlNodeAttributesValue(node,"namelist");
-		this->from = helper::xml::getXmlNodeAttributesValue(m_node,"from");
-		this->fromexpr = helper::xml::getXmlNodeAttributesValue(m_node,"fromexpr");
+		//this->from = helper::xml::getXmlNodeAttributesValue(m_node,"from");
+		//this->fromexpr = helper::xml::getXmlNodeAttributesValue(m_node,"fromexpr");
 		this->dest = helper::xml::getXmlNodeAttributesValue(m_node,"dest");
 		this->destexpr = helper::xml::getXmlNodeAttributesValue(m_node,"destexpr");
 	}
@@ -49,10 +49,10 @@ namespace model
 		return target;
 	}
 
-	const std::string& Send::getFrom()const
+	/*const std::string& Send::getFrom()const
 	{
 		return from;
-	}
+	}*/
 
 	const std::string& Send::getType()const
 	{
@@ -121,12 +121,12 @@ namespace model
 			}
 		}
 
-		if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
-			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
+		/*if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
+			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*//*);
 			if (jsonfrom.isString() || jsonfrom.isBool() || jsonfrom.isNull()){
 				from = jsonfrom.asCString();
 			}
-		}
+		}*/
 
 		if (ctx && helper::string::isStringEmpty(dest) && !destexpr.empty()){
 			Json::Value jsondest = ctx->eval(destexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
@@ -174,7 +174,7 @@ namespace model
 		sendValue["type"] = getType();
 		sendValue["event"] = getEvent();
 		sendValue["id"] = getId();
-		sendValue["from"] = getFrom();
+		sendValue["from"] = m_strSession;
 		sendValue["dest"] = getDestination();
 		sendValue["target"] = getTarget();
 
