@@ -139,6 +139,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClInclude Include="Dynamiclibrary.h" />
     <ClInclude Include="Extension\ExtensionImp.h" />
     <ClInclude Include="Extension\ExtensionModule.h" />
+    <ClInclude Include="freeswitch\FreeSwitchExtension.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="Group\GroupImp.h" />
     <ClInclude Include="Group\GroupModule.h" />
@@ -172,6 +173,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
     <ClCompile Include="Extension\ExtensionImp.cpp" />
     <ClCompile Include="Extension\ExtensionModule.cpp" />
+    <ClCompile Include="freeswitch\FreeSwitchExtension.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="Group\GroupImp.cpp" />
     <ClCompile Include="Group\GroupModule.cpp" />
@@ -217,6 +219,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
     <Xml Include="conf\chilli.xml" />
+    <Xml Include="conf\FreeSwitchExtension.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />
   </ItemGroup>

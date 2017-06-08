@@ -7,18 +7,19 @@
 namespace chilli{
 namespace FreeSwitch{
 
-	class FreeSwtichModule :public model::ProcessModule
+	class FreeSwitchModule :public model::ProcessModule
 	{
 	public:
-		explicit FreeSwtichModule(const std::string & id);
-		virtual ~FreeSwtichModule(void);
+		explicit FreeSwitchModule(const std::string & id);
+		virtual ~FreeSwitchModule(void);
 		virtual int Start() override;
 		virtual int Stop() override;
 		virtual bool LoadConfig(const std::string & config) override;
 		virtual model::ExtensionPtr newExtension(const model::ExtensionConfigPtr & config) override;
-	private:
+	protected:
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;
+		void processSend(const std::string &strContent, const void * param, bool & bHandled, model::Extension * ext);
 	private:
 		std::thread m_Thread;
 		std::string m_Host;
@@ -26,6 +27,7 @@ namespace FreeSwitch{
 		std::string m_User;
 		std::string m_Password;
 		void ConnectFS();
+		friend class FreeSwitchExtension;
 	};
 
 }

@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <esl.h>
 #include "FreeSwitchModule.h"
+#include "FreeSwitchExtension.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -9,15 +10,19 @@
 namespace chilli{
 namespace FreeSwitch{
 
+	enum ExtType {
+		FreeSwitchExtType =0,
+		FreeSwitchACDType,
+	};
 
-FreeSwtichModule::FreeSwtichModule(const std::string & id):ProcessModule(id)
+FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
-	log = log4cplus::Logger::getInstance("chilli.FreeSwtichModule");
+	log = log4cplus::Logger::getInstance("chilli.FreeSwitchModule");
 	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
 }
 
 
-FreeSwtichModule::~FreeSwtichModule(void)
+FreeSwitchModule::~FreeSwitchModule(void)
 {
 	if (m_bRunning){
 		Stop();
@@ -26,7 +31,7 @@ FreeSwtichModule::~FreeSwtichModule(void)
 	LOG4CPLUS_DEBUG(log, "Destruction a FreeSwitch module.");
 }
 
-int FreeSwtichModule::Stop(void)
+int FreeSwitchModule::Stop(void)
 {
 	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
 	if (m_bRunning)
@@ -41,18 +46,18 @@ int FreeSwtichModule::Stop(void)
 	return 0;
 }
 
-int FreeSwtichModule::Start()
+int FreeSwitchModule::Start()
 {
 	LOG4CPLUS_DEBUG(log, "Start...  FreeSwitch module");
 	if(!m_bRunning){
 		ProcessModule::Start();
 		m_bRunning = true;
-		m_Thread = std::thread(&FreeSwtichModule::ConnectFS, this);
+		m_Thread = std::thread(&FreeSwitchModule::ConnectFS, this);
 	}
 	return 0;
 }
 
-bool FreeSwtichModule::LoadConfig(const std::string & configContext)
+bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 {
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument config;
@@ -67,26 +72,65 @@ bool FreeSwtichModule::LoadConfig(const std::string & configContext)
 	m_User = eConfig->Attribute("user") ? eConfig->Attribute("user") : "";
 	m_Password = eConfig->Attribute("password") ? eConfig->Attribute("password") : "";
 
+	// extensions 
+	XMLElement * extensions = eConfig->FirstChildElement("Extensions");
+
+	if (extensions != nullptr) {
+
+		for (XMLElement *child = extensions->FirstChildElement("Extension");
+			child != nullptr;
+			child = child->NextSiblingElement("Extension"))
+		{
+
+			const char * num = child->Attribute("ExtensionNumber");
+			const char * sm = child->Attribute("StateMachine");
+
+			num = num ? num : "";
+			sm = sm ? sm : "";
+
+			model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::FreeSwitchExtType);
+			if (extConfig != nullptr) {
+				extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+			}
+			else {
+				LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+			}
+		}
+	}
+
 	return true;
 }
 
 
-model::ExtensionPtr FreeSwtichModule::newExtension(const model::ExtensionConfigPtr & config)
+model::ExtensionPtr FreeSwitchModule::newExtension(const model::ExtensionConfigPtr & config)
 {
+	if (config != nullptr)
+	{
+		if (config->m_ExtType == ExtType::FreeSwitchExtType) {
+			model::ExtensionPtr ext(new FreeSwitchExtension(this, config->m_ExtNumber, config->m_SMFileName));
+			return ext;
+		}
+	}
 	return nullptr;
 }
 
-void FreeSwtichModule::fireSend(const std::string & strContent, const void * param)
+void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
 	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
-void FreeSwtichModule::ConnectFS()
+void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::Extension * ext)
+{
+}
+
+void FreeSwitchModule::ConnectFS()
 {
 	LOG4CPLUS_DEBUG(log, "Run  FreeSwitch module");
+
+	esl_handle_t handle = { { 0 } };
+
 	while (m_bRunning)
 	{
-		esl_handle_t handle = { { 0 } };
 		LOG4CPLUS_DEBUG(log, "connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
@@ -94,12 +138,27 @@ void FreeSwtichModule::ConnectFS()
 		if (!handle.connected){
 			LOG4CPLUS_ERROR(log, "connect freeswitch " << m_Host << ":" << m_Port << " error,"
 				<< handle.errnum << " " << handle.err);
+			if (m_bRunning)
+				std::this_thread::sleep_for(std::chrono::seconds(5));
 			continue;
 		}
 
 		LOG4CPLUS_INFO(log, "Connected to FreeSWITCH");
+
 		esl_events(&handle, ESL_EVENT_TYPE_JSON, "all");
 		LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
+
+		for (auto &it : this->GetExtensionConfig()) {
+			if (it.second->m_ExtType == ExtType::FreeSwitchExtType)
+			{
+
+				std::string cmd = "api sofia status profile internal reg ";
+				cmd.append(it.first);
+				LOG4CPLUS_DEBUG(log, "send:" << cmd);
+				esl_send(&handle, cmd.c_str());
+
+			}
+		}
 
 		while (m_bRunning){
 			esl_status_t status = esl_recv_timed(&handle, 1000);

@@ -163,6 +163,9 @@
     <ClInclude Include="uuid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="freeswitch\FreeSwitchExtension.h">
+      <Filter>freeswitch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -246,6 +249,9 @@
     <ClCompile Include="Avaya\AvayaACD.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
+    <ClCompile Include="freeswitch\FreeSwitchExtension.cpp">
+      <Filter>freeswitch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="conf\ACD.xml">
@@ -276,6 +282,9 @@
       <Filter>conf</Filter>
     </Xml>
     <Xml Include="conf\IVR.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\FreeSwitchExtension.xml">
       <Filter>conf</Filter>
     </Xml>
   </ItemGroup>

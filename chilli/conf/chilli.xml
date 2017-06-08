@@ -6,10 +6,6 @@
   <Agents id="agent001" TCPPort="9995" WSPort="9996">
     <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>
   </Agents>
-  <Extensions id="ext001">
-    <Extension ExtensionNumber="1000" ChannelID="0" Type="Analog_Trunk" Enable="1" StateMachine="./conf/Analog_Trunk.xml"></Extension>
-    <Extension ExtensionNumber="1001" ChannelID="1" Type="Anolog_User" Enable="1" StateMachine="./conf/Anolog_User.xml"></Extension>
-  </Extensions>
   <IVR id="ivr001">
     <Extension ExtensionNumber="5001" StateMachine="./conf/IVR.xml"></Extension>
   </IVR>
@@ -37,7 +33,29 @@
         <Extension>0109</Extension>
     </Group>
    </Groups>
-  <FreeSwitch id = "freeswitch001" host="123.56.241.85" port ="18021" password="qiwei">
+  <FreeSwitch id = "freeswitch001" host="47.94.16.223" port ="18021" password="qiwei">
+    <Extensions>
+      <Extension ExtensionNumber="1000" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1001" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1002" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1003" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1004" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1005" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1006" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1007" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1008" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1009" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1010" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1011" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1012" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1013" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1014" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1015" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1016" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1017" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1018" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+      <Extension ExtensionNumber="1019" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
+		</Extensions>
 	</FreeSwitch>
   <!--Avaya id = "tsapi001">
 		<TSAPI>

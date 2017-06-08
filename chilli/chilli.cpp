@@ -246,11 +246,11 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			modelid = modelid ? modelid : "";
 
 			if (nodeName == FREESWITCHNODE) {
-				model::ProcessModulePtr freeswtich(new chilli::FreeSwitch::FreeSwtichModule(modelid));
+				model::ProcessModulePtr freeswitch(new chilli::FreeSwitch::FreeSwitchModule(modelid));
 				XMLPrinter printer;
 				e->Accept(&printer);
-				freeswtich->LoadConfig(printer.CStr());
-				model::ProcessModule::g_Modules.push_back(freeswtich);
+				freeswitch->LoadConfig(printer.CStr());
+				model::ProcessModule::g_Modules.push_back(freeswitch);
 			}
 			else if (nodeName == AVAYANODE)
 			{
