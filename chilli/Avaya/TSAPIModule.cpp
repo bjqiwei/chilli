@@ -6,6 +6,7 @@
 #include <log4cplus/loggingmacros.h>
 #include <memory>
 #include "../tinyxml2/tinyxml2.h"
+#include "../uuid.h"
 
 // TSAPIModule
 
@@ -1715,7 +1716,9 @@ namespace chilli {
 							event["callCleared"]["cause"] = max(callCleared.cause,0);
 							event["callCleared"]["reason"] = AvayaAPI::cstaEventCauseString(callCleared.cause);
 							event["callid"] = callCleared.clearedCall.callID;
-
+							
+							m_callid2UUID.erase(callCleared.clearedCall.callID);
+							
 							model::EventType_t evt(event);
 							this->PushEvent(evt);
 						}
@@ -1770,6 +1773,12 @@ namespace chilli {
 
 							event["delivered"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 							event["callid"] = connection.callID;
+
+							auto &it = m_callid2UUID.find(connection.callID);
+							if (it == m_callid2UUID.end())
+								m_callid2UUID[connection.callID] = uuid();
+
+							event["uuid"] = m_callid2UUID[connection.callID];
 
 							model::EventType_t evt(event);
 							this->PushEvent(evt);

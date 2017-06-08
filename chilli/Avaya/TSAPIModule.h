@@ -47,6 +47,7 @@ namespace chilli {
 			std::map<std::string, uint32_t>m_callid2ACDExtenion;
 			std::string findACDByCallid(uint32_t callid);
 			void removeAcdExtension(const std::string & ext);
+			std::map<uint32_t, std::string>m_callid2UUID;
 
 			std::thread m_thread;
 			void run();

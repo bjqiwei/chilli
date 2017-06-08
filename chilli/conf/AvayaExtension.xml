@@ -86,7 +86,7 @@
 			<transition target="serviceInitiated"/>
 		</event>
 		<event event ="DELIVERED">
-			<script>connection = _event.delivered.connection;</script>
+			<script>connection = _event.delivered.connection; callUUID = _event.uuid;</script>
 			<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<delivered type="script">_event.delivered;</delivered>
 			</send>

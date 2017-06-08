@@ -24,7 +24,7 @@
 <state id="init">
 	
 	<event event= "DELIVERED">
-		<script>companyid = _event.companyid; stationNo = _event.stationNo; connection = _event.delivered.connection; callUUID = uuid(); timestamp = new Date(); starttime = new Date();caller= _event.delivered.calling; origcaller = caller; called = _event.delivered.called; origcalled = called;</script>
+		<script>companyid = _event.companyid; stationNo = _event.stationNo; connection = _event.delivered.connection; callUUID = _event.uuid; timestamp = new Date(); starttime = new Date();caller= _event.delivered.calling; origcaller = caller; called = _event.delivered.called; origcalled = called;</script>
 		
 		<send target="mysql" type="cmd" dest="mysql"  event="sql">
 			<sql type="script">var sql='INSERT INTO call_cdr'+
@@ -32,6 +32,7 @@
 			'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\',' + companyid + ',\'' + caller+ '\',\'' + called + '\',\''+ caller + '\',\'' + called + '\',' + Date.parse(timestamp)/1000 +',0,'  +  Date.parse(new Date())/1000 +',3 ,     0,' +   Date.parse(timestamp)/1000 +',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+')'; 
 			sql;</sql>
 		</send>
+		<transition target="delivered"/>
 	</event>
 	
 	<event event="MONITOR_ENDED">
@@ -44,7 +45,10 @@
 		</send>
 		<transition target="final"/>
 	</event>
-	
+	<state id = "delivered">
+		<event event= "DELIVERED">
+		</event>
+	</state>
 </state>
 
 <state id="final">

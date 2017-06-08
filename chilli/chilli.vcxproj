@@ -156,6 +156,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClInclude Include="Sh\shpa3api.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
+    <ClInclude Include="uuid.h" />
     <ClInclude Include="websocket\websocket.h" />
   </ItemGroup>
   <ItemGroup>
