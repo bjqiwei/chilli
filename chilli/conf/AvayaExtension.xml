@@ -3,10 +3,10 @@
 <fsm name ="AvayaExtension" initial="init">
 <datamodel>
 	<data id="agentId" expr="''"/>
-	<date id="connection"/>
-	<date id="newCall"/>
-	<date id="called"/>
-	<data id="acdGroup" expr="'5000'"/>
+	<data id="connection"/>
+	<data id="newCall"/>
+	<data id="called"/>
+	<data id="caller"/>
 	<data id="callUUID"/>
 	<data id="timestamp"/>
 	<data id="starttime"/>
@@ -19,7 +19,7 @@
 </scriptmodel>
 	<state id="init">
 		<onentry>
-			<script>callUUID = ''; hangupdir=0;</script>
+			<script>callUUID = null; hangupdir=0;</script>
 		</onentry>
 		
 		<event event="AgentLogin" cond="_event.AgentLogin.agentId != ''">
@@ -27,9 +27,7 @@
 		</event>
 		
 		<event event="AgentLogin">
-			<send target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">_event.agentId;</extension>
+			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<AgentLogin type="script">_event.AgentLogin.cause = 1; _event.AgentLogin;</AgentLogin>
 			</send>
 		</event>
@@ -38,31 +36,64 @@
 			<script>agentId = '';</script>
 		</event>
 		
+		<event event="MakeCall" cond="_event.type =='cmd'">
+			<script>tmpcaller = _event.MakeCall.caller; tmpcalled = _event.MakeCall.called; </script>
+			<send target="this" type="cmd" dest="this" event="MakeCall">
+				<calling type="script">_event.MakeCall.caller;</calling>
+				<called type="script">_event.MakeCall.called;</called>
+			</send>
+		</event>
+		
+		<event event="MakeCall" cond="_event.MakeCall.cause !=0">
+			<script>
+				if(_event.MakeCall.cause !=0){
+					_event.MakeCall.newCall = {};
+					_event.MakeCall.newCall.callID =0;
+				}
+			</script>
+			<script>tmpcallUUID = uuid(); timestamp = new Date(); starttime = new Date();</script>			
+			<send target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var sql='INSERT INTO call_cdr'+
+				'(  id,                                  callid,                            device,                  companyid,                  agentid,               caller,                      called,              origcaller,                 origcalled,         start_stamp,                 direction,        createtime,              owner, cdrtype,       timestamp,             devicetype,     callid_stamp_str,                              mediano) VALUES'+
+				'(\''+tmpcallUUID+'\',\''+ _event.MakeCall.newCall.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' +tmpcalled +'\',\'' + _extension.Extension +'\',\'' + tmpcalled + '\',' + Date.parse(starttime) / 1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
+				sql;</sql>
+			</send>
+						
+			<send target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.MakeCall.cause + '\',hangupdir=0  where id=\'' + tmpcallUUID + '\''; sql;</sql>
+			</send>
+
+			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
+				<MakeCall type="script">_event.MakeCall;</MakeCall>
+			</send>		
+			
+		</event>
+		
+		<event event="MakeCall">
+			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
+				<MakeCall type="script">_event.MakeCall;</MakeCall>
+			</send>		
+		</event>
+		
 		<event event="SQL">
 			<log level="trace">execute sql result</log>
 		</event>
 		<event event="SERVICE_INITIATED">
 			<script>connection = _event.serviceInitiated.connection;</script>
-			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
+			<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<serviceInitiated type="script">_event.serviceInitiated;</serviceInitiated>
 			</send>
 			<transition target="serviceInitiated"/>
 		</event>
 		<event event ="DELIVERED">
 			<script>connection = _event.delivered.connection;</script>
-			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
+			<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<delivered type="script">_event.delivered;</delivered>
 			</send>
 			<transition target="Alerting"/>
 		</event>
 		<event event ="CONNECTION_CLEARED">
-			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
+			<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<connectionCleared type="script">_event.connectionCleared;</connectionCleared>
 			</send>
 			<send cond="cmp(_event.connectionCleared.connection,connection)" target="mysql" type="cmd" dest="mysql"  event="sql">
@@ -72,9 +103,7 @@
 			<transition cond="cmp(_event.connectionCleared.connection,connection)" target="init"/>
 		</event>
 		<event event ="CALL_CLEARED">
-			<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-				<event type="script">_event._name;</event>
-				<extension type="script">agentId;</extension>
+			<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<connectionCleared type="script">_event.callCleared;</connectionCleared>
 			</send>
 			<send cond="cmp(_event.callCleared.connection,connection)" target="mysql" type="cmd" dest="mysql"  event="sql">
@@ -85,9 +114,7 @@
 		</event>
 		<state id="serviceInitiated">
 			<event event="ORIGINATED">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
+				<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<originated type="script">_event.originated;</originated>
 				</send>
 		
@@ -96,7 +123,7 @@
 						
 				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='INSERT INTO call_cdr'+
-					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
+					'(id,                      callid,                      device,                      companyid,                    agentid,                 caller,                  called,             origcaller,                  origcalled,        start_stamp,              direction,      createtime,              owner,  cdrtype,    timestamp,             devicetype,     callid_stamp_str,                                 mediano) VALUES'+
 					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
 					sql;</sql>
 				</send>
@@ -111,31 +138,25 @@
 				<script>callUUID = uuid(); timestamp = new Date(); starttime = new Date(); called = _event.failed.called;</script>
 				<send target="mysql" type="cmd" dest="mysql"  event="sql">
 					<sql type="script">var sql='INSERT INTO call_cdr'+
-					'(id,                      callid,                      device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                  origcalled,      start_stamp,           direction, createtime,              owner, cdrtype,  timestamp,            devicetype,  callid_stamp_str,                                 mediano) VALUES'+
+					'(id,                      callid,                       device,                  companyid,                    agentid,                  caller,                     called,              origcaller,                origcalled,           start_stamp,           direction,       createtime,              owner, cdrtype,      timestamp,            devicetype,    callid_stamp_str,                                 mediano) VALUES'+
 					'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + _extension.Extension+ '\','+_extension.companyid + ',\'' + agentId + '\',\'' +_extension.Extension + '\',\'' + called +'\',\'' + _extension.Extension +'\',\'' + called + '\',' + Date.parse(starttime)/1000+ ',1,' +   Date.parse(new Date())/1000 + ',3,      0,' +  Date.parse(timestamp)/1000 + ',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+ ')';
 					sql;</sql>
 				</send>
 
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
+				<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<failed type="script">_event.failed;</failed>
 				</send>
 			</event>
 			<state id="originated">
 			
 				<event event ="DELIVERED">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<delivered type="script">_event.delivered;</delivered>
 					</send>
 					<transition cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 				</event>
 				<event event ="ESTABLISHED">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<established type="script">_event.established;</established>
 					</send>
 					<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
@@ -152,9 +173,7 @@
 
 		<state id ="Alerting">
 			<event event ="ESTABLISHED">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
+				<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<established type="script">_event.established;</established>
 				</send>
 				<transition cond="cmp(_event.established.connection,connection)" target="established"/>
@@ -169,9 +188,7 @@
 			</onentry>
 			
 			<event event="HELD">
-				<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-					<event type="script">_event._name;</event>
-					<extension type="script">agentId;</extension>
+				<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<held type="script">_event.held;</held>
 				</send>
 				<transition cond="cmp(_event.held.connection,connection)" target="held"/>
@@ -179,17 +196,13 @@
 			</event>
 			<state id="held">
 				<event event="RETRIEVED">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
 				</event>
 				<event event="HELD">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<held type="script">_event.held;</held>
 					</send>
 					<transition cond="_event.held.connection.callID == connection.callID" target="heldedAndheld"/>
@@ -200,53 +213,41 @@
 				</event>
 				<state id="heldAndserviceInitiated">
 					<event event="FAILED">
-						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-							<event type="script">_event._name;</event>
-							<extension type="script">agentId;</extension>
+						<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 							<failed type="script">_event.failed;</failed>
 						</send>
 					</event>
 					<event event="HELD" cond="cmp(_event.held.connection,newCall)">
 					</event>
 					<event event="ORIGINATED">
-						<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-							<event type="script">_event._name;</event>
-							<extension type="script">agentId;</extension>
+						<send cond="agentId != ''" target="this" type="notify" destexpre="agentId" eventexpr="_event._name">
 							<originated type="script">_event.originated;</originated>
 						</send>
 						<transition cond="cmp(_event.originated.connection,newCall)" target="heldAndoriginated"/>
 					</event>
 					<state id="heldAndoriginated">
 						<event event="DELIVERED">
-							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-								<event type="script">_event._name;</event>
-								<extension type="script">agentId;</extension>
+							<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 								<delivered type="script">_event.delivered;</delivered>
 							</send>
 							<transition cond="_event.delivered.connection.callID == newCall.callID" target="heldAnddelivered"/>
 						</event>
 						<event event="TRANSFERRED">
-							<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-								<event type="script">_event._name;</event>
-								<extension type="script">agentId;</extension>
+							<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 								<transferred type="script">_event.transferred;</transferred>
 							</send>
 							<transition target="init"/>
 						</event>
 						<state id="heldAnddelivered">
 							<event event="ESTABLISHED" cond="_event.established.connection.callID == newCall.callID">
-								<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-									<event type="script">_event._name;</event>
-									<extension type="script">agentId;</extension>
+								<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 									<established type="script">_event.established;</established>
 								</send>
 								<transition target="heldAndestablished"/>
 							</event>
 							<state id="heldAndestablished">
 								<event event="CONFERENCED">
-									<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-										<event type="script">_event._name;</event>
-										<extension type="script">agentId;</extension>
+									<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 										<conferenced type="script">_event.conferenced;</conferenced>
 									</send>
 									<script>connection = _event.conferenced.secondaryOldCall;</script>
@@ -262,17 +263,13 @@
 			</state>
 			<state id="helded">
 				<event event="RETRIEVED">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="_event.retrieved.connection.callID == connection.callID" target="established"/>
 				</event>
 				<event event="HELD">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<held type="script">_event.held;</held>
 					</send>
 					<transition cond="cmp(_event.held.connection,connection)" target="heldedAndheld"/>
@@ -280,9 +277,7 @@
 			</state>
 			<state id="heldedAndheld">
 				<event event="RETRIEVED">
-					<send cond="agentId != ''" target="this" type="notify" dest="agent" eventexpr="_event._name">
-						<event type="script">_event._name;</event>
-						<extension type="script">agentId;</extension>
+					<send cond="agentId != ''" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="cmp(_event.retrieved.connection,connection)" target="helded"/>

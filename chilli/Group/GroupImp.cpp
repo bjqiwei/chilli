@@ -23,13 +23,15 @@ namespace Group {
 		Json::Value jsonData;
 		Json::Reader jsonReader;
 		if (jsonReader.parse(strContent, jsonData)) {
-			if (jsonData["type"].asString() == "cmd" && jsonData["dest"].asString() == "extension")
-			{
-				jsonData["param"]["from"] = m_ExtNumber;
-				chilli::model::EventType_t sendData(jsonData["param"]);
-				this->m_model->PushEvent(sendData);
-				bHandled = true;
-			}
+
+			jsonData["param"]["from"] = jsonData["from"];
+			jsonData["param"]["extension"] = jsonData["dest"];
+			jsonData["param"]["event"] = jsonData["event"];
+			jsonData["param"]["type"] = jsonData["type"];
+			chilli::model::EventType_t sendData(jsonData["param"]);
+			this->m_model->PushEvent(sendData);
+			bHandled = true;
+
 		}
 		else {
 			LOG4CPLUS_ERROR(log, strContent << " not json data.");

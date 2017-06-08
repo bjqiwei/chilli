@@ -42,10 +42,8 @@
 					<agentId type="script">_avaya.AgentId</agentId>
 					<group type="script">_event.logingroups</group>
 				</send>
-				<send target="this" type="notify" dest="extension" event="AgentLogin">
-					<event>AgentLogin</event>
+				<send target="this" type="notify" destexpr="_agent.Extension" event="AgentLogin">
 					<AgentLogin type="script">var AgentLogin ={};AgentLogin.agentId = _agent.AgentId; AgentLogin;</AgentLogin>
-					<extension type="script">_agent.Extension</extension>
 				</send>
 			</onentry>
 			<event event="AgentLogout" cond="_event.AgentLogout.cause==0">
@@ -190,11 +188,8 @@
 					<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='makecall'">
-					<send target="this" type="cmd" dest="acd" event="MakeCall">
-						<calling type="script">_agent.Extension;</calling>
-						<called type="script">_event.called;</called>
-						<agentId type="script">_agent.AgentId;</agentId>
-						<companyid type="script">_event.companyid;</companyid>
+					<send target="this" type="cmd" destexpr="_agent.Extension" event="MakeCall">
+						<MakeCall type="script">var makecall ={}; makecall.caller =_agent.Extension; makecall.called = _event.called; makecall; </MakeCall>
 					</send>
 					<script>called = _event.called;</script>
 					<transition target="makecalling"/>
@@ -590,10 +585,8 @@
     </state>
 	<state id="final">
 		<onentry>
-			<send target="this" type="notify" dest="extension" event="AgentLogout">
-				<event>AgentLogout</event>
+			<send target="this" type="notify" destexpr="_agent.Extension" event="AgentLogout">
 				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId;</AgentLogout>
-				<extension type="script">_agent.Extension</extension>
 			</send>
 		</onentry>
 	</state>

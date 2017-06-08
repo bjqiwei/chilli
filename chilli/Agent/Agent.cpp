@@ -43,9 +43,9 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 	Json::Value jsonData;
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonData)) {
-		if (jsonData["type"].asString() == "response")
+		if (jsonData["dest"].asString() == "client")
 		{
-			if (jsonData["dest"].asString() == "client")
+			if (jsonData["type"].asString() == "response")
 			{
 
 				Json::FastWriter writer;
@@ -69,28 +69,28 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 				}
 				bHandled = true;
 			}
-		}
-		else if (jsonData["type"].asString() == "notify")
-		{
-			std::string dest = jsonData["dest"].asString();
-			if (dest == "client")
+			else if (jsonData["type"].asString() == "notify")
 			{
 				Json::FastWriter writer;
 				std::string sendData = writer.write(jsonData["param"]);
 				model::ConnectAdapter::Send(m_ConnectId, sendData.c_str(), sendData.length());
 				bHandled = true;
-				
-				if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "kick"){
+
+				if (jsonData["param"]["type"].isString() && jsonData["param"]["type"].asString() == "kick") {
 					//踢出坐席
 					model::ConnectAdapter::SetExtension(m_ConnectId, "");//删除原有连接坐席号
 				}
+				
 			}
-			else {
-				jsonData["param"]["from"] = m_ExtNumber;
-				chilli::model::EventType_t  sendData(jsonData["param"]);
-				this->m_model->PushEvent(sendData);
-				bHandled = true;
-			}
+		}
+		else {
+			jsonData["param"]["from"] = m_ExtNumber;
+			jsonData["param"]["extension"] = jsonData["dest"];
+			jsonData["param"]["event"] = jsonData["event"];
+			jsonData["param"]["type"] = jsonData["type"];
+			chilli::model::EventType_t  sendData(jsonData["param"]);
+			this->m_model->PushEvent(sendData);
+			bHandled = true;
 		}
 	}
 
