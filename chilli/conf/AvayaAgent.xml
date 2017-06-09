@@ -3,11 +3,13 @@
 <datamodel>
 	<data id="connection"/>
 	<data id="consultationNewCall"/>
-	<date id="conferenceCall"/>
-	<date id="called"/>
+	<data id="conferenceCall"/>
+	<data id="called"/>
+	<data id="caller"/>
 	<data id="callUUID"/>
 	<data id="timestamp"/>
 	<data id="starttime"/>
+	<data id="logingroups"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
@@ -16,13 +18,8 @@
 </scriptmodel>
 	<state id="init">
 		<event event="cmd" cond="_event.cmd=='logon'">
+			<script>logingroups = _event.logingroups;</script>
 			<transition  target="logining"/>
-		</event>
-		<event event="cmd" cond="_event.cmd=='logon'">
-			<send target="this" type="response" dest="client" event="logon">
-				<status>1</status>
-				<type>logon</type>
-			</send>
 		</event>
 		<event event="AgentLogout">
 			<transition  target="final"/>
@@ -36,14 +33,8 @@
 		</event>
 		<state id="logining">
 			<onentry>
-				<send target="this" type="cmd" dest="this" event="AgentLogin">
-					<deviceId type="script">_avaya.Extension</deviceId>
-					<password type="script">_avaya.Password</password>
-					<agentId type="script">_avaya.AgentId</agentId>
-					<group type="script">_event.logingroups</group>
-				</send>
-				<send target="this" type="notify" destexpr="_agent.Extension" event="AgentLogin">
-					<AgentLogin type="script">var AgentLogin ={};AgentLogin.agentId = _agent.AgentId; AgentLogin;</AgentLogin>
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogin">
+					<AgentLogin type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password= _avaya.Password; agentInfo.group = logingroups; agentInfo;</AgentLogin>
 				</send>
 			</onentry>
 			<event event="AgentLogout" cond="_event.AgentLogout.cause==0">
@@ -61,10 +52,8 @@
 				<transition  target="logined"/>
 			</event>
 			<event event="AgentLogin" cond="_event.AgentLogin.cause==1001">
-				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_avaya.Extension</deviceId>
-					<password type="script">_avaya.Password</password>
-					<agentId type="script">_avaya.AgentId</agentId>
+				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
 				</send>
 			</event>
 			<event event="AgentLogin">
@@ -76,27 +65,20 @@
 				<transition  target="final"/>
 			</event>
 			<event event="ConnectError">
-				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_avaya.Extension</deviceId>
-					<password type="script">_avaya.Password</password>
-					<agentId type="script">_avaya.AgentId</agentId>
+				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
 			<event event="ConnectClose">
-				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_avaya.Extension</deviceId>
-					<password type="script">_avaya.Password</password>
-					<agentId type="script">_avaya.AgentId</agentId>
+				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='logout'">
-				<send target="this" type="cmd" dest="this" event="AgentLogout">
-					<deviceId type="script">_avaya.Extension</deviceId>
-					<password type="script">_avaya.Password</password>
-					<agentId type="script">_avaya.AgentId</agentId>
-					<group type="script">_event.logingroups</group>
+				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
@@ -112,9 +94,19 @@
 						<status type="script">0</status>
 						<type>logon</type>
 					</send>
+
 					<send target="this" type="cmd" dest="this" event="AgentGetState">
 						<deviceId type="script">_avaya.Extension</deviceId>
 					</send>
+					
+					<send target="monitor" type="notify" dest="monitor" event="Login">
+						<status>onwork</status>
+						<operatorid type="script">_agent.AgentId;</operatorid>
+						<worktype type="script">2</worktype>
+						<auto type="script">false;</auto>
+						<groupids type="script">logingroups</groupids>
+					</send>
+					
 				</onentry>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='NotReady'">
 					<send target="this" type="notify" dest="client" event="agentbusy">
@@ -153,7 +145,7 @@
 						<type>kick</type>
 						<reason>账号在其他地方登陆</reason>
 					</send>
-					<transition  target="logining"/>
+					<transition  target="logined"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
 					<send target="this" type="cmd" dest="this" event="AgentSetFree">
@@ -168,8 +160,20 @@
 					</send>
 					<transition cond="_event.AgentSetFree.cause==0" target="Ready"/>
 				</event>
+				
+				<event event="cmd" cond="_event.cmd == 'monitoragent'">
+					<send target="monitor" type="cmd" dest="this" event="MonitorAgent"/>
+				</event>
+				
+				<event event="MonitorAgent">
+					<send target="this" type="notify" dest="client" event="monitoragent">
+						<type>monitoragent</type>
+						<data type="script"> _event.data;</data>
+					</send>
+				</event>
+				
 				<event event="DELIVERED">
-					<script>connection = _event.delivered.connection; called = _event.delivered.called;</script>
+					<script>connection = _event.delivered.connection; called = _event.delivered.called; caller = _event.delivered.calling;</script>
 					<send target="this" type="notify" dest="client" event="inringing">
 						<type>inringing</type>
 						<callid type="script">_event.delivered.connection.callID;</callid>
@@ -209,6 +213,7 @@
 						<transition cond="_event.MakeCall.cause !=0" target="ACW"/>
 					</event>
 					<event event="SERVICE_INITIATED">
+						<script>caller = _agent.Extension;</script>
 						<send target="this" type="notify" dest="client" event="outringing">
 							<type>outringing</type>
 							<called type="script">called;</called>
@@ -216,6 +221,15 @@
 							<callid type="script">_event.serviceInitiated.connection.callID;</callid>
 							<nowgroupid type="script">1</nowgroupid>
 							<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outringing">
+							<status>outringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
 						</send>
 					</event>
 					<event event="ORIGINATED">
@@ -229,8 +243,26 @@
 					</event>
 				</state>
 				<state id="NotReady">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="Login">
+							<status>busy</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
 				</state>
 				<state id="Ready">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="Login">
+							<status>free</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
 					<event event="cmd" cond="_event.cmd=='agentbusy'">
 						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
 							<deviceId type="script">_avaya.Extension</deviceId>
@@ -262,6 +294,15 @@
 							<callid type="script">_event.originated.connection.callID;</callid>
 							<called type="script">called;</called>
 						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outcall">
+							<status>outcall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
 						<send target="this" type="notify" dest="client" event="calledringing">
 							<type>calledringing</type>
 							<callid type="script">_event.originated.connection.callID;</callid>
@@ -269,6 +310,15 @@
 							<caller type="script">_event.originated.calling; </caller>
 							<called type="script">called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="calledringing">
+							<status>calledringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
 						</send>
 					</onentry>
 					<event event="DELIVERED">
@@ -297,17 +347,46 @@
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">called;</called>
 						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outboundcall">
+							<status>outboundcall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
 						<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
 					</event>
 					<state id ="delivered">
 					</state>
 				</state>
 				<state id="Alerting">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="inringing">
+							<status>inringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
 					<event event="ESTABLISHED">
 						<send target="this" type="notify" dest="client" event="incall">
 							<type>incall</type>
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="innercall">
+							<status>innercall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
 						</send>
 						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 					</event>
@@ -328,6 +407,13 @@
 							<type>after</type>
 							<callid type="script">connection.callID;</callid>
 							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="after">
+							<status>after</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
 						</send>
 					</onentry>
 					<event event="ORIGINATED">
@@ -576,6 +662,14 @@
 
 		<state id="logouting">
 			<event event="AgentLogout">
+				<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
+				<send target="monitor" type="notify" dest="monitor" event="Login">
+					<status>offwork</status>
+					<operatorid type="script">_agent.AgentId;</operatorid>
+					<worktype type="script">2</worktype>
+					<auto type="script">false;</auto>
+					<groupids type="script">logingroups</groupids>
+				</send>
 				<transition  target="final"/>
 			</event>
 			<event event=".*">
@@ -585,9 +679,6 @@
     </state>
 	<state id="final">
 		<onentry>
-			<send target="this" type="notify" destexpr="_agent.Extension" event="AgentLogout">
-				<AgentLogout type="script">var agentId={};agentId.agentId = _agent.AgentId; agentId;</AgentLogout>
-			</send>
 		</onentry>
 	</state>
 </fsm>

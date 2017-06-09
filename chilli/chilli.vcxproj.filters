@@ -52,6 +52,9 @@
     <Filter Include="conf">
       <UniqueIdentifier>{991e0369-59ea-40b2-862e-7f1aec0420f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="monitor">
+      <UniqueIdentifier>{7d4b3347-6824-4d39-bcef-0a66e9e0cb8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="welcome.wav">
@@ -166,6 +169,9 @@
     <ClInclude Include="freeswitch\FreeSwitchExtension.h">
       <Filter>freeswitch</Filter>
     </ClInclude>
+    <ClInclude Include="monitor\MonitorModule.h">
+      <Filter>monitor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -251,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="freeswitch\FreeSwitchExtension.cpp">
       <Filter>freeswitch</Filter>
+    </ClCompile>
+    <ClCompile Include="monitor\MonitorModule.cpp">
+      <Filter>monitor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

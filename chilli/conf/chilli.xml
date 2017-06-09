@@ -9,6 +9,7 @@
   <IVR id="ivr001">
     <Extension ExtensionNumber="5001" StateMachine="./conf/IVR.xml"></Extension>
   </IVR>
+   <Monitor id="monitor"/>
   <Conferences>
       <Conf ChannelID="0" Type="BASE" Enable="0"></Conf>
       <Conf ChannelID="1" Type="BASE" Enable="1"></Conf>

@@ -148,6 +148,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="model\TypeDef.h" />
+    <ClInclude Include="monitor\MonitorModule.h" />
     <ClInclude Include="mysql\MySqlModule.h" />
     <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
@@ -181,6 +182,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClCompile Include="model\ConnectAdapter.cpp" />
     <ClCompile Include="model\Extension.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
+    <ClCompile Include="monitor\MonitorModule.cpp" />
     <ClCompile Include="mysql\MySqlModule.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
@@ -218,7 +220,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <Xml Include="conf\AvayaACD.xml" />
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
-    <Xml Include="conf\chilli.xml" />
+    <Xml Include="conf\chilli.xml"/>
     <Xml Include="conf\FreeSwitchExtension.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />
