@@ -4,7 +4,8 @@
 <datamodel>
 	<data id="agentId" expr="null"/>
 	<data id="password" expr="null"/>
-	<data id="group" expt="null"/>
+	<data id="group" expr="null"/>
+	<data id="loginAgentId" expr="null"/>
 	<data id="connection"/>
 	<data id="newCall"/>
 	<data id="called"/>
@@ -24,12 +25,12 @@
 			<script>callUUID = null; hangupdir=0;</script>
 		</onentry>
 		
-		<event event="AgentLogin" cond="_event.type=='cmd' &amp;&amp; (agentId===null)">
-			<script>agentId = _event.AgentLogin.agentId; password = _event.AgentLogin.password; group = _event.AgentLogin.group; </script>
+		<event event="AgentLogin" cond="_event.type=='cmd' &amp;&amp; (agentId===null &amp;&amp; loginAgentId === null)">
+			<script>loginAgentId = _event.AgentLogin.agentId; password = _event.AgentLogin.password; group = _event.AgentLogin.group; </script>
 			<send target="this" type="cmd" dest="this" event="AgentLogin">
 					<deviceId type="script">_avaya.Extension</deviceId>
 					<password type="script">password</password>
-					<agentId type="script">agentId</agentId>
+					<agentId type="script">loginAgentId</agentId>
 					<group type="script">group</group>
 			</send>
 		</event>
@@ -41,10 +42,19 @@
 		</event>
 		
 		<event event="AgentLogin">
-			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
+			<send target="this" type="notify" destexpr="loginAgentId" eventexpr="_event._name">
 				<AgentLogin type="script">_event.AgentLogin;</AgentLogin>
 			</send>
-			<script cond="_event.AgentLogin.cause!=0 &amp;&amp; _event.AgentLogin.cause != 1001 ">agentId = null;</script>
+			<script>
+				if(_event.AgentLogin.cause!=0){
+					agentId = null;
+					loginAgentId = null;
+				}
+				else{
+					agentId = loginAgentId;
+					loginAgentId = null;
+				}
+			</script>
 		</event>
 		
 		<event event="AgentLogout" cond=" _event.type=='cmd'">

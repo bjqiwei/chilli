@@ -53,7 +53,7 @@
 			</event>
 			<event event="AgentLogin" cond="_event.AgentLogin.cause==1001">
 				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
-					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _avaya.Password; agentInfo;</AgentLogout>
 				</send>
 			</event>
 			<event event="AgentLogin">
@@ -66,19 +66,19 @@
 			</event>
 			<event event="ConnectError">
 				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
-					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _avaya.Password; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
 			<event event="ConnectClose">
 				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
-					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _avaya.Password; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
 			<event event="cmd" cond="_event.cmd=='logout'">
 				<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
-					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo;</AgentLogout>
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _avaya.Password; agentInfo;</AgentLogout>
 				</send>
 				<transition target="logouting"/>
 			</event>
@@ -145,7 +145,7 @@
 						<type>kick</type>
 						<reason>账号在其他地方登陆</reason>
 					</send>
-					<transition  target="logined"/>
+					<transition  target="logining"/>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
 					<send target="this" type="cmd" dest="this" event="AgentSetFree">
