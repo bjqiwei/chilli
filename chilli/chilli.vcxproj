@@ -156,6 +156,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ClInclude Include="Sh\ShDevModule.h" />
     <ClInclude Include="Sh\ShExtension.h" />
     <ClInclude Include="Sh\shpa3api.h" />
+    <ClInclude Include="stringHelper.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <ClInclude Include="uuid.h" />
@@ -220,7 +221,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <Xml Include="conf\AvayaACD.xml" />
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
-    <Xml Include="conf\chilli.xml"/>
+    <Xml Include="conf\chilli.xml" />
     <Xml Include="conf\FreeSwitchExtension.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />

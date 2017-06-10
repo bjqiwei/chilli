@@ -145,7 +145,17 @@
 						<type>kick</type>
 						<reason>账号在其他地方登陆</reason>
 					</send>
-					<transition  target="logining"/>
+					
+					<send target="this" type="cmd" destexpr="_avaya.Extension" event="AgentLogout">
+						<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _avaya.Password; agentInfo;</AgentLogout>
+					</send>
+					
+					<transition  target="kicking"/>
+					<state id="kicking">
+						<event event="AgentLogout">
+							<transition  target="logining"/>
+						</event>
+					</state>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
 					<send target="this" type="cmd" dest="this" event="AgentSetFree">

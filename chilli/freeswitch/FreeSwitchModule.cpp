@@ -5,6 +5,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
+#include "../stringHelper.h"
 
 
 namespace chilli{
@@ -155,13 +156,41 @@ void FreeSwitchModule::ConnectFS()
 				std::string cmd = "api sofia status profile internal reg ";
 				cmd.append(it.first);
 				LOG4CPLUS_DEBUG(log, "send:" << cmd);
-				esl_send(&handle, cmd.c_str());
+				if (ESL_SUCCESS == esl_send_recv_timed(&handle, cmd.c_str(), 2000)) {
+					LOG4CPLUS_DEBUG(log, handle.last_sr_event->body);
+					std::string response = handle.last_sr_event->body;
 
+					if (response.length() < 300)
+						continue;
+					
+					model::EventType_t evt;
+					evt.event["extension"] = it.first;
+					evt.event["event"] = "GetStatus";
+					std::string name = "Status:";
+					size_t start = response.find(name);				
+					if (start != std::string::npos) {
+						response = response.substr(start + name.length());
+						helper::string::ltrim(response);
+						std::string value = response.substr(0,response.find_first_of("(\n"));
+						evt.event["Status"] = value;
+					}
+
+					response = handle.last_sr_event->body;
+					name = "Auth-User:";
+					start = response.find(name);
+					if (start != std::string::npos) {
+						response = response.substr(start + name.length());
+						helper::string::ltrim(response);
+						std::string value = response.substr(0, response.find_first_of("(\n"));
+						evt.event["Auth-User"] = value;
+					}
+					this->PushEvent(evt);
+				}
 			}
 		}
 
 		while (m_bRunning){
-			esl_status_t status = esl_recv_timed(&handle, 1000);
+			esl_status_t status = esl_recv_event_timed(&handle, 1000, true, NULL);
 			if (status == ESL_SUCCESS){
 				if (handle.last_event && handle.last_event->body) {
 					LOG4CPLUS_DEBUG(log, handle.last_event->body);
