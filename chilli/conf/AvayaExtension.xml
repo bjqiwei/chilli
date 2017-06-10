@@ -24,7 +24,7 @@
 			<script>callUUID = null; hangupdir=0;</script>
 		</onentry>
 		
-		<event event="AgentLogin" cond="_event.type=='cmd' &amp;&amp; (agentId===null || agentId == _event.AgentLogin.agentId)">
+		<event event="AgentLogin" cond="_event.type=='cmd' &amp;&amp; (agentId===null)">
 			<script>agentId = _event.AgentLogin.agentId; password = _event.AgentLogin.password; group = _event.AgentLogin.group; </script>
 			<send target="this" type="cmd" dest="this" event="AgentLogin">
 					<deviceId type="script">_avaya.Extension</deviceId>
@@ -36,7 +36,7 @@
 		
 		<event event="AgentLogin" cond="_event.type=='cmd'">
 			<send target="this" type="notify" destexpr="_event.AgentLogin.agentId" eventexpr="_event._name">
-				<AgentLogin type="script">_event.AgentLogin.cause = 1; _event.AgentLogin;</AgentLogin>
+				<AgentLogin type="script">_event.AgentLogin.cause = 1001; _event.AgentLogin;</AgentLogin>
 			</send>
 		</event>
 		
@@ -44,15 +44,15 @@
 			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<AgentLogin type="script">_event.AgentLogin;</AgentLogin>
 			</send>
-			<script cond="_event.AgentLogin.cause!=0">agentId = null;</script>
+			<script cond="_event.AgentLogin.cause!=0 &amp;&amp; _event.AgentLogin.cause != 1001 ">agentId = null;</script>
 		</event>
 		
-		<event event="AgentLogout" cond=" _event.type=='cmd'  &amp;&amp; (agentId===null || agentId == _event.AgentLogout.agentId)">
-			<script>agentId = _event.AgentLogout.agentId;</script>
+		<event event="AgentLogout" cond=" _event.type=='cmd'">
+			<script>logoutAgentId = _event.AgentLogout.agentId; logoutPassword = _event.AgentLogout.password;</script>
 			<send target="this" type="cmd" dest="this" event="AgentLogout">
 				<deviceId type="script">_avaya.Extension</deviceId>
-				<password type="script">password</password>
-				<agentId type="script">agentId</agentId>
+				<password type="script">logoutPassword</password>
+				<agentId type="script">logoutAgentId</agentId>
 			</send>
 		</event>
 		
@@ -63,7 +63,7 @@
 		</event>
 		
 		<event event="AgentLogout">
-			<send target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
+			<send target="this" type="notify" destexpr="logoutAgentId" eventexpr="_event._name">
 				<AgentLogout type="script">_event.AgentLogout;</AgentLogout>
 			</send>
 			<script cond="_event.AgentLogout.cause==0">agentId = null;</script>
