@@ -42,7 +42,8 @@
 			var logout = new Object();
 			logout.agentid= document.getElementById("agentId").value;
 			logout.password = document.getElementById("password").value;
-			logout.event = "logout";
+			logout.event = "cmd";
+			logout.cmd="Logout";
 			doSend(JSON.stringify(logout));
 			websocket.close();
 		}
@@ -53,7 +54,8 @@
 			var login = new Object();
 			login.agentid= document.getElementById("agentId").value;
 			login.password = document.getElementById("password").value;
-			login.event = "logon";
+			login.cmd = "Login";
+			login.event="cmd";
 			doSend(JSON.stringify(login));
         }
 

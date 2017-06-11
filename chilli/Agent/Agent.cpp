@@ -101,7 +101,7 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 
 void Agent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_DEBUG(log, "fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
