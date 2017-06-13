@@ -1,61 +1,37 @@
 ﻿<?xml version="1.0" ?>
-<!--
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
--->
-<fsm>
-	<functionmodel>
-		<function >function log(var1){logging(var1);}</function>
-	</functionmodel>
-	<state id="init">
-		<onentry>
-			<log level = "info">enter init state.</log>
-			<transition  target="idle"/>
-		</onentry>
-		<state id="idle">
-			<onentry>
-				<log level = "info">enter idle state.</log>
-				<send target="extension" type="cmd" idlocation="extension.number;" from="extension.number;" event="reloadConfig"></send>
-			</onentry>
-			<event event="transfer">
-				<script>forward = extension.eventData; log(extension.number+':'+forward);</script>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="answer" ></send>
-				<transition  target="waitingForAnswer"/>
-			</event>
-		</state>
-		
-		<state id="waitingForAnswer">
-			<onentry>
-				<log level = "info">enter waitingForAnswer state.</log>
-			</onentry>
-			<event event="talking">
-				<transition  target="welcome"/>
-			</event>
-		</state> 
-		
-		<state id="welcome">
-			<onentry>
-				<log level = "info">enter welcome state.</log>
-				<send target="acd" type="cmd" idlocation="extension.number; " from="extension.number;" dest="forward" event="playFile" >
-					<file>'./wav/welcome.wav'</file>
-				</send>
-			</onentry>
-		</state> 
-	
-	 <event event="onhook"><transition  target="idle"/></event>
+<fsm name ="FreeSwitchExtension" initial="Null" final="Null">
+  <state id="Null">
+    <state id="Received">
+			
     </state>
-
+		
+    <state id="Received-On-Hold">
+			
+    </state> 
+		
+    <state id="Delivered">
+			
+    </state>
+	<state id="Established">
+	</state>
+	<state id="Failed">
+	</state>
+	<state id="Established-On-Hold">
+	</state>
+	<state id="Originated">
+	</state>
+	<state id="Queued">
+	</state>
+	<state id="Delivered-Held">
+	</state>
+	<state id="Established-Held">
+	</state>
+	<state id="Failed-Held">
+	</state>
+	<state id="Queued-Held">
+	</state>
+	<state id="Pending">
+	</state>
+  </state>
 </fsm>
 

@@ -19,7 +19,7 @@
 	<script src="./conf/uuid.js" />
 	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
-	<state id="init">
+	<state id="Null">
 		<onentry>
 			<script>callUUID = null; hangupdir=0;</script>
 		</onentry>
@@ -95,7 +95,7 @@
 			<send cond="agentId != null" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 				<serviceInitiated type="script">_event.serviceInitiated;</serviceInitiated>
 			</send>
-			<transition target="serviceInitiated"/>
+			<transition target="Initiated"/>
 		</event>
 		<event event ="DELIVERED">
 			<script>connection = _event.delivered.connection; callUUID = _event.uuid;</script>
@@ -124,7 +124,7 @@
 			<script> hangupdir = 1;</script>
 			<transition cond="cmp(_event.callCleared.connection,connection)" target="init"/>
 		</event>
-		<state id="serviceInitiated">
+		<state id="Initiated">
 			<event event="ORIGINATED">
 				<send cond="agentId != null" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<originated type="script">_event.originated;</originated>
@@ -203,10 +203,10 @@
 				<send cond="agentId != null" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 					<held type="script">_event.held;</held>
 				</send>
-				<transition cond="cmp(_event.held.connection,connection)" target="held"/>
+				<transition cond="cmp(_event.held.connection,connection)" target="Held"/>
 				<transition cond="_event.held.connection.callID == connection.callID" target="helded"/>
 			</event>
-			<state id="held">
+			<state id="Held">
 				<event event="RETRIEVED">
 					<send cond="agentId != null" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 						<retrieved type="script">_event.retrieved;</retrieved>
@@ -293,7 +293,7 @@
 						<retrieved type="script">_event.retrieved;</retrieved>
 					</send>
 					<transition cond="cmp(_event.retrieved.connection,connection)" target="helded"/>
-					<transition cond="_event.retrieved.connection.callID == connection.callID" target="held"/>
+					<transition cond="_event.retrieved.connection.callID == connection.callID" target="Held"/>
 				</event>
 			</state>
 		</state>
@@ -303,7 +303,8 @@
 				<monitorId type="script">monitorId</monitorId>
 			</send>
 		</event-->
-
+		<state id="Queued">
+		</state>
     </state>
 </fsm>
 
