@@ -21,15 +21,13 @@
 			<script>logingroups = _event.logingroups;</script>
 			<transition  target="logining"/>
 		</event>
-		<event event="AgentLogout">
-			<transition  target="final"/>
-		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
 				<status>1</status>
 				<type type="script">_event.cmd;</type>
 				<mem>未登录</mem>
 			</send>
+			<transition target = "final"/>
 		</event>
 		<state id="logining">
 			<onentry>
@@ -673,7 +671,7 @@
 		<state id="logouting">
 			<event event="AgentLogout">
 				<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
-				<send target="monitor" type="notify" dest="monitor" event="Login">
+				<send target="monitor" type="notify" dest="monitor" event="Logout">
 					<status>offwork</status>
 					<operatorid type="script">_agent.AgentId;</operatorid>
 					<worktype type="script">2</worktype>

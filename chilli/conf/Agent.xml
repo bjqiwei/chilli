@@ -1,61 +1,686 @@
 ﻿<?xml version="1.0" ?>
-<fsm name="avayaAgent" initial="init">
+<fsm name="chilliAgent" initial="init" final="final">
+<datamodel>
+	<data id="called"/>
+	<data id="caller"/>
+	<data id="callUUID"/>
+	<data id="timestamp"/>
+	<data id="starttime"/>
+</datamodel>
+<scriptmodel>
+	<script src="./conf/uuid.js" />
+	<script src="./conf/DateFormat.js"/>
+</scriptmodel>
 	<state id="init">
-		<onentry>
-			<log level = "info">enter init state.</log>
-		</onentry>
-		<event event="logon" cond="_event.password == _agent.Password">
-			<transition  target="logined"/>
-		</event>
-		<event event="logon">
-			<send target="this" type="response" dest="client" event="logon">
-				<status>1</status>
-				<type>logon</type>
-			</send>
+		<event event="cmd" cond="_event.cmd=='Login' &amp;&amp; _event.password == _agent.Password">
+			<transition  target="logining"/>
 		</event>
 		<event event=".*">
 			<send target="this" type="response" dest="client" eventexpr="_event._name">
 				<status>1</status>
-				<type type="script">_event._name;</type>
+				<type type="script">_event.cmd;</type>
 				<mem>未登录</mem>
 			</send>
+			<transition target = "final"/>
 		</event>
-		<state id="logined">
+		<state id="logining">
 			<onentry>
-				<log level = "info">enter logined state.</log>
-				<send target="this" type="response" dest="client" event="logon">
-					<status>0</status>
-					<type>logon</type>
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogin">
+					<AgentLogin type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password= _agent.Password; agentInfo;</AgentLogin>
 				</send>
 			</onentry>
-			<event event="ping">
-				<log level="debug"> ping message</log>
+			<event event="AgentLogout" cond="_event.AgentLogout.cause==0">
+				<transition target="logining"/>
+			</event>
+			<event event="AgentLogout">
+				<send target="this" type="response" dest="client" event="logon">
+					<status type="script">_event.AgentLogout.cause</status>
+					<type>logon</type>
+					<reason type="script">_event.AgentLogout.reason</reason>
+				</send>
+				<transition  target="final"/>
+			</event>
+			<event event="AgentLogin" cond="_event.AgentLogin.cause==0">
+				<transition  target="logined"/>
+			</event>
+			<event event="AgentLogin" cond="_event.AgentLogin.cause==1001">
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _agent.Password; agentInfo;</AgentLogout>
+				</send>
+			</event>
+			<event event="AgentLogin">
+				<send target="this" type="response" dest="client" event="logon">
+					<status type="script">_event.AgentLogin.cause</status>
+					<type>logon</type>
+					<reason type="script">_event.AgentLogin.reason</reason>
+				</send>
+				<transition  target="final"/>
 			</event>
 			<event event="ConnectError">
-				<transition  target="init"/>
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _agent.Password; agentInfo;</AgentLogout>
+				</send>
+				<transition target="logouting"/>
 			</event>
 			<event event="ConnectClose">
-				<transition  target="init"/>
-			</event>
-			<event event="logout">
-				<transition  target="init"/>
-			</event>
-			<event event="logon">
-				<send target="this" type="notify" dest="client" event="logon">
-					<status>1</status>
-					<type>logon</type>
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _agent.Password; agentInfo;</AgentLogout>
 				</send>
-				<send target="this" type="response" dest="client" event="logon">
-					<status>0</status>
-					<type>logon</type>
+				<transition target="logouting"/>
+			</event>
+			<event event="cmd" cond="_event.cmd=='Logout'">
+				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogout">
+					<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _agent.Password; agentInfo;</AgentLogout>
 				</send>
+				<transition target="logouting"/>
+			</event>
+			<event event="cmd" cond="_event.cmd=='ping'">
+				<log level="trace"> ping message</log>
 			</event>
 			<event event=".*">
-				<log level="warn" type="script">"not process event "+_event._name;</log>
+				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
+			</event>
+			<state id="logined">
+				<onentry>
+					<send target="this" type="response" dest="client" event="logon">
+						<status type="script">0</status>
+						<type>logon</type>
+					</send>
+
+					<send target="this" type="cmd" dest="this" event="AgentGetState">
+						<deviceId type="script">_agent.Extension</deviceId>
+					</send>
+					
+					<send target="monitor" type="notify" dest="monitor" event="Login">
+						<status>onwork</status>
+						<operatorid type="script">_agent.AgentId;</operatorid>
+						<worktype type="script">2</worktype>
+						<auto type="script">false;</auto>
+					</send>
+					
+				</onentry>
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='NotReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
+					<transition  target="NotReady"/>
+				</event>
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Ready'">
+					<send target="this" type="notify" dest="client" event="agentidle">
+						<status type="script">0;</status>
+						<type>agentidle</type>
+					</send>
+					<transition  target="Ready"/>
+				</event>
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='Null'">
+					<transition  target="Null"/>
+				</event>
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkNotReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
+					<transition  target="WorkNotReady"/>
+				</event>
+				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='WorkReady'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0;</status>
+						<type>agentbusy</type>
+					</send>
+					<transition  target="WorkReady"/>
+				</event>
+				<event event="cmd" cond="_event.cmd=='Login'">
+					<send target="this" type="notify" dest="client" event="kick">
+						<status>1</status>
+						<type>kick</type>
+						<reason>账号在其他地方登陆</reason>
+					</send>
+					
+					<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogout">
+						<AgentLogout type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password = _agent.Password; agentInfo;</AgentLogout>
+					</send>
+					
+					<transition  target="kicking"/>
+					<state id="kicking">
+						<event event="AgentLogout">
+							<transition  target="logining"/>
+						</event>
+					</state>
+				</event>
+				<event event="cmd" cond="_event.cmd=='agentidle'">
+					<send target="this" type="cmd" dest="this" event="AgentSetFree">
+						<deviceId type="script">_agent.Extension</deviceId>
+						<agentId type="script">_agent.AgentId</agentId>
+					</send>
+				</event>
+				<event event="AgentSetFree">
+					<send target="this" type="notify" dest="client" event="agentidle">
+						<status type="script"> _event.AgentSetFree.cause</status>
+						<type>agentidle</type>
+					</send>
+					<transition cond="_event.AgentSetFree.cause==0" target="Ready"/>
+				</event>
+				
+				<event event="cmd" cond="_event.cmd == 'monitoragent'">
+					<send target="monitor" type="cmd" dest="this" event="MonitorAgent"/>
+				</event>
+				
+				<event event="MonitorAgent">
+					<send target="this" type="notify" dest="client" event="monitoragent">
+						<type>monitoragent</type>
+						<data type="script"> _event.data;</data>
+					</send>
+				</event>
+				
+				<event event="DELIVERED">
+					<script>connection = _event.delivered.connection; called = _event.delivered.called; caller = _event.delivered.calling;</script>
+					<send target="this" type="notify" dest="client" event="inringing">
+						<type>inringing</type>
+						<callid type="script">_event.delivered.connection.callID;</callid>
+						<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+						<caller type="script">_event.delivered.calling; </caller>
+						<called type="script">called;</called>
+						<userdata type="script">_event.delivered.userdata;</userdata>
+						<nowgroupid type="script"> -1;</nowgroupid>
+					</send>
+					<transition  target="Alerting"/>
+				</event>
+				<event event="CONNECTION_CLEARED">
+					<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
+				</event>
+				<event event="CALL_CLEARED">
+					<transition cond="cmp(_event.callCleared.connection,connection)" target="ACW"/>
+				</event>
+				<event event="cmd" cond="_event.cmd=='makecall'">
+					<send target="this" type="cmd" destexpr="_agent.Extension" event="MakeCall">
+						<MakeCall type="script">var makecall ={}; makecall.caller =_agent.Extension; makecall.called = _event.called; makecall; </MakeCall>
+					</send>
+					<script>called = _event.called;</script>
+					<transition target="makecalling"/>
+				</event>
+				
+				<state id="makecalling">
+					<event event="cmd" cond="_event.cmd=='makecall'"/>
+					<event event="MakeCall">
+						<send target="this" type="notify" dest="client" event="makecall">
+							<status type="script">_event.MakeCall.cause;</status>
+							<type>makecall</type>
+							<reason type="script">_event.MakeCall.reason;</reason>
+						</send>
+						<script>
+							connection = _event.MakeCall.newCall;
+						</script>
+						<transition cond="_event.MakeCall.cause !=0" target="ACW"/>
+					</event>
+					<event event="SERVICE_INITIATED">
+						<script>caller = _agent.Extension;</script>
+						<send target="this" type="notify" dest="client" event="outringing">
+							<type>outringing</type>
+							<called type="script">called;</called>
+							<caller type="script">_agent.Extension;</caller>
+							<callid type="script">_event.serviceInitiated.connection.callID;</callid>
+							<nowgroupid type="script">1</nowgroupid>
+							<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outringing">
+							<status>outringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</event>
+					<event event="ORIGINATED">
+						<script>connection = _event.originated.connection;</script>
+						<transition target="originated"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+				</state>
+				<state id="NotReady">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="Login">
+							<status>busy</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
+				</state>
+				<state id="Ready">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="Login">
+							<status>free</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
+					<event event="cmd" cond="_event.cmd=='agentbusy'">
+						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
+							<deviceId type="script">_agent.Extension</deviceId>
+							<agentId type="script">_agent.AgentId</agentId>
+						</send>
+					</event>
+					<event event="AgentSetBusy">
+						<send target="this" type="notify" dest="client" event="agentbusy">
+							<status type="script">_event.AgentSetBusy.cause</status>
+							<type>agentbusy</type>
+						</send>
+						<transition  cond="_event.AgentSetBusy.cause==0" target="NotReady"/>
+					</event>
+					<event event="ORIGINATED">
+						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
+						<transition target="originated"/>
+					</event>
+				</state>
+				<state id="Null">
+				</state>
+				<state id="WorkNotReady">
+				</state>
+				<state id="WorkReady">
+				</state>
+				<state id="originated">
+					<onentry>
+						<send target="this" type="notify" dest="client" event="outcall">
+							<type>outcall</type>
+							<callid type="script">_event.originated.connection.callID;</callid>
+							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outcall">
+							<status>outcall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+						<send target="this" type="notify" dest="client" event="calledringing">
+							<type>calledringing</type>
+							<callid type="script">_event.originated.connection.callID;</callid>
+							<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+							<caller type="script">_event.originated.calling; </caller>
+							<called type="script">called;</called>
+							<nowgroupid type="script"> -1;</nowgroupid>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="calledringing">
+							<status>calledringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
+					<event event="DELIVERED">
+						<send target="this" type="notify" dest="client" event="calledringing">
+							<type>calledringing</type>
+							<callid type="script">_event.delivered.connection.callID;</callid>
+							<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+							<caller type="script">_event.delivered.calling; </caller>
+							<called type="script">called;</called>
+							<nowgroupid type="script"> -1;</nowgroupid>
+						</send>
+						<transition  cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<event event="FAILED">
+					</event>
+					<event event="ClearCall">
+					</event>
+					<event event="ESTABLISHED">
+						<send target="this" type="notify" dest="client" event="answer">
+							<type>answer</type>
+							<callid type="script">_event.established.connection.callID;</callid>
+							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="outboundcall">
+							<status>outboundcall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+						<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
+					</event>
+					<state id ="delivered">
+					</state>
+				</state>
+				<state id="Alerting">
+					<onentry>
+						<send target="monitor" type="notify" dest="monitor" event="inringing">
+							<status>inringing</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
+					<event event="ESTABLISHED">
+						<send target="this" type="notify" dest="client" event="incall">
+							<type>incall</type>
+							<callid type="script">_event.established.connection.callID;</callid>
+							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="innercall">
+							<status>innercall</status>
+							<caller type="script">caller;</caller>
+							<called type="script">called;</called>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<event event="cmd" cond="_event.cmd=='answercall'">
+						<send target="this" type="cmd" dest="this" event="AnswerCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+				</state>
+				<state id="ACW">
+					<onentry>
+						<send target="this" type="notify" dest="client" event="after">
+							<type>after</type>
+							<callid type="script">connection.callID;</callid>
+							<called type="script">called;</called>
+						</send>
+						<send target="monitor" type="notify" dest="monitor" event="after">
+							<status>after</status>
+							<operatorid type="script">_agent.AgentId;</operatorid>
+							<worktype type="script">2</worktype>
+							<auto type="script">false;</auto>
+							<groupids type="script">logingroups</groupids>
+						</send>
+					</onentry>
+					<event event="ORIGINATED">
+						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
+						<transition target="originated"/>
+					</event>
+				</state>
+				<state id="established">
+					<event event="cmd" cond="_event.cmd=='makecall'">
+					</event>
+					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+						<send target="this" type="cmd" dest="this" event="ClearCall">
+							<connection type="script">connection;</connection>
+						</send>
+					</event>
+					<event event="cmd" cond="_event.cmd=='mute'">
+						<send target="this" type="cmd" dest="this" event="HoldCall">
+							<connection type="script">connection;</connection>
+						</send>
+						<transition target="helding"/>
+					</event>
+					<event event="RETRIEVED">
+						<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='agentconsult'">
+						<send target="this" type="cmd" dest="this" event="ConsultationCall">
+							<connection type="script">connection;</connection>
+							<called type="script">_event.num;</called>
+						</send>
+						<transition target="consultationing"/>
+					</event>
+					<event event="cmd" cond="_event.cmd=='transfercall'">
+						<send target="this" type="cmd" dest="this" event="ConsultationCall">
+							<connection type="script">connection;</connection>
+							<called type="script">_event.num;</called>
+						</send>
+						<transition target="transfering"/>
+					</event>
+					<state id="transfering">
+						<event event="ConsultationCall" >
+							<send target="this" type="notify" dest="client" event="transfercall">
+								<type>transfercall</type>
+								<status type="script">_event.ConsultationCall.cause;</status>
+								<reason type="script">_event.ConsultationCall.reason; </reason>
+							</send>
+							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
+
+							<send target="this" type="cmd" dest="this" event="TransferCall">
+								<activeCall type="script">consultationNewCall;</activeCall>
+								<heldCall type="script">connection;</heldCall>
+							</send>
+							
+							<transition cond = "_event.ConsultationCall.cause != 0" target="established"/>
+							
+						</event>
+						<event event="HELD">
+						</event>
+						<event event="DELIVERED">
+						</event>
+						<event event="FAILED">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">_event.failed.connection;</connection>
+							</send>
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+						</event>
+						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
+						</event>
+						
+						<event event="TransferCall" cond="_event.TransferCall.cause==0">
+						</event>
+						
+						<event event="TransferCall">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">consultationNewCall;</connection>
+							</send>
+						</event>
+						<event event ="TRANSFERRED">
+							<transition target="ACW"/>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
+						</event>
+						<event event="RETRIEVED" >
+							<transition cond="cmp(_event.retrieved.connection, connection)" target="established"/>
+						</event>
+					</state>
+					<state id="consultationing">
+					
+						<event event="HELD">
+						</event>
+						<event event="FAILED">
+						</event>
+						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
+						</event>
+						<event event="DELIVERED" cond="cmp(_event.originated.connection,consultationNewCall)">
+							<transition target="consultationDelivered"/>
+						</event>
+						<event event="ConsultationCall" >
+							<send target="this" type="notify" dest="client" event="agentconsult">
+								<type>agentconsult</type>
+								<status type="script">_event.ConsultationCall.cause;</status>
+								<reason type="script">_event.ConsultationCall.reason; </reason>
+							</send>
+							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
+							<transition  cond = "_event.ConsultationCall.cause != 0" target="established"/>
+						</event>
+						<event event="cmd" cond="_event.cmd=='agentconsultback'">
+							<send target="this" type="cmd" dest="this" event="ReconnectCall">
+								<activeCall type="script">consultationNewCall;</activeCall>
+								<heldCall type="script">connection;</heldCall>
+							</send>
+							<transition target="consultationReconnecting"/>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
+						</event>
+						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">connection;</connection>
+							</send>
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">consultationNewCall;</connection>
+							</send>
+						</event>
+
+						<event event="RETRIEVED" >
+							<transition cond="cmp(_event.retrieved.connection, connection)" target="established"/>
+						</event>
+						<state id="consultationDelivered">
+							<event event="ESTABLISHED" cond="_event.established.connection.callID == consultationNewCall.callID">
+								<send target="this" type="notify" dest="client" event="consultationcalls">
+									<type>consultationcalls</type>
+									<status type="script">_event.established.cause;</status>
+									<reason type="script">_event.established.reason; </reason>
+								</send>
+								<transition target="consultationed"/>
+							</event>
+							<state id="consultationed">
+								<event event="cmd" cond="_event.cmd=='agentshift'">
+									<send target="this" type="cmd" dest="this" event="TransferCall">
+										<activeCall type="script">consultationNewCall;</activeCall>
+										<heldCall type="script">connection;</heldCall>
+									</send>
+								</event>
+								<event event="TransferCall">
+								</event>
+								<event event="TRANSFERRED">
+									<transition target="ACW"/>
+								</event>
+								<event event="cmd" cond="_event.cmd=='tripartitetalk'">
+									<send target="this" type="cmd" dest="this" event="ConferenceCall">
+										<activeCall type="script">consultationNewCall;</activeCall>
+										<heldCall type="script">connection;</heldCall>
+									</send>
+								</event>
+								<event event="ConferenceCall" cond="_event.ConferenceCall.cause == 0">
+									<script>conferenceCall = _event.ConferenceCall.newCall;</script>
+								</event>
+								<event event="CONFERENCED">
+									<send target="this" type="notify" dest="client" event="tripartitetalk">
+										<type>tripartitetalk</type>
+										<status type="script">0;</status>
+										<reason type="script">''; </reason>
+									</send>
+									<transition target="conferenced"/>
+								</event>
+							</state>
+						</state>
+						<state id="consultationReconnecting">
+							<event event="ReconnectCall">
+								<send target="this" type="notify" dest="client" event="agentconsultback">
+									<type>agentconsultback</type>
+									<status type="script">_event.ReconnectCall.cause;</status>
+									<reason type="script">_event.ReconnectCall.reason; </reason>
+								</send>
+							</event>
+							<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
+							</event>
+						</state>
+					</state>
+					<state id="helding">
+						<event event="cmd" cond="_event.cmd=='mute'">
+						</event>
+						<event event="HoldCall" cond = "_event.HoldCall.cause != 0">
+							<send target="this" type="notify" dest="client" event="mute">
+								<type>mute</type>
+								<status type="script">_event.HoldCall.cause;</status>
+								<reason type="script">_event.HoldCall.reason; </reason>
+							</send>
+							<transition target="established"/>
+						</event>
+						<event event="HELD" cond="cmp(_event.held.connection,connection)">
+							<send target="this" type="notify" dest="client" event="mute">
+								<type>mute</type>
+								<status type="script">0</status>
+							</send>
+							<transition target="held"/>
+						</event>
+						<state  id="held">
+							<event event="cmd" cond="_event.cmd=='unmute'">
+								<send target="this" type="cmd" dest="this" event="RetrieveCall">
+									<connection type="script">connection;</connection>
+								</send>
+								<transition target="retrieveCalling"/>
+							</event>
+							<state id="retrieveCalling">
+								<event event="cmd" cond="_event.cmd=='unmute'">
+								</event>
+								<event event="RetrieveCall" cond = "_event.RetrieveCall.cause != 0">
+									<send target="this" type="notify" dest="client" event="unmute">
+										<type>unmute</type>
+										<status type="script">_event.RetrieveCall.cause;</status>
+										<reason type="script">_event.RetrieveCall.reason; </reason>
+									</send>
+									<transition target="held"/>
+								</event>
+								<event event="RETRIEVED" cond="cmp(_event.retrieved.connection,connection)">
+									<send target="this" type="notify" dest="client" event="unmute">
+										<type>unmute</type>
+										<status type="script">0</status>
+									</send>
+									<transition target="established"/>
+								</event>
+							</state>
+						</state>
+					</state>
+					<state id="conferenced">
+						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
+							<send target="this" type="cmd" dest="this" event="ClearCall">
+								<connection type="script">conferenceCall;</connection>
+							</send>
+						</event>
+						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,conferenceCall)">
+							<transition target="ACW"/>
+						</event>
+						<event event="CALL_CLEARED">
+							<transition cond="cmp(_event.callCleared.connection,conferenceCall)" target="ACW"/>
+						</event>
+					</state>
+				</state>
+			</state>
+		</state>
+
+		<state id="logouting">
+			<event event="AgentLogout">
+				<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
+				<send target="monitor" type="notify" dest="monitor" event="Logout">
+					<status>offwork</status>
+					<operatorid type="script">_agent.AgentId;</operatorid>
+					<worktype type="script">2</worktype>
+					<auto type="script">false;</auto>
+					<groupids type="script">logingroups</groupids>
+				</send>
+				<transition  target="final"/>
+			</event>
+			<event event=".*">
+				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
 			</event>
 		</state>
-		
     </state>
-
+	<state id="final">
+		<onentry>
+		</onentry>
+	</state>
 </fsm>
 
