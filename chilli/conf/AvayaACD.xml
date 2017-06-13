@@ -15,6 +15,7 @@
 	<data id="companyid"/>
 	<data id="callID"/>
 	<data id="stationNo"/>
+	<data id="hangupdir" expr="0"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
@@ -29,7 +30,7 @@
 		<send target="mysql" type="cmd" dest="mysql"  event="sql">
 			<sql type="script">var sql='INSERT INTO call_cdr'+
 			'(id,                     callid,                      device,                      companyid,          caller,           called,         origcaller,        origcalled,          start_stamp,            direction,       createtime,              owner, cdrtype,       timestamp,            devicetype,    callid_stamp_str,                                mediano) VALUES'+
-			'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\',' + companyid + ',\'' + caller+ '\',\'' + called + '\',\''+ caller + '\',\'' + called + '\',' + Date.parse(timestamp)/1000 +',0,'  +  Date.parse(new Date())/1000 +',3 ,     0,' +   Date.parse(timestamp)/1000 +',1,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+')'; 
+			'(\'' + callUUID+'\',\''+ connection.callID +'\',\'' + connection.deviceID+ '\',' + companyid + ',\'' + caller+ '\',\'' + called + '\',\''+ caller + '\',\'' + called + '\',' + Date.parse(timestamp)/1000 +',0,'  +  Date.parse(new Date())/1000 +',3 ,     0,' +   Date.parse(timestamp)/1000 +',2,\'' +  timestamp.Format('yyyy-MM-dd HH:mm:ss') + '\',' + _stationNo+')'; 
 			sql;</sql>
 		</send>
 		<transition target="delivered"/>
@@ -39,9 +40,17 @@
 		<transition target="final"/>
 	</event>
 	
+	<event event="CONNECTION_CLEARED">
+		<script>
+			if(_event.connectionCleared.localConnect == 'Connect')
+				hangupdir = 0;
+			else
+				hangupdir = 1;
+		</script>
+	</event>
 	<event event="CALL_CLEARED">
 		<send target="mysql" type="cmd" dest="mysql"  event="sql">
-			<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.callCleared.cause + '\',hangupdir=1  where id=\'' + callUUID + '\''; sql;</sql>
+			<sql type="script">var sql='UPDATE call_cdr SET end_stamp=' + Date.parse(new Date())/1000+ ', hangup_cause=\'' + _event.callCleared.cause + '\',hangupdir=' + hangupdir + '  where id=\'' + callUUID + '\''; sql;</sql>
 		</send>
 		<transition target="final"/>
 	</event>

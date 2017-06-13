@@ -136,6 +136,7 @@ namespace chilli {
 					const char * avayaExtension = child->Attribute("avayaExtension");
 					const char * companyid = child->Attribute("companyid");
 					const char * stationno = child->Attribute("StationNo");
+					const char * agent_id = child->Attribute("agent_id");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
@@ -146,12 +147,14 @@ namespace chilli {
 					avayaExtension = avayaExtension ? avayaExtension : "";
 					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
+					agent_id = agent_id ? agent_id : "";
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaAgentType);
 					if (extConfig != nullptr) {
 						extConfig->m_Vars.push_back(std::make_pair("_agent.AgentId", num));
 						extConfig->m_Vars.push_back(std::make_pair("_agent.Password", password));
 						extConfig->m_Vars.push_back(std::make_pair("_agent.Extension", extension)); 
+						extConfig->m_Vars.push_back(std::make_pair("_agent.Agent_ID", agent_id));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.AgentId", avayaAgentId));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Password", avayaPassword));
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));

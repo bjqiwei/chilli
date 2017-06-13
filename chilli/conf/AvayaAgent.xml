@@ -34,7 +34,7 @@
 		<state id="logining">
 			<onentry>
 				<send target="this" type="cmd" destexpr="_agent.Extension" event="AgentLogin">
-					<AgentLogin type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password= _avaya.Password; agentInfo.group = logingroups; agentInfo;</AgentLogin>
+					<AgentLogin type="script">var agentInfo={};agentInfo.agentId = _agent.AgentId; agentInfo.password= _avaya.Password; agentInfo.group = logingroups; agentInfo.agent_ID =_agent.Agent_ID; agentInfo;</AgentLogin>
 				</send>
 			</onentry>
 			<event event="AgentLogout" cond="_event.AgentLogout.cause==0">
