@@ -10,6 +10,9 @@
 	<data id="timestamp"/>
 	<data id="starttime"/>
 	<data id="logingroups"/>
+	<data id="statustarttime"/>
+	<data id="laststatus"/>
+	<data id="currentstatus"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/cmpObject.js" />
@@ -17,6 +20,9 @@
 	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
 	<state id="init">
+		<onentry>
+			<script>statustarttime = Date.parse(new Date())/1000; laststatus='offwork'; currentstatus='offwork';</script>
+		</onentry>
 		<event event="cmd" cond="_event.cmd=='logon'">
 			<script>logingroups = _event.logingroups;</script>
 			<transition  target="logining"/>
@@ -88,6 +94,7 @@
 			</event>
 			<state id="logined">
 				<onentry>
+					<script>currentstatus='onwork';</script>
 					<send target="this" type="response" dest="client" event="logon">
 						<status type="script">0</status>
 						<type>logon</type>
@@ -104,6 +111,13 @@
 						<auto type="script">false;</auto>
 						<groupids type="script">logingroups</groupids>
 					</send>
+					<send target="mysql" type="cmd" dest="mysql"  event="sql">
+						<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+						'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+						'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+						sql;</sql>
+					</send>
+					<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					
 				</onentry>
 				<event event="AgentGetState" cond="_event.AgentGetState.agentState=='NotReady'">
@@ -239,6 +253,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='outringing';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</event>
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection;</script>
@@ -259,6 +281,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='busy';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</onentry>
 				</state>
 				<state id="Ready">
@@ -270,6 +300,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='free';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</onentry>
 					<event event="cmd" cond="_event.cmd=='agentbusy'">
 						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
@@ -328,6 +366,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='calledringing';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</onentry>
 					<event event="DELIVERED">
 						<send target="this" type="notify" dest="client" event="calledringing">
@@ -364,6 +410,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='outboundcall';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 						<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
 					</event>
 					<state id ="delivered">
@@ -380,6 +434,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='inringing';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</onentry>
 					<event event="ESTABLISHED">
 						<send target="this" type="notify" dest="client" event="incall">
@@ -396,6 +458,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='incall';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
@@ -423,6 +493,14 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<script>currentstatus='after';</script>
+						<send target="mysql" type="cmd" dest="mysql"  event="sql">
+							<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+								'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+								'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+								sql;</sql>
+						</send>
+						<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
 					</onentry>
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
@@ -670,21 +748,36 @@
 
 		<state id="logouting">
 			<event event="AgentLogout">
-				<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
-				<send target="monitor" type="notify" dest="monitor" event="Logout">
-					<status>offwork</status>
-					<operatorid type="script">_agent.AgentId;</operatorid>
-					<worktype type="script">2</worktype>
-					<auto type="script">false;</auto>
-					<groupids type="script">logingroups</groupids>
-				</send>
-				<transition  target="final"/>
+				<transition  target="offwork"/>
 			</event>
 			<event event=".*">
 				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
 			</event>
 		</state>
     </state>
+	<state id="offwork">
+		<onentry>
+			<script>currentstatus='offwork';</script>
+			<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
+			<send target="monitor" type="notify" dest="monitor" event="Logout">
+				<status>offwork</status>
+				<operatorid type="script">_agent.AgentId;</operatorid>
+				<worktype type="script">2</worktype>
+				<auto type="script">false;</auto>
+				<groupids type="script">logingroups</groupids>
+			</send>
+			<send target="mysql" type="cmd" dest="mysql"  event="sql">
+				<sql type="script">var createtime = Date.parse(new Date())/1000; var sql='INSERT INTO ccs_work_log('+
+					'        id,                 companyid,           groupid,       agentid,                  name,                 operator_id,   login_type,      phone,                     status,           operate_time, busydescr, isauto,             timelag,               createtime,  changestatus)VALUES ' +
+					'(\'' + uuid()+'\',' + _extension.companyid + ',' +  0 + ',' + _agent.Agent_ID + ',\'' + _agent.name + '\',\'' + _agent.AgentId + '\',0,\'' + _avaya.Extension + '\',\''+laststatus+'\',' + statustarttime + ',null,    0,    ' + (createtime - statustarttime) + ',' + createtime + ',\'' + currentstatus+ '\')';	
+					sql;</sql>
+			</send>
+			<script>statustarttime=Date.parse(new Date())/1000; laststatus = currentstatus;</script>
+		</onentry>
+		<event event="SQL">
+			<transition  target="final"/>
+		</event>
+	</state>
 	<state id="final">
 		<onentry>
 		</onentry>

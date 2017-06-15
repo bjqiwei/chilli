@@ -137,6 +137,7 @@ namespace chilli {
 					const char * companyid = child->Attribute("companyid");
 					const char * stationno = child->Attribute("StationNo");
 					const char * agent_id = child->Attribute("agent_id");
+					const char * agent_name = child->Attribute("agent_name");
 
 					num = num ? num : "";
 					sm = sm ? sm : "";
@@ -148,6 +149,7 @@ namespace chilli {
 					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
 					agent_id = agent_id ? agent_id : "";
+					agent_name = agent_name ? agent_name : "";
 
 					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaAgentType);
 					if (extConfig != nullptr) {
@@ -160,6 +162,7 @@ namespace chilli {
 						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
 						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
 						extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
+						extConfig->m_Vars.push_back(std::make_pair("_agent.name", agent_name));
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had agent:" << num);

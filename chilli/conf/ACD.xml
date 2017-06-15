@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<fsm name ="FreeSwitchExtension" initial="Null" final="Null">
+<fsm name ="ACDExtension" initial="Null" final="Null">
   <state id="Null">
     <state id="Received">
 			
