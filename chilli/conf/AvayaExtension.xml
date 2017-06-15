@@ -264,7 +264,7 @@
 					<event event="HELD" cond="cmp(_event.held.connection,newCall)">
 					</event>
 					<event event="ORIGINATED">
-						<send cond="agentId != null" target="this" type="notify" destexpre="agentId" eventexpr="_event._name">
+						<send cond="agentId != null" target="this" type="notify" destexpr="agentId" eventexpr="_event._name">
 							<originated type="script">_event.originated;</originated>
 						</send>
 						<transition cond="cmp(_event.originated.connection,newCall)" target="heldAndoriginated"/>

@@ -508,6 +508,8 @@
 					</event>
 				</state>
 				<state id="established">
+					<event event="cmd" cond="_event.cmd=='idleagents'">
+					</event>
 					<event event="cmd" cond="_event.cmd=='makecall'">
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
@@ -595,10 +597,18 @@
 						<event event="HELD">
 						</event>
 						<event event="FAILED">
+							<send target="this" type="notify" dest="client" event="agentconsult">
+								<type>agentconsult</type>
+								<status type="script">_event.failed.cause</status>
+								<reason type="script">_event.failed.reason</reason>
+							</send>
+							<send target="this" type="cmd" dest="this" event="RetrieveCall">
+								<connection type="script">connection;</connection>
+							</send>
 						</event>
 						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
 						</event>
-						<event event="DELIVERED" cond="cmp(_event.originated.connection,consultationNewCall)">
+						<event event="DELIVERED" cond="_event.delivered.connection.callID==consultationNewCall.callID">
 							<transition target="consultationDelivered"/>
 						</event>
 						<event event="ConsultationCall" >
