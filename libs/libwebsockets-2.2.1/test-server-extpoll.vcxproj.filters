@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\test-server\test-server.c" />
+    <ClCompile Include=".\test-server\test-server-http.c" />
+    <ClCompile Include=".\test-server\test-server-dumb-increment.c" />
+    <ClCompile Include=".\test-server\test-server-mirror.c" />
+    <ClCompile Include=".\test-server\test-server-status.c" />
+    <ClCompile Include=".\test-server\test-server-echogen.c" />
+    <ClCompile Include=".\win32port\win32helpers\getopt.c" />
+    <ClCompile Include=".\win32port\win32helpers\getopt_long.c" />
+    <ClCompile Include=".\win32port\win32helpers\gettimeofday.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\win32port\win32helpers\getopt.h" />
+    <ClInclude Include=".\win32port\win32helpers\gettimeofday.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers Private">
+      <UniqueIdentifier>{A2C9FDED-30A5-375A-99C9-6C566E741E5D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{0C9B5B3C-98A3-3B9D-9300-73DD171F7ACF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

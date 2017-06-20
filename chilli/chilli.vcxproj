@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,7 +90,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.1.0\;$(SolutionDir)\libs\libwebsockets-2.1.0\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -206,8 +206,8 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.8-win32\lib\*.dll
     <ProjectReference Include="..\libs\libevent-2.0.22-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libs\libwebsockets-2.1.0\websockets.vcxproj">
-      <Project>{f27b384c-ab21-3ee3-a4be-5352962cf2b3}</Project>
+    <ProjectReference Include="..\libs\libwebsockets-2.2.1\websockets.vcxproj">
+      <Project>{594e5e3e-e08d-3633-82d5-3672d7f07e35}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libs\log4cplus-1.2.0\msvc14\log4cplus.vcxproj">
       <Project>{917836a4-0ddc-47be-b930-1b3bfdf6c940}</Project>

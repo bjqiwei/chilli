@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\test-server\test-ping.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\win32port\win32helpers\getopt.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\win32port\win32helpers\getopt_long.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include=".\win32port\win32helpers\gettimeofday.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\win32port\win32helpers\getopt.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+    <ClInclude Include=".\win32port\win32helpers\gettimeofday.h">
+      <Filter>Headers Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers Private">
+      <UniqueIdentifier>{A2C9FDED-30A5-375A-99C9-6C566E741E5D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{0C9B5B3C-98A3-3B9D-9300-73DD171F7ACF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
