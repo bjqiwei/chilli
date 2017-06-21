@@ -33,6 +33,7 @@ namespace WebSocket {
 			if (wsclient) {
 				wsclient->m_state = OPEN;
 				wsclient->OnOpen();
+				lws_callback_on_writable(wsi);
 			}
 			break;
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
@@ -43,7 +44,10 @@ namespace WebSocket {
 			}
 			if (wsclient) {
 				wsclient->m_state = CLOSED;
+				std::this_thread::yield();
 				wsclient->OnError(errorCode);
+				std::this_thread::yield();
+				wsclient->OnClose(errorCode);
 			}
 		}
 												   break;
@@ -55,6 +59,7 @@ namespace WebSocket {
 			if (wsclient) {
 				wsclient->m_state = OPEN;
 				wsclient->OnOpen();
+				lws_callback_on_writable(wsi);
 			}
 			break;
 		case LWS_CALLBACK_CLOSED:
@@ -120,6 +125,9 @@ lwsclose:
 					int bufLen = wsclient->m_sendBuf.at(0).size() - LWS_PRE;
 					if (bufLen > 0)
 					{
+						std::string sdata = std::string(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).end());
+						LOG4CPLUS_DEBUG(wsclient->log, wsclient->m_SessionId << "Send:" << sdata);
+
 						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 						if (len > 0){
 							wsclient->m_sendBuf.at(0).erase(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).begin() + LWS_PRE + len);
@@ -460,10 +468,13 @@ lwsclose:
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
 		{
-			this->m_state = CLOSING;
-			//WSClientSet.erase(this->wsi);
-			lws_callback_on_writable(wsi);
-			lws_cancel_service(m_Context);
+			if (this->m_state == OPEN)
+			{
+				this->m_state = CLOSING;
+				//WSClientSet.erase(this->wsi);
+				lws_callback_on_writable(wsi);
+				lws_cancel_service(m_Context);
+			}
 		}
 
 	}
@@ -475,9 +486,7 @@ lwsclose:
 		data.insert(data.end(), lpBuf, lpBuf + nBufLen);
 		m_sendBuf.push_back(data);
 
-		LOG4CPLUS_DEBUG(log, m_SessionId << "Send:" << std::string(data.begin() + LWS_PRE, data.end()));
-
-		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi) {
+		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi && this->m_state == OPEN) {
 			lws_callback_on_writable(this->wsi);
 			lws_cancel_service(m_Context);
 		}
