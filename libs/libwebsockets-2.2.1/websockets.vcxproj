@@ -47,7 +47,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\;.\lib;.\win32port\win32helpers;.\win32port\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\lib;.\win32port\win32helpers;.\win32port\zlib;..\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsC</CompileAs>
@@ -80,7 +80,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\;.\lib;.\win32port\win32helpers;.\win32port\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\lib;.\win32port\win32helpers;.\win32port\zlib;..\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>
@@ -111,6 +111,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lib\ssl-client.c" />
+    <ClCompile Include="lib\ssl-server.c" />
+    <ClCompile Include="lib\ssl.c" />
     <ClInclude Include=".\lib\private-libwebsockets.h" />
     <ClInclude Include=".\lib\extension-permessage-deflate.h" />
     <ClInclude Include=".\win32port\win32helpers\gettimeofday.h" />

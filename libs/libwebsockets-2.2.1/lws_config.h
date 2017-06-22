@@ -38,7 +38,7 @@
 #define LWS_BUILD_HASH "desktop-36dl3c6\\qiwei@DESKTOP-36DL3C6-"
 
 /* Build with OpenSSL support */
-/* #undef LWS_OPENSSL_SUPPORT */
+#define LWS_OPENSSL_SUPPORT
 
 /* The client should load and trust CA root certs it finds in the OS */
 #define LWS_SSL_CLIENT_USE_OS_CA_CERTS

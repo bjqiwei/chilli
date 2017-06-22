@@ -67,6 +67,13 @@
     <ClCompile Include=".\win32port\win32helpers\gettimeofday.c">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="lib\ssl.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\ssl-server.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\ssl-client.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\lib\private-libwebsockets.h">

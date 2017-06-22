@@ -12,6 +12,8 @@ namespace WebSocket {
 		virtual ~WebSocketServer();
 	private:
 		struct lws_context_creation_info m_Info;
+		std::string m_cert_path="./conf/cacert.pem";
+		std::string m_key_path = "./conf/cakey.pem";
 		struct lws_context *m_Context;
 		int m_port;
 	protected:
