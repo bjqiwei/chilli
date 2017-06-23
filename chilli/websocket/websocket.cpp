@@ -80,7 +80,7 @@ lwsclose:
 			}
 
 			WSClientSet.erase(wsi);
-			if (wsclient) {
+			if (wsclient && wsclient->m_state != CLOSED) {
 				wsclient->m_state = CLOSED;
 				wsclient->OnClose(errorCode);
 			}
