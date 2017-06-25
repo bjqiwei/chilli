@@ -263,6 +263,20 @@ lwsclose:
 		case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
 			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_DROP_PROTOCOL");
 			break;
+		case LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION:
+			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION");
+			{
+				/* Verify the client certificate */
+				X509_STORE_CTX_set_error((X509_STORE_CTX*)user, X509_V_OK);
+				/*if (!len || (SSL_get_verify_result((SSL*)in) != X509_V_OK)) {
+				int err = X509_STORE_CTX_get_error((X509_STORE_CTX*)user);
+				int depth = X509_STORE_CTX_get_error_depth((X509_STORE_CTX*)user);
+				const char* msg = X509_verify_cert_error_string(err);
+				LOG4CPLUS_ERROR(This->log, "SSL error: " << msg << "(" << err << "), depth:" << depth);
+				return 1;
+				}*/
+			}
+			break;
 		default:
 			LOG4CPLUS_DEBUG(This->log, "Unknown:" << reason);
 			break;
