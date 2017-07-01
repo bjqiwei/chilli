@@ -42,6 +42,8 @@ namespace WebSocket {
 			if (in) {
 				errorCode.assign((char *)in, len);
 			}
+
+			WSClientSet.erase(wsi);
 			if (wsclient) {
 				wsclient->m_state = CLOSED;
 				std::this_thread::yield();
