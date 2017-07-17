@@ -52,12 +52,6 @@ namespace Monitor {
 		return true;
 	}
 
-	model::ExtensionPtr MonitorModule::newExtension(const model::ExtensionConfigPtr & config)
-	{
-		return nullptr;
-	}
-
-
 	void MonitorModule::fireSend(const std::string & strContent, const void * param)
 	{
 		LOG4CPLUS_TRACE(log, strContent);

@@ -2,45 +2,29 @@
 #ifndef _CHILLI_CTI_EXTENSION_HEADER_
 #define _CHILLI_CTI_EXTENSION_HEADER_
 #include <string>
-#include <memory>
-#include <thread>
-#include <atomic>
 #include <FSM.h>
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 #include "TypeDef.h"
 #include <json/json.h>
-#include <list>
+#include <map>
+#include "../CEventBuffer.h"
 
 namespace chilli{
 namespace model{
 
-class ExtensionConfig {
-public:
-	ExtensionConfig(class ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type);
-
-	uint32_t m_ExtType = 0;
-	class ProcessModule * m_model = nullptr;
-	std::string m_ExtNumber;
-	std::string m_SMFileName;
-	std::list<std::pair<std::string, Json::Value>>  m_Vars;
-};
-
-typedef std::shared_ptr<model::ExtensionConfig> ExtensionConfigPtr;
-
 class Extension: public fsm::SendInterface
 {
+protected:
+	typedef std::shared_ptr<fsm::StateMachine> Conntion;
 public:
 	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName);
 
 	virtual ~Extension();
 
 	virtual void Start();
-
 	virtual void Stop();
 	virtual bool IsFinalState();
-
-	bool AddSendImplement(SendInterface * evtDsp);
 
 	virtual bool setVar(const std::string &name, const Json::Value &value);
 
@@ -67,11 +51,14 @@ public:
 	friend class ProcessModule;
 
 protected:
-	fsm::StateMachine * m_SM = nullptr;
+	std::map<std::string, Conntion> m_Connections;
 	class ProcessModule * m_model = nullptr;
 	log4cplus::Logger log;
 	std::string m_ExtNumber;
 	std::string m_SessionId;
+	std::string m_SMFileName;
+	helper::CEventBuffer<EventType_t> m_EvtBuffer;
+	Json::Value m_Vars;
 
 };
 typedef std::shared_ptr<model::Extension> ExtensionPtr;

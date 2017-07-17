@@ -13,13 +13,6 @@
 namespace chilli {
 	namespace Avaya {
 
-		enum ExtType {
-			AvayaAgentType = 0,
-			AvayaExtType,
-			AvayaVDNType,
-			AvayaACDType,
-		};
-
 		ATTPrivateData_t g_stPrivateData;
 		using namespace AvayaAPI;
 		// Constructor of the TSAPIModule 
@@ -151,18 +144,18 @@ namespace chilli {
 					agent_id = agent_id ? agent_id : "";
 					agent_name = agent_name ? agent_name : "";
 
-					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaAgentType);
-					if (extConfig != nullptr) {
-						extConfig->m_Vars.push_back(std::make_pair("_agent.AgentId", num));
-						extConfig->m_Vars.push_back(std::make_pair("_agent.Password", password));
-						extConfig->m_Vars.push_back(std::make_pair("_agent.Extension", extension)); 
-						extConfig->m_Vars.push_back(std::make_pair("_agent.Agent_ID", agent_id));
-						extConfig->m_Vars.push_back(std::make_pair("_avaya.AgentId", avayaAgentId));
-						extConfig->m_Vars.push_back(std::make_pair("_avaya.Password", avayaPassword));
-						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
-						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
-						extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
-						extConfig->m_Vars.push_back(std::make_pair("_agent.name", agent_name));
+					model::ExtensionPtr ext(new AvayaAgent(this, num, sm));
+					if (ext != nullptr && addExtension(num,ext)) {
+						ext->setVar("_agent.AgentId", num);
+						ext->setVar("_agent.Password", password);
+						ext->setVar("_agent.Extension", extension); 
+						ext->setVar("_agent.Agent_ID", agent_id);
+						ext->setVar("_avaya.AgentId", avayaAgentId);
+						ext->setVar("_avaya.Password", avayaPassword);
+						ext->setVar("_avaya.Extension", avayaExtension);
+						ext->setVar("_extension.companyid", companyid);
+						ext->setVar("_stationNo", stationno);
+						ext->setVar("_agent.name", agent_name);
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
@@ -192,12 +185,12 @@ namespace chilli {
 					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
 
-					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaExtType);
-					if (extConfig != nullptr) {
-						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
-						extConfig->m_Vars.push_back(std::make_pair("_avaya.Extension", avayaExtension));
-						extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
-						extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
+					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+					if (ext != nullptr && addExtension(num,ext)) {
+						ext->setVar("_extension.Extension", num);
+						ext->setVar("_avaya.Extension", avayaExtension);
+						ext->setVar("_extension.companyid", companyid);
+						ext->setVar("_stationNo", stationno);
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -221,15 +214,14 @@ namespace chilli {
 				companyid = companyid ? companyid : "";
 				stationno = stationno ? stationno : "";
 
-				model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, "", ExtType::AvayaVDNType);
-				if (extConfig == nullptr) {
-					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
-					continue;
+				model::ExtensionPtr ext(new AvayaVDN(this, num, ""));
+				if (ext != nullptr && addExtension(num,ext)) {
+					ext->setVar("_extension.companyid", companyid);
+					ext->setVar("_stationNo", stationno);
 				}
-
-				extConfig->m_Vars.push_back(std::make_pair("_extension.companyid", companyid));
-				extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
-
+				else{
+					LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+				}
 			}
 
 			// ACD 
@@ -252,10 +244,10 @@ namespace chilli {
 
 					m_ACDExts[num] = false;
 
-					model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::AvayaACDType);
-					if (extConfig != nullptr) {
-						extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
-						extConfig->m_Vars.push_back(std::make_pair("_stationNo", stationno));
+					model::ExtensionPtr ext(new AvayaACD(this,num, sm));
+					if (ext != nullptr && addExtension(num,ext)) {
+						ext->setVar("_extension.Extension", num);
+						ext->setVar("_stationNo", stationno);
 					}
 					else {
 						LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -267,32 +259,6 @@ namespace chilli {
 			return true;
 		}
 
-		model::ExtensionPtr TSAPIModule::newExtension(const model::ExtensionConfigPtr & config)
-		{
-			if (config != nullptr)
-			{
-				if (config->m_ExtType == ExtType::AvayaAgentType) {
-					model::ExtensionPtr ext(new AvayaAgent(this, config->m_ExtNumber, config->m_SMFileName));
-					return ext;
-				}
-				else if (config->m_ExtType == ExtType::AvayaExtType)
-				{
-					model::ExtensionPtr ext(new AvayaExtension(this, config->m_ExtNumber, config->m_SMFileName));
-					return ext;
-				}
-				else if (config->m_ExtType == ExtType::AvayaVDNType)
-				{
-					model::ExtensionPtr ext(new AvayaVDN(this, config->m_ExtNumber, config->m_SMFileName));
-					return ext;
-				}
-				else if (config->m_ExtType == ExtType::AvayaACDType)
-				{
-					model::ExtensionPtr ext(new AvayaACD(this, config->m_ExtNumber, config->m_SMFileName));
-					return ext;
-				}
-			}
-			return nullptr;
-		}
 
 		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
 		{
@@ -1286,8 +1252,8 @@ namespace chilli {
 							AvayaAPI::cstaGetDeviceList(m_lAcsHandle, ++m_ulInvokeID, -1, CSTA_CALL_DEVICE_MONITOR);
 
 							
-							for (auto &it: this->GetExtensionConfig()){
-								if (it.second->m_ExtType == ExtType::AvayaExtType)
+							for (auto &it: this->GetExtensions()){
+								if (typeid(*(it.second)) == typeid(AvayaExtension))
 								{
 									const char* deviceId = it.first.c_str();
 
@@ -1314,7 +1280,7 @@ namespace chilli {
 										//this->m_InvokeID2Event[uInvodeId] = "MonitorDevice";
 									}
 								}
-								else if (it.second->m_ExtType == ExtType::AvayaVDNType)
+								else if (typeid(*it.second) == typeid(AvayaVDN))
 								{
 									const char* deviceId = it.first.c_str();
 

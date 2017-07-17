@@ -8,10 +8,6 @@
 namespace chilli{
 namespace IVR{
 
-enum ExtType {
-	IVRType = 0,
-};
-
 IVRModule::IVRModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.IVRModule");
@@ -43,9 +39,10 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		num = num ? num : "";
 		sm = sm ? sm : "";
 
-		model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::IVRType);
-		if (extConfig != nullptr) {
-			extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+		model::ExtensionPtr ext(new Extension::ExtensionImp(this, num, sm));
+
+		if (ext != nullptr && addExtension(num,ext)) {
+			ext->setVar("_extension.Extension", num);
 		}
 		else {
 			LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -54,17 +51,6 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-model::ExtensionPtr IVRModule::newExtension(const model::ExtensionConfigPtr & config)
-{
-	if (config != nullptr)
-	{
-		if (config->m_ExtType == ExtType::IVRType) {
-			model::ExtensionPtr ext(new Extension::ExtensionImp(this, config->m_ExtNumber, config->m_SMFileName));
-			return ext;
-		}
-	}
-	return nullptr;
-}
 
 void IVRModule::fireSend(const std::string &strContent, const void * param)
 {

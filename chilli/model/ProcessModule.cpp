@@ -6,12 +6,7 @@ namespace chilli{
 namespace model{
 	std::recursive_mutex ProcessModule::g_ExtMtx;
 	model::ExtensionMap ProcessModule::g_Extensions;
-	model::ExtensionConfigMap ProcessModule::g_ExtensionConfigs;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
-
-	std::recursive_mutex ProcessModule::g_GroupMtx;
-	std::map<std::string, std::vector<std::string>> ProcessModule::g_ExtBelongGroup;
-	std::map<std::string, std::vector<std::string>> ProcessModule::g_GroupHasExt;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId)
 	{
@@ -25,11 +20,6 @@ namespace model{
 
 		for (auto & it = m_Extensions.begin(); it != m_Extensions.end();) {
 			removeExtension(it++->first);
-		}
-
-		for (auto & it = m_ExtensionConfigs.begin(); it != m_ExtensionConfigs.end();)
-		{
-			deleteExtensionConfig(it++->first);
 		}
 
 	}
@@ -60,7 +50,7 @@ namespace model{
 		return 0;
 	}
 
-	ExtensionMap  ProcessModule::GetExtension()
+	ExtensionMap  ProcessModule::GetExtensions()
 	{
 		// TODO: insert return statement here
 		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
@@ -80,9 +70,9 @@ namespace model{
 			}
 
 			//
-			auto extconfigptr = getExtensionConfig(ext);
-			if (extconfigptr != nullptr){
-				extconfigptr->m_model->m_RecEvtBuffer.Put(Event);
+			auto extptr = getExtension(ext);
+			if (extptr != nullptr){
+				extptr->m_model->m_RecEvtBuffer.Put(Event);
 				return;
 			}
 			else {
@@ -99,7 +89,7 @@ namespace model{
 			}
 		}
 		else {
-			for (int i = 0; i < jsonEvent["extension"].size(); i++) {
+			for (size_t i = 0; i < jsonEvent["extension"].size(); i++) {
 
 				std::string ext;
 				if (jsonEvent["extension"][i].isString()) {
@@ -109,9 +99,9 @@ namespace model{
 				chilli::model::EventType_t newEvent(Event.event);
 				newEvent.event["extension"] = ext;
 
-				auto extconfigptr = getExtensionConfig(ext);
-				if (extconfigptr != nullptr) {
-					extconfigptr->m_model->m_RecEvtBuffer.Put(newEvent);
+				auto extptr = getExtension(ext);
+				if (extptr != nullptr) {
+					extptr->m_model->m_RecEvtBuffer.Put(newEvent);
 					continue;
 				}
 				else {
@@ -127,15 +117,10 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Starting...");
 		try
 		{
-			/*
 			for (auto & it : m_Extensions) {
-				for (auto & it2 : g_Modules) {
-					it.second->AddSendImplement(it2.get());
-				}
-				it.second->AddSendImplement(it.second.get());
 				it.second->Start();
 			}
-			*/
+
 			while (m_bRunning)
 			{
 				try
@@ -150,60 +135,13 @@ namespace model{
 						}
 
 						auto extptr = getExtension(ext);
-						
-						if (extptr == nullptr) {
-							ExtensionConfigPtr config = getExtensionConfig(ext);
-							extptr = newExtension(config);
-							if (extptr != nullptr ){
-
-								addExtension(ext, extptr);
-								for (auto & it : config->m_Vars)
-								{
-									extptr->setVar(it.first,it.second);
-								}
-								// Group has extensions
-								{
-									auto & it = getExtByGroup(ext);
-									Json::Value extensions;
-
-									for (auto & it2 : it) {
-										extensions.append(it2);
-									}
-									extptr->setVar("_extension.Extensions", extensions);
-									
-								}
-
-								// extension belong group
-								{
-									auto & it = getGroupByExt(ext);
-									Json::Value groups;
-
-									for (auto & it2 : it) {
-										groups.append(it2);
-									}
-									extptr->setVar("_extension.Groups", groups);
-									
-								}
-
-								for (auto & it : g_Modules) {
-									extptr->AddSendImplement(it.get());
-								}
-
-								extptr->AddSendImplement(extptr.get());
-								extptr->Start();
-
-							}
-						}
 
 						if (extptr != nullptr) {
-
 							extptr->pushEvent(Event);
 							extptr->mainEventLoop();
-
-							if (extptr->IsFinalState()) {
-								removeExtension(ext);
-								extptr->Stop();
-							}
+						}
+						else {
+							LOG4CPLUS_ERROR(log, "not find extension:" << ext);
 						}
 					}
 				}
@@ -254,41 +192,6 @@ namespace model{
 		}
 	}
 
-	ExtensionConfigPtr ProcessModule::newExtensionConfig(ProcessModule * model, const std::string & ext, const std::string & smFileName, uint32_t type)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		if (g_ExtensionConfigs.find(ext) == g_ExtensionConfigs.end())
-		{
-			model::ExtensionConfigPtr extptr(new model::ExtensionConfig(model, ext, smFileName, type));
-			g_ExtensionConfigs[ext] = extptr;
-			m_ExtensionConfigs[ext] = extptr;
-			return extptr;
-		}
-		return nullptr;
-	}
-
-	void ProcessModule::deleteExtensionConfig(const std::string & ext)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		g_ExtensionConfigs.erase(ext);
-		m_ExtensionConfigs.erase(ext);
-	}
-
-	ExtensionConfigPtr ProcessModule::getExtensionConfig(const std::string & ext)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		auto & it = g_ExtensionConfigs.find(ext);
-		if (it != g_ExtensionConfigs.end()){
-			return it->second;
-		}
-		return nullptr;
-	}
-
-	ExtensionConfigMap ProcessModule::GetExtensionConfig()
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		return m_ExtensionConfigs;
-	}
 
 	bool ProcessModule::addExtension(const std::string &ext, ExtensionPtr & extptr)
 	{
@@ -322,38 +225,6 @@ namespace model{
 		}
 
 		return nullptr;
-	}
-
-	void ProcessModule::addExtToGroup(const std::string & group, const std::string & ext)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
-		g_GroupHasExt[group].push_back(ext);
-	}
-
-	void ProcessModule::addGroupToExt(const std::string & ext, const std::string & group)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
-		g_ExtBelongGroup[ext].push_back(group);
-	}
-
-	std::vector<std::string> ProcessModule::getExtByGroup(const std::string & group)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
-		auto & it = g_GroupHasExt.find(group);
-		if (it != g_GroupHasExt.end())
-			return it->second;
-
-		return std::vector<std::string>();
-	}
-
-	std::vector<std::string> ProcessModule::getGroupByExt(const std::string & ext)
-	{
-		std::unique_lock<std::recursive_mutex> lck(g_GroupMtx);
-		auto & it = g_ExtBelongGroup.find(ext);
-		if (it != g_ExtBelongGroup.end())
-			return it->second;
-
-		return std::vector<std::string>();
 	}
 
 }

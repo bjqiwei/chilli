@@ -34,7 +34,7 @@
         <Extension>0109</Extension>
     </Group>
    </Groups>
-  <FreeSwitch id = "freeswitch001" host="47.94.16.223" port ="18021" password="qiwei">
+  <FreeSwitch id = "freeswitch001" host="47.88.171.173" port ="18021" password="qiwei">
     <Extensions>
       <Extension ExtensionNumber="1000" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
       <Extension ExtensionNumber="1001" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>

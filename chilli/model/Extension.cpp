@@ -7,37 +7,42 @@ namespace model {
 
 
 	Extension::Extension(ProcessModule * model, const std::string &ext, const std::string &smFileName) :
-		m_model(model), m_ExtNumber(ext), SendInterface("this")
+		m_model(model), m_ExtNumber(ext), SendInterface("this"), m_SMFileName(smFileName)
 	{
-		m_SM = new fsm::StateMachine(ext, smFileName, ProcessModule::OnTimerExpiredFunc);
+		std::string logName = "Extension.";
+		this->log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
 	}
 
 	Extension::~Extension() {
-		delete m_SM;
+		m_Connections.clear();
 	}
 
 	void Extension::Start() {
 		LOG4CPLUS_INFO(log, " Start.");
-		m_SM->start(false);
+		for (auto & it : m_Connections) {
+			it.second->start(false);
+		}
 	}
 
 	void Extension::Stop() {
-		m_SM->stop();
+		for (auto & it: m_Connections){
+			it.second->stop();
+		}
 		LOG4CPLUS_INFO(log, " Stop.");
 	}
 
 	bool Extension::IsFinalState()
 	{
-		return m_SM->isInFinalState();
-	}
-
-	bool Extension::AddSendImplement(SendInterface * evtDsp) {
-		return m_SM->addSendImplement(evtDsp);
+		return m_Connections.empty();
 	}
 
 	bool Extension::setVar(const std::string &name, const Json::Value &value)
 	{
-		return m_SM->setVar(name, value);
+		if (m_Vars.isMember(name))
+			return false;
+
+		m_Vars[name] = value;
+		return true;
 	}
 
 	const std::string & Extension::getExtNumber() {
@@ -46,30 +51,68 @@ namespace model {
 
 	int Extension::pushEvent(const EventType_t & Event)
 	{
-		const Json::Value & jsonEvent = Event.event;
-
-		std::string eventName;
-
-		if (jsonEvent["event"].isString()) {
-			eventName = jsonEvent["event"].asString();
-		}
-
-		fsm::TriggerEvent evt(eventName);
-
-		for (auto & it : jsonEvent.getMemberNames()) {
-			evt.addVars(it, jsonEvent[it]);
-		}
-
-		LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
-
-		m_SM->pushEvent(evt);
-
-		return 0;
+		return m_EvtBuffer.Put(Event) ? 0 : 1;
 	}
 
 	void Extension::mainEventLoop()
 	{
-		return m_SM->mainEventLoop();
+		try
+		{
+
+			model::EventType_t Event;
+			if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
+				const Json::Value & jsonEvent = Event.event;
+
+				std::string eventName;
+				std::string callid;
+
+				if (jsonEvent["event"].isString()) {
+					eventName = jsonEvent["event"].asString();
+				}
+
+				if (jsonEvent["callid"].isString()) {
+					callid = jsonEvent["callid"].asString();
+				}
+
+				fsm::TriggerEvent evt(eventName);
+
+				for (auto & it : jsonEvent.getMemberNames()) {
+					evt.addVars(it, jsonEvent[it]);
+				}
+
+				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+
+				auto & it = m_Connections.find(callid);
+				if (it == m_Connections.end()) {
+					m_Connections[callid] = Conntion(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
+					it = m_Connections.find(callid);
+
+					for (auto & itt : this->m_Vars.getMemberNames())
+					{
+						it->second->setVar(itt, this->m_Vars[itt]);
+					}
+
+					for (auto & itt : ProcessModule::g_Modules) {
+						it->second->addSendImplement(itt.get());
+					}
+
+					it->second->addSendImplement(this);
+					it->second->start(false);
+				}
+
+				it->second->pushEvent(evt);
+				it->second->mainEventLoop();
+
+				if (it->second->isInFinalState()) {
+					m_Connections.erase(it);
+					it->second->stop();
+				}
+			}
+		}
+		catch (std::exception & e)
+		{
+			LOG4CPLUS_ERROR(log, e.what());
+		}
 	}
 
 	void Extension::setSessionId(const std::string & sessinId) {
@@ -84,11 +127,6 @@ namespace model {
 		return log;
 	}
 
-	ExtensionConfig::ExtensionConfig(ProcessModule * model, const std::string &ext, const std::string &smFileName, uint32_t type) :
-		m_model(model), m_ExtNumber(ext), m_SMFileName(smFileName), m_ExtType(type)
-	{
-
-	}
 
 }
 }

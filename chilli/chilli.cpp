@@ -328,6 +328,9 @@ void ConsoleLoop()
 		if (strCmd == "quit"){
 			break;
 		}
+		else if(strCmd == "...") {
+			break;
+		}
 		else if (strCmd == "loadconfig"){
 			//std::string strConfigFile = chilli::App::strFileNameNoExtension + ".xml";
 			//chilli::App::LoadConfig(strConfigFile);

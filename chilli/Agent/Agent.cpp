@@ -112,27 +112,7 @@ int Agent::pushEvent(const model::EventType_t & Event)
 	if (Event.connect != 0)
 		this->m_curConnectId = Event.connect;
 
-	const Json::Value & jsonEvent = Event.event;
-	
-	std::string eventName;
-
-	if (jsonEvent["event"].isString()){
-		eventName = jsonEvent["event"].asString();
-	}
-
-	fsm::TriggerEvent evt(eventName);
-
-	for (auto & it : jsonEvent.getMemberNames()) {
-		evt.addVars(it, jsonEvent[it]);
-	}
-	if (jsonEvent["cmd"].isString() && jsonEvent["cmd"].asString() == "ping"){
-	}
-	else
-		LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
-
-	m_SM->pushEvent(evt);
-
-	return 0;
+	return Extension::pushEvent(Event);
 }
 
 }

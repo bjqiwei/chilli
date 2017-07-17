@@ -18,7 +18,6 @@ namespace Group {
 		virtual int Start() override;
 		virtual int Stop() override;
 		virtual bool LoadConfig(const std::string & configContext) override;
-		virtual model::ExtensionPtr newExtension(const model::ExtensionConfigPtr & config) override;
 
 	private:
 		//inherit from SendInterface
