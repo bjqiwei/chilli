@@ -82,30 +82,30 @@ namespace model {
 
 				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
-				auto & it = m_Connections.find(callid);
-				if (it == m_Connections.end()) {
-					m_Connections[callid] = Conntion(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
-					it = m_Connections.find(callid);
+				if (m_Connections.find(callid) == m_Connections.end()) {
+					Conntion connection(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
+					m_Connections[callid] = connection;
 
 					for (auto & itt : this->m_Vars.getMemberNames())
 					{
-						it->second->setVar(itt, this->m_Vars[itt]);
+						connection->setVar(itt, this->m_Vars[itt]);
 					}
 
 					for (auto & itt : ProcessModule::g_Modules) {
-						it->second->addSendImplement(itt.get());
+						connection->addSendImplement(itt.get());
 					}
 
-					it->second->addSendImplement(this);
-					it->second->start(false);
+					connection->addSendImplement(this);
+					connection->start(false);
 				}
 
+				auto & it = m_Connections.find(callid);
 				it->second->pushEvent(evt);
 				it->second->mainEventLoop();
 
 				if (it->second->isInFinalState()) {
-					m_Connections.erase(it);
 					it->second->stop();
+					m_Connections.erase(it);
 				}
 			}
 		}

@@ -11,11 +11,6 @@
 namespace chilli{
 namespace FreeSwitch{
 
-	enum ExtType {
-		FreeSwitchExtType =0,
-		FreeSwitchACDType,
-	};
-
 FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.FreeSwitchModule");
@@ -89,9 +84,9 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 			num = num ? num : "";
 			sm = sm ? sm : "";
 
-			model::ExtensionConfigPtr extConfig = newExtensionConfig(this, num, sm, ExtType::FreeSwitchExtType);
-			if (extConfig != nullptr) {
-				extConfig->m_Vars.push_back(std::make_pair("_extension.Extension", num));
+			model::ExtensionPtr ext(new FreeSwitchExtension(this, num, sm));
+			if (ext != nullptr && addExtension(num, ext)) {
+				ext->setVar("_extension.Extension", num);
 			}
 			else {
 				LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
@@ -100,19 +95,6 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 	}
 
 	return true;
-}
-
-
-model::ExtensionPtr FreeSwitchModule::newExtension(const model::ExtensionConfigPtr & config)
-{
-	if (config != nullptr)
-	{
-		if (config->m_ExtType == ExtType::FreeSwitchExtType) {
-			model::ExtensionPtr ext(new FreeSwitchExtension(this, config->m_ExtNumber, config->m_SMFileName));
-			return ext;
-		}
-	}
-	return nullptr;
 }
 
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
@@ -149,8 +131,9 @@ void FreeSwitchModule::ConnectFS()
 		esl_events(&handle, ESL_EVENT_TYPE_JSON, "all");
 		LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
 
-		for (auto &it : this->GetExtensionConfig()) {
-			if (it.second->m_ExtType == ExtType::FreeSwitchExtType)
+		/*
+		for (auto &it : this->GetExtensions()) {
+			if (typeid(*it.second) == typeid(FreeSwitchExtension))
 			{
 
 				std::string cmd = "api sofia status profile internal reg ";
@@ -188,12 +171,75 @@ void FreeSwitchModule::ConnectFS()
 				}
 			}
 		}
-
+		*/
 		while (m_bRunning){
 			esl_status_t status = esl_recv_event_timed(&handle, 1000, true, NULL);
 			if (status == ESL_SUCCESS){
 				if (handle.last_event && handle.last_event->body) {
-					LOG4CPLUS_DEBUG(log, handle.last_event->body);
+					Json::Reader reader;
+					Json::Value event;
+					if (reader.parse(handle.last_event->body, event) && event.isObject()) {
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "HEARTBEAT")
+							continue;
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "RE_SCHEDULE")
+							continue;
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_EXECUTE")
+							continue;
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_EXECUTE_COMPLETE")
+							continue;
+						
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_STATE")
+						{
+							event.removeMember("Core-UUID");
+							event.removeMember("FreeSWITCH-Hostname");
+							event.removeMember("FreeSWITCH-Switchname");
+							event.removeMember("FreeSWITCH-IPv4");
+							event.removeMember("FreeSWITCH-IPv6");
+							event.removeMember("Event-Calling-File");
+							event.removeMember("Event-Calling-Function");
+							event.removeMember("Event-Calling-Line-Number");
+							event.removeMember("Event-Sequence");
+							event.removeMember("Caller-Dialplan");
+							//event.removeMember("Caller-Caller-ID-Name");
+							//event.removeMember("Caller-Channel-Name");
+							//event.removeMember("Caller-Context");
+							event.removeMember("Caller-Orig-Caller-ID-Name");
+							event.removeMember("Caller-Network-Addr");
+							event.removeMember("Caller-Privacy-Hide-Name");
+							event.removeMember("Caller-Privacy-Hide-Number");
+							event.removeMember("Caller-Profile-Created-Time");
+							event.removeMember("Caller-Profile-Index");
+							event.removeMember("Caller-Screen-Bit");
+							event.removeMember("Caller-Source");
+							event.removeMember("Channel-HIT-Dialplan");
+							//event.removeMember("Channel-Name");
+							//event.removeMember("Channel-Presence-ID");
+							event.removeMember("Event-Date-GMT");
+							event.removeMember("Event-Date-Timestamp");
+
+							model::EventType_t evt;
+							for (auto & varname : event.getMemberNames()) {
+								std::string newvarname = varname;
+								helper::string::replaceString(newvarname, "-", "");
+								evt.event[newvarname] = event[varname];
+							}
+
+							std::string Channel_Presence_ID;
+							if (evt.event["ChannelPresenceID"].isString()){
+								Channel_Presence_ID = evt.event["ChannelPresenceID"].asString();
+							}
+							
+							std::string extNum = Channel_Presence_ID.substr(0, Channel_Presence_ID.find("@"));
+							evt.event["extension"] = extNum;
+							evt.event["event"] = evt.event["EventName"];
+
+							this->PushEvent(evt);
+						}
+						else {
+							LOG4CPLUS_DEBUG(log, handle.last_event->body);
+						}
+					}
+					
 				}
 			}
 			else if (status == ESL_BREAK)
