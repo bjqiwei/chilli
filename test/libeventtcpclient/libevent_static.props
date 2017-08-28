@@ -9,7 +9,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>

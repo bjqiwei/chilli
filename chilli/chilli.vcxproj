@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +91,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.0.22-stable\WIN32-Code;$(SolutionDir)libs\libevent-2.0.22-stable\include;$(SolutionDir)libs\libevent-2.0.22-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-src-0.5.0\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\freeswitch\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl1.0.2e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -205,8 +205,11 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ProjectReference Include="..\libs\jsoncpp-src-0.5.0\makefiles\vs2015\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libs\libevent-2.0.22-stable\libevent_core.vcxproj">
+    <ProjectReference Include="..\libs\libevent-2.1.8-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libs\libevent-2.1.8-stable\libevent_extras.vcxproj">
+      <Project>{7bd82078-0049-4b2f-843e-2f7c018f426a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libs\libwebsockets-2.2.1\websockets.vcxproj">
       <Project>{594e5e3e-e08d-3633-82d5-3672d7f07e35}</Project>

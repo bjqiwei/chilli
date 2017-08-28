@@ -146,7 +146,7 @@
     <ProjectReference Include="..\..\libs\jsoncpp-src-0.5.0\makefiles\vs2015\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\libevent-2.0.22-stable\libevent_core.vcxproj">
+    <ProjectReference Include="..\..\libs\libevent-2.1.8-stable\libevent_core.vcxproj">
       <Project>{3c2be383-a1b5-41ab-86cd-11455df41edc}</Project>
     </ProjectReference>
   </ItemGroup>
