@@ -83,7 +83,7 @@ namespace model {
 				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
 				if (m_Connections.find(callid) == m_Connections.end()) {
-					Conntion connection(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
+					Connction connection(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
 					m_Connections[callid] = connection;
 
 					for (auto & itt : this->m_Vars.getMemberNames())

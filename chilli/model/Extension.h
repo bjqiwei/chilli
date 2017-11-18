@@ -16,7 +16,7 @@ namespace model{
 class Extension: public fsm::SendInterface
 {
 protected:
-	typedef std::shared_ptr<fsm::StateMachine> Conntion;
+	typedef std::shared_ptr<fsm::StateMachine> Connction;
 public:
 	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName);
 
@@ -51,7 +51,7 @@ public:
 	friend class ProcessModule;
 
 protected:
-	std::map<std::string, Conntion> m_Connections;
+	std::map<std::string, Connction> m_Connections;
 	class ProcessModule * m_model = nullptr;
 	log4cplus::Logger log;
 	std::string m_ExtNumber;
