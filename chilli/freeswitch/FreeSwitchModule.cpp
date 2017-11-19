@@ -187,8 +187,10 @@ void FreeSwitchModule::ConnectFS()
 							continue;
 						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_EXECUTE_COMPLETE")
 							continue;
+						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "API")
+							continue;
 						
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_STATE")
+						if (event["Caller-ANI"].isString() && event["Caller-Destination-Number"].isString())
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");
@@ -199,11 +201,11 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Event-Calling-Function");
 							event.removeMember("Event-Calling-Line-Number");
 							event.removeMember("Event-Sequence");
-							event.removeMember("Caller-Dialplan");
+							//event.removeMember("Caller-Dialplan");
 							//event.removeMember("Caller-Caller-ID-Name");
 							//event.removeMember("Caller-Channel-Name");
 							//event.removeMember("Caller-Context");
-							event.removeMember("Caller-Orig-Caller-ID-Name");
+							//event.removeMember("Caller-Orig-Caller-ID-Name");
 							event.removeMember("Caller-Network-Addr");
 							event.removeMember("Caller-Privacy-Hide-Name");
 							event.removeMember("Caller-Privacy-Hide-Number");
@@ -217,6 +219,9 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Event-Date-GMT");
 							event.removeMember("Event-Date-Timestamp");
 
+							std::string extNum = event["Caller-ANI"].asString();
+							std::string called = event["Caller-Destination-Number"].asString();
+
 							model::EventType_t evt;
 							for (auto & varname : event.getMemberNames()) {
 								std::string newvarname = varname;
@@ -224,12 +229,6 @@ void FreeSwitchModule::ConnectFS()
 								evt.event[newvarname] = event[varname];
 							}
 
-							std::string Channel_Presence_ID;
-							if (evt.event["ChannelPresenceID"].isString()){
-								Channel_Presence_ID = evt.event["ChannelPresenceID"].asString();
-							}
-							
-							std::string extNum = Channel_Presence_ID.substr(0, Channel_Presence_ID.find("@"));
 							evt.event["extension"] = extNum;
 							evt.event["event"] = evt.event["EventName"];
 

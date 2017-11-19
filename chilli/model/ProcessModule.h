@@ -45,6 +45,7 @@ private:
 protected:
 	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
 	std::atomic<bool> m_bRunning = false;
+private:
 	std::thread m_thread;
 	void run();
 };
