@@ -16,6 +16,7 @@
 #include "Avaya/TSAPIModule.h"
 #include "mysql/MySqlModule.h"
 #include "monitor/MonitorModule.h"
+#include "EeventReport/EventReportModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
@@ -28,6 +29,7 @@
 #define  GROUPS         "Groups"
 #define  MYSQL          "MySql"
 #define  MONITOR        "Monitor"
+#define  EVENTREPORT	"EventReport"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -304,6 +306,15 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				e->Accept(&printer);
 				monitor->LoadConfig(printer.CStr());
 				model::ProcessModule::g_Modules.push_back(monitor);
+
+			}
+			else if (nodeName == EVENTREPORT)
+			{
+				model::ProcessModulePtr eventreport(new chilli::EventReport::EventReportModule(modelid));
+				XMLPrinter printer;
+				e->Accept(&printer);
+				eventreport->LoadConfig(printer.CStr());
+				model::ProcessModule::g_Modules.push_back(eventreport);
 
 			}
 			e = e->NextSiblingElement();
