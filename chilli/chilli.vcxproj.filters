@@ -52,8 +52,8 @@
     <Filter Include="conf">
       <UniqueIdentifier>{991e0369-59ea-40b2-862e-7f1aec0420f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="monitor">
-      <UniqueIdentifier>{7d4b3347-6824-4d39-bcef-0a66e9e0cb8c}</UniqueIdentifier>
+    <Filter Include="EventReport">
+      <UniqueIdentifier>{5caea3ee-9aa3-49e3-b0ba-2e23a5b637c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -169,11 +169,11 @@
     <ClInclude Include="freeswitch\FreeSwitchExtension.h">
       <Filter>freeswitch</Filter>
     </ClInclude>
-    <ClInclude Include="monitor\MonitorModule.h">
-      <Filter>monitor</Filter>
-    </ClInclude>
     <ClInclude Include="stringHelper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EeventReport\EventReportModule.h">
+      <Filter>EventReport</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -261,8 +261,8 @@
     <ClCompile Include="freeswitch\FreeSwitchExtension.cpp">
       <Filter>freeswitch</Filter>
     </ClCompile>
-    <ClCompile Include="monitor\MonitorModule.cpp">
-      <Filter>monitor</Filter>
+    <ClCompile Include="EeventReport\EventReportModule.cpp">
+      <Filter>EventReport</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,7 +15,6 @@
 #include "IVR/IVRModule.h"
 #include "Avaya/TSAPIModule.h"
 #include "mysql/MySqlModule.h"
-#include "monitor/MonitorModule.h"
 #include "EeventReport/EventReportModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
@@ -28,7 +27,6 @@
 #define  EXTENSIONS     "Extensions"
 #define  GROUPS         "Groups"
 #define  MYSQL          "MySql"
-#define  MONITOR        "Monitor"
 #define  EVENTREPORT	"EventReport"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
@@ -298,15 +296,6 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				e->Accept(&printer);
 				mysql->LoadConfig(printer.CStr());
 				model::ProcessModule::g_Modules.push_back(mysql);
-			}
-			else if (nodeName == MONITOR)
-			{
-				model::ProcessModulePtr monitor(new chilli::Monitor::MonitorModule(modelid));
-				XMLPrinter printer;
-				e->Accept(&printer);
-				monitor->LoadConfig(printer.CStr());
-				model::ProcessModule::g_Modules.push_back(monitor);
-
 			}
 			else if (nodeName == EVENTREPORT)
 			{

@@ -139,6 +139,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClInclude Include="Avaya\TSAPIModule.h" />
     <ClInclude Include="CEventBuffer.h" />
     <ClInclude Include="Dynamiclibrary.h" />
+    <ClInclude Include="EeventReport\EventReportModule.h" />
     <ClInclude Include="Extension\ExtensionImp.h" />
     <ClInclude Include="Extension\ExtensionModule.h" />
     <ClInclude Include="freeswitch\FreeSwitchExtension.h" />
@@ -150,7 +151,6 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClInclude Include="model\Extension.h" />
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="model\TypeDef.h" />
-    <ClInclude Include="monitor\MonitorModule.h" />
     <ClInclude Include="mysql\MySqlModule.h" />
     <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
@@ -175,6 +175,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClCompile Include="Avaya\AvayaExtension.cpp" />
     <ClCompile Include="Avaya\AvayaVDN.cpp" />
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
+    <ClCompile Include="EeventReport\EventReportModule.cpp" />
     <ClCompile Include="Extension\ExtensionImp.cpp" />
     <ClCompile Include="Extension\ExtensionModule.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchExtension.cpp" />
@@ -185,7 +186,6 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClCompile Include="model\ConnectAdapter.cpp" />
     <ClCompile Include="model\Extension.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
-    <ClCompile Include="monitor\MonitorModule.cpp" />
     <ClCompile Include="mysql\MySqlModule.cpp" />
     <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
