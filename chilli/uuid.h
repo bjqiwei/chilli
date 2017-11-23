@@ -7,7 +7,7 @@
 #include <uuid/uuid.h> 
 #endif
 
-std::string uuid()
+static std::string uuid()
 {
 	#define GUID_LEN 64 
 	char buffer[GUID_LEN] = { 0 };

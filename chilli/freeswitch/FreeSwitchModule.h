@@ -26,7 +26,9 @@ namespace FreeSwitch{
 		std::string m_User;
 		std::string m_Password;
 		void ConnectFS();
+		std::string m_CallExt;
 		friend class FreeSwitchExtension;
+		friend class FreeSwitchCall;
 	};
 
 }

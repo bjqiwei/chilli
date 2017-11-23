@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" ?>
+
+<fsm name ="FreeSwitchCall" initial="Null" final="Destroy">
+<datamodel>
+	<data id="status"/>
+</datamodel>
+<scriptmodel>
+	<script src="./conf/uuid.js" />
+	<script src="./conf/DateFormat.js"/>
+</scriptmodel>
+	<state id="Null">
+		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_NEW'">
+		</event>
+		<event event="CHANNEL_CREATE" cond="_event.ChannelState=='CS_INIT'">
+		</event>
+		<event event="CHANNEL_CREATE" cond="_event.ChannelState=='CS_ROUTING'">
+		</event>
+		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_INIT'">
+			<transition target="Pending"/>
+		</event>
+		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_DESTROY'">
+			<transition target="Destroy"/>
+		</event>
+		<state id="Pending">
+			<onentry>
+				<send target="eventreport" type="notify" dest="eventreport" event="ServiceInitiated">
+				</send>
+			</onentry>
+		</state>
+		<state id="Alerting">
+		</state>
+		<state id="Received">
+		</state>
+		<state id="Received-OnHold">
+		</state>
+		<state id="Delivered">
+		</state>
+		<state id="Established">
+		</state>
+		<state id="Failed">
+		</state>
+		<state id="Established-OnHold">
+		</state>
+		<state id="Originated">
+		</state>
+		<state id="Queued">
+		</state>
+		<state id="Delivered-Held">
+		</state>
+		<state id="Established-Held">
+		</state>
+		<state id="Failed-Held">
+		</state>
+		<state id="Queued-Held">
+		</state>
+    </state>
+	<state id="Destroy"/>
+</fsm>
+

@@ -175,6 +175,9 @@
     <ClInclude Include="EeventReport\EventReportModule.h">
       <Filter>EventReport</Filter>
     </ClInclude>
+    <ClInclude Include="freeswitch\FreeSwitchCall.h">
+      <Filter>freeswitch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -264,6 +267,9 @@
     <ClCompile Include="EeventReport\EventReportModule.cpp">
       <Filter>EventReport</Filter>
     </ClCompile>
+    <ClCompile Include="freeswitch\FreeSwitchCall.cpp">
+      <Filter>freeswitch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="conf\ACD.xml">
@@ -297,6 +303,9 @@
       <Filter>conf</Filter>
     </Xml>
     <Xml Include="conf\FreeSwitchExtension.xml">
+      <Filter>conf</Filter>
+    </Xml>
+    <Xml Include="conf\FreeSwitchCall.xml">
       <Filter>conf</Filter>
     </Xml>
   </ItemGroup>

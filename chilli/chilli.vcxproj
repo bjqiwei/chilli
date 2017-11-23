@@ -142,6 +142,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClInclude Include="EeventReport\EventReportModule.h" />
     <ClInclude Include="Extension\ExtensionImp.h" />
     <ClInclude Include="Extension\ExtensionModule.h" />
+    <ClInclude Include="freeswitch\FreeSwitchCall.h" />
     <ClInclude Include="freeswitch\FreeSwitchExtension.h" />
     <ClInclude Include="freeswitch\FreeSwitchModule.h" />
     <ClInclude Include="Group\GroupImp.h" />
@@ -178,6 +179,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <ClCompile Include="EeventReport\EventReportModule.cpp" />
     <ClCompile Include="Extension\ExtensionImp.cpp" />
     <ClCompile Include="Extension\ExtensionModule.cpp" />
+    <ClCompile Include="freeswitch\FreeSwitchCall.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchExtension.cpp" />
     <ClCompile Include="freeswitch\FreeSwitchModule.cpp" />
     <ClCompile Include="Group\GroupImp.cpp" />
@@ -227,6 +229,7 @@ xcopy /y $(SolutionDir)\libs\openssl1.0.2e\bin\*.dll $(OutDir)</Command>
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
     <Xml Include="conf\chilli.xml" />
+    <Xml Include="conf\FreeSwitchCall.xml" />
     <Xml Include="conf\FreeSwitchExtension.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />

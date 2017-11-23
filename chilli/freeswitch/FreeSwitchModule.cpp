@@ -2,6 +2,7 @@
 #include <esl.h>
 #include "FreeSwitchModule.h"
 #include "FreeSwitchExtension.h"
+#include "FreeSwitchCall.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -91,6 +92,21 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 			else {
 				LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 			}
+		}
+	}
+
+	// extensions 
+	XMLElement * call = eConfig->FirstChildElement("Call");
+	if (call != nullptr){
+		const char * num = call->Attribute("ExtensionNumber");
+		const char * sm = call->Attribute("StateMachine");
+		model::ExtensionPtr ext(new FreeSwitchCall(this, num, sm));
+		if (ext != nullptr && addExtension(num, ext)) {
+			ext->setVar("_extension.Extension", num);
+			m_CallExt = num;
+		}
+		else {
+			LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
 		}
 	}
 
@@ -204,7 +220,7 @@ void FreeSwitchModule::ConnectFS()
 							//event.removeMember("Caller-Dialplan");
 							//event.removeMember("Caller-Caller-ID-Name");
 							//event.removeMember("Caller-Channel-Name");
-							//event.removeMember("Caller-Context");
+							event.removeMember("Caller-Context");
 							//event.removeMember("Caller-Orig-Caller-ID-Name");
 							event.removeMember("Caller-Network-Addr");
 							event.removeMember("Caller-Privacy-Hide-Name");
@@ -218,20 +234,29 @@ void FreeSwitchModule::ConnectFS()
 							//event.removeMember("Channel-Presence-ID");
 							event.removeMember("Event-Date-GMT");
 							event.removeMember("Event-Date-Timestamp");
+							event.removeMember("Caller-Unique-ID");
+							event.removeMember("Unique-ID");
 
 							std::string extNum = event["Caller-ANI"].asString();
 							std::string called = event["Caller-Destination-Number"].asString();
 
 							model::EventType_t evt;
 							for (auto & varname : event.getMemberNames()) {
-								std::string newvarname = varname;
-								helper::string::replaceString(newvarname, "-", "");
-								evt.event[newvarname] = event[varname];
+								std::string tmp = varname.substr(0, sizeof("variable_")-1);
+								if (tmp != "variable_"){
+									std::string newvarname = varname;
+									helper::string::replaceString(newvarname, "-", "");
+									evt.event[newvarname] = event[varname];
+								}
 							}
 
 							evt.event["extension"] = extNum;
 							evt.event["event"] = evt.event["EventName"];
+							evt.event["ConnectionID"] = evt.event["ChannelCallUUID"];
 
+							this->PushEvent(evt);
+
+							evt.event["extension"] = m_CallExt;
 							this->PushEvent(evt);
 						}
 						else {

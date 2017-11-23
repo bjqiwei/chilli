@@ -9,7 +9,7 @@
   <IVR id="ivr001">
     <Extension ExtensionNumber="5001" StateMachine="./conf/IVR.xml"></Extension>
   </IVR>
-  <EventReport id="eventreport001" TCPPort="9985" WSPort="9986"/>
+  <EventReport id="eventreport" TCPPort="9985" WSPort="9986"/>
   <Conferences>
       <Conf ChannelID="0" Type="BASE" Enable="0"></Conf>
       <Conf ChannelID="1" Type="BASE" Enable="1"></Conf>
@@ -57,6 +57,7 @@
       <Extension ExtensionNumber="1018" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
       <Extension ExtensionNumber="1019" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
     </Extensions>
+    <Call ExtensionNumber="2000" StateMachine="./conf/FreeSwitchCall.xml"></Call>
   </FreeSwitch>
   <!--Avaya id = "tsapi001">
 		<TSAPI>
