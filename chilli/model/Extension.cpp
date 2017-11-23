@@ -64,14 +64,14 @@ namespace model {
 				const Json::Value & jsonEvent = Event.event;
 
 				std::string eventName;
-				std::string callid;
+				std::string connectid;
 
 				if (jsonEvent["event"].isString()) {
 					eventName = jsonEvent["event"].asString();
 				}
 
-				if (jsonEvent["callid"].isString()) {
-					callid = jsonEvent["callid"].asString();
+				if (jsonEvent["ConnectionID"].isString()) {
+					connectid = jsonEvent["ConnectionID"].asString();
 				}
 
 				fsm::TriggerEvent evt(eventName);
@@ -82,9 +82,9 @@ namespace model {
 
 				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
-				if (m_Connections.find(callid) == m_Connections.end()) {
+				if (m_Connections.find(connectid) == m_Connections.end()) {
 					Connction connection(new fsm::StateMachine(m_ExtNumber, m_SMFileName, ProcessModule::OnTimerExpiredFunc));
-					m_Connections[callid] = connection;
+					m_Connections[connectid] = connection;
 
 					for (auto & itt : this->m_Vars.getMemberNames())
 					{
@@ -99,7 +99,7 @@ namespace model {
 					connection->start(false);
 				}
 
-				auto & it = m_Connections.find(callid);
+				auto & it = m_Connections.find(connectid);
 				it->second->pushEvent(evt);
 				it->second->mainEventLoop();
 
