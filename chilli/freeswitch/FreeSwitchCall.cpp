@@ -34,6 +34,9 @@ namespace FreeSwitch {
 
 			model::EventType_t Event;
 			if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
+
+				return;
+
 				const Json::Value & jsonEvent = Event.event;
 
 				std::string eventName;
