@@ -190,7 +190,7 @@
 				<event event="cmd" cond="_event.cmd=='makecall'">
 					<send target="this" type="cmd" destexpr="_agent.Extension" event="MakeCall">
 						<MakeCall type="script">var makecall ={}; makecall.caller =_agent.Extension; makecall.called = _event.called; makecall; </MakeCall>
-						<ConnectionID type="script"> uuid();</ConnectionID> 
+						<ConnectionID type="script"> connection = {}; connection.callID = uuid(); connection.callID;</ConnectionID> 
 					</send>
 					<script>called = _event.called;</script>
 					<transition target="makecalling"/>
@@ -212,12 +212,12 @@
 					<event event="SERVICE_INITIATED">
 					</event>
 					<event event="Alerting">
-						<script>caller = _agent.Extension; connection = _event.serviceInitiated.connection;</script>
+						<script>caller = _agent.Extension; connection = _event.alerting.connection;</script>
 						<send target="this" type="notify" dest="client" event="outringing">
 							<type>outringing</type>
 							<called type="script">called;</called>
 							<caller type="script">_agent.Extension;</caller>
-							<callid type="script">_event.serviceInitiated.connection.callID;</callid>
+							<callid type="script">_event.alerting.connection.callID;</callid>
 							<nowgroupid type="script">1</nowgroupid>
 							<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
 						</send>
@@ -237,7 +237,7 @@
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-							<connection type="script">connection;</connection>
+							<ConnectionID type="script">connection.callID;</ConnectionID> 
 						</send>
 					</event>
 				</state>
@@ -327,7 +327,7 @@
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-							<connection type="script">connection;</connection>
+							<ConnectionID type="script">connection.callID;</ConnectionID> 
 						</send>
 					</event>
 					<event event="FAILED">
@@ -385,7 +385,7 @@
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-							<connection type="script">connection;</connection>
+							<ConnectionID type="script">connection.callID;</ConnectionID>
 						</send>
 					</event>
 					<event event="cmd" cond="_event.cmd=='answercall'">
@@ -419,7 +419,7 @@
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-							<connection type="script">connection;</connection>
+							<ConnectionID type="script">connection.callID;</ConnectionID>
 						</send>
 					</event>
 					<event event="cmd" cond="_event.cmd=='mute'">
@@ -471,7 +471,7 @@
 								<connection type="script">_event.failed.connection;</connection>
 							</send>
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">connection;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID>
 							</send>
 						</event>
 						<event event="ORIGINATED" cond="cmp(_event.originated.connection,consultationNewCall)">
@@ -482,10 +482,10 @@
 						
 						<event event="TransferCall">
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">connection;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID>
 							</send>
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">consultationNewCall;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID> 
 							</send>
 						</event>
 						<event event ="TRANSFERRED">
@@ -528,10 +528,10 @@
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">connection;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID> 
 							</send>
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">consultationNewCall;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID> 
 							</send>
 						</event>
 
@@ -639,7 +639,7 @@
 					<state id="conferenced">
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
 							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
-								<connection type="script">conferenceCall;</connection>
+								<ConnectionID type="script">connection.callID;</ConnectionID> 
 							</send>
 						</event>
 						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,conferenceCall)">

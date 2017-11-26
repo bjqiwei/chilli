@@ -167,9 +167,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		if (jsonEvent["param"]["ConnectionID"].isString())
 			uuid = jsonEvent["param"]["ConnectionID"].asString();
 
-		std::string cmd = "api originate {origination_uuid=" + uuid + "}user/";
-		cmd.append(calling);
-		cmd.append(" &bridge(sofia/external/");
+		std::string cmd = "api originate {origination_uuid=" + uuid + "}user/" + calling + " &bridge(sofia/external/";
 		cmd.append(called);
 		cmd.append("@192.168.1.254)");
 		esl_send(&m_Handle, cmd.c_str());
@@ -183,7 +181,23 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		if (jsonEvent["param"]["ConnectionID"].isString())
 			uuid = jsonEvent["param"]["ConnectionID"].asString();
 
-		std::string cmd = "api break " + uuid;
+		std::string cmd = "api uuid_kill " + uuid;
+		esl_send(&m_Handle, cmd.c_str());
+
+		bHandled = true;
+	}
+	else if (eventName == "StartRecord")
+	{
+		std::string uuid = "";
+		std::string filename = "";
+
+		if (jsonEvent["param"]["ConnectionID"].isString())
+			uuid = jsonEvent["param"]["ConnectionID"].asString();
+
+		if (jsonEvent["param"]["filename"].isString())
+			filename = jsonEvent["param"]["filename"].asString();
+
+		std::string cmd = "api uuid_record " + uuid + " start " + filename;
 		esl_send(&m_Handle, cmd.c_str());
 
 		bHandled = true;
@@ -329,11 +343,11 @@ void FreeSwitchModule::ConnectFS()
 								}
 							}
 
-							/*if (caller != "0000000000")
+							if (caller != "0000000000")
 								evt.event["extension"] = caller;
 							else
 								evt.event["extension"] = called;
-							*/
+							
 				
 							evt.event["event"] = evt.event["EventName"];
 							evt.event["ConnectionID"] = evt.event["UniqueID"];
