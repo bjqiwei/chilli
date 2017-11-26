@@ -42,12 +42,15 @@ namespace chilli {
 			Json::Reader jsonReader;
 			if (jsonReader.parse(strContent, jsonData)) {
 
-				jsonData["param"]["from"] = jsonData["from"];
-				jsonData["param"]["extension"] = jsonData["dest"];
-				jsonData["param"]["event"] = jsonData["event"];
-				jsonData["param"]["type"] = jsonData["type"];
-				chilli::model::EventType_t sendData(jsonData["param"]);
-				this->m_model->PushEvent(sendData);
+				if (jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
+				{
+					jsonData["param"]["from"] = jsonData["from"];
+					jsonData["param"]["extension"] = jsonData["dest"];
+					jsonData["param"]["event"] = jsonData["event"];
+					jsonData["param"]["type"] = jsonData["type"];
+					chilli::model::EventType_t sendData(jsonData["param"]);
+					this->m_model->PushEvent(sendData);
+				}
 				bHandled = true;
 		
 			}
