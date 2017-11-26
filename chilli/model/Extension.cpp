@@ -74,6 +74,28 @@ namespace model {
 					connectid = jsonEvent["ConnectionID"].asString();
 				}
 
+				if (eventName == "AgentLogin" && !jsonEvent["from"].isNull()){
+					m_AgentID = jsonEvent[eventName]["agentId"].asString();
+					model::EventType_t _event;
+					_event.event["event"] = eventName;
+					_event.event["extension"] = jsonEvent["from"];
+					_event.event[eventName]["cause"] = 0;
+					this->m_model->PushEvent(_event);
+					LOG4CPLUS_DEBUG(log, " Push a event," << _event.event.toStyledString());
+					return;
+				}
+
+				if (eventName == "AgentLogout" && !jsonEvent["from"].isNull()) {
+					m_AgentID.clear();
+					model::EventType_t _event;
+					_event.event["event"] = eventName;
+					_event.event["extension"] = jsonEvent["from"];
+					_event.event[eventName]["cause"] = 0;
+					this->m_model->PushEvent(_event);
+					LOG4CPLUS_DEBUG(log, " Push a event," << _event.event.toStyledString());
+					return;
+				}
+
 				fsm::TriggerEvent evt(eventName);
 
 				for (auto & it : jsonEvent.getMemberNames()) {
@@ -90,6 +112,7 @@ namespace model {
 					{
 						connection->setVar(itt, this->m_Vars[itt]);
 					}
+					connection->setVar("_extension.AgentID", m_AgentID);
 
 					for (auto & itt : ProcessModule::g_Modules) {
 						connection->addSendImplement(itt.get());

@@ -57,6 +57,7 @@ protected:
 	std::string m_ExtNumber;
 	std::string m_SessionId;
 	std::string m_SMFileName;
+	std::string m_AgentID;
 	helper::CEventBuffer<EventType_t> m_EvtBuffer;
 	Json::Value m_Vars;
 
