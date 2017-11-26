@@ -6,13 +6,18 @@
 	<data id="callUUID"/>
 	<data id="timestamp"/>
 	<data id="starttime"/>
+	<date id="logingroups"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
 	<script src="./conf/DateFormat.js"/>
+	<script src="./conf/cmpObject.js"/>
 </scriptmodel>
 	<state id="init">
-		<event event="cmd" cond="_event.cmd=='Login' &amp;&amp; _event.password == _agent.Password">
+		<onentry>
+			<script>logingroups = "";</script>
+		</onentry>
+		<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
 			<transition  target="logining"/>
 		</event>
 		<event event=".*">
@@ -86,10 +91,6 @@
 						<status type="script">0</status>
 						<type>logon</type>
 					</send>
-
-					<send target="this" type="cmd" dest="this" event="AgentGetState">
-						<deviceId type="script">_agent.Extension</deviceId>
-					</send>
 					
 					<send target="monitor" type="notify" dest="monitor" event="Login">
 						<status>onwork</status>
@@ -149,21 +150,15 @@
 					</state>
 				</event>
 				<event event="cmd" cond="_event.cmd=='agentidle'">
-					<send target="this" type="cmd" dest="this" event="AgentSetFree">
-						<deviceId type="script">_agent.Extension</deviceId>
-						<agentId type="script">_agent.AgentId</agentId>
-					</send>
-				</event>
-				<event event="AgentSetFree">
 					<send target="this" type="notify" dest="client" event="agentidle">
-						<status type="script"> _event.AgentSetFree.cause</status>
+						<status type="script">0</status>
 						<type>agentidle</type>
 					</send>
-					<transition cond="_event.AgentSetFree.cause==0" target="Ready"/>
+					<transition target="Ready"/>
 				</event>
 				
 				<event event="cmd" cond="_event.cmd == 'monitoragent'">
-					<send target="monitor" type="cmd" dest="this" event="MonitorAgent"/>
+					<send target="monitor" type="cmd" destexpr="_agent.Extension" event="MonitorAgent"/>
 				</event>
 				
 				<event event="MonitorAgent">
@@ -195,6 +190,7 @@
 				<event event="cmd" cond="_event.cmd=='makecall'">
 					<send target="this" type="cmd" destexpr="_agent.Extension" event="MakeCall">
 						<MakeCall type="script">var makecall ={}; makecall.caller =_agent.Extension; makecall.called = _event.called; makecall; </MakeCall>
+						<ConnectionID type="script"> uuid();</ConnectionID> 
 					</send>
 					<script>called = _event.called;</script>
 					<transition target="makecalling"/>
@@ -214,7 +210,9 @@
 						<transition cond="_event.MakeCall.cause !=0" target="ACW"/>
 					</event>
 					<event event="SERVICE_INITIATED">
-						<script>caller = _agent.Extension;</script>
+					</event>
+					<event event="Alerting">
+						<script>caller = _agent.Extension; connection = _event.serviceInitiated.connection;</script>
 						<send target="this" type="notify" dest="client" event="outringing">
 							<type>outringing</type>
 							<called type="script">called;</called>
@@ -238,7 +236,7 @@
 						<transition target="originated"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-						<send target="this" type="cmd" dest="this" event="ClearCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
@@ -265,17 +263,11 @@
 						</send>
 					</onentry>
 					<event event="cmd" cond="_event.cmd=='agentbusy'">
-						<send target="this" type="cmd" dest="this" event="AgentSetBusy">
-							<deviceId type="script">_agent.Extension</deviceId>
-							<agentId type="script">_agent.AgentId</agentId>
-						</send>
-					</event>
-					<event event="AgentSetBusy">
 						<send target="this" type="notify" dest="client" event="agentbusy">
-							<status type="script">_event.AgentSetBusy.cause</status>
+							<status type="script">0</status>
 							<type>agentbusy</type>
 						</send>
-						<transition  cond="_event.AgentSetBusy.cause==0" target="NotReady"/>
+						<transition target="NotReady"/>
 					</event>
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
@@ -334,7 +326,7 @@
 						<transition  cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-						<send target="this" type="cmd" dest="this" event="ClearCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
@@ -392,12 +384,12 @@
 						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-						<send target="this" type="cmd" dest="this" event="ClearCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
 					<event event="cmd" cond="_event.cmd=='answercall'">
-						<send target="this" type="cmd" dest="this" event="AnswerCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="AnswerCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
@@ -426,12 +418,12 @@
 					<event event="cmd" cond="_event.cmd=='makecall'">
 					</event>
 					<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-						<send target="this" type="cmd" dest="this" event="ClearCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 							<connection type="script">connection;</connection>
 						</send>
 					</event>
 					<event event="cmd" cond="_event.cmd=='mute'">
-						<send target="this" type="cmd" dest="this" event="HoldCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="HoldCall">
 							<connection type="script">connection;</connection>
 						</send>
 						<transition target="helding"/>
@@ -440,14 +432,14 @@
 						<transition cond="cmp(_event.retrieved.connection,connection)" target="established"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='agentconsult'">
-						<send target="this" type="cmd" dest="this" event="ConsultationCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ConsultationCall">
 							<connection type="script">connection;</connection>
 							<called type="script">_event.num;</called>
 						</send>
 						<transition target="consultationing"/>
 					</event>
 					<event event="cmd" cond="_event.cmd=='transfercall'">
-						<send target="this" type="cmd" dest="this" event="ConsultationCall">
+						<send target="this" type="cmd" destexpr="_agent.Extension" event="ConsultationCall">
 							<connection type="script">connection;</connection>
 							<called type="script">_event.num;</called>
 						</send>
@@ -462,7 +454,7 @@
 							</send>
 							<script>consultationNewCall = _event.ConsultationCall.newCall;</script>
 
-							<send target="this" type="cmd" dest="this" event="TransferCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="TransferCall">
 								<activeCall type="script">consultationNewCall;</activeCall>
 								<heldCall type="script">connection;</heldCall>
 							</send>
@@ -475,10 +467,10 @@
 						<event event="DELIVERED">
 						</event>
 						<event event="FAILED">
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">_event.failed.connection;</connection>
 							</send>
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">connection;</connection>
 							</send>
 						</event>
@@ -489,10 +481,10 @@
 						</event>
 						
 						<event event="TransferCall">
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">connection;</connection>
 							</send>
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">consultationNewCall;</connection>
 							</send>
 						</event>
@@ -526,7 +518,7 @@
 							<transition  cond = "_event.ConsultationCall.cause != 0" target="established"/>
 						</event>
 						<event event="cmd" cond="_event.cmd=='agentconsultback'">
-							<send target="this" type="cmd" dest="this" event="ReconnectCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ReconnectCall">
 								<activeCall type="script">consultationNewCall;</activeCall>
 								<heldCall type="script">connection;</heldCall>
 							</send>
@@ -535,10 +527,10 @@
 						<event event="CONNECTION_CLEARED" cond="cmp(_event.connectionCleared.connection,consultationNewCall)">
 						</event>
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">connection;</connection>
 							</send>
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">consultationNewCall;</connection>
 							</send>
 						</event>
@@ -557,7 +549,7 @@
 							</event>
 							<state id="consultationed">
 								<event event="cmd" cond="_event.cmd=='agentshift'">
-									<send target="this" type="cmd" dest="this" event="TransferCall">
+									<send target="this" type="cmd" destexpr="_agent.Extension" event="TransferCall">
 										<activeCall type="script">consultationNewCall;</activeCall>
 										<heldCall type="script">connection;</heldCall>
 									</send>
@@ -568,7 +560,7 @@
 									<transition target="ACW"/>
 								</event>
 								<event event="cmd" cond="_event.cmd=='tripartitetalk'">
-									<send target="this" type="cmd" dest="this" event="ConferenceCall">
+									<send target="this" type="cmd" destexpr="_agent.Extension" event="ConferenceCall">
 										<activeCall type="script">consultationNewCall;</activeCall>
 										<heldCall type="script">connection;</heldCall>
 									</send>
@@ -618,7 +610,7 @@
 						</event>
 						<state  id="held">
 							<event event="cmd" cond="_event.cmd=='unmute'">
-								<send target="this" type="cmd" dest="this" event="RetrieveCall">
+								<send target="this" type="cmd" destexpr="_agent.Extension" event="RetrieveCall">
 									<connection type="script">connection;</connection>
 								</send>
 								<transition target="retrieveCalling"/>
@@ -646,7 +638,7 @@
 					</state>
 					<state id="conferenced">
 						<event event="cmd" cond="_event.cmd=='cancelmakecall'">
-							<send target="this" type="cmd" dest="this" event="ClearCall">
+							<send target="this" type="cmd" destexpr="_agent.Extension" event="ClearCall">
 								<connection type="script">conferenceCall;</connection>
 							</send>
 						</event>
@@ -663,7 +655,7 @@
 
 		<state id="logouting">
 			<event event="AgentLogout">
-				<send target="monitor" type="cmd" dest="this" event="MonitorEnd"/>
+				<send target="monitor" type="cmd" destexpr="_agent.Extension" event="MonitorEnd"/>
 				<send target="monitor" type="notify" dest="monitor" event="Logout">
 					<status>offwork</status>
 					<operatorid type="script">_agent.AgentId;</operatorid>
@@ -677,6 +669,21 @@
 				<log level="warn" type="script">_state._id + " not process event "+_event._name;</log>
 			</event>
 		</state>
+		<event event="cmd" cond="_event.cmd=='AlternateCall'">
+		
+		</event>
+		<event event="cmd" cond="_event.cmd=='AnswerCall'">
+		
+		</event>
+		<event event="cmd" cond="_event.cmd=='CallCompletion'">
+		
+		</event>
+		<event event="cmd" cond="_event.cmd=='ClearCall'">
+		
+		</event>
+		<event event="cmd" cond="_event.cmd=='ClearConnection'">
+		
+		</event>
     </state>
 	<state id="final">
 		<onentry>

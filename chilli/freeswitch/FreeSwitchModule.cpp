@@ -120,23 +120,91 @@ void FreeSwitchModule::fireSend(const std::string & strContent, const void * par
 
 void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::Extension * ext)
 {
+	log4cplus::Logger log = ext->getLogger();
+	Json::Value jsonEvent;
+	Json::Reader jsonReader;
+	if (!jsonReader.parse(strContent, jsonEvent) || !jsonEvent.isObject()) {
+		LOG4CPLUS_ERROR(log, strContent << " not json object.");
+		return;
+	}
+
+	std::string eventName;
+	std::string typeName;
+	std::string dest;
+
+	if (jsonEvent["type"].isString()) {
+		typeName = jsonEvent["type"].asString();
+	}
+
+	if (typeName != "cmd") {
+		return;
+	}
+
+	if (jsonEvent["dest"].isString()) {
+		dest = jsonEvent["dest"].asString();
+	}
+
+	if (dest != "this") {
+		return;
+	}
+
+	if (jsonEvent["event"].isString()) {
+		eventName = jsonEvent["event"].asString();
+	}
+
+	if (eventName == "MakeCall")
+	{
+		std::string calling = "";
+		std::string called = "";
+		std::string uuid = "";
+
+		if (jsonEvent["param"]["calling"].isString())
+			calling = jsonEvent["param"]["calling"].asString();
+
+		if (jsonEvent["param"]["called"].isString())
+			called = jsonEvent["param"]["called"].asString();
+
+		if (jsonEvent["param"]["ConnectionID"].isString())
+			uuid = jsonEvent["param"]["ConnectionID"].asString();
+
+		std::string cmd = "api originate {origination_uuid=" + uuid + "}user/";
+		cmd.append(calling);
+		cmd.append(" &bridge(sofia/external/");
+		cmd.append(called);
+		cmd.append("@192.168.1.254)");
+		esl_send(&m_Handle, cmd.c_str());
+
+		bHandled = true;
+	}
+	else if (eventName == "ClearCall")
+	{
+		std::string uuid = "";
+
+		if (jsonEvent["param"]["ConnectionID"].isString())
+			uuid = jsonEvent["param"]["ConnectionID"].asString();
+
+		std::string cmd = "api break " + uuid;
+		esl_send(&m_Handle, cmd.c_str());
+
+		bHandled = true;
+	}
 }
 
 void FreeSwitchModule::ConnectFS()
 {
 	LOG4CPLUS_DEBUG(log, "Run  FreeSwitch module");
 
-	esl_handle_t handle = { { 0 } };
+	//esl_handle_t handle = { { 0 } };
 
 	while (m_bRunning)
 	{
 		LOG4CPLUS_DEBUG(log, "connect freeswitch " << m_Host << ":" << m_Port);
 
-		esl_status_t status = esl_connect_timeout(&handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
+		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
 
-		if (!handle.connected){
+		if (!m_Handle.connected){
 			LOG4CPLUS_ERROR(log, "connect freeswitch " << m_Host << ":" << m_Port << " error,"
-				<< handle.errnum << " " << handle.err);
+				<< m_Handle.errnum << " " << m_Handle.err);
 			if (m_bRunning)
 				std::this_thread::sleep_for(std::chrono::seconds(5));
 			continue;
@@ -144,8 +212,8 @@ void FreeSwitchModule::ConnectFS()
 
 		LOG4CPLUS_INFO(log, "Connected to FreeSWITCH");
 
-		esl_events(&handle, ESL_EVENT_TYPE_JSON, "all");
-		LOG4CPLUS_DEBUG(log, handle.last_sr_reply);
+		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "all");
+		LOG4CPLUS_DEBUG(log, m_Handle.last_sr_reply);
 
 		/*
 		for (auto &it : this->GetExtensions()) {
@@ -189,24 +257,35 @@ void FreeSwitchModule::ConnectFS()
 		}
 		*/
 		while (m_bRunning){
-			esl_status_t status = esl_recv_event_timed(&handle, 1000, true, NULL);
+			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, true, NULL);
 			if (status == ESL_SUCCESS){
-				if (handle.last_event && handle.last_event->body) {
+				if (m_Handle.last_event && m_Handle.last_event->body) {
 					Json::Reader reader;
 					Json::Value event;
-					if (reader.parse(handle.last_event->body, event) && event.isObject()) {
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "HEARTBEAT")
+
+					if (reader.parse(m_Handle.last_event->body, event) && event.isObject()) {
+
+						std::string eventName;
+						if (event["Event-Name"].isString()) {
+							eventName = event["Event-Name"].asString();
+						}
+						if(eventName == "HEARTBEAT")
 							continue;
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "RE_SCHEDULE")
+						if (eventName == "RE_SCHEDULE")
 							continue;
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_EXECUTE")
+						if (eventName == "CHANNEL_EXECUTE")
 							continue;
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "CHANNEL_EXECUTE_COMPLETE")
+						if (eventName == "CHANNEL_EXECUTE_COMPLETE")
 							continue;
-						if (event["Event-Name"].isString() && event["Event-Name"].asString() == "API")
+						if (eventName == "API")
 							continue;
 						
-						if (event["Caller-ANI"].isString() && event["Caller-Destination-Number"].isString())
+						if (eventName == "CHANNEL_CREATE" 
+							|| eventName == "CHANNEL_PROGRESS"
+							|| eventName == "CHANNEL_ANSWER"
+							|| eventName == "CHANNEL_BRIDGE"
+							|| eventName == "CHANNEL_HANGUP"
+							|| eventName == "CHANNEL_DESTROY")
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");
@@ -235,9 +314,9 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Event-Date-GMT");
 							event.removeMember("Event-Date-Timestamp");
 							event.removeMember("Caller-Unique-ID");
-							event.removeMember("Unique-ID");
+							//event.removeMember("Unique-ID");
 
-							std::string extNum = event["Caller-ANI"].asString();
+							std::string caller = event["Caller-ANI"].asString();
 							std::string called = event["Caller-Destination-Number"].asString();
 
 							model::EventType_t evt;
@@ -250,9 +329,20 @@ void FreeSwitchModule::ConnectFS()
 								}
 							}
 
-							evt.event["extension"] = extNum;
+							/*if (caller != "0000000000")
+								evt.event["extension"] = caller;
+							else
+								evt.event["extension"] = called;
+							*/
+				
 							evt.event["event"] = evt.event["EventName"];
-							evt.event["ConnectionID"] = evt.event["ChannelCallUUID"];
+							evt.event["ConnectionID"] = evt.event["UniqueID"];
+
+							//Channel _ Create：通道创建事件
+							//Channel _ Progress：通道振铃事件
+							//Channel _ Answer：通道应答事件
+							//Channel _ Bridge：通道桥接事件
+							//Channel _ Hangup：通道挂断事件
 
 							this->PushEvent(evt);
 
@@ -260,7 +350,7 @@ void FreeSwitchModule::ConnectFS()
 							this->PushEvent(evt);
 						}
 						else {
-							LOG4CPLUS_DEBUG(log, handle.last_event->body);
+							LOG4CPLUS_DEBUG(log, m_Handle.last_event->body);
 						}
 					}
 					
@@ -272,7 +362,7 @@ void FreeSwitchModule::ConnectFS()
 				break;
 		}
 
-		esl_disconnect(&handle);
+		esl_disconnect(&m_Handle);
 	}
 	LOG4CPLUS_DEBUG(log, "Stoped  FreeSwitch module");
 	log4cplus::threadCleanup();

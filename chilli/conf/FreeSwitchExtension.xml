@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" ?>
 
-<fsm name ="FreeSwitchExtension" initial="init">
+<fsm name ="FreeSwitchExtension" initial="Null" final="Destroy">
 <datamodel>
 	<data id="status"/>
 </datamodel>
@@ -9,11 +9,81 @@
 	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
 	<state id="Null">
-		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_INIT'">
+		<event event="CHANNEL_CREATE">
+		    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerANI; called =_event.CallerDestinationNumber;</script>
 			<transition target="Initiated"/>
 		</event>
+		<event event="CHANNEL_DESTROY">
+			<transition target="Destroy"/>
+		</event>
+		<event event="MakeCall" cond="_event.type =='cmd'">
+			<script>caller = _event.MakeCall.caller; called = _event.MakeCall.called; ConnectionID = _event.ConnectionID;</script>
+			<send target="this" type="cmd" dest="this" event="MakeCall">
+				<calling type="script">_event.MakeCall.caller;</calling>
+				<called type="script">_event.MakeCall.called;</called>
+				<ConnectionID type="script">_event.ConnectionID;</ConnectionID>
+			</send>
+		</event>
+		<event event="ClearCall" cond="_event.type =='cmd'">
+			<send target="this" type="cmd" dest="this" event="ClearCall">
+				<ConnectionID type="script">_event.connection.callID;</ConnectionID>
+			</send>
+		</event>
+		<event event="CHANNEL_ANSWER">
+			<transition target="Connected"/>
+		</event>
+		
+		<event event="CHANNEL_HANGUP">
+			<send target="this" type="notify" destexpr="_extension.AgentID" event="CONNECTION_CLEARED">
+				<connectionCleared type="script">var connectionCleared ={}; connectionCleared.connection={}; connectionCleared.connection.callID = ConnectionID;connectionCleared;</connectionCleared>
+			</send>
+			<transition target="Null"/>
+		</event>
+		
 		<state id="Initiated">
+			<onentry>
+				<send target="eventreport" type="notify" dest="eventreport" event="ServiceInitiated">
+				</send>
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="SERVICE_INITIATED">
+					<serviceInitiated type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID;param;</serviceInitiated>
+				</send>
+			</onentry>
+			<event event="CHANNEL_PROGRESS">
+			    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerANI; called =_event.CallerDestinationNumber;</script>
+				<transition target="Alerting"/>
+			</event>
+		</state>
+		<state id="Alerting">
+			<onentry>
+				<send target="eventreport" type="notify" dest="eventreport" event="Alerting">
+				</send>
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="Alerting">
+					<alerting type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.calling = caller; param;</alerting>
+				</send>
+			</onentry>
+		</state>
+		<state id="Queued">
+		</state>
+		<state id="Failed">
+		</state>
+		<state id="Connected">
+			<onentry>
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="ORIGINATED">
+					<originated type="script">var originated ={}; originated.connection={}; originated.connection.callID = ConnectionID; originated.called = called;originated;</originated>
+				</send>
+			</onentry>
+			<event event="CHANNEL_BRIDGE" cond="_event.AnswerState=='answered'">
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="ESTABLISHED">
+					<established type="script">var established ={}; established.connection={}; established.connection.callID = ConnectionID; established.called = called;established;</established>
+				</send>
+			</event>
+			<state id="Held">
+			</state>
 		</state>
     </state>
+	<state id="Destroy">
+		<onentry>
+		</onentry>
+	</state>
 </fsm>
 
