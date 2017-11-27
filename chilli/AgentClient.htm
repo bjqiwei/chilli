@@ -11,6 +11,8 @@
     <font>服务器地址</font><input type="text" id="wsUri" value="ws://127.0.0.1:9996" /><p/>
 	<font>坐席ID</font><input type="text" id="agentId" value="6001" />
 	<font>密码</font><input type="password" id="password" value="1234" /><p/>
+    <font>分机</font><input type="text" id="device" value="1000" />
+    <font>技能组</font><input type="text" id="group" value="" /><p />
     <input type="button" value="登陆" onclick="Login();" />
 	<input type="button" value="登出" onclick="Logout();" /><p/>
 	<font>电话</font><input type="text" id="idTel" value="" width="300"/><input type="button" value="添加" onclick="AddTel();" />
@@ -48,6 +50,52 @@
 			websocket.close();
 		}
 		
+		function AlternateCall(active, other)
+		{
+		    var alternateCall = new Object();
+		    alternateCall.active = active;
+		    alternateCall.other = other;
+		    alternateCall.cmd = "AlternateCall";
+		    alternateCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function AnswerCall(alertingCall)
+		{
+		    var answerCall = new Object();
+		    answerCall.alertingCall = alertingCall;
+		    answerCall.cmd = "AnswerCall";
+		    answerCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function CallCompletion(feature,connection) {
+		    var callCompletion = new Object();
+		    callCompletion.feature = feature;
+		    callCompletion.connection = connection;
+		    callCompletion.cmd = "CallCompletion";
+		    callCompletion.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+        
+		function ClearCall(call)
+		{
+		    var clearCall = new Object();
+		    clearCall.call = call;
+		    clearCall.cmd = "ClearCall";
+		    clearCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function ClearConnection(call)
+		{
+		    var clearConnection = new Object();
+		    clearConnection.call = call;
+		    clearConnection.cmd = "ClearConnection";
+		    clearConnection.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
         function onOpen(evt)
         {
             document.getElementById("status").value = "已连接";
@@ -55,7 +103,9 @@
 			login.agentid= document.getElementById("agentId").value;
 			login.password = document.getElementById("password").value;
 			login.cmd = "Login";
-			login.event="cmd";
+			login.event = "cmd";
+			login.device = document.getElementById("device").value;
+			login.group = document.getElementById("group").value;
 			doSend(JSON.stringify(login));
         }
 
