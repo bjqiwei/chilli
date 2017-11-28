@@ -25,10 +25,10 @@ namespace xml{
 			}
 
 			// Make the writer an arbitrary bit larger than the source string
-			int len = str.length();
+			size_t len = str.length();
 			std::string stringWriter;
 
-			for (int i = 0; i < len; i++)
+			for (size_t i = 0; i < len; i++)
 			{
 				char c = str.at(i);
 				std::string entityName = ""; // Look for XML 1.0 predefined entities
