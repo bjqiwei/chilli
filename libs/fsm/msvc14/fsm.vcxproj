@@ -152,7 +152,7 @@
     <ProjectReference Include="..\..\jsoncpp-src-0.5.0\makefiles\vs2015\lib_json.vcxproj">
       <Project>{b84f7231-16ce-41d8-8c08-7b523ff4225b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libxml2-2.9.3\win32\VC14\libxml2.vcxproj">
+    <ProjectReference Include="..\..\libxml2-2.9.3\win\VC14\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\log4cplus-1.2.0\msvc14\log4cplus.vcxproj">
