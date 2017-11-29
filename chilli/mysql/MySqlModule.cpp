@@ -181,6 +181,7 @@ void MySqlModule::fireSend(const std::string &strContent, const void * param)
 		sql = jsonEvent["param"]["sql"].asString();
 
 	chilli::model::SQLEventType_t event(sql, from);
+	LOG4CPLUS_INFO(log, "sql:"  << event.m_sql);
 	m_SqlBuffer.Put(event);
 
 }
@@ -347,7 +348,7 @@ void MySqlModule::executeSql()
 			std::ostringstream oss;
 			oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLStateCStr() << ")";
 			LOG4CPLUS_DEBUG(log, oss.str());
-
+			std::this_thread::sleep_for(std::chrono::seconds(30));
 			if (connect && connect->isClosed()){
 				continue;
 			}
@@ -355,6 +356,7 @@ void MySqlModule::executeSql()
 		}
 		catch (std::runtime_error &e) {
 			LOG4CPLUS_ERROR(log, "ERROR: " << e.what());
+			std::this_thread::sleep_for(std::chrono::seconds(30));
 			if (connect && connect->isClosed()) {
 				continue;
 			}
