@@ -7,7 +7,7 @@ namespace fsm
 {
 namespace env
 {
-	static std::atomic_ulong g_JSEvaluatorReferce = 0;
+	static std::atomic_ulong g_JSEvaluatorReferce(0);
 
 	static const size_t gMaxHeapSize = 512 * 1024 * 1024;
 
@@ -29,14 +29,14 @@ namespace env
 		if (g_JSEvaluatorReferce.fetch_add(1) == 0) {
 			if (!JS_Init()) {
 				LOG4CPLUS_ERROR(log, ",JS_Init error.");
-				throw std::exception("JS_Init error.");
+				throw std::logic_error("JS_Init error.");
 			}
 		}
 
 		this->m_jsrt = JS_NewRuntime(gMaxHeapSize);
 		if ( m_jsrt == NULL ){
 			LOG4CPLUS_ERROR(log, "new evaluator runtime error.");
-			throw std::exception("JS_NewRuntime error.");
+			throw std::logic_error("JS_NewRuntime error.");
 		}
 
 		JS_SetErrorReporter(m_jsrt, reportError);

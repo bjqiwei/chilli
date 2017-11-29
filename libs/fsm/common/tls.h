@@ -7,6 +7,7 @@ typedef DWORD tls_key_type;
 #else
 #include <pthread.h>
 typedef pthread_key_t * tls_key_type;
+typedef void * tls_value_type;
 
 #endif
 

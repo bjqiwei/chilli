@@ -16,7 +16,7 @@ namespace env
 	static const size_t gStackChunkSize = 8192;
 
 	JsContext::JsContext(::JSRuntime * rt, const std::string &sessionid, Evaluator * eval,Context * _parent)
-		:m_jsrt(rt) ,m_strSessionID(sessionid),Context(eval,_parent)
+		:Context(eval, _parent), m_strSessionID(sessionid), m_jsrt(rt)
 	{
 		log =  log4cplus::Logger::getInstance("fsm.JsContext");
 		LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
@@ -209,7 +209,7 @@ namespace env
 		m_jsctx = JS_NewContext(m_jsrt, gStackChunkSize);
 		if (m_jsctx == NULL){
 			LOG4CPLUS_ERROR(log, m_strSessionID << ",JS_NewContext error.");
-			throw std::exception("JS_NewContext error.");
+			throw std::logic_error("JS_NewContext error.");
 		}
 
 		/* Enter a request before running anything in the context */
@@ -226,31 +226,31 @@ namespace env
 			JS::DontFireOnNewGlobalHook, options));
 
 		if (!(*m_global))
-			throw std::exception("JS_NewGlobalObject error.") ;
+			throw std::logic_error("JS_NewGlobalObject error.") ;
 
 		// Enter the new global object's compartment.
 		JSAutoCompartment ac(m_jsctx, *m_global);
 
 		/* Populate the global object with the standard globals, like Object and Array. */
 		if (!JS_InitStandardClasses(m_jsctx, *m_global))
-			throw std::exception("JS_InitStandardClasses error.");
+			throw std::logic_error("JS_InitStandardClasses error.");
 
 #ifdef JS_HAS_CTYPES
 		if (!JS_InitCTypesClass(m_jsctx, global))
-			throw std::exception("JS_InitCTypesClass error.");
+			throw std::logic_error("JS_InitCTypesClass error.");
 #endif
 		if (!JS_InitReflectParse(m_jsctx, *m_global))
-			throw std::exception("JS_InitReflectParse error.");
+			throw std::logic_error("JS_InitReflectParse error.");
 
 		if (!JS_DefineDebuggerObject(m_jsctx, *m_global))
-			throw std::exception("JS_DefineDebuggerObject error.");
+			throw std::logic_error("JS_DefineDebuggerObject error.");
 
 		if (!JS::RegisterPerfMeasurement(m_jsctx, *m_global))
-			throw std::exception("RegisterPerfMeasurement error.");
+			throw std::logic_error("RegisterPerfMeasurement error.");
 
 		bool succeeded;
 		if (!JS_SetImmutablePrototype(m_jsctx, *m_global, &succeeded))
-			throw std::exception("JS_SetImmutablePrototype error.");
+			throw std::logic_error("JS_SetImmutablePrototype error.");
 
 		JS_FireOnNewGlobalObject(m_jsctx, *m_global);
 	}

@@ -33,7 +33,7 @@ namespace fsm {
 }
 
 fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerExpiredFunc func)
-	:m_xmlType(xtype), m_strSessionID(sessionid), m_TimeOutFunc(func)
+	:m_xmlType(xtype), m_xmlDocPtr(nullptr), xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
 {
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");
 
@@ -270,33 +270,33 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 		}
 		else if (isLog(actionNode))
 		{
-			processLog(actionNode)? doneSomething = true:NULL;
+			processLog(actionNode)? doneSomething = true:false;
 			continue;
 		}
 
 		else if (isSend(actionNode))
 		{
-			processSend(actionNode)? doneSomething = true:NULL;
+			processSend(actionNode)? doneSomething = true:false;
 			continue;
 		}
 		else if (isScript(actionNode))
 		{
-			processScript(actionNode)? doneSomething = true:NULL;
+			processScript(actionNode)? doneSomething = true:false;
 			continue;
 		}
 		else if (isTimer(actionNode))
 		{
-			processTimer(actionNode)? doneSomething = true:NULL;
+			processTimer(actionNode)? doneSomething = true:false;
 			continue;
 		}
 		else if (isRaise(actionNode))
 		{
-			processRaise(actionNode)? doneSomething = true:NULL;
+			processRaise(actionNode)? doneSomething = true:false;
 			continue;
 		}
 		else if (isSleep(actionNode))
 		{
-			processSleep(actionNode)? doneSomething = true:NULL;
+			processSleep(actionNode)? doneSomething = true:false;
 			continue;
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
@@ -702,7 +702,7 @@ bool fsm::StateMachineimp::start(bool block)
 		return true;
 	}
 	else{
-		throw std::exception("Error: init statemachine.");
+		throw std::runtime_error("Error: init statemachine.");
 	}
 	return false;
 }
@@ -735,7 +735,7 @@ void fsm::StateMachineimp::mainEventLoop()
 			TriggerEvent trigEvent;
 			if (m_externalQueue.Get(trigEvent, 1000)) {
 
-				for_each(m_globalVars.begin(), m_globalVars.end(), [&](auto & it) {getRootContext()->setVar(it.first, it.second); });
+				for_each(m_globalVars.begin(), m_globalVars.end(), [&](auto & it) {this->getRootContext()->setVar(it.first, it.second); });
 				m_globalVars.clear();
 				if (!trigEvent.getEventName().empty()) {
 					processEvent(trigEvent);

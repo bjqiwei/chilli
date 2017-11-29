@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _SCXML_TRIGGEREVENT_HEADER_
 #define _SCXML_TRIGGEREVENT_HEADER_
-#include "..\config.h"
+#include "../config.h"
 #include <string>
 #include <json/json.h>
 

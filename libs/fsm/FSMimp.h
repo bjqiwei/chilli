@@ -54,8 +54,8 @@ namespace fsm{
 		std::string m_strStateFile;
 		std::string m_strStateContent;
 		uint32_t m_xmlType = 0;
-		helper::xml::CXmlDocumentPtr m_xmlDocPtr = nullptr;
-		helper::xml::CXPathContextPtr xpathCtx = nullptr;
+		helper::xml::CXmlDocumentPtr m_xmlDocPtr;
+		helper::xml::CXPathContextPtr xpathCtx;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
 		xmlNodePtr  m_initState = nullptr;
 		xmlNodePtr  m_finalState = nullptr;
@@ -69,8 +69,8 @@ namespace fsm{
 	private:
 		TriggerEvent m_currentEvt;
 
-		std::atomic_bool m_Running = false;
-		std::atomic_bool m_Block = false;
+		std::atomic_bool m_Running;
+		std::atomic_bool m_Block;
 		std::queue<TriggerEvent> m_internalQueue;
 		helper::CEventBuffer<TriggerEvent> m_externalQueue;
 		std::list<std::pair<std::string, Json::Value>> m_globalVars;

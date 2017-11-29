@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _FSM_SENDINTERFACE_HEADER_
 #define _FSM_SENDINTERFACE_HEADER_
-#include "..\config.h"
+#include "../config.h"
 #include <string>
 
 namespace fsm

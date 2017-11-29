@@ -27,7 +27,7 @@ namespace helper{
 		public:
 			//生成一个定时器对象，时间间隔，定时器id，
 			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, OnTimerExpiredFunc fun, void * userdata) :
-				m_nTimerId(timerId), m_interval(interval), m_attr(attr), m_TimeOutFuc(fun), m_userdata(userdata)
+				m_nTimerId(timerId), m_attr(attr), m_interval(interval), m_TimeOutFuc(fun), m_userdata(userdata)
 			  {
 				  ftime(&m_startTime);
 			  }
@@ -67,11 +67,11 @@ namespace helper{
 		std::map<unsigned long, unsigned long> m_rvtimer;
 
 		std::mutex m_mtx;
-		std::atomic_bool m_Running = false;
+		std::atomic_bool m_Running;
 		std::condition_variable m_cv;
 		std::thread m_thread;
 	public:
-		TimerServer(){
+		TimerServer():m_Running(false){
 			
 		}
 

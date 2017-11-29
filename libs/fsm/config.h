@@ -5,7 +5,7 @@
 #ifdef FSM_LIB
 #    define FSM_EXPORT __declspec(dllexport)
 #else
-#	define FSM_EXPORT __declspec(dllimport)
+#	define FSM_EXPORT
 #endif
 #define EXPIMP_TEMPLATE
 

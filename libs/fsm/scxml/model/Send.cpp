@@ -122,7 +122,7 @@ namespace model
 		}
 
 		/*if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
-			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*//*);
+			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line,xmlHasProp(m_node,BAD_CAST"fromexpr"));
 			if (jsonfrom.isString() || jsonfrom.isBool() || jsonfrom.isNull()){
 				from = jsonfrom.asCString();
 			}
