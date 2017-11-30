@@ -37,7 +37,7 @@ export PROJECT_IMPORT_LIB_RELEASE=
 #项目编译输出路径
 export PROJECT_PATH = ./build
 #项目输出文件主名称(不带后缀）
-export PROJECT_BASENAME = fsm
+export PROJECT_BASENAME = libfsm
 
 
 
