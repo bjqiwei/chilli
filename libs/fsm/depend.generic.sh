@@ -5,14 +5,14 @@ data=`$1 $2 -MM $3`
 
 debug=
 if [ $4 = "debug" ];then
-	debug="-g"
+	debug="-O0 -g"
 else
-    debug="-O3"
+    debug="-O0 -g"
 fi
 
 
 if [ -z "$data" ];then
-	echo "ÒÀÀµÎÄ¼þ¼ì²é´íÎó for $3"
+	echo "ä¾èµ–æ–‡ä»¶æ£€æŸ¥é”™è¯¯ for $3"
 else
 	$1 $2 -MM $3 | sed 1,1s/"^"/"\.\/$4\/"/ > ./$4/$basename.d
 	echo "	$1 $2 $debug -c \$< -o \$@" >> ./$4/$basename.d

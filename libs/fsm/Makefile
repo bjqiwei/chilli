@@ -1,54 +1,54 @@
-#���޸�����������ȷ���������
+#请修改以下内容以确定相关内容
 
-#��Ŀ����(��ִ�г���exe,��̬��lib,��̬��dll,so)
+#项目类型(可执行程序exe,静态库lib,动态库dll,so)
 export PROJECT_TYPE=a
 
-#��Ŀ�İ汾��
+#项目的版本号
 export PROJECT_VERSION= 1.0.0.0
 
-#Դ�ļ�����·�� ��Ŀ¼�б���
+#源文件所在路径 （目录列表）
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
-#ͷ�ļ�·��(-IĿ¼)
-PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include -I/usr/local/include/mozjs-45/ -I/usr/local/include/libxml2/
+#头文件路径(-I目录)
+PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I/usr/local/include/libxml2/ -I../mozjs-45.0.2/js/src/build/dist/include/ -I../mozjs-45.0.2/js/src/build/dist/system_wrappers -include ../mozjs-45.0.2/js/src/build/js/src/js-confdefs.h -include ../mozjs-45.0.2/config/gcc_hidden.h
 
-#���ɵİ汾�ļ�����
+#生成的版本文件名称
 PROJCT_VERSION_H= 
 
-#����������·����(-LĿ¼)
+#其他的链接路径，(-L目录)
 PROJECT_LINK_DIR=-L../jsoncpp-src-0.5.0/libs/linux-gcc-6.1.0
 
-#���̵ĺ궨��
-PROJECT_DEF= -D_LINUX -DLIBXML_STATIC -DEXPORT_JS_API -DMOZILLA_CLIENT
-# debug ���̵ĺ궨��
+#工程的宏定义
+PROJECT_DEF= -D_LINUX -DLIBXML_STATIC -DEXPORT_JS_API -DMOZILLA_CLIENT 
+# debug 工程的宏定义
 export PROJECT_DEF_DEBUG= -D_DEBUG -DDEBUG
-# release ���̵ĺ궨��
+# release 工程的宏定义
 export PROJECT_DEF_RELEASE= -DNDEBUG
 
-#������Ҫ���ӵ�������̬��
+#工程需要链接的其他动态库
 export PROJECT_IMPORT_DLL= -lpthread -ldl
 
-# debug ������Ҫ���ӵ�������̬���ļ��б�
+# debug 工程需要链接的其他静态库文件列表
 export PROJECT_IMPORT_LIB_DEBUG=   
 
-# release ������Ҫ���ӵ�������̬���ļ��б�
+# release 工程需要链接的其他静态库文件列表
 export PROJECT_IMPORT_LIB_RELEASE=    
 
-#��Ŀ�������·��
+#项目编译输出路径
 export PROJECT_PATH = ./build
-#��Ŀ����ļ�������(������׺��
+#项目输出文件主名称(不带后缀）
 export PROJECT_BASENAME = libfsm
 
 
 
 ######################################################################
-#--------------�������ݲ���Ҫ�޸�------------------------------------#
+#--------------以下内容不需要修改------------------------------------#
 ######################################################################
 
 export PROJECT_CC= g++
 export PROJECT_LINKER= g++
 export PROJECT_AR= ar rv
-export PWD = $shell('pwd')
+export PWD = $shell('pwd')
 
 DLL_FLAG=
 ifeq ($(PROJECT_TYPE),so)
@@ -59,7 +59,7 @@ ifeq ($(PROJECT_TYPE),dll)
 DLL_FLAG= -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
 endif
 
-#�Զ��ж�32λ��64λϵͳ
+#自动判断32位、64位系统
 SYSBYTE := $(shell uname -r | grep 'x86_64')
 ifeq ($(strip $(SYSBYTE)),) 
 override SYSBYTE = -m32 
@@ -69,14 +69,14 @@ override SYSBYTE = -m64
 #-std=gnu++0x
 endif 
 
-#�����õı���������
-export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -Wall $(SYSBYTE) $(PROJECT_DEF)
+#编译用的编译器参数
+export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -fPIC -Wall -Wsign-compare -Wtype-limits -Wno-invalid-offsetof -Wcast-align -freorder-blocks -static-libstdc++ -static-libgcc $(SYSBYTE) $(PROJECT_DEF)
 
-#�����õĲ���
+#链接用的参数
 export PROJECT_EXE_LINK_FLAGS = $(PROJECT_LINK_DIR) -Wall $(SYSBYTE) -Wl,-rpath -Wl,.
 export PROJECT_DLL_LINK_FLAGS = $(PROJECT_LINK_DIR) -Wall $(SYSBYTE) -shared -fPIC
 
-#PROJECTԴ�ļ��б� 
+#PROJECT源文件列表 
 PROJECT_CPP_FILES :=$(foreach dir,$(PROJECT_SOURCE),$(wildcard $(dir)/*.cpp))
 PROJECT_CXX_FILES :=$(foreach dir,$(PROJECT_SOURCE),$(wildcard $(dir)/*.cxx))
 PROJECT_C_FILES :=$(foreach dir,$(PROJECT_SOURCE),$(wildcard $(dir)/*.c))
