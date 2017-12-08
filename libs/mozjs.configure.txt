@@ -1,0 +1,1 @@
+./configure --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-system-zlib
