@@ -1,5 +1,6 @@
 #请修改以下内容以确定相关内容
 
+MOZJSDIR = ../mozjs-45.0.2/js/src/
 #项目类型(可执行程序exe,静态库lib,动态库dll,so)
 export PROJECT_TYPE=a
 
@@ -10,7 +11,7 @@ export PROJECT_VERSION= 1.0.0.0
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
 #头文件路径(-I目录)
-PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I/usr/local/include/libxml2/ -I../mozjs-45.0.2/js/src/build/dist/include/ -I../mozjs-45.0.2/js/src/build/dist/system_wrappers -include ../mozjs-45.0.2/js/src/build/js/src/js-confdefs.h -include ../mozjs-45.0.2/config/gcc_hidden.h
+PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I/usr/local/include/libxml2/ -I$(MOZJSDIR)dist/include/
 
 #生成的版本文件名称
 PROJCT_VERSION_H= 
@@ -26,13 +27,13 @@ export PROJECT_DEF_DEBUG= -D_DEBUG -DDEBUG
 export PROJECT_DEF_RELEASE= -DNDEBUG
 
 #工程需要链接的其他动态库
-export PROJECT_IMPORT_DLL= -lpthread -ldl
+export PROJECT_IMPORT_DLL= -lpthread -ldl 
 
 # debug 工程需要链接的其他静态库文件列表
-export PROJECT_IMPORT_LIB_DEBUG=   
+export PROJECT_IMPORT_LIB_DEBUG=
 
 # release 工程需要链接的其他静态库文件列表
-export PROJECT_IMPORT_LIB_RELEASE=    
+export PROJECT_IMPORT_LIB_RELEASE=$(PROJECT_IMPORT_LIB_DEBUG)  
 
 #项目编译输出路径
 export PROJECT_PATH = ./build
@@ -70,7 +71,7 @@ override SYSBYTE = -m64
 endif 
 
 #编译用的编译器参数
-export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -fPIC -Wall -Wsign-compare -Wtype-limits -Wno-invalid-offsetof -Wcast-align -freorder-blocks -static-libstdc++ -static-libgcc $(SYSBYTE) $(PROJECT_DEF)
+export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -fPIC -Wall -static-libstdc++ -static-libgcc $(SYSBYTE) $(PROJECT_DEF)
 
 #链接用的参数
 export PROJECT_EXE_LINK_FLAGS = $(PROJECT_LINK_DIR) -Wall $(SYSBYTE) -Wl,-rpath -Wl,.
