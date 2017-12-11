@@ -799,7 +799,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 	//scInstance->getRootContext()->set("_event.data",strEventData);
 	while (filterState != NULL && filterState != m_rootNode && foundEvent == false) 
 	{
-
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",matching event stateid=" << getXmlNodeAttributesValue(filterState, "id"));
 		for (xmlNodePtr eventNode = filterState->children; eventNode !=NULL;
 			eventNode = eventNode->next)
 		{
