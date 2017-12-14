@@ -600,10 +600,20 @@ RollingFileAppender::rollover(bool alreadyLocked)
     // If maxBackups <= 0, then there is no file renaming to be done.
     if (maxBackupIndex > 0)
     {
-        rolloverFiles(filename, maxBackupIndex);
+		//不对文件重命名，直接追加文件名
+        //rolloverFiles(filename, maxBackupIndex);
+		int newIndex = 1;
+		tstring target;
+		for (; newIndex <= maxBackupIndex; newIndex++) {
+			tostringstream backup_target_oss;
+			backup_target_oss << filename << LOG4CPLUS_TEXT(".") << newIndex;
+			target = backup_target_oss.str();
 
-        // Rename fileName to fileName.1
-        tstring target = filename + LOG4CPLUS_TEXT(".1");
+			std::fstream _file;
+			_file.open(target, std::ios::in);
+			if (!_file)
+				break;
+		}
 
         long ret;
 
@@ -863,13 +873,26 @@ DailyRollingFileAppender::rollover(bool alreadyLocked)
     // don't overwrite any of those previous files.
     // E.g. if "log.2009-11-07.1" already exists we rename it
     // to "log.2009-11-07.2", etc.
-    rolloverFiles(scheduledFilename, maxBackupIndex);
+
+	//祁伟修改，不对原来的文件重命名，直接在最后的文件名追加
+    //rolloverFiles(scheduledFilename, maxBackupIndex);
 
     // Do not overwriet the newest file either, e.g. if "log.2009-11-07"
     // already exists rename it to "log.2009-11-07.1"
-    tostringstream backup_target_oss;
-    backup_target_oss << scheduledFilename << LOG4CPLUS_TEXT(".") << 1;
-    tstring backupTarget = backup_target_oss.str();
+
+	int newIndex = 1;
+	tstring backupTarget;
+	for (; newIndex <= maxBackupIndex; newIndex++) {
+		tostringstream backup_target_oss;
+		backup_target_oss << scheduledFilename << LOG4CPLUS_TEXT(".") << newIndex;
+		backupTarget = backup_target_oss.str();
+
+		std::fstream _file;
+		_file.open(backupTarget, std::ios::in);
+		if (!_file)
+			break;
+	}
+
 
     helpers::LogLog & loglog = helpers::getLogLog();
     long ret;

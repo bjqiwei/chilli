@@ -60,9 +60,9 @@
 namespace log4cplus { namespace internal {
 
 #if defined(_WIN32)
-tstring const dir_sep(LOG4CPLUS_TEXT("\\"));
+	#define  dir_sep LOG4CPLUS_TEXT("\\")
 #else
-tstring const dir_sep(LOG4CPLUS_TEXT("/"));
+	#define dir_sep LOG4CPLUS_TEXT("/")
 #endif
 
 
