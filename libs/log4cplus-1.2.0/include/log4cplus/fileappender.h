@@ -150,6 +150,7 @@ namespace log4cplus
          * <code>true</code> by default.
          */
         bool immediateFlush;
+		log4cplus::helpers::Time lastFlush_time;
 
         /**
          * When this variable is true, FileAppender will try to create
