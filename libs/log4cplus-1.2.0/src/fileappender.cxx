@@ -365,6 +365,13 @@ FileAppenderBase::append(const spi::InternalLoggingEvent& event)
 
     if(immediateFlush || useLockFile)
         out.flush();
+	else {
+		log4cplus::helpers::Time now = log4cplus::helpers::Time::gettimeofday();
+		if (now.sec() - lastFlush_time.sec() > 5){
+			lastFlush_time = now;
+			out.flush();
+		}
+	}
 }
 
 void
