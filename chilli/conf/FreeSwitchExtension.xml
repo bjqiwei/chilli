@@ -3,6 +3,7 @@
 <fsm name ="FreeSwitchExtension" initial="Null" final="Destroy">
 <datamodel>
 	<data id="status"/>
+	<data id="recordfilename"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -10,7 +11,7 @@
 </scriptmodel>
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
-		    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerANI; called =_event.CallerDestinationNumber;</script>
+		    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
 			<transition target="Initiated"/>
 		</event>
 		<event event="CHANNEL_DESTROY">
@@ -19,8 +20,9 @@
 		<event event="MakeCall" cond="_event.type =='cmd'">
 			<script>caller = _event.MakeCall.caller; called = _event.MakeCall.called; ConnectionID = _event.ConnectionID; oricalled = called; oricaller = caller;</script>
 			<send target="this" type="cmd" dest="this" event="MakeCall">
-				<calling type="script">_event.MakeCall.caller;</calling>
+				<caller type="script">_event.MakeCall.caller;</caller>
 				<called type="script">_event.MakeCall.called;</called>
+				<display type="script">_extension.AgentID</display>
 				<ConnectionID type="script">_event.ConnectionID;</ConnectionID>
 			</send>
 		</event>
@@ -49,7 +51,7 @@
 				</send>
 			</onentry>
 			<event event="CHANNEL_PROGRESS">
-			    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerANI; called =_event.CallerDestinationNumber;</script>
+			    <script>ConnectionID = _event.ConnectionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
 				<transition target="Alerting"/>
 			</event>
 		</state>
@@ -58,7 +60,7 @@
 				<send target="eventreport" type="notify" dest="eventreport" event="Alerting">
 				</send>
 				<send target="this" type="notify" destexpr="_extension.AgentID" event="Alerting">
-					<alerting type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.calling = caller; param;</alerting>
+					<alerting type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.caller = caller; param;</alerting>
 				</send>
 			</onentry>
 		</state>
@@ -68,15 +70,18 @@
 		</state>
 		<state id="Connected">
 			<onentry>
-				<send target="this" type="notify" destexpr="_extension.AgentID" event="ORIGINATED">
-					<originated type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called;param;</originated>
-				</send>
 				<send target="this" type="cmd" dest="this" event="StartRecord">
 					<ConnectionID type="script">_event.ConnectionID;</ConnectionID>
-					<filename type="script">var now = new Date(); _extension.AgentID + '_' + now.Format('y-M-d-H-m-s') + '_' + oricalled + '_' + oricaller + '.wav';</filename>
+					<filename type="script">var now = new Date(); recordfilename = now.Format('yyyy-MM-dd') + '/' + _extension.AgentID + '_' + now.Format('yyyy-MM-dd-H-m-s.S') + '_' + (oricalled ? oricalled : called) + '_' + (oricaller ? oricaller : caller) + '.wav'; 'D:/record/' + recordfilename;</filename>
+				</send>
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="ORIGINATED">
+					<originated type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.recordfilename = recordfilename; param;</originated>
+				</send>
+				<send target="this" type="notify" destexpr="_extension.AgentID" event="ESTABLISHED">
+					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called;param;</established>
 				</send>
 			</onentry>
-			<event event="CHANNEL_BRIDGE" cond="_event.AnswerState=='answered'">
+			<event event="CHANNEL_BRIDGE">
 				<send target="this" type="notify" destexpr="_extension.AgentID" event="ESTABLISHED">
 					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called;param;</established>
 				</send>

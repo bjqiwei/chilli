@@ -7,6 +7,7 @@
 	<data id="timestamp"/>
 	<data id="starttime"/>
 	<date id="logingroups"/>
+	<date id="loginId"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -15,7 +16,7 @@
 </scriptmodel>
 	<state id="init">
 		<onentry>
-			<script>logingroups = "";</script>
+			<script>logingroups = ""; caller = _agent.Extension;</script>
 		</onentry>
 		<event event="cmd" cond="_event.cmd=='logon' &amp;&amp; _event.password == _agent.Password">
 			<transition  target="logining"/>
@@ -87,6 +88,9 @@
 			</event>
 			<state id="logined">
 				<onentry>
+					<send target="mysql" type="cmd" dest="mysql" event="sql">
+						<sql type="script">loginId = uuid(); var sql='INSERT INTO AgentLogin(Id,AgentID,Extension,LoginTime)VALUES(\''+loginId+'\',\'' +_agent.AgentId + '\',\''+ _agent.Extension +'\',\'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\');'; sql;</sql>
+					</send>
 					<send target="this" type="response" dest="client" event="logon">
 						<status type="script">0</status>
 						<type>logon</type>
@@ -131,7 +135,7 @@
 					</send>
 					<transition  target="WorkReady"/>
 				</event>
-				<event event="cmd" cond="_event.cmd=='Login'">
+				<event event="cmd" cond="_event.cmd=='logon'">
 					<send target="this" type="notify" dest="client" event="kick">
 						<status>1</status>
 						<type>kick</type>
@@ -155,6 +159,14 @@
 						<type>agentidle</type>
 					</send>
 					<transition target="Ready"/>
+				</event>
+				
+				<event event="cmd" cond="_event.cmd=='agentbusy'">
+					<send target="this" type="notify" dest="client" event="agentbusy">
+						<status type="script">0</status>
+						<type>agentbusy</type>
+					</send>
+					<transition target="NotReady"/>
 				</event>
 				
 				<event event="cmd" cond="_event.cmd == 'monitoragent'">
@@ -181,7 +193,23 @@
 					</send>
 					<transition  target="Alerting"/>
 				</event>
+				<event event="Alerting">
+					<script>connection = _event.alerting.connection; called = _event.alerting.called; caller = _event.alerting.caller;</script>
+					<send target="this" type="notify" dest="client" event="inringing">
+						<type>inringing</type>
+						<callid type="script">_event.alerting.connection.callID;</callid>
+						<timestamp type="script">Date.parse(new Date())/1000; </timestamp>
+						<caller type="script">_event.alerting.caller; </caller>
+						<called type="script">called;</called>
+						<userdata type="script">_event.alerting.userdata;</userdata>
+						<nowgroupid type="script"> -1;</nowgroupid>
+					</send>
+					<transition  target="Alerting"/>
+				</event>
 				<event event="CONNECTION_CLEARED">
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='UPDATE CallDetail SET EndTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE ConnectID=\'' + connection.callID + '\''; sql;</sql>
+						</send>
 					<transition cond="cmp(_event.connectionCleared.connection,connection)" target="ACW"/>
 				</event>
 				<event event="CALL_CLEARED">
@@ -192,7 +220,10 @@
 						<MakeCall type="script">var makecall ={}; makecall.caller =_agent.Extension; makecall.called = _event.called; makecall; </MakeCall>
 						<ConnectionID type="script"> connection = {}; connection.callID = uuid(); connection.callID;</ConnectionID> 
 					</send>
-					<script>called = _event.called;</script>
+					<script>caller = _agent.Extension; called = _event.called;</script>
+					<send target="mysql" type="cmd" dest="mysql" event="sql">
+						<sql type="script">var sql='INSERT INTO CallDetail(CallID,ConnectID,Direction,Caller,AgentID,Called,StartTime)VALUES(\''+uuid()+'\',\'' + connection.callID + '\',0,\'' + caller +'\',\'' +_agent.AgentId + '\',\''+ called +'\',\'' + (new Date()).Format('yyyy-MM-dd-H-m-s')+ '\');'; sql;</sql>
+					</send>
 					<transition target="makecalling"/>
 				</event>
 				
@@ -251,6 +282,13 @@
 							<groupids type="script">logingroups</groupids>
 						</send>
 					</onentry>
+					<event event="ORIGINATED">
+						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='INSERT INTO CallDetail(CallID,ConnectID,Direction,Caller,AgentID,Called,StartTime)VALUES(\''+uuid()+'\',\'' + connection.callID + '\',0,\'' + caller +'\',\'' +_agent.AgentId + '\',\''+ called +'\',\'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\');'; sql;</sql>
+						</send>
+						<transition target="originated"/>
+					</event>
 				</state>
 				<state id="Ready">
 					<onentry>
@@ -271,6 +309,9 @@
 					</event>
 					<event event="ORIGINATED">
 						<script>connection = _event.originated.connection; called = _event.originated.called;</script>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='INSERT INTO CallDetail(CallID,ConnectID,Direction,Caller,AgentID,Called,StartTime)VALUES(\''+uuid()+'\',\'' + connection.callID + '\',0,\'' + caller +'\',\'' +_agent.AgentId + '\',\''+ called +'\',\'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\');'; sql;</sql>
+						</send>
 						<transition target="originated"/>
 					</event>
 				</state>
@@ -282,10 +323,12 @@
 				</state>
 				<state id="originated">
 					<onentry>
+						<script>recordfilename = _event.originated.recordfilename;</script>
 						<send target="this" type="notify" dest="client" event="outcall">
 							<type>outcall</type>
 							<callid type="script">_event.originated.connection.callID;</callid>
 							<called type="script">called;</called>
+							<recordfilename type="script">recordfilename;</recordfilename>
 						</send>
 						<send target="monitor" type="notify" dest="monitor" event="outcall">
 							<status>outcall</status>
@@ -303,6 +346,7 @@
 							<caller type="script">_event.originated.calling; </caller>
 							<called type="script">called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
+							<recordfilename type="script">recordfilename;</recordfilename>
 						</send>
 						<send target="monitor" type="notify" dest="monitor" event="calledringing">
 							<status>calledringing</status>
@@ -322,6 +366,10 @@
 							<caller type="script">_event.delivered.calling; </caller>
 							<called type="script">called;</called>
 							<nowgroupid type="script"> -1;</nowgroupid>
+							<recordfilename type="script">recordfilename;</recordfilename>
+						</send>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='UPDATE CallDetail SET RingingTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE ConnectID=\'' + connection.callID + '\''; sql;</sql>
 						</send>
 						<transition  cond="_event.delivered.connection.callID == connection.callID" target="delivered"/>
 					</event>
@@ -339,6 +387,7 @@
 							<type>answer</type>
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">called;</called>
+							<recordfilename type="script">recordfilename;</recordfilename>
 						</send>
 						<send target="monitor" type="notify" dest="monitor" event="outboundcall">
 							<status>outboundcall</status>
@@ -349,6 +398,9 @@
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
 						</send>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='UPDATE CallDetail SET AnswerTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE ConnectID=\'' + connection.callID + '\''; sql;</sql>
+						</send>
 						<transition cond="_event.established.connection.callID == connection.callID" target="established"/>
 					</event>
 					<state id ="delivered">
@@ -356,6 +408,12 @@
 				</state>
 				<state id="Alerting">
 					<onentry>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='INSERT INTO CallDetail(CallID,ConnectID,Direction,Caller,AgentID,Called,StartTime)VALUES(\''+uuid()+'\',\'' + connection.callID + '\',1,\'' + caller +'\',\'' +_agent.AgentId + '\',\''+ called +'\',\'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\');'; sql;</sql>
+						</send>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='UPDATE CallDetail SET RingingTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE ConnectID=\'' + connection.callID + '\''; sql;</sql>
+						</send>
 						<send target="monitor" type="notify" dest="monitor" event="inringing">
 							<status>inringing</status>
 							<caller type="script">caller;</caller>
@@ -367,10 +425,15 @@
 						</send>
 					</onentry>
 					<event event="ESTABLISHED">
+						<script>recordfilename = _event.established.recordfilename;</script>
+						<send target="mysql" type="cmd" dest="mysql" event="sql">
+							<sql type="script">var sql='UPDATE CallDetail SET AnswerTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE ConnectID=\'' + connection.callID + '\''; sql;</sql>
+						</send>
 						<send target="this" type="notify" dest="client" event="incall">
 							<type>incall</type>
 							<callid type="script">_event.established.connection.callID;</callid>
 							<called type="script">called;</called>
+							<recordfilename type="script">recordfilename;</recordfilename>
 						</send>
 						<send target="monitor" type="notify" dest="monitor" event="innercall">
 							<status>innercall</status>
@@ -380,6 +443,7 @@
 							<worktype type="script">2</worktype>
 							<auto type="script">false;</auto>
 							<groupids type="script">logingroups</groupids>
+							<recordfilename type="script">recordfilename;</recordfilename>
 						</send>
 						<transition cond="cmp(_event.established.connection,connection)" target="established"/>
 					</event>
@@ -687,6 +751,9 @@
     </state>
 	<state id="final">
 		<onentry>
+			<send target="mysql" type="cmd" dest="mysql" event="sql">
+				<sql type="script">var sql='UPDATE AgentLogin SET LogoutTime = \'' + (new Date()).Format('yyyy-MM-dd-H-m-s') + '\' WHERE Id=\'' + loginId + '\''; sql;</sql>
+			</send>
 		</onentry>
 	</state>
 </fsm>
