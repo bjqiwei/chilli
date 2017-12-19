@@ -911,13 +911,13 @@ DailyRollingFileAppender::rollover(bool alreadyLocked)
 #endif
 
     // Rename e.g. "log.2009-11-07" to "log.2009-11-07.1".
-    ret = file_rename (scheduledFilename, backupTarget);
-    loglog_renaming_result (loglog, scheduledFilename, backupTarget, ret);
+    //ret = file_rename (scheduledFilename, backupTarget);
+    //loglog_renaming_result (loglog, scheduledFilename, backupTarget, ret);
 
 #if defined (_WIN32)
     // Try to remove the target first. It seems it is not
     // possible to rename over existing file, e.g. "log.2009-11-07".
-    ret = file_remove (scheduledFilename);
+    //ret = file_remove (scheduledFilename);
 #endif
 
     // Rename filename to scheduledFilename,
@@ -927,8 +927,8 @@ DailyRollingFileAppender::rollover(bool alreadyLocked)
         + filename
         + LOG4CPLUS_TEXT(" to ")
         + scheduledFilename);
-    ret = file_rename (filename, scheduledFilename);
-    loglog_renaming_result (loglog, filename, scheduledFilename, ret);
+    ret = file_rename (filename, backupTarget);
+    loglog_renaming_result (loglog, filename, backupTarget, ret);
 
     // Open a new file, e.g. "log".
 	open(fileOpenMode);
