@@ -163,10 +163,12 @@ AppenderAttachableImpl::appendLoopOnAppenders(const spi::InternalLoggingEvent& e
 {
     int count = 0;
 
-    thread::MutexGuard guard (appender_list_mutex);
+	appender_list_mutex.lock();
+	ListType _tmpAppenderList = appenderList;
+	appender_list_mutex.unlock();
 
-    for(ListType::const_iterator it=appenderList.begin();
-        it!=appenderList.end();
+    for(ListType::const_iterator it= _tmpAppenderList.begin();
+        it!= _tmpAppenderList.end();
         ++it)
     {
         ++count;
