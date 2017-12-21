@@ -4,6 +4,10 @@
 <datamodel>
 	<data id="status"/>
 	<data id="recordfilename"/>
+	<data id="oricalled" expr="null"/>
+	<data id="oricaller" expr="null"/>
+	<data id="called" expr="null" />
+	<data id="caller" expr="null"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -78,12 +82,12 @@
 					<originated type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.recordfilename = recordfilename; param;</originated>
 				</send>
 				<send target="this" type="notify" destexpr="_extension.AgentID" event="ESTABLISHED">
-					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called;param;</established>
+					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.recordfilename = recordfilename; param;</established>
 				</send>
 			</onentry>
 			<event event="CHANNEL_BRIDGE">
 				<send target="this" type="notify" destexpr="_extension.AgentID" event="ESTABLISHED">
-					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called;param;</established>
+					<established type="script">var param ={}; param.connection={}; param.connection.callID = ConnectionID; param.called = called; param.recordfilename = recordfilename; param;</established>
 				</send>
 			</event>
 			<state id="Held">
