@@ -103,7 +103,7 @@
       </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -124,7 +124,7 @@
       </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -162,7 +162,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LIBXML_STATIC;EXPORT_JS_API;MOZILLA_CLIENT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>

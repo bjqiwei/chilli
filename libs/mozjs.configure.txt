@@ -1,1 +1,6 @@
-./configure --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-system-zlib
+./configure --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-system-zlib 
+#禁用动态库参数 --disable-shared-js 
+#编译64位库参数 --target=x86_64-pc-mingw32 --host=x86_64-pc-mingw32
+#修改configure 目录下 nsprpub\config\config.mk,OS_CFLAGS 添加-MT 参数
+#修改RTL_FLAGS=-MT
+#修改configure 目录下 intl\icu\target\icudefs.mk -MD 修改为 -MT
