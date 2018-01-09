@@ -23,7 +23,7 @@ public:
 	bool Put(const T &data){
 		std::unique_lock<std::mutex> lck(m_mtx);
 		if (m_dataBuffer.size() > MAXBUFFER){
-			std::logic_error ex("CEventBuffer size Exceed max buffer.");
+			std::runtime_error ex("CEventBuffer size Exceed max buffer.");
 			throw  std::exception(ex);
 		}
 		this->m_dataBuffer.push_back(data);

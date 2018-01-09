@@ -193,6 +193,22 @@ int main(int argc, char* argv[])
 		log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("conf/log4cplus.properties"), 10 * 1000);
 
 		SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+
+		time_t t;  //秒时间  
+		tm* local; //本地时间   
+		tm* gmt;   //格林威治时间  
+		char buf[128] = { 0 };
+
+		t = time(NULL); //获取目前秒时间  
+		local = localtime(&t); //转为本地时间  
+		strftime(buf, 64, "%Y-%m-%d %H:%M:%S", local);
+		std::string timeoutstr = "2019-01-01 00:00:00";
+		//std::cout << buf << std::endl;
+		if (buf > timeoutstr){
+			LOG4CPLUS_ERROR(log, LOG4CPLUS_TEXT("timeout..."));
+			return 1;
+		}
+
 		chilli::App::Start();
 		CoreRuntimeLoop(0);
 		chilli::App::Stop();
