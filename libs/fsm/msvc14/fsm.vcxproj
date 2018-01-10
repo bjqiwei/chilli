@@ -108,7 +108,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;icutud.lib;icudtd.lib;icuind.lib;icuucd.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -129,7 +129,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;icutud.lib;icudtd.lib;icuind.lib;icuucd.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -151,7 +151,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;icutu.lib;icudt.lib;icuin.lib;icuuc.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -169,7 +169,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;icutu.lib;icudt.lib;icuin.lib;icuuc.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>js_static.lib;mozglue.lib;nspr4.lib;psapi.lib;plc4.lib;plds4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
