@@ -356,7 +356,12 @@ lwsclose:
 		m_Info.timeout_secs = 5;
 		m_Info.user = this;
 
-		m_Info.options = m_Info.options | LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_ALLOW_NON_SSL_ON_SSL_PORT;
+		static std::atomic_bool initssl = false;
+		if (initssl == false){
+			initssl = true;
+			m_Info.options = m_Info.options | LWS_SERVER_OPTION_ALLOW_NON_SSL_ON_SSL_PORT;
+		}
+	
 		m_Info.options = m_Info.options | LWS_SERVER_OPTION_VALIDATE_UTF8;
 
 		m_Info.ssl_cert_filepath = m_cert_path.c_str();
