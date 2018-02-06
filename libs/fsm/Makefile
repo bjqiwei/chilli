@@ -11,13 +11,13 @@ export PROJECT_VERSION= 1.0.0.0
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
 #头文件路径(-I目录)
-PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I/usr/local/include/libxml2/ -I$(MOZJSDIR)dist/include/
+PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I../libxml2-2.9.3/include/ -I$(MOZJSDIR)dist/include/
 
 #生成的版本文件名称
 PROJCT_VERSION_H= 
 
 #其他的链接路径，(-L目录)
-PROJECT_LINK_DIR=-L../jsoncpp-src-0.5.0/libs/linux-gcc-6.1.0
+PROJECT_LINK_DIR=
 
 #工程的宏定义
 PROJECT_DEF= -D_LINUX -DLIBXML_STATIC -DEXPORT_JS_API -DMOZILLA_CLIENT 
