@@ -11,7 +11,7 @@ export PROJECT_VERSION= 1.0.0.0
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
 #头文件路径(-I目录)
-PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I../libxml2-2.9.3/include/ -I$(MOZJSDIR)dist/include/
+PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I../libxml2-2.9.3/include/ -I$(MOZJSDIR)dist/include/ -include js/RequiredDefines.h
 
 #生成的版本文件名称
 PROJCT_VERSION_H= 
@@ -90,7 +90,7 @@ export PROJECT_SRC_FILES :=$(PROJECT_CPP_FILES) $(PROJECT_CXX_FILES) $(PROJECT_C
 export PROJECT_DEPS := $(PROJECT_CPP_DEP) $(PROJECT_CXX_DEP) $(PROJECT_C_DEP)
 export PROJECT_OBJS := $(PROJECT_DEPS:%.d=%.o)
 
-default: debug
+default: release
 
 all: debug release
 
