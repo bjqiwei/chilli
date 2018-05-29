@@ -617,7 +617,7 @@ RollingFileAppender::rollover(bool alreadyLocked)
 			target = backup_target_oss.str();
 
 			std::fstream _file;
-			_file.open(target, std::ios::in);
+			_file.open(LOG4CPLUS_FSTREAM_PREFERED_FILE_NAME(target).c_str(), std::ios::in);
 			if (!_file)
 				break;
 		}
@@ -895,7 +895,7 @@ DailyRollingFileAppender::rollover(bool alreadyLocked)
 		backupTarget = backup_target_oss.str();
 
 		std::fstream _file;
-		_file.open(backupTarget, std::ios::in);
+		_file.open(LOG4CPLUS_FSTREAM_PREFERED_FILE_NAME(backupTarget).c_str(), std::ios::in);
 		if (!_file)
 			break;
 	}
