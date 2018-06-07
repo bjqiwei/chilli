@@ -176,11 +176,19 @@ void MySqlModule::fireSend(const std::string &strContent, const void * param)
 	}
 
 	std::string sql;
+	std::string conctionId;
 
 	if (jsonEvent["param"]["sql"].isString())
 		sql = jsonEvent["param"]["sql"].asString();
 
+	if (jsonEvent["param"]["ConnectionID"].isString()) {
+		conctionId = jsonEvent["param"]["ConnectionID"].asString();
+	}
+
+
+
 	chilli::model::SQLEventType_t event(sql, from);
+	event.m_ConnectionID = conctionId;
 	LOG4CPLUS_INFO(log, "sql:"  << event.m_sql);
 	m_SqlBuffer.Put(event);
 
@@ -338,6 +346,7 @@ void MySqlModule::executeSql()
 				}
 
 				result["extension"] = Event.m_ExtNumber;
+				result["ConnectionID"] = Event.m_ConnectionID;
 				result["event"] = "SQL";
 
 				chilli::model::EventType_t resultEvent(result);

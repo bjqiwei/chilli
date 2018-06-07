@@ -3,20 +3,20 @@ Navicat MySQL Data Transfer
 
 Source Server         : cti
 Source Server Version : 50505
-Source Host           : 192.168.1.250:3306
+Source Host           : localhost:3306
 Source Database       : cti
 
 Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2017-12-02 01:15:10
+Date: 2018-01-16 01:39:55
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for agentlogin
+-- Table structure for `agentlogin`
 -- ----------------------------
 DROP TABLE IF EXISTS `agentlogin`;
 CREATE TABLE `agentlogin` (
@@ -31,7 +31,11 @@ CREATE TABLE `agentlogin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for calldetail
+-- Records of agentlogin
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `calldetail`
 -- ----------------------------
 DROP TABLE IF EXISTS `calldetail`;
 CREATE TABLE `calldetail` (
@@ -51,3 +55,7 @@ CREATE TABLE `calldetail` (
   KEY `caller` (`Caller`),
   KEY `called` (`Called`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of calldetail
+-- ----------------------------

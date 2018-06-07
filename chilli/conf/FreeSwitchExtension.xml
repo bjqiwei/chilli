@@ -25,7 +25,19 @@
 			<script>caller = _event.MakeCall.caller; called = _event.MakeCall.called; ConnectionID = _event.ConnectionID; oricalled = called; oricaller = caller;</script>
 			<send target="this" type="cmd" dest="this" event="MakeCall">
 				<caller type="script">_event.MakeCall.caller;</caller>
-				<called type="script">_event.MakeCall.called;</called>
+				<called type="script">var called; 
+				if(_event.MakeCall.called.length &lt; 5){
+					called = 'user/'+_event.MakeCall.called;
+				}
+				else{
+					if (_event.MakeCall.caller &lt; 1033){
+						called = 'sofia/external/' + _event.MakeCall.called + '@172.16.0.8'
+					}
+					else{
+						called = 'sofia/external/' + _event.MakeCall.called + '@172.16.0.7'
+					}
+				}
+				called;</called>
 				<display type="script">_extension.AgentID</display>
 				<ConnectionID type="script">_event.ConnectionID;</ConnectionID>
 			</send>

@@ -27,6 +27,7 @@ public:
 	virtual bool IsFinalState();
 
 	virtual bool setVar(const std::string &name, const Json::Value &value);
+	virtual Json::Value getVar(const std::string & name);
 
 	virtual const std::string & getExtNumber() final;
 
@@ -37,6 +38,8 @@ public:
 	virtual void setSessionId(const std::string & sessinId) final;
 
 	virtual const std::string & getSessionId()final;
+	
+	virtual std::string getStateId()final;
 
 	virtual log4cplus::Logger getLogger()final;
 

@@ -54,7 +54,7 @@ namespace model{
 	{
 		// TODO: insert return statement here
 		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		return m_Extensions;
+		return g_Extensions;
 	}
 
 	void ProcessModule::PushEvent(const EventType_t & Event)
@@ -77,7 +77,7 @@ namespace model{
 			}
 			else {
 
-				LOG4CPLUS_ERROR(log, " not find extension by event:" << Event.event.toStyledString());
+				LOG4CPLUS_WARN(log, " not find extension by event:" << Event.event.toStyledString());
 				return;
 			}
 		}
@@ -98,7 +98,7 @@ namespace model{
 					continue;
 				}
 				else {
-					LOG4CPLUS_ERROR(log, " not find extension by event:" << newEvent.event.toStyledString());
+					LOG4CPLUS_WARN(log, " not find extension by event:" << newEvent.event.toStyledString());
 				}
 				
 			}
@@ -134,7 +134,7 @@ namespace model{
 							extptr->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_ERROR(log, "not find extension:" << ext);
+							LOG4CPLUS_WARN(log, "not find extension:" << ext);
 						}
 					}
 				}
@@ -180,7 +180,7 @@ namespace model{
 				it->second->m_model->PushEvent(evt);
 			}
 			else {
-				LOG4CPLUS_ERROR(log, " not find extension by event:" << attr);
+				LOG4CPLUS_WARN(log, " not find extension by event:" << attr);
 			}
 		}
 	}

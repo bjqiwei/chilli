@@ -21,6 +21,7 @@ namespace model {
 		explicit _SQLEventType(const std::string & sql, const std::string & ext) :m_sql(sql), m_ExtNumber(ext) {};
 		std::string m_sql;
 		std::string m_ExtNumber;
+		std::string m_ConnectionID;
 		uint32_t m_times = 0;
 	}SQLEventType_t;
 }
