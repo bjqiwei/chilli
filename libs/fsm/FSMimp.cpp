@@ -735,7 +735,9 @@ void fsm::StateMachineimp::mainEventLoop()
 			TriggerEvent trigEvent;
 			if (m_externalQueue.Get(trigEvent, 1000)) {
 
-				for_each(m_globalVars.begin(), m_globalVars.end(), [&](auto & it) {this->getRootContext()->setVar(it.first, it.second); });
+				for(auto & it :m_globalVars){
+					this->getRootContext()->setVar(it.first, it.second); 
+				}
 				m_globalVars.clear();
 				if (!trigEvent.getEventName().empty()) {
 					processEvent(trigEvent);
