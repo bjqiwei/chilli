@@ -1,0 +1,2 @@
+1、安装scons
+2、scons platform=linux-gcc
