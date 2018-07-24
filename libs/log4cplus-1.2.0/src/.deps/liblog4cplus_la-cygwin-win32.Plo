@@ -1,0 +1,4 @@
+src/liblog4cplus_la-cygwin-win32.lo: src/cygwin-win32.cxx \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:

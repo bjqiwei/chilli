@@ -1,4 +1,4 @@
-﻿UNICODE
+UNICODE
 =======
 
 Log4cplus uses the expression "UNICODE" in at least two not so equal

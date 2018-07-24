@@ -147,7 +147,7 @@ xcopy /Y Sh\ShIndex.ini $(OutDir)conf\
 xcopy /Y Sh\ShConfig.ini $(OutDir)conf\
 xcopy /Y *.js $(OutDir)conf\
 xcopy /Y welcome.wav $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\mozglue.dll $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -217,7 +217,7 @@ xcopy /Y Sh\ShIndex.ini $(OutDir)conf\
 xcopy /Y Sh\ShConfig.ini $(OutDir)conf\
 xcopy /Y *.js $(OutDir)conf\
 xcopy /Y welcome.wav $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)
+xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\mozglue.dll $(OutDir)
 xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
