@@ -241,11 +241,11 @@ done:
 	return true;
 }
 
-class EventReportWSclient :public WebSocket::WebSocketClient, chilli::model::ConnectAdapter
+class EventReportWSclient :public WebSocket::WSConnection, chilli::model::ConnectAdapter
 {
 public:
 	explicit EventReportWSclient(struct lws * wsi, model::ProcessModule * module) 
-		:WebSocketClient(wsi),m_module(module)
+		:WSConnection(wsi),m_module(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.EventReportWSclient");
 		LOG4CPLUS_TRACE(log, m_SessionId << "construction");
@@ -275,12 +275,12 @@ public:
 	virtual int Send(const char * lpBuf, int nBufLen) override
 	{
 		//LOG4CPLUS_DEBUG(log, m_SessionId << " Send:" << std::string(lpBuf, nBufLen));
-		return WebSocketClient::Send(lpBuf, nBufLen);
+		return WSConnection::Send(lpBuf, nBufLen);
 	}
 
 	virtual void Close() override
 	{
-		return WebSocketClient::Close();
+		return WSConnection::Close();
 	}
 
 private:
@@ -294,9 +294,9 @@ public:
 	explicit EventReportWSServer(int port, model::ProcessModule * module)
 		:WebSocketServer(port), m_module(module)
 	{};
-	virtual WebSocket::WebSocketClient * OnAccept(struct lws *wsi) override
+	virtual WebSocket::WSConnection * OnAccept(struct lws *wsi) override
 	{
-		WebSocket::WebSocketClient * wsc = new EventReportWSclient(wsi, m_module);
+		WebSocket::WSConnection * wsc = new EventReportWSclient(wsi, m_module);
 		return wsc;
 	}
 private:

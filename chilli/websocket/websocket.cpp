@@ -5,7 +5,7 @@
 #include <mutex>
 
 namespace WebSocket {
-	static std::map<struct lws *, WebSocketClient *> WSClientSet;
+	static std::map<struct lws *, WSConnection *> WSClientSet;
 	//static std::recursive_mutex wsClientSetMtx;
 
 	/*
@@ -19,7 +19,7 @@ namespace WebSocket {
 		callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 	{
 
-		WebSocketClient * wsclient = nullptr;
+		WSConnection * wsclient = nullptr;
 		WebSocketServer * This = reinterpret_cast<WebSocketServer*>(lws_context_user(lws_get_context(wsi)));
 
 		//std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
@@ -222,13 +222,13 @@ lwsclose:
 		case LWS_CALLBACK_WSI_CREATE: {
 			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_CREATE");
 			if(lws_wsi_user(wsi) == nullptr)
-				WebSocketClient * wsclient = This->OnAccept(wsi);
+				WSConnection * wsclient = This->OnAccept(wsi);
 		}
 									  break;
 		case LWS_CALLBACK_WSI_DESTROY: {
 			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_DESTROY");
 			if (wsclient){
-				if (typeid(*wsclient) == typeid(WebSocketClient))
+				if (typeid(*wsclient) == typeid(WSConnection))
 					delete wsclient;
 			}
 
@@ -311,9 +311,9 @@ lwsclose:
 		return m_Context;
 	}
 
-	WebSocket::WebSocketClient * WebSocketServer::OnAccept(struct lws *wsi)
+	WebSocket::WSConnection * WebSocketServer::OnAccept(struct lws *wsi)
 	{
-		WebSocketClient * wsclient = new WebSocketClient(wsi);
+		WSConnection * wsclient = new WSConnection(wsi);
 		return wsclient;
 	}
 
@@ -406,7 +406,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr)
+	WSConnection::WSConnection(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -422,7 +422,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr)
+	WSConnection::WSConnection(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -437,7 +437,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::WebSocketClient(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi)
+	WSConnection::WSConnection(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi)
 	{
 		std::stringstream str;
 		str << this << ":";
@@ -455,7 +455,7 @@ lwsclose:
 
 	}
 
-	WebSocketClient::~WebSocketClient()
+	WSConnection::~WSConnection()
 	{
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end())
@@ -465,7 +465,7 @@ lwsclose:
 		//LOG4CPLUS_TRACE(log, m_SessionId << "deconstruct");
 	}
 
-	void WebSocketClient::Open()
+	void WSConnection::Open()
 	{
 		if (this->wsi != nullptr)
 			return;
@@ -507,7 +507,7 @@ lwsclose:
 
 	}
 
-	void WebSocketClient::Close()
+	void WSConnection::Close()
 	{
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi)
@@ -523,7 +523,7 @@ lwsclose:
 
 	}
 
-	int WebSocketClient::Send(const char* lpBuf, int nBufLen)
+	int WSConnection::Send(const char* lpBuf, int nBufLen)
 	{
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		std::vector<unsigned char> data(LWS_PRE);
@@ -542,43 +542,43 @@ lwsclose:
 	}
 
 
-	void WebSocketClient::OnOpen()
+	void WSConnection::OnOpen()
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnOpen");
 	}
 
-	void WebSocketClient::OnSend()
+	void WSConnection::OnSend()
 	{
 		LOG4CPLUS_TRACE(log, m_SessionId << "OnSend");
 	}
 
-	void WebSocketClient::OnClose(const std::string & ErrorCode)
+	void WSConnection::OnClose(const std::string & ErrorCode)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnClose:" << ErrorCode);
 	}
 
-	void WebSocketClient::OnError(const std::string & errorCode)
+	void WSConnection::OnError(const std::string & errorCode)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnError:" << errorCode);
 	}
 
-	void WebSocketClient::OnMessage(const std::string & message)
+	void WSConnection::OnMessage(const std::string & message)
 	{
 		LOG4CPLUS_DEBUG(log, m_SessionId << "OnMessage:" << message);
 	}
 
-	void WebSocketClient::SetWSUrl(const std::string & url)
+	void WSConnection::SetWSUrl(const std::string & url)
 	{
 		this->m_url = url;
 		LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << this->m_url);
 	}
 
-	const std::string & WebSocketClient::GetWSUrl()
+	const std::string & WSConnection::GetWSUrl()
 	{
 		return this->m_url;
 	}
 
-	long WebSocketClient::GetStatus()
+	long WSConnection::GetStatus()
 	{
 		return m_state;
 	}

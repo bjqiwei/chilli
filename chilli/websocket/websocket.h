@@ -5,7 +5,7 @@
 #include <libwebsockets.h>
 
 namespace WebSocket {
-	class WebSocketClient;
+	class WSConnection;
 	class WebSocketServer {
 	public:
 		explicit WebSocketServer(int port = CONTEXT_PORT_NO_LISTEN);
@@ -23,7 +23,7 @@ namespace WebSocket {
 		bool UnInitInstance();
 		void Loop(int timeout_ms);
 		struct lws_context * GetContext();
-		virtual WebSocketClient * OnAccept(struct lws *wsi);
+		virtual WSConnection * OnAccept(struct lws *wsi);
 
 		friend int callback_lws(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len);
@@ -35,14 +35,14 @@ namespace WebSocket {
 		CLOSING 	= 2,// 	The connection is in the process of closing.
 		CLOSED 		= 3,// 	The connection is closed or couldn't be opened.
 	}Status;
-	class WebSocketClient
+	class WSConnection
 	{
 	friend class WebSocketServer;
 	protected:
-		explicit WebSocketClient(const std::string & ws, struct lws_context *ctx);
-		explicit WebSocketClient(struct lws_context *context);
-		explicit WebSocketClient(struct lws *);
-		virtual ~WebSocketClient();
+		explicit WSConnection(const std::string & ws, struct lws_context *ctx);
+		explicit WSConnection(struct lws_context *context);
+		explicit WSConnection(struct lws *);
+		virtual ~WSConnection();
 
 	public:
 		void Open();
@@ -52,8 +52,8 @@ namespace WebSocket {
 		const std::string & GetWSUrl();
 		long GetStatus();
 
-		WebSocketClient(const WebSocketClient&) = delete;
-		WebSocketClient& operator=(const WebSocketClient&) = delete;
+		WSConnection(const WSConnection&) = delete;
+		WSConnection& operator=(const WSConnection&) = delete;
 		//websocketclient& operator=(const websocketclient&) volatile = delete;
 
 	protected:
