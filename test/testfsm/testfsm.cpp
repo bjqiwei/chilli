@@ -13,9 +13,17 @@
 
 using namespace std;
 
-
 //#ifdef SCXML
 using namespace fsm;
+
+class ontimer :public OnTimerInterface {
+
+	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
+	{
+		std::cout << attr << endl;
+	}
+}my_timer;
+
 
 int main(int argc, _TCHAR* argv[])
 {
@@ -28,7 +36,7 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
-		fsm::StateMachine mysmscxml("0123456",strStateFile, nullptr);
+		fsm::StateMachine mysmscxml("0123456",strStateFile, &my_timer);
 		SendImp mySend;
 
 		std::thread th([&]() {
