@@ -110,7 +110,7 @@ namespace model{
 
 	void ProcessModule::run()
 	{
-		LOG4CPLUS_INFO(log, this->getId() << "Starting...");
+		LOG4CPLUS_INFO(log, this->getId() << " Starting...");
 		try
 		{
 			for (auto & it : m_PerformElements) {
@@ -143,7 +143,7 @@ namespace model{
 				}
 				catch (std::exception & e)
 				{
-					LOG4CPLUS_ERROR(log, e.what());
+					LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
 				}
 			}
 

@@ -175,7 +175,7 @@ void Agent::mainEventLoop()
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log,this->getId() << " " << e.what());
 	}
 }
 

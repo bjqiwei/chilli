@@ -11,16 +11,16 @@ namespace chilli {
 		{
 			std::string logName = "Device";
 			log = log4cplus::Logger::getInstance(logName);
-			LOG4CPLUS_DEBUG(log, "new a device object.");
+			LOG4CPLUS_DEBUG(log, this->getId() << " new a device object.");
 		}
 
 		Device::~Device() {
-			LOG4CPLUS_DEBUG(log, "destruction a device object.");
+			LOG4CPLUS_DEBUG(log, this->getId() << " destruction a device object.");
 		}
 
 		void Device::Start()
 		{
-			LOG4CPLUS_INFO(log, " Start.");
+			LOG4CPLUS_INFO(log, this->getId()<< " Start.");
 			for (auto & it : m_Connections) {
 				it.second->start(false);
 			}
@@ -31,7 +31,7 @@ namespace chilli {
 			for (auto & it : m_Connections) {
 				it.second->stop();
 			}
-			LOG4CPLUS_INFO(log, " Stop.");
+			LOG4CPLUS_INFO(log, this->getId() << " Stop.");
 		}
 
 		bool Device::IsClosed()
@@ -75,7 +75,7 @@ namespace chilli {
 						evt.addVars(it, jsonEvent[it]);
 					}
 
-					LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+					LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 					if (m_Connections.find(connectid) == m_Connections.end()) {
 						Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, nullptr));
@@ -106,7 +106,7 @@ namespace chilli {
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, e.what());
+				LOG4CPLUS_ERROR(log, this->getId() << e.what());
 			}
 		}
 
@@ -129,14 +129,14 @@ namespace chilli {
 		
 			}
 			else {
-				LOG4CPLUS_ERROR(log, strContent << " not json data.");
+				LOG4CPLUS_ERROR(log, this->getId() << strContent << " not json data.");
 			}
 
 		}
 
 		void Device::fireSend(const std::string &strContent, const void * param)
 		{
-			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
+			LOG4CPLUS_TRACE(log, this->getId() << "fireSend:" << strContent);
 			bool bHandled = false;
 			processSend(strContent, param, bHandled);
 		}

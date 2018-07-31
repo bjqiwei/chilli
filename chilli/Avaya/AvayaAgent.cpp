@@ -18,7 +18,7 @@ AvayaAgent::~AvayaAgent(){
 
 void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_TRACE(log,"fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
 	bool bHandled = false;
 	this->processSend(strContent, param, bHandled);
 	

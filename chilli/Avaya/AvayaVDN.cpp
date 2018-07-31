@@ -9,42 +9,19 @@ namespace Avaya {
 	AvayaVDN::AvayaVDN(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
 		:m_model(model), Device(model, ext, smFileName)
 	{
-		std::string logName = "AvayaVDN.";
-		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
+		std::string logName = "AvayaVDN";
+		log = log4cplus::Logger::getInstance(logName);
 	}
 
 	AvayaVDN::~AvayaVDN() {
 	}
 
-	void AvayaVDN::Start()
-	{
-	}
-
-	void AvayaVDN::Stop()
-	{
-	}
-
-	bool AvayaVDN::IsFinalState()
+	bool AvayaVDN::IsClosed()
 	{
 		return false;
 	}
 
-	bool AvayaVDN::setVar(const std::string & name, const Json::Value & value)
-	{
-		if (name == "_extension.companyid")
-		{
-			if (value.isString())
-				m_companyid = value.asString();
-		}
-		else if (name == "_stationNo")
-		{
-			if (value.isString())
-				m_stationNo = value.asString();
-		}
-		return true;
-	}
-
-	int AvayaVDN::pushEvent(const model::EventType_t &evt)
+	bool AvayaVDN::pushEvent(const model::EventType_t &evt)
 	{
 		//return m_EventBuffer.Put(evt);
 		const Json::Value & jsonEvent = evt.event;
@@ -56,7 +33,7 @@ namespace Avaya {
 
 			if (callid == 0)
 			{
-				LOG4CPLUS_WARN(log, "callid is invalid," << jsonEvent.toStyledString());
+				LOG4CPLUS_WARN(log, this->getId() << " callid is invalid," << jsonEvent.toStyledString());
 				return -1;
 
 			}
@@ -88,20 +65,6 @@ namespace Avaya {
 	{
 	}
 
-	int AvayaVDN::Answer()
-	{
-		return 0;
-	}
-
-	int AvayaVDN::PlayFile(const std::string & fileName)
-	{
-		return 0;
-	}
-
-	int AvayaVDN::HangUp()
-	{
-		return 0;
-	}
 
 }
 }
