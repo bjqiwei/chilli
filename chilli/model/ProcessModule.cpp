@@ -4,8 +4,8 @@
 
 namespace chilli{
 namespace model{
-	std::recursive_mutex ProcessModule::g_ExtMtx;
-	model::ExtensionMap ProcessModule::g_Extensions;
+	std::recursive_mutex ProcessModule::g_PEMtx;
+	model::PerformElementMap ProcessModule::g_PerformElements;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId)
@@ -18,8 +18,8 @@ namespace model{
 			Stop();
 		}
 
-		for (auto & it = m_Extensions.begin(); it != m_Extensions.end();) {
-			removeExtension(it++->first);
+		for (auto & it = m_PerformElements.begin(); it != m_PerformElements.end();) {
+			removePerfromElement(it++->first);
 		}
 
 	}
@@ -50,12 +50,14 @@ namespace model{
 		return 0;
 	}
 
-	ExtensionMap  ProcessModule::GetExtensions()
+	/*
+	PerformElementMap  ProcessModule::GetExtensions()
 	{
 		// TODO: insert return statement here
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		return g_Extensions;
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		return g_PerformElements;
 	}
+	*/
 
 	void ProcessModule::PushEvent(const EventType_t & Event)
 	{
@@ -64,15 +66,15 @@ namespace model{
 
 		if (!jsonEvent["extension"].isArray()) {
 
-			std::string ext;
+			std::string peId;
 			if (jsonEvent["extension"].isString()) {
-				ext = jsonEvent["extension"].asString();
+				peId = jsonEvent["extension"].asString();
 			}
 
 			//
-			auto extptr = getExtension(ext);
-			if (extptr != nullptr){
-				extptr->m_model->m_RecEvtBuffer.Put(Event);
+			auto peptr = getPerformElement(peId);
+			if (peptr != nullptr){
+				peptr->m_model->m_RecEvtBuffer.Put(Event);
 				return;
 			}
 			else {
@@ -84,15 +86,15 @@ namespace model{
 		else {
 			for (size_t i = 0; i < jsonEvent["extension"].size(); i++) {
 
-				std::string ext;
+				std::string peId;
 				if (jsonEvent["extension"][i].isString()) {
-					ext = jsonEvent["extension"][i].asString();
+					peId = jsonEvent["extension"][i].asString();
 				}
 
 				chilli::model::EventType_t newEvent(Event.event);
-				newEvent.event["extension"] = ext;
+				newEvent.event["extension"] = peId;
 
-				auto extptr = getExtension(ext);
+				auto extptr = getPerformElement(peId);
 				if (extptr != nullptr) {
 					extptr->m_model->m_RecEvtBuffer.Put(newEvent);
 					continue;
@@ -110,7 +112,7 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Starting...");
 		try
 		{
-			for (auto & it : m_Extensions) {
+			for (auto & it : m_PerformElements) {
 				it.second->Start();
 			}
 
@@ -122,19 +124,19 @@ namespace model{
 					if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
 					{
 						const Json::Value & jsonEvent = Event.event;
-						std::string ext;
+						std::string peId;
 						if (jsonEvent["extension"].isString()) {
-							ext = jsonEvent["extension"].asString();
+							peId = jsonEvent["extension"].asString();
 						}
 
-						auto extptr = getExtension(ext);
+						auto extptr = getPerformElement(peId);
 
 						if (extptr != nullptr) {
 							extptr->pushEvent(Event);
 							extptr->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_WARN(log, "not find extension:" << ext);
+							LOG4CPLUS_WARN(log, "not find extension:" << peId);
 						}
 					}
 				}
@@ -144,7 +146,7 @@ namespace model{
 				}
 			}
 
-			for (auto & it : m_Extensions) {
+			for (auto & it : m_PerformElements) {
 				it.second->Stop();
 			}
 		}
@@ -156,64 +158,53 @@ namespace model{
 		LOG4CPLUS_INFO(log, "Stoped.");
 		log4cplus::threadCleanup();
 	}
-
-	void ProcessModule::OnTimerExpiredFunc(unsigned long timerId, const std::string & attr, void * userdata)
+	
+	void ProcessModule::OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
 	{
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("Timer");
 		Json::Value jsonEvent;
 		Json::Reader jsonReader;
-		std::string ext;
+		std::string peId;
 
 		if (jsonReader.parse(attr, jsonEvent)) {
 			jsonEvent["extension"] = jsonEvent["sessionId"];
 
 			if (jsonEvent["extension"].isString()) {
-				ext = jsonEvent["extension"].asString();
+				peId = jsonEvent["extension"].asString();
 			}
 		}
 		chilli::model::EventType_t evt(jsonEvent);
-		{
-			std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-			auto & it = g_Extensions.find(ext);
-
-			if (it != g_Extensions.end()) {
-				it->second->m_model->PushEvent(evt);
-			}
-			else {
-				LOG4CPLUS_WARN(log, " not find extension by event:" << attr);
-			}
-		}
+		m_RecEvtBuffer.Put(evt);
 	}
 
-
-	bool ProcessModule::addExtension(const std::string &ext, ExtensionPtr & extptr)
+	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		if (this->g_Extensions.find(ext) == this->g_Extensions.end()){
-			this->g_Extensions[ext] = extptr;
-			this->m_Extensions[ext] = extptr;
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		if (this->g_PerformElements.find(peId) == this->g_PerformElements.end()){
+			this->g_PerformElements[peId] = peptr;
+			this->m_PerformElements[peId] = peptr;
 			return true;
 		}
 		return false;
 	}
 
-	void ProcessModule::removeExtension(const std::string & ext)
+	void ProcessModule::removePerfromElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		this->g_Extensions.erase(ext);
-		this->m_Extensions.erase(ext);
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		this->g_PerformElements.erase(peId);
+		this->m_PerformElements.erase(peId);
 	}
 
-	chilli::model::ExtensionPtr ProcessModule::getExtension(const std::string & ext)
+	chilli::model::PerformElementPtr ProcessModule::getPerformElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_ExtMtx);
-		auto & it = this->m_Extensions.find(ext);
-		if (it != this->m_Extensions.end()) {
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		auto & it = this->m_PerformElements.find(peId);
+		if (it != this->m_PerformElements.end()) {
 			return it->second;
 		}
 
-		it = this->g_Extensions.find(ext);
-		if (it != this->g_Extensions.end()) {
+		it = this->g_PerformElements.find(peId);
+		if (it != this->g_PerformElements.end()) {
 			return it->second;
 		}
 

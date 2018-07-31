@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CHILLI_ACDMODULE_HEADER_
-#define _CHILLI_ACDMODULE_HEADER_
 #include "../model/ProcessModule.h"
 #include <log4cplus/logger.h>
 #include <atomic>
@@ -18,9 +16,7 @@ public:
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
-
 };
 }
 }
-#endif // end acd header
 

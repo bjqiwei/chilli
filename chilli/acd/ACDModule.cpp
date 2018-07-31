@@ -1,5 +1,5 @@
 #include "ACDModule.h"
-#include "ACDExtension.h"
+#include "ACDDevice.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
@@ -31,21 +31,21 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 		return false;
 	}
 	
-	for (XMLElement *child = config.FirstChildElement("Extension");
+	for (XMLElement *child = config.FirstChildElement("Device");
 		child != nullptr;
-		child = child->NextSiblingElement("Extension"))
+		child = child->NextSiblingElement("Device"))
 	{
-		const char * num = child->Attribute("ExtensionNumber");
+		const char * num = child->Attribute("DeviceID");
 		const char * sm = child->Attribute("StateMachine");
 		num = num ? num : "";
 		sm = sm ? sm : "";
 
-		model::ExtensionPtr ext(new ACDExtension(this, num, sm));
-		if (ext != nullptr && addExtension(num,ext)){
-			ext->setVar("_extension.Extension", num);
+		model::PerformElementPtr ext(new ACDDevice(this, num, sm));
+		if (ext != nullptr && addPerformElement(num,ext)){
+			ext->setVar("_extension.deviceID", num);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, "alredy had extension:" << num);
+			LOG4CPLUS_ERROR(log, "alredy had device:" << num);
 		}
 	}
 	

@@ -130,9 +130,6 @@
     <ClInclude Include="model\ConnectAdapter.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="acd\ACDExtension.h">
-      <Filter>ACD</Filter>
-    </ClInclude>
     <ClInclude Include="Avaya\AvayaAgent.h">
       <Filter>Avaya</Filter>
     </ClInclude>
@@ -174,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="Avaya\AvayaDevice.h">
       <Filter>Avaya</Filter>
+    </ClInclude>
+    <ClInclude Include="acd\ACDDevice.h">
+      <Filter>ACD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,9 +225,6 @@
     <ClCompile Include="model\ProcessModule.cpp">
       <Filter>model</Filter>
     </ClCompile>
-    <ClCompile Include="acd\ACDExtension.cpp">
-      <Filter>ACD</Filter>
-    </ClCompile>
     <ClCompile Include="Avaya\AvayaAgent.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="Avaya\AvayaDevice.cpp">
       <Filter>Avaya</Filter>
+    </ClCompile>
+    <ClCompile Include="acd\ACDDevice.cpp">
+      <Filter>ACD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

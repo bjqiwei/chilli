@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Config>
   <ACD id="acd001">
-    <Extension ExtensionNumber="0001" StateMachine="./conf/ACD.xml"></Extension>
+    <Device DeviceID="0001" StateMachine="./conf/ACD.xml"></Device>
   </ACD>
   <Agents id="agent001" TCPPort="9995" WSPort="9996">
     <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>

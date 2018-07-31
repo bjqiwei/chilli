@@ -230,7 +230,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <None Include="welcome.wav" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="acd\ACDExtension.h" />
+    <ClInclude Include="acd\ACDDevice.h" />
     <ClInclude Include="ACD\ACDModule.h" />
     <ClInclude Include="Agent\Agent.h" />
     <ClInclude Include="Agent\AgentModule.h" />
@@ -268,7 +268,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="websocket\websocket.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="acd\ACDExtension.cpp" />
+    <ClCompile Include="acd\ACDDevice.cpp" />
     <ClCompile Include="ACD\ACDModule.cpp" />
     <ClCompile Include="Agent\Agent.cpp" />
     <ClCompile Include="Agent\AgentModule.cpp" />
