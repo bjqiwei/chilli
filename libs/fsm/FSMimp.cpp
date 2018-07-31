@@ -32,7 +32,7 @@ namespace fsm {
 	static helper::TimerServer * g_TimerServer = nullptr;
 }
 
-fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerExpiredFunc func)
+fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerInterface * func)
 	:m_xmlType(xtype), m_xmlDocPtr(nullptr), xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
 {
 	log = log4cplus::Logger::getInstance("fsm.StateMachine");

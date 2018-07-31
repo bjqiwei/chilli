@@ -7,15 +7,13 @@
 #include <log4cplus/logger.h>
 #include "scxml/TriggerEvent.h"
 #include "scxml/SendInterface.h"
+#include "common/TimerInterface.h"
 
 
 using namespace std;
-
+using namespace helper;
 
 namespace fsm{
-
-	typedef void(*OnTimerExpiredFunc)(unsigned long timerId, const std::string & attr, void * userdata);
-
 	class StateMachineimp;
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
 	enum xmlType{
@@ -24,7 +22,7 @@ namespace fsm{
 	};
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const std::string &sessionid, const string &xml, OnTimerExpiredFunc func, xmlType xtype = xmlType::File);
+		StateMachine(const std::string &sessionid, const string &xml, OnTimerInterface * func, xmlType xtype = xmlType::File);
 		virtual ~StateMachine();
 		StateMachine(const StateMachine &other) = delete;
 		StateMachine & operator=(const StateMachine & other) = delete;

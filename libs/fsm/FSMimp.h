@@ -23,7 +23,7 @@ namespace fsm{
 	class  StateMachineimp {
 		friend class StateMachine;
 	protected:
-		StateMachineimp(const std::string &sessionid, const string &xml, int xtype, helper::OnTimerExpiredFunc func);
+		StateMachineimp(const std::string &sessionid, const string &xml, int xtype, helper::OnTimerInterface * func);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;
@@ -64,7 +64,7 @@ namespace fsm{
 		Context *  m_Context = nullptr;
 		std::string m_strSessionID;
 		std::string m_strName;
-		helper::OnTimerExpiredFunc m_TimeOutFunc = nullptr;
+		helper::OnTimerInterface * m_TimeOutFunc = nullptr;
 
 	private:
 		TriggerEvent m_currentEvt;

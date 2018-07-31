@@ -7,6 +7,7 @@
 #include <thread>
 #include <atomic>
 #include <map>
+#include "TimerInterface.h"
 
 #ifndef INFINITE
 #define  INFINITE  (0xFFFFFFFF)
@@ -16,9 +17,6 @@
 
 namespace helper{
 
-	//定时器超时通知接口
-
-	typedef void(*OnTimerExpiredFunc)(unsigned long timerId, const std::string & attr, void * userdata);
 	// 定时器
 	class TimerServer{
 	private:
@@ -26,7 +24,7 @@ namespace helper{
 		class  Timer{
 		public:
 			//生成一个定时器对象，时间间隔，定时器id，
-			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, OnTimerExpiredFunc fun, void * userdata) :
+			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, OnTimerInterface * fun, void * userdata) :
 				m_nTimerId(timerId), m_attr(attr), m_interval(interval), m_TimeOutFuc(fun), m_userdata(userdata)
 			  {
 				  ftime(&m_startTime);
@@ -42,13 +40,13 @@ namespace helper{
 			unsigned long getTimerId(){return m_nTimerId;};
 			const std::string & getAttr(){ return m_attr;};
 			void * getUserData() { return m_userdata; };
-			OnTimerExpiredFunc getFunction() { return m_TimeOutFuc; };
+			OnTimerInterface * getFunction() { return m_TimeOutFuc; };
 		private:
 			const unsigned long m_nTimerId;
 			const std::string m_attr;
 			const unsigned long m_interval;
 			struct timeb m_startTime;
-			OnTimerExpiredFunc m_TimeOutFuc = nullptr;
+			OnTimerInterface * m_TimeOutFuc = nullptr;
 			void * m_userdata;
 			Timer & operator=( const Timer & ) = delete;
 		};
@@ -123,7 +121,7 @@ namespace helper{
 
 						if (m_rvtimer.find(timer->getTimerId()) == m_rvtimer.end()) {
 							if (timer->getFunction() != nullptr)
-								timer->getFunction()(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+								timer->getFunction()->OnTimer(timer->getTimerId(), timer->getAttr(), timer->getUserData());
 						}
 						else
 							m_rvtimer.erase(timer->getTimerId());
@@ -146,7 +144,7 @@ namespace helper{
 		}
 
 	public:
-		unsigned long SetTimer(unsigned long delay, const std::string & attr, OnTimerExpiredFunc func, void * userdata){
+		unsigned long SetTimer(unsigned long delay, const std::string & attr, OnTimerInterface * func, void * userdata){
 
 			unsigned long timerId = GenerateTimerID();
 			Timer * _timer = new Timer(timerId, delay, attr, func, userdata);
