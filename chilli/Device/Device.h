@@ -23,6 +23,6 @@ namespace chilli{
 			void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
 		};
-		typedef std::shared_ptr<Device>  ExtensionImpPtr;
+		typedef std::shared_ptr<Device>  DevicePtr;
 	}
 }

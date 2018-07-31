@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" ?>
 
-<fsm name ="AvayaExtension" initial="init">
+<fsm name ="AvayaDevice" initial="init">
 <datamodel>
 	<data id="agentId" expr="null"/>
 	<data id="agent_ID" expr="null"/>

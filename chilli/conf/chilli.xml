@@ -69,9 +69,9 @@
 			<Agent ExtensionNumber="9999" StateMachine="./conf/AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" Extension="8005" avayaAgentId="6030" avayaPassword="1234" avayaExtension="8005"></Agent>
 		</Agents>
 		<Extensions>
-			<Extension ExtensionNumber="8005" StateMachine="./conf/AvayaExtension.xml" avayaExtension="8005"></Extension>
-			<Extension ExtensionNumber="8006" StateMachine="./conf/AvayaExtension.xml" avayaExtension="8006"></Extension>
-			<Extension ExtensionNumber="8007" StateMachine="./conf/AvayaExtension.xml" avayaExtension="8007"></Extension>
+			<Extension ExtensionNumber="8005" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8005"></Extension>
+			<Extension ExtensionNumber="8006" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8006"></Extension>
+			<Extension ExtensionNumber="8007" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8007"></Extension>
 		</Extensions>
     <VDN ExtensionNumber="5099" avayaExtension="5099"/>
     <ACD>

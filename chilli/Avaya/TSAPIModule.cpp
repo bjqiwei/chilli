@@ -1,6 +1,6 @@
 #include "TSAPIModule.h"
 #include "AvayaAgent.h"
-#include "AvayaExtension.h"
+#include "AvayaDevice.h"
 #include "AvayaVDN.h"
 #include "AvayaACD.h"
 #include <log4cplus/loggingmacros.h>
@@ -185,7 +185,7 @@ namespace chilli {
 					companyid = companyid ? companyid : "";
 					stationno = stationno ? stationno : "";
 
-					model::ExtensionPtr ext(new AvayaExtension(this, num, sm));
+					model::ExtensionPtr ext(new AvayaDevice(this, num, sm));
 					if (ext != nullptr && addExtension(num,ext)) {
 						ext->setVar("_extension.Extension", num);
 						ext->setVar("_avaya.Extension", avayaExtension);
@@ -1253,7 +1253,7 @@ namespace chilli {
 
 							
 							for (auto &it: this->GetExtensions()){
-								if (typeid(*(it.second)) == typeid(AvayaExtension))
+								if (typeid(*(it.second)) == typeid(AvayaDevice))
 								{
 									const char* deviceId = it.first.c_str();
 

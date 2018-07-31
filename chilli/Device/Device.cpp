@@ -9,7 +9,7 @@ namespace chilli {
 		Device::Device(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
 			:PerformElement(model, ext, smFileName)
 		{
-			std::string logName = "ExtensionImp.";
+			std::string logName = "Device.";
 			log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
 			LOG4CPLUS_DEBUG(log, "new a extension object.");
 		}

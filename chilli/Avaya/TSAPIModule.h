@@ -51,7 +51,7 @@ namespace chilli {
 			std::thread m_thread;
 			void run();
 			friend class AvayaAgent;
-			friend class AvayaExtension;
+			friend class AvayaDevice;
 			friend class AvayaVDN;
 			friend class AvayaACD;
 

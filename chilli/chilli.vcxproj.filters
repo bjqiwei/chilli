@@ -136,9 +136,6 @@
     <ClInclude Include="Avaya\AvayaAgent.h">
       <Filter>Avaya</Filter>
     </ClInclude>
-    <ClInclude Include="Avaya\AvayaExtension.h">
-      <Filter>Avaya</Filter>
-    </ClInclude>
     <ClInclude Include="Avaya\AvayaVDN.h">
       <Filter>Avaya</Filter>
     </ClInclude>
@@ -174,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="Device\Device.h">
       <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="Avaya\AvayaDevice.h">
+      <Filter>Avaya</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -231,9 +231,6 @@
     <ClCompile Include="Avaya\AvayaAgent.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="Avaya\AvayaExtension.cpp">
-      <Filter>Avaya</Filter>
-    </ClCompile>
     <ClCompile Include="Avaya\AvayaVDN.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="Device\Device.cpp">
       <Filter>Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Avaya\AvayaDevice.cpp">
+      <Filter>Avaya</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
