@@ -9,7 +9,6 @@
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
-#include "Device/ExtensionModule.h"
 #include "Group/GroupModule.h"
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"
@@ -24,7 +23,6 @@
 #define  FREESWITCHNODE "FreeSwitch"
 #define  AVAYANODE      "Avaya"
 #define  AGENTNODE      "Agents"
-#define  EXTENSIONS     "Extensions"
 #define  GROUPS         "Groups"
 #define  MYSQL          "MySql"
 #define  EVENTREPORT	"EventReport"
@@ -286,15 +284,6 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 				e->Accept(&printer);
 				agent->LoadConfig(printer.CStr());
 				model::ProcessModule::g_Modules.push_back(agent);
-
-			}
-			else if (nodeName == EXTENSIONS)
-			{
-				model::ProcessModulePtr extension(new chilli::Extension::ExtensionModule(modelid));
-				XMLPrinter printer;
-				e->Accept(&printer);
-				extension->LoadConfig(printer.CStr());
-				model::ProcessModule::g_Modules.push_back(extension);
 
 			}
 			else if (nodeName == GROUPS)
