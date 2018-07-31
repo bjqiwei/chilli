@@ -16,7 +16,7 @@ using namespace std;
 //#ifdef SCXML
 using namespace fsm;
 
-class ontimer :public OnTimerInterface {
+class ontimer :public helper::OnTimerInterface {
 
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
 	{
