@@ -1,4 +1,4 @@
-#include "ExtensionImp.h"
+#include "Device.h"
 #include "../model/ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
 #include <scxml/TriggerEvent.h>
@@ -7,7 +7,7 @@ namespace chilli {
 	namespace Extension {
 
 		ExtensionImp::ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-			:Extension(model, ext, smFileName)
+			:PerformElement(model, ext, smFileName)
 		{
 			std::string logName = "ExtensionImp.";
 			log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

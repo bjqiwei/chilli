@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Extension\ExtensionImp.h"
+#include "..\Device\Device.h"
 #include <log4cplus\logger.h>
 
 

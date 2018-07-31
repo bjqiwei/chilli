@@ -1,4 +1,4 @@
-#include "Extension.h"
+#include "PerformElement.h"
 #include "ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
 
@@ -6,37 +6,37 @@ namespace chilli {
 namespace model {
 
 
-	Extension::Extension(ProcessModule * model, const std::string &ext, const std::string &smFileName) :
+	PerformElement::PerformElement(ProcessModule * model, const std::string &ext, const std::string &smFileName) :
 		m_model(model), m_ExtNumber(ext), SendInterface("this"), m_SMFileName(smFileName)
 	{
 		std::string logName = "Extension.";
 		this->log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
 	}
 
-	Extension::~Extension() {
+	PerformElement::~PerformElement() {
 		m_Connections.clear();
 	}
 
-	void Extension::Start() {
+	void PerformElement::Start() {
 		LOG4CPLUS_INFO(log, " Start.");
 		for (auto & it : m_Connections) {
 			it.second->start(false);
 		}
 	}
 
-	void Extension::Stop() {
+	void PerformElement::Stop() {
 		for (auto & it: m_Connections){
 			it.second->stop();
 		}
 		LOG4CPLUS_INFO(log, " Stop.");
 	}
 
-	bool Extension::IsFinalState()
+	bool PerformElement::IsFinalState()
 	{
 		return m_Connections.empty();
 	}
 
-	bool Extension::setVar(const std::string &name, const Json::Value &value)
+	bool PerformElement::setVar(const std::string &name, const Json::Value &value)
 	{
 		if (m_Vars.isMember(name))
 			return false;
@@ -45,21 +45,21 @@ namespace model {
 		return true;
 	}
 
-	Json::Value Extension::getVar(const std::string & name)
+	Json::Value PerformElement::getVar(const std::string & name)
 	{
 		return m_Vars[name];
 	}
 
-	const std::string & Extension::getExtNumber() {
+	const std::string & PerformElement::getExtNumber() {
 		return m_ExtNumber;
 	}
 
-	int Extension::pushEvent(const EventType_t & Event)
+	int PerformElement::pushEvent(const EventType_t & Event)
 	{
 		return m_EvtBuffer.Put(Event) ? 0 : 1;
 	}
 
-	void Extension::mainEventLoop()
+	void PerformElement::mainEventLoop()
 	{
 		try
 		{
@@ -153,15 +153,15 @@ namespace model {
 		}
 	}
 
-	void Extension::setSessionId(const std::string & sessinId) {
+	void PerformElement::setSessionId(const std::string & sessinId) {
 		m_SessionId = sessinId;
 	}
 
-	const std::string & Extension::getSessionId() {
+	const std::string & PerformElement::getSessionId() {
 		return m_SessionId;
 	}
 
-	std::string Extension::getStateId()
+	std::string PerformElement::getStateId()
 	{
 		if (!m_Connections.empty()){
 			return m_Connections.begin()->second->getCurrentStateID();
@@ -170,7 +170,7 @@ namespace model {
 		return std::string();
 	}
 
-	log4cplus::Logger Extension::getLogger() {
+	log4cplus::Logger PerformElement::getLogger() {
 		return log;
 	}
 

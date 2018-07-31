@@ -1,12 +1,12 @@
 #pragma once
-#include "..\model\extension.h"
+#include "..\model\PerformElement.h"
 #include <log4cplus\logger.h>
 
 
 namespace chilli{
 	namespace Extension {
 
-		class ExtensionImp :public model::Extension {
+		class ExtensionImp :public model::PerformElement {
 		public:
 			ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 			virtual ~ExtensionImp();

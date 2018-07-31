@@ -19,7 +19,7 @@ namespace FreeSwitch{
 	protected:
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;
-		void processSend(const std::string &strContent, const void * param, bool & bHandled, model::Extension * ext);
+		void processSend(const std::string &strContent, const void * param, bool & bHandled, model::PerformElement * pe);
 	private:
 		std::thread m_Thread;
 		std::string m_Host;

@@ -2,7 +2,7 @@
 #ifndef _CHILLI_CTI_PROCESS_MODULE_HEADER_
 #define _CHILLI_CTI_PROCESS_MODULE_HEADER_
 #include "..\CEventBuffer.h"
-#include "Extension.h"
+#include "PerformElement.h"
 #include <map>
 #include <memory>
 #include "TypeDef.h"

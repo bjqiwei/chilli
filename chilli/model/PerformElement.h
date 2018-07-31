@@ -13,14 +13,14 @@
 namespace chilli{
 namespace model{
 
-class Extension: public fsm::SendInterface
+class PerformElement: public fsm::SendInterface
 {
 protected:
 	typedef std::shared_ptr<fsm::StateMachine> Connction;
 public:
-	Extension(class ProcessModule * model, const std::string &ext, const std::string &smFileName);
+	PerformElement(class ProcessModule * model, const std::string &ext, const std::string &smFileName);
 
-	virtual ~Extension();
+	virtual ~PerformElement();
 
 	virtual void Start();
 	virtual void Stop();
@@ -49,8 +49,8 @@ public:
 	virtual int HangUp() = 0;
 
 	//Only define a copy constructor and assignment function, these two functions can be disabled
-	Extension(const Extension &) = delete;
-	Extension & operator=(const Extension &) = delete;
+	PerformElement(const PerformElement &) = delete;
+	PerformElement & operator=(const PerformElement &) = delete;
 	friend class ProcessModule;
 
 protected:
@@ -65,7 +65,7 @@ protected:
 	Json::Value m_Vars;
 
 };
-typedef std::shared_ptr<model::Extension> ExtensionPtr;
+typedef std::shared_ptr<model::PerformElement> ExtensionPtr;
 }
 }
 #endif // end extension header

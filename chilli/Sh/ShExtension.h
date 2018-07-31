@@ -2,7 +2,7 @@
 
 #ifndef _CHILLI_SHDEV_SHEXTENSION_HEADER_
 #define _CHILLI_SHDEV_SHEXTENSION_HEADER_
-#include "..\Extension\ExtensionImp.h"
+#include "..\Device\Device.h"
 #include <log4cplus\logger.h>
 #include <memory>
 

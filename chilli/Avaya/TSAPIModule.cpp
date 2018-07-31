@@ -340,9 +340,9 @@ namespace chilli {
 			return bReturnValue;
 		}
 
-		void TSAPIModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::Extension * ext)
+		void TSAPIModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::PerformElement * pe)
 		{
-			log4cplus::Logger log = ext->getLogger();
+			log4cplus::Logger log = pe->getLogger();
 			Json::Value jsonEvent;
 			Json::Reader jsonReader;
 			if (!jsonReader.parse(strContent, jsonEvent)) {
@@ -409,7 +409,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AgentLogin";
 					event["AgentLogin"]["cause"] = nRetCode;
 					event["AgentLogin"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -418,7 +418,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AgentLogin:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 				}
 				bHandled = true;
@@ -455,7 +455,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AgentLogout";
 					event["AgentLogout"]["cause"] = nRetCode;
 					event["AgentLogout"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -464,7 +464,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AgentLogout:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogout";
 				}
 				bHandled = true;
@@ -484,7 +484,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaQueryAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AgentGetState";
 					event["AgentGetState"]["cause"] = nRetCode;
 					event["AgentGetState"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -493,7 +493,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AgentGetState:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AgentGetState";
 				}
 				bHandled = true;
@@ -523,7 +523,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AgentSetFree";
 					event["AgentSetFree"]["cause"] = nRetCode;
 					event["AgentSetFree"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -532,7 +532,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AgentSetFree:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] =ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] =pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetFree";
 				}
 				bHandled = true;
@@ -562,7 +562,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AgentSetBusy";
 					event["AgentSetBusy"]["cause"] = nRetCode;
 					event["AgentSetBusy"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -571,7 +571,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AgentSetBusy:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetBusy";
 				}
 				bHandled = true;
@@ -600,7 +600,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaClearConnection:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "ClearConnection";
 					event["ClearConnection"]["cause"] = nRetCode;
 					event["ClearConnection"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -609,7 +609,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "ClearConnection:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "ClearConnection";
 				}
 				bHandled = true;
@@ -638,7 +638,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaClearCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "ClearCall";
 					event["ClearCall"]["cause"] = nRetCode;
 					event["ClearCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -647,7 +647,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "ClearCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "ClearCall";
 				}
 				bHandled = true;
@@ -676,7 +676,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaAnswerCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "AnswerCall";
 					event["AnswerCall"]["cause"] = nRetCode;
 					event["AnswerCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -685,7 +685,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "AnswerCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "AnswerCall";
 				}
 				bHandled = true;
@@ -712,7 +712,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaMakeCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "MakeCall";
 					event["MakeCall"]["cause"] = nRetCode;
 					event["MakeCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -721,7 +721,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "MakeCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MakeCall";
 				}
 				bHandled = true;
@@ -751,7 +751,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaHoldCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "HoldCall";
 					event["HoldCall"]["cause"] = nRetCode;
 					event["HoldCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -760,7 +760,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "HoldCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "HoldCall";
 				}
 				bHandled = true;
@@ -789,7 +789,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaRetrieveCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "RetrieveCall";
 					event["RetrieveCall"]["cause"] = nRetCode;
 					event["RetrieveCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -798,7 +798,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "RetrieveCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "RetrieveCall";
 				}
 				bHandled = true;
@@ -831,7 +831,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaConsultationCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "ConsultationCall";
 					event["ConsultationCall"]["cause"] = nRetCode;
 					event["ConsultationCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -840,7 +840,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "ConsultationCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "ConsultationCall";
 				}
 				bHandled = true;
@@ -882,7 +882,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaReconnectCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "ReconnectCall";
 					event["ReconnectCall"]["cause"] = nRetCode;
 					event["ReconnectCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -891,7 +891,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "ReconnectCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "ReconnectCall";
 				}
 				bHandled = true;
@@ -933,7 +933,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaTransferCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "TransferCall";
 					event["TransferCall"]["cause"] = nRetCode;
 					event["TransferCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -942,7 +942,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "TransferCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "TransferCall";
 				}
 				bHandled = true;
@@ -984,7 +984,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaConferenceCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "ConferenceCall";
 					event["ConferenceCall"]["cause"] = nRetCode;
 					event["ConferenceCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -993,7 +993,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "ConferenceCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "ConferenceCall";
 				}
 				bHandled = true;
@@ -1022,7 +1022,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaMonitorDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "MonitorDevice";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -1031,7 +1031,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "MonitorDevice:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorDevice";
 				}
 				bHandled = true;
@@ -1053,7 +1053,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaMonitorStop:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "MonitorStop";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -1062,7 +1062,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "MonitorStop:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorStop";
 				}
 				bHandled = true;
@@ -1091,7 +1091,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaMonitorCallsViaDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "MonitorCallsViaDevice";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -1100,7 +1100,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "MonitorCallsViaDevice:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
 				}
 				bHandled = true;
@@ -1136,7 +1136,7 @@ namespace chilli {
 				if (nRetCode != ACSPOSITIVE_ACK) {
 					LOG4CPLUS_ERROR(log, "cstaMonitorCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
-					event["extension"] = ext->getExtNumber();
+					event["extension"] = pe->getExtNumber();
 					event["event"] = "MonitorCall";
 					event["MonitorCall"]["cause"] = nRetCode;
 					event["MonitorCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
@@ -1145,7 +1145,7 @@ namespace chilli {
 				}
 				else {
 					LOG4CPLUS_DEBUG(log, "MonitorCall:" << jsonEvent["param"].toStyledString());
-					this->m_InvokeID2Extension[uInvodeId] = ext->getExtNumber();
+					this->m_InvokeID2Extension[uInvodeId] = pe->getExtNumber();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCall";
 				}
 				bHandled = true;

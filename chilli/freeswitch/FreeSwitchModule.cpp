@@ -119,9 +119,9 @@ void FreeSwitchModule::fireSend(const std::string & strContent, const void * par
 	LOG4CPLUS_WARN(log, "fireSend not implement.");
 }
 
-void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::Extension * ext)
+void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::PerformElement * pe)
 {
-	log4cplus::Logger log = ext->getLogger();
+	log4cplus::Logger log = pe->getLogger();
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (!jsonReader.parse(strContent, jsonEvent) || !jsonEvent.isObject()) {
@@ -229,10 +229,10 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		static std::string lastAgent;
 		std::string findAgent;
 
-		auto ext = this->getExtension(agentid);
-		if (ext != nullptr) {
-			LOG4CPLUS_DEBUG(log, agentid << " state:" << ext->getStateId());
-			if (ext->getStateId() == "Ready") {
+		auto pe = this->getExtension(agentid);
+		if (pe != nullptr) {
+			LOG4CPLUS_DEBUG(log, agentid << " state:" << pe->getStateId());
+			if (pe->getStateId() == "Ready") {
 				findAgent = agentid;
 				goto _findAgent;
 			}

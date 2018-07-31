@@ -1,12 +1,12 @@
 #pragma once
-#include "..\model\extension.h"
+#include "..\model\PerformElement.h"
 #include <log4cplus\logger.h>
 
 
 namespace chilli{
 namespace Agent{
 
-class Agent :public model::Extension{
+class Agent :public model::PerformElement{
 public:
 	Agent(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 	virtual ~Agent();

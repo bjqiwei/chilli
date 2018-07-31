@@ -9,7 +9,7 @@
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
-#include "Extension/ExtensionModule.h"
+#include "Device/ExtensionModule.h"
 #include "Group/GroupModule.h"
 #include "freeswitch/FreeSwitchModule.h"
 #include "IVR/IVRModule.h"

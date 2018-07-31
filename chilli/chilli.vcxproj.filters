@@ -40,9 +40,6 @@
     <Filter Include="Avaya">
       <UniqueIdentifier>{30b81287-8bbb-4298-9c40-99fe02dbde55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Extension">
-      <UniqueIdentifier>{e74a7c9f-a71a-4955-819f-415cf4ebb6b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Group">
       <UniqueIdentifier>{62aa6b3b-c07f-4462-ae0d-700f87ba1f53}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="EventReport">
       <UniqueIdentifier>{5caea3ee-9aa3-49e3-b0ba-2e23a5b637c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Device">
+      <UniqueIdentifier>{e74a7c9f-a71a-4955-819f-415cf4ebb6b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,9 +72,6 @@
     </ClInclude>
     <ClInclude Include="ServiceModule.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="model\Extension.h">
-      <Filter>model</Filter>
     </ClInclude>
     <ClInclude Include="model\ProcessModule.h">
       <Filter>model</Filter>
@@ -133,11 +130,8 @@
     <ClInclude Include="model\ConnectAdapter.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\ExtensionImp.h">
-      <Filter>Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\ExtensionModule.h">
-      <Filter>Extension</Filter>
+    <ClInclude Include="Device\ExtensionModule.h">
+      <Filter>Device</Filter>
     </ClInclude>
     <ClInclude Include="acd\ACDExtension.h">
       <Filter>ACD</Filter>
@@ -177,6 +171,12 @@
     </ClInclude>
     <ClInclude Include="freeswitch\FreeSwitchCall.h">
       <Filter>freeswitch</Filter>
+    </ClInclude>
+    <ClInclude Include="model\PerformElement.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="Device\Device.h">
+      <Filter>Device</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,11 +225,8 @@
     <ClCompile Include="model\ConnectAdapter.cpp">
       <Filter>model</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\ExtensionImp.cpp">
-      <Filter>Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\ExtensionModule.cpp">
-      <Filter>Extension</Filter>
+    <ClCompile Include="Device\ExtensionModule.cpp">
+      <Filter>Device</Filter>
     </ClCompile>
     <ClCompile Include="model\ProcessModule.cpp">
       <Filter>model</Filter>
@@ -255,9 +252,6 @@
     <ClCompile Include="mysql\MySqlModule.cpp">
       <Filter>mysql</Filter>
     </ClCompile>
-    <ClCompile Include="model\Extension.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
     <ClCompile Include="Avaya\AvayaACD.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
@@ -269,6 +263,12 @@
     </ClCompile>
     <ClCompile Include="freeswitch\FreeSwitchCall.cpp">
       <Filter>freeswitch</Filter>
+    </ClCompile>
+    <ClCompile Include="model\PerformElement.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="Device\Device.cpp">
+      <Filter>Device</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

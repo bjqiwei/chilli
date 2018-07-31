@@ -9,7 +9,7 @@ namespace Agent{
 
 
 Agent::Agent(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
-	:Extension(model, ext, smFileName)
+	:PerformElement(model, ext, smFileName)
 {
 	std::string logName= "Agent.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -112,7 +112,7 @@ int Agent::pushEvent(const model::EventType_t & Event)
 	if (Event.connect != 0)
 		this->m_curConnectId = Event.connect;
 
-	return Extension::pushEvent(Event);
+	return PerformElement::pushEvent(Event);
 }
 
 }
