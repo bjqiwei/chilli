@@ -22,7 +22,7 @@ namespace Agent{
 AgentModule::AgentModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
-	LOG4CPLUS_DEBUG(log, "Constuction a Agent module.");
+	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a Agent module.");
 }
 
 
@@ -32,7 +32,7 @@ AgentModule::~AgentModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, "Destruction a Agent module.");
+	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a Agent module.");
 }
 
 int AgentModule::Stop(void)
@@ -82,7 +82,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, "load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -118,15 +118,15 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 		password = password ? password : "";
 		extension = extension ? extension : "";
 
-		model::ExtensionPtr ext(new Agent(this, num, sm));
+		model::PerformElementPtr ext(new Agent(this, num, sm));
 	
-		if (ext != nullptr && addExtension(num,ext)) {
+		if (ext != nullptr && addPerformElement(num,ext)) {
 			ext->setVar("_agent.AgentId", num);
 			ext->setVar("_agent.Password", password);
 			ext->setVar("_agent.Extension", extension);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, "alredy had agent:" << num);
+			LOG4CPLUS_ERROR(log, this->getId() << " alredy had agent:" << num);
 		}
 	}
 
@@ -136,7 +136,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 
 void AgentModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, "fireSend not implement.");
+	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
 }
 
 
@@ -154,21 +154,21 @@ static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, str
 	
 	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 	if (!bev) {
-		LOG4CPLUS_ERROR(This->log, "Error constructing bufferevent!");
+		LOG4CPLUS_ERROR(This->getLogger(), This->getId() << " Error constructing bufferevent!");
 		event_base_loopbreak(base);
 		return;
 	}
 
 	bufferevent_setcb(bev, conn_read_cb, conn_writecb, conn_eventcb, user_data);
 	bufferevent_enable(bev, EV_WRITE | EV_READ);
-	LOG4CPLUS_DEBUG(This->log, "accept client:" << bev);
+	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " accept client:" << bev);
 
 }
 
 static void conn_read_cb(struct bufferevent *bev, void * user_data)
 {
 	AgentModule * This = reinterpret_cast<AgentModule *>(user_data);
-	LOG4CPLUS_DEBUG(This->log, ":" << bev);
+	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << ":" << bev);
 	/* This callback is invoked when there is data to read on bev. */
 	struct evbuffer *input = bufferevent_get_input(bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
@@ -181,7 +181,7 @@ static void conn_writecb(struct bufferevent *bev, void *user_data)
 {
 	AgentModule * This = reinterpret_cast<AgentModule *>(user_data);
 
-	LOG4CPLUS_DEBUG(This->log, "write:" << bev);
+	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " write:" << bev);
 	struct evbuffer *output = bufferevent_get_output(bev);
 	
 }
@@ -190,11 +190,11 @@ static void conn_eventcb(struct bufferevent *bev, short events, void * user_data
 {
 	AgentModule * This = reinterpret_cast<AgentModule *>(user_data);
 
-	LOG4CPLUS_DEBUG(This->log, ":" << bev);
+	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << ":" << bev);
 	if (events & BEV_EVENT_ERROR)
-		LOG4CPLUS_DEBUG(This->log, "Error from bufferevent");
+		LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " Error from bufferevent");
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
-		LOG4CPLUS_DEBUG(This->log, "Connection closed." << bev);
+		LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " Connection closed." << bev);
 		bufferevent_free(bev);
 	}
 }
@@ -204,7 +204,7 @@ bool AgentModule::listenTCP(int port)
 	struct sockaddr_in sin;
 	struct evconnlistener *listener;
 
-	LOG4CPLUS_INFO(log, "listen TCP Starting...");
+	LOG4CPLUS_INFO(log, this->getId() << " listen TCP Starting...");
 #ifdef WIN32
 	evthread_use_windows_threads();
 	WSADATA wsa_data;
@@ -219,10 +219,10 @@ bool AgentModule::listenTCP(int port)
 	}
 
 	m_Base = event_base_new();
-	LOG4CPLUS_INFO(log, ",libevent current method:" <<  event_base_get_method(m_Base));
+	LOG4CPLUS_INFO(log, this->getId() << ",libevent current method:" <<  event_base_get_method(m_Base));
 
 	if (!m_Base) {
-		LOG4CPLUS_ERROR(log, "Could not initialize libevent!");
+		LOG4CPLUS_ERROR(log, this->getId() << " Could not initialize libevent!");
 		goto done;
 	}
 
@@ -237,11 +237,11 @@ bool AgentModule::listenTCP(int port)
 		sizeof(sin));
 
 	if (!listener) {
-		LOG4CPLUS_ERROR(log, "Could not create a listener!");
+		LOG4CPLUS_ERROR(log, this->getId() << " Could not create a listener!");
 		goto done;
 	}
 
-	LOG4CPLUS_INFO(log, ",start listen tcp port:" << port);
+	LOG4CPLUS_INFO(log, this->getId() << ",start listen tcp port:" << port);
 
 	while (m_bRunning){
 		event_base_dispatch(m_Base);
@@ -261,7 +261,7 @@ done:
 #ifdef WIN32
 	WSACleanup();
 #endif
-	LOG4CPLUS_INFO(log, "listen TCP Stoped.");
+	LOG4CPLUS_INFO(log, this->getId() << " listen TCP Stoped.");
 	log4cplus::threadCleanup();
 	return true;
 }
@@ -373,7 +373,7 @@ bool AgentModule::listenWS(int port)
 	bool result = true;
 
 	AgentWSServer wsserver(port, this);
-	LOG4CPLUS_INFO(log, ",websocket start listen port:" << port);
+	LOG4CPLUS_INFO(log, this->getId() << ",websocket start listen port:" << port);
 	wsserver.InitInstance();
 
 	while (m_bRunning){

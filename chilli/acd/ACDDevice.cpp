@@ -10,12 +10,12 @@ namespace ACD{
 ACDDevice::ACDDevice(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
 	:Device(model, ext,smFileName)
 {
-	std::string logName = "ACD.";
-	log = log4cplus::Logger::getInstance(logName.append(m_Id));
-	LOG4CPLUS_DEBUG(log,"new a ACD device object.");
+	std::string logName = "ACD";
+	log = log4cplus::Logger::getInstance(logName);
+	LOG4CPLUS_DEBUG(log, this->getId() << " new a ACD device object.");
 }
 ACDDevice::~ACDDevice(){
-	LOG4CPLUS_DEBUG(log,"destruction a ACD device object.");
+	LOG4CPLUS_DEBUG(log, this->getId() << " destruction a ACD device object.");
 }
 
 void ACDDevice::mainEventLoop()
@@ -44,7 +44,7 @@ void ACDDevice::mainEventLoop()
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 			if (m_Connections.begin() == m_Connections.end()) {
 				Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
@@ -75,7 +75,7 @@ void ACDDevice::mainEventLoop()
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
 	}
 }
 

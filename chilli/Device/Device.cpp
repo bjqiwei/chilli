@@ -9,8 +9,8 @@ namespace chilli {
 		Device::Device(model::ProcessModule * model, const std::string &id, const std::string &smFileName)
 			:PerformElement(model, id), m_SMFileName(smFileName)
 		{
-			std::string logName = "Device.";
-			log = log4cplus::Logger::getInstance(logName.append(id));
+			std::string logName = "Device";
+			log = log4cplus::Logger::getInstance(logName);
 			LOG4CPLUS_DEBUG(log, "new a device object.");
 		}
 

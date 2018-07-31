@@ -11,7 +11,7 @@ namespace chilli{
 namespace model{
 
 typedef std::map<std::string, PerformElementPtr> PerformElementMap;
-class ProcessModule :public fsm::SendInterface, public helper::OnTimerInterface
+class ProcessModule :public fsm::SendInterface, public fsm::OnTimerInterface
 {
 public:
 	explicit ProcessModule(const std::string & modelId);
@@ -27,12 +27,14 @@ public:
 	virtual void removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
+	virtual log4cplus::Logger getLogger()final;
+	virtual const std::string getId()final;
 
 	static std::vector<std::shared_ptr<model::ProcessModule>> g_Modules;
 
 protected:
 	log4cplus::Logger log;
-
+	const std::string m_Id;
 	static std::recursive_mutex g_PEMtx;
 	static model::PerformElementMap g_PerformElements;
 	model::PerformElementMap m_PerformElements;

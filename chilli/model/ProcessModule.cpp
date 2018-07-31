@@ -8,7 +8,8 @@ namespace model{
 	model::PerformElementMap ProcessModule::g_PerformElements;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
 
-	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId)
+	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId),
+		m_Id(modelId)
 	{
 	}
 
@@ -31,7 +32,7 @@ namespace model{
 			m_thread = std::thread(&ProcessModule::run, this);
 		}
 		else {
-			LOG4CPLUS_WARN(log, "already running for this module.");
+			LOG4CPLUS_WARN(log, this->getId() << " already running for this module.");
 		}
 		return 0;
 	}
@@ -79,7 +80,7 @@ namespace model{
 			}
 			else {
 
-				LOG4CPLUS_WARN(log, " not find extension by event:" << Event.event.toStyledString());
+				LOG4CPLUS_WARN(log, this->getId() << " not find extension by event:" << Event.event.toStyledString());
 				return;
 			}
 		}
@@ -100,7 +101,7 @@ namespace model{
 					continue;
 				}
 				else {
-					LOG4CPLUS_WARN(log, " not find extension by event:" << newEvent.event.toStyledString());
+					LOG4CPLUS_WARN(log, this->getId() << " not find extension by event:" << newEvent.event.toStyledString());
 				}
 				
 			}
@@ -109,7 +110,7 @@ namespace model{
 
 	void ProcessModule::run()
 	{
-		LOG4CPLUS_INFO(log, "Starting...");
+		LOG4CPLUS_INFO(log, this->getId() << "Starting...");
 		try
 		{
 			for (auto & it : m_PerformElements) {
@@ -136,7 +137,7 @@ namespace model{
 							extptr->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_WARN(log, "not find extension:" << peId);
+							LOG4CPLUS_WARN(log, this->getId() << " not find extension:" << peId);
 						}
 					}
 				}
@@ -152,16 +153,15 @@ namespace model{
 		}
 		catch (std::exception & e)
 		{
-			LOG4CPLUS_ERROR(log, e.what());
+			LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
 		}
 
-		LOG4CPLUS_INFO(log, "Stoped.");
+		LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
 		log4cplus::threadCleanup();
 	}
 	
 	void ProcessModule::OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
 	{
-		static log4cplus::Logger log = log4cplus::Logger::getInstance("Timer");
 		Json::Value jsonEvent;
 		Json::Reader jsonReader;
 		std::string peId;
@@ -175,6 +175,16 @@ namespace model{
 		}
 		chilli::model::EventType_t evt(jsonEvent);
 		m_RecEvtBuffer.Put(evt);
+	}
+
+	log4cplus::Logger ProcessModule::getLogger()
+	{
+		return this->log;
+	}
+
+	const std::string ProcessModule::getId()
+	{
+		return m_Id;
 	}
 
 	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)
