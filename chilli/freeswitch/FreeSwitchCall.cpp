@@ -9,7 +9,7 @@ namespace chilli {
 namespace FreeSwitch {
 
 	FreeSwitchCall::FreeSwitchCall(FreeSwitchModule * model, const std::string &ext, const std::string &smFileName)
-		:m_model(model), ExtensionImp(model, ext, smFileName)
+		:m_model(model), Device(model, ext, smFileName)
 	{
 		std::string logName = "FreeSwitchExtension.";
 		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -126,7 +126,7 @@ namespace FreeSwitch {
 	{
 		m_model->processSend(strContent, param, bHandled, this);
 		if (!bHandled) {
-			ExtensionImp::processSend(strContent, param, bHandled);
+			Device::processSend(strContent, param, bHandled);
 		}
 	}
 

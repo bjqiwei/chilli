@@ -7,7 +7,7 @@ namespace chilli{
 	namespace Avaya {
 
 		class TSAPIModule;
-		class AvayaVDN :public Extension::ExtensionImp {
+		class AvayaVDN :public Device::Device {
 		public:
 			AvayaVDN(TSAPIModule * model, const std::string &ext, const std::string &smFileName);
 			virtual ~AvayaVDN();

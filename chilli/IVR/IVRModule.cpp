@@ -39,7 +39,7 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		num = num ? num : "";
 		sm = sm ? sm : "";
 
-		model::ExtensionPtr ext(new Extension::ExtensionImp(this, num, sm));
+		model::ExtensionPtr ext(new Device::Device(this, num, sm));
 
 		if (ext != nullptr && addExtension(num,ext)) {
 			ext->setVar("_extension.Extension", num);

@@ -7,7 +7,7 @@ namespace chilli {
 namespace Group {
 
 	GroupImp::GroupImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-		:ExtensionImp(model, ext, smFileName)
+		:Device(model, ext, smFileName)
 	{
 		std::string logName = "GroupImp.";
 		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -38,7 +38,7 @@ namespace Group {
 		}
 
 		if (!bHandled) {
-			ExtensionImp::processSend(strContent, param, bHandled);
+			Device::processSend(strContent, param, bHandled);
 		}
 	}
 

@@ -7,7 +7,7 @@ namespace chilli {
 namespace Avaya {
 
 	AvayaExtension::AvayaExtension(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
-		:m_model(model), ExtensionImp(model, ext, smFileName)
+		:m_model(model), Device(model, ext, smFileName)
 	{
 		std::string logName = "AvayaExtension.";
 		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
@@ -28,7 +28,7 @@ namespace Avaya {
 	{
 		m_model->processSend(strContent, param, bHandled, this);
 		if (!bHandled) {
-			ExtensionImp::processSend(strContent, param, bHandled);
+			Device::processSend(strContent, param, bHandled);
 		}
 	}
 

@@ -4,9 +4,9 @@
 #include <scxml/TriggerEvent.h>
 
 namespace chilli {
-	namespace Extension {
+	namespace Device {
 
-		ExtensionImp::ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
+		Device::Device(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
 			:PerformElement(model, ext, smFileName)
 		{
 			std::string logName = "ExtensionImp.";
@@ -14,29 +14,29 @@ namespace chilli {
 			LOG4CPLUS_DEBUG(log, "new a extension object.");
 		}
 
-		ExtensionImp::~ExtensionImp() {
+		Device::~Device() {
 			LOG4CPLUS_DEBUG(log, "destruction a extension object.");
 		}
 
-		int ExtensionImp::Answer()
+		int Device::Answer()
 		{
 			LOG4CPLUS_WARN(log, "not implement.");
 			return 0;
 		}
 
-		int ExtensionImp::PlayFile(const std::string &fileName)
+		int Device::PlayFile(const std::string &fileName)
 		{
 			LOG4CPLUS_WARN(log, "not implement.");
 			return 0;
 		}
 
-		int ExtensionImp::HangUp()
+		int Device::HangUp()
 		{
 			LOG4CPLUS_WARN(log, "not implement.");
 			return 0;
 		}
 
-		void ExtensionImp::processSend(const std::string & strContent, const void * param, bool & bHandled)
+		void Device::processSend(const std::string & strContent, const void * param, bool & bHandled)
 		{
 			Json::Value jsonData;
 			Json::Reader jsonReader;
@@ -60,7 +60,7 @@ namespace chilli {
 
 		}
 
-		void ExtensionImp::fireSend(const std::string &strContent, const void * param)
+		void Device::fireSend(const std::string &strContent, const void * param)
 		{
 			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
 			bool bHandled = false;

@@ -9,7 +9,7 @@ namespace ShDev{
 using namespace SHAPI;
 
 ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
-	:ExtensionImp(model, ext, smFileName)
+	:Device(model, ext, smFileName)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDev.Extension");
 	LOG4CPLUS_DEBUG(log,"new a extension object.");

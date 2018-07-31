@@ -7,7 +7,7 @@ namespace ACD{
 
 
 ACDExtension::ACDExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName) 
-	:ExtensionImp(model, ext,smFileName)
+	:Device(model, ext,smFileName)
 {
 	std::string logName = "ACD.";
 	log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

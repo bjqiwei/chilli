@@ -6,7 +6,7 @@
 namespace chilli{
 namespace Group {
 
-	class GroupImp :public Extension::ExtensionImp {
+	class GroupImp :public Device::Device {
 	public:
 		GroupImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
 		virtual ~GroupImp();

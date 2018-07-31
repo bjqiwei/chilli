@@ -10,7 +10,7 @@ namespace chilli{
 namespace ShDev{
 
 
-class ShExtension :public Extension::ExtensionImp
+class ShExtension :public Device::Device
 {
 public:
 	ShExtension(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);

@@ -4,12 +4,12 @@
 
 
 namespace chilli{
-	namespace Extension {
+	namespace Device {
 
-		class ExtensionImp :public model::PerformElement {
+		class Device :public model::PerformElement {
 		public:
-			ExtensionImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
-			virtual ~ExtensionImp();
+			Device(model::ProcessModule * model, const std::string &ext, const std::string &smFileName);
+			virtual ~Device();
 
 			//inherit from SendInterface
 			virtual void fireSend(const std::string &strContent, const void * param) override;
@@ -23,6 +23,6 @@ namespace chilli{
 			void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
 		};
-		typedef std::shared_ptr<ExtensionImp>  ExtensionImpPtr;
+		typedef std::shared_ptr<Device>  ExtensionImpPtr;
 	}
 }

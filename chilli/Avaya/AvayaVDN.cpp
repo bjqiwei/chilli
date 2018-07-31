@@ -7,7 +7,7 @@ namespace chilli {
 namespace Avaya {
 
 	AvayaVDN::AvayaVDN(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
-		:m_model(model), ExtensionImp(model, ext, smFileName)
+		:m_model(model), Device(model, ext, smFileName)
 	{
 		std::string logName = "AvayaVDN.";
 		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));

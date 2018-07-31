@@ -7,7 +7,7 @@ namespace chilli{
 namespace FreeSwitch {
 
 	class FreeSwitchModule;
-	class FreeSwitchExtension :public Extension::ExtensionImp {
+	class FreeSwitchExtension :public Device::Device {
 	public:
 		FreeSwitchExtension(FreeSwitchModule * model, const std::string &ext, const std::string &smFileName);
 		virtual ~FreeSwitchExtension();
