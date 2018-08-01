@@ -115,7 +115,7 @@ bool Agent::pushEvent(const model::EventType_t & Event)
 	if (Event.connect != 0)
 		this->m_curConnectId = Event.connect;
 
-	return PerformElement::pushEvent(Event);
+	return m_EvtBuffer.Put(Event);
 }
 
 void Agent::mainEventLoop()

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" ?>
 
-<fsm name ="FreeSwitchExtension" initial="Null" final="Destroy">
+<fsm name ="FreeSwitchDevice" initial="Null" final="Destroy">
 <datamodel>
 	<data id="status"/>
 	<data id="recordfilename"/>

@@ -1,5 +1,4 @@
-#ifndef _CHILLI_FREESWITCHMODULE_HEADER_
-#define _CHILLI_FREESWITCHMODULE_HEADER_
+#pragma once
 #include <log4cplus/logger.h>
 #include "../model/ProcessModule.h"
 #include <esl.h>
@@ -29,10 +28,9 @@ namespace FreeSwitch{
 		esl_handle_t m_Handle = { { 0 } };
 		void ConnectFS();
 		std::string m_CallExt;
-		friend class FreeSwitchExtension;
+		friend class FreeSwitchDevice;
 		friend class FreeSwitchCall;
 	};
 
 }
 }
-#endif // end header

@@ -246,7 +246,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="Dynamiclibrary.h" />
     <ClInclude Include="EeventReport\EventReportModule.h" />
     <ClInclude Include="Device\Device.h" />
-    <ClInclude Include="FreeSWITCH\FreeSwitchExtension.h" />
+    <ClInclude Include="FreeSWITCH\FreeSwitchDevice.h" />
     <ClInclude Include="FreeSWITCH\FreeSwitchModule.h" />
     <ClInclude Include="Group\GroupImp.h" />
     <ClInclude Include="Group\GroupModule.h" />
@@ -283,7 +283,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClCompile Include="Call\CallModule.cpp" />
     <ClCompile Include="EeventReport\EventReportModule.cpp" />
     <ClCompile Include="Device\Device.cpp" />
-    <ClCompile Include="FreeSWITCH\FreeSwitchExtension.cpp" />
+    <ClCompile Include="FreeSWITCH\FreeSwitchDevice.cpp" />
     <ClCompile Include="FreeSWITCH\FreeSwitchModule.cpp" />
     <ClCompile Include="Group\GroupImp.cpp" />
     <ClCompile Include="Group\GroupModule.cpp" />

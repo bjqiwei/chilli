@@ -154,9 +154,6 @@
     <ClInclude Include="uuid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeSWITCH\FreeSwitchExtension.h">
-      <Filter>FreeSWITCH</Filter>
-    </ClInclude>
     <ClInclude Include="stringHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -180,6 +177,9 @@
     </ClInclude>
     <ClInclude Include="Call\CallModule.h">
       <Filter>Call</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeSWITCH\FreeSwitchDevice.h">
+      <Filter>FreeSWITCH</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,9 +249,6 @@
     <ClCompile Include="Avaya\AvayaACD.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="FreeSWITCH\FreeSwitchExtension.cpp">
-      <Filter>FreeSWITCH</Filter>
-    </ClCompile>
     <ClCompile Include="EeventReport\EventReportModule.cpp">
       <Filter>EventReport</Filter>
     </ClCompile>
@@ -272,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="Call\CallModule.cpp">
       <Filter>Call</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeSWITCH\FreeSwitchDevice.cpp">
+      <Filter>FreeSWITCH</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

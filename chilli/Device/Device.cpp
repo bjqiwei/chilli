@@ -11,11 +11,11 @@ namespace chilli {
 		{
 			std::string logName = "Device";
 			log = log4cplus::Logger::getInstance(logName);
-			LOG4CPLUS_DEBUG(log, this->getId() << " new a device object.");
+			//LOG4CPLUS_DEBUG(log, this->getId() << " new a device object.");
 		}
 
 		Device::~Device() {
-			LOG4CPLUS_DEBUG(log, this->getId() << " destruction a device object.");
+			//LOG4CPLUS_DEBUG(log, this->getId() << " destruction a device object.");
 		}
 
 		void Device::Start()
