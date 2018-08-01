@@ -7,10 +7,10 @@ namespace chilli{
 namespace FreeSwitch {
 
 	class FreeSwitchModule;
-	class FreeSwitchExtension :public Device::Device {
+	class FreeSwitchDevice :public Device::Device {
 	public:
-		FreeSwitchExtension(FreeSwitchModule * model, const std::string &ext, const std::string &smFileName);
-		virtual ~FreeSwitchExtension();
+		FreeSwitchDevice(FreeSwitchModule * model, const std::string &ext, const std::string &smFileName);
+		virtual ~FreeSwitchDevice();
 
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;
@@ -21,6 +21,6 @@ namespace FreeSwitch {
 		FreeSwitchModule * m_model;
 
 	};
-	typedef std::shared_ptr<FreeSwitchExtension>  FreeSwitchExtensionPtr;
+	typedef std::shared_ptr<FreeSwitchDevice>  FreeSwitchDevicePtr;
 }
 }
