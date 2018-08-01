@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C0940163-A
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxml2", "libs\libxml2-2.9.3\win\VC14\libxml2.vcxproj", "{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esl", "libs\freeswitch\esl\esl.2015.vcxproj", "{CF405366-9558-4AE8-90EF-5E21B51CCB4E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esl", "libs\FreeSWITCH\esl\esl.2015.vcxproj", "{CF405366-9558-4AE8-90EF-5E21B51CCB4E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsm", "libs\fsm\msvc14\fsm.vcxproj", "{D851713A-9D32-4693-89F5-B2ED52FEFEDB}"
 EndProject
