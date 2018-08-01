@@ -142,9 +142,6 @@
     <ClInclude Include="Group\GroupModule.h">
       <Filter>Group</Filter>
     </ClInclude>
-    <ClInclude Include="Group\GroupImp.h">
-      <Filter>Group</Filter>
-    </ClInclude>
     <ClInclude Include="mysql\MySqlModule.h">
       <Filter>mysql</Filter>
     </ClInclude>
@@ -180,6 +177,9 @@
     </ClInclude>
     <ClInclude Include="FreeSWITCH\FreeSwitchDevice.h">
       <Filter>FreeSWITCH</Filter>
+    </ClInclude>
+    <ClInclude Include="Group\Group.h">
+      <Filter>Group</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -240,9 +240,6 @@
     <ClCompile Include="Group\GroupModule.cpp">
       <Filter>Group</Filter>
     </ClCompile>
-    <ClCompile Include="Group\GroupImp.cpp">
-      <Filter>Group</Filter>
-    </ClCompile>
     <ClCompile Include="mysql\MySqlModule.cpp">
       <Filter>mysql</Filter>
     </ClCompile>
@@ -272,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="FreeSWITCH\FreeSwitchDevice.cpp">
       <Filter>FreeSWITCH</Filter>
+    </ClCompile>
+    <ClCompile Include="Group\Group.cpp">
+      <Filter>Group</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

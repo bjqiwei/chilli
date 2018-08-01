@@ -1,4 +1,4 @@
-#include "GroupImp.h"
+#include "Group.h"
 #include "../model/ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
 #include <scxml/TriggerEvent.h>
@@ -6,19 +6,19 @@
 namespace chilli {
 namespace Group {
 
-	GroupImp::GroupImp(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
+	Group::Group(model::ProcessModule * model, const std::string &ext, const std::string &smFileName)
 		:Device(model, ext, smFileName)
 	{
-		std::string logName = "GroupImp.";
-		log = log4cplus::Logger::getInstance(logName.append(m_ExtNumber));
-		LOG4CPLUS_DEBUG(log, "new a group object.");
+		std::string logName = "GroupImp";
+		log = log4cplus::Logger::getInstance(logName);
+		LOG4CPLUS_DEBUG(log, this->getId() << " new a group object.");
 	}
 
-	GroupImp::~GroupImp() {
-		LOG4CPLUS_DEBUG(log, "destruction a group object.");
+	Group::~Group() {
+		LOG4CPLUS_DEBUG(log, this->getId() << " destruction a group object.");
 	}
 
-	void GroupImp::processSend(const std::string & strContent, const void * param, bool & bHandled)
+	void Group::processSend(const std::string & strContent, const void * param, bool & bHandled)
 	{
 		Json::Value jsonData;
 		Json::Reader jsonReader;
@@ -34,7 +34,7 @@ namespace Group {
 
 		}
 		else {
-			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			LOG4CPLUS_ERROR(log, this->getId() << " " << strContent << " not json data.");
 		}
 
 		if (!bHandled) {
@@ -42,9 +42,9 @@ namespace Group {
 		}
 	}
 
-	void GroupImp::fireSend(const std::string &strContent, const void * param)
+	void Group::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 	}

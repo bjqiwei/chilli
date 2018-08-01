@@ -1,10 +1,6 @@
 #pragma once
-
 #include "../model/ProcessModule.h"
-#include <log4cplus/logger.h>
 #include <string>
-#include <atomic>
-#include <thread>
 
 namespace chilli {
 namespace Group {
