@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CHILLI_EVENTREPORTMODULE_HEADER_
-#define _CHILLI_EVENTREPORTMODULE_HEADER_
 #include "../model/ProcessModule.h"
 #include <log4cplus/logger.h>
 #include <thread>
@@ -36,5 +34,4 @@ private:
 };
 }
 }
-#endif // end EventReport header
 

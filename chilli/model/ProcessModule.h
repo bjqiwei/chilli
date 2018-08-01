@@ -27,7 +27,7 @@ public:
 	virtual void removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
-	virtual log4cplus::Logger getLogger()final;
+	virtual const log4cplus::Logger & getLogger()final;
 	virtual const std::string getId()final;
 
 	static std::vector<std::shared_ptr<model::ProcessModule>> g_Modules;

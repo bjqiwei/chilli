@@ -177,7 +177,7 @@ namespace model{
 		m_RecEvtBuffer.Put(evt);
 	}
 
-	log4cplus::Logger ProcessModule::getLogger()
+	const log4cplus::Logger & ProcessModule::getLogger()
 	{
 		return this->log;
 	}
