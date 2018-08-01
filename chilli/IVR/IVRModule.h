@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CHILLI_IVRMODULE_HEADER_
-#define _CHILLI_IVRMODULE_HEADER_
 #include "../model/ProcessModule.h"
 #include <log4cplus/logger.h>
 #include <thread>
