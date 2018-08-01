@@ -3,6 +3,7 @@
   <ACD id="acd001">
     <Device DeviceID="0001" StateMachine="./conf/ACD.xml"></Device>
   </ACD>
+  <ACD id="call001" StateMachine="./conf/Call.xml"/>
   <Agents id="agent001" TCPPort="9995" WSPort="9996">
     <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>
   </Agents>
@@ -57,7 +58,6 @@
       <Extension ExtensionNumber="1018" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
       <Extension ExtensionNumber="1019" StateMachine="./conf/FreeSwitchExtension.xml"></Extension>
     </Extensions>
-    <Call ExtensionNumber="2000" StateMachine="./conf/FreeSwitchCall.xml"></Call>
   </FreeSwitch>
   <!--Avaya id = "tsapi001">
 		<TSAPI>

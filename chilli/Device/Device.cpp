@@ -78,7 +78,7 @@ namespace chilli {
 					LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 					if (m_Connections.find(connectid) == m_Connections.end()) {
-						Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, nullptr));
+						Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
 						m_Connections[connectid] = connection;
 
 						for (auto & itt : this->m_Vars.getMemberNames())

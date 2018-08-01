@@ -34,9 +34,6 @@
     <Filter Include="websocket">
       <UniqueIdentifier>{966d4dc4-729f-4d54-945a-f4b31c140fb5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="freeswitch">
-      <UniqueIdentifier>{3f4e453c-8f58-4e1d-bc69-020370354b2c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Avaya">
       <UniqueIdentifier>{30b81287-8bbb-4298-9c40-99fe02dbde55}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,12 @@
     </Filter>
     <Filter Include="Device">
       <UniqueIdentifier>{e74a7c9f-a71a-4955-819f-415cf4ebb6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Call">
+      <UniqueIdentifier>{d2383946-6b09-474a-9a57-2da822de3fec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeSWITCH">
+      <UniqueIdentifier>{3f4e453c-8f58-4e1d-bc69-020370354b2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -106,8 +109,8 @@
     <ClInclude Include="websocket\websocket.h">
       <Filter>websocket</Filter>
     </ClInclude>
-    <ClInclude Include="freeswitch\FreeSwitchModule.h">
-      <Filter>freeswitch</Filter>
+    <ClInclude Include="FreeSWITCH\FreeSwitchModule.h">
+      <Filter>FreeSWITCH</Filter>
     </ClInclude>
     <ClInclude Include="Sh\shpa3api.h">
       <Filter>Header Files</Filter>
@@ -151,17 +154,14 @@
     <ClInclude Include="uuid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="freeswitch\FreeSwitchExtension.h">
-      <Filter>freeswitch</Filter>
+    <ClInclude Include="FreeSWITCH\FreeSwitchExtension.h">
+      <Filter>FreeSWITCH</Filter>
     </ClInclude>
     <ClInclude Include="stringHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EeventReport\EventReportModule.h">
       <Filter>EventReport</Filter>
-    </ClInclude>
-    <ClInclude Include="freeswitch\FreeSwitchCall.h">
-      <Filter>freeswitch</Filter>
     </ClInclude>
     <ClInclude Include="model\PerformElement.h">
       <Filter>model</Filter>
@@ -174,6 +174,12 @@
     </ClInclude>
     <ClInclude Include="acd\ACDDevice.h">
       <Filter>ACD</Filter>
+    </ClInclude>
+    <ClInclude Include="Call\Call.h">
+      <Filter>Call</Filter>
+    </ClInclude>
+    <ClInclude Include="Call\CallModule.h">
+      <Filter>Call</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -207,8 +213,8 @@
     <ClCompile Include="websocket\websocket.cpp">
       <Filter>websocket</Filter>
     </ClCompile>
-    <ClCompile Include="freeswitch\FreeSwitchModule.cpp">
-      <Filter>freeswitch</Filter>
+    <ClCompile Include="FreeSWITCH\FreeSwitchModule.cpp">
+      <Filter>FreeSWITCH</Filter>
     </ClCompile>
     <ClCompile Include="Avaya\TSAPIModule.cpp">
       <Filter>Avaya</Filter>
@@ -243,14 +249,11 @@
     <ClCompile Include="Avaya\AvayaACD.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="freeswitch\FreeSwitchExtension.cpp">
-      <Filter>freeswitch</Filter>
+    <ClCompile Include="FreeSWITCH\FreeSwitchExtension.cpp">
+      <Filter>FreeSWITCH</Filter>
     </ClCompile>
     <ClCompile Include="EeventReport\EventReportModule.cpp">
       <Filter>EventReport</Filter>
-    </ClCompile>
-    <ClCompile Include="freeswitch\FreeSwitchCall.cpp">
-      <Filter>freeswitch</Filter>
     </ClCompile>
     <ClCompile Include="model\PerformElement.cpp">
       <Filter>model</Filter>
@@ -263,6 +266,12 @@
     </ClCompile>
     <ClCompile Include="acd\ACDDevice.cpp">
       <Filter>ACD</Filter>
+    </ClCompile>
+    <ClCompile Include="Call\Call.cpp">
+      <Filter>Call</Filter>
+    </ClCompile>
+    <ClCompile Include="Call\CallModule.cpp">
+      <Filter>Call</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

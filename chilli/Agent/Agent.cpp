@@ -106,7 +106,7 @@ void Agent::Stop()
 
 bool Agent::IsClosed()
 {
-	return m_StateMachines.empty();;
+	return m_StateMachines.empty();
 }
 
 bool Agent::pushEvent(const model::EventType_t & Event)

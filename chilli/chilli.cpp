@@ -15,6 +15,7 @@
 #include "Avaya/TSAPIModule.h"
 #include "mysql/MySqlModule.h"
 #include "EeventReport/EventReportModule.h"
+#include "Call/CallModule.h"
 #include <log4cplus/helpers/loglog.h>
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
@@ -26,6 +27,7 @@
 #define  GROUPS         "Groups"
 #define  MYSQL          "MySql"
 #define  EVENTREPORT	"EventReport"
+#define  CALL			"Call"
 
 BOOL WINAPI ConsoleHandler(DWORD msgType)
 {
@@ -305,6 +307,15 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			else if (nodeName == EVENTREPORT)
 			{
 				model::ProcessModulePtr eventreport(new chilli::EventReport::EventReportModule(modelid));
+				XMLPrinter printer;
+				e->Accept(&printer);
+				eventreport->LoadConfig(printer.CStr());
+				model::ProcessModule::g_Modules.push_back(eventreport);
+
+			}
+			else if (nodeName == CALL)
+			{
+				model::ProcessModulePtr eventreport(new chilli::Call::CallModule(modelid));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				eventreport->LoadConfig(printer.CStr());
