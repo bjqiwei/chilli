@@ -1,6 +1,7 @@
 #include "ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
 #include "ConnectAdapter.h"
+#include <regex>
 
 namespace chilli{
 namespace model{
@@ -60,50 +61,7 @@ namespace model{
 
 	void ProcessModule::PushEvent(const EventType_t & Event)
 	{
-		
-		const Json::Value & jsonEvent = Event.event;
-
-		if (!jsonEvent["extension"].isArray()) {
-
-			std::string peId;
-			if (jsonEvent["extension"].isString()) {
-				peId = jsonEvent["extension"].asString();
-			}
-
-			//
-			auto peptr = getPerformElement(peId);
-			if (peptr != nullptr){
-				peptr->m_model->m_RecEvtBuffer.Put(Event);
-				return;
-			}
-			else {
-
-				LOG4CPLUS_WARN(log, this->getId() << " not find extension by event:" << Event.event.toStyledString());
-				return;
-			}
-		}
-		else {
-			for (size_t i = 0; i < jsonEvent["extension"].size(); i++) {
-
-				std::string peId;
-				if (jsonEvent["extension"][i].isString()) {
-					peId = jsonEvent["extension"][i].asString();
-				}
-
-				chilli::model::EventType_t newEvent(Event.event);
-				newEvent.event["extension"] = peId;
-
-				auto extptr = getPerformElement(peId);
-				if (extptr != nullptr) {
-					extptr->m_model->m_RecEvtBuffer.Put(newEvent);
-					continue;
-				}
-				else {
-					LOG4CPLUS_WARN(log, this->getId() << " not find extension by event:" << newEvent.event.toStyledString());
-				}
-				
-			}
-		}
+		this->m_RecEvtBuffer.Put(Event);
 	}
 
 	void ProcessModule::run()
@@ -124,8 +82,8 @@ namespace model{
 					{
 						const Json::Value & jsonEvent = Event.event;
 						std::string peId;
-						if (jsonEvent["extension"].isString()) {
-							peId = jsonEvent["extension"].asString();
+						if (jsonEvent["id"].isString()) {
+							peId = jsonEvent["id"].asString();
 						}
 
 						auto extptr = getPerformElement(peId);
@@ -135,7 +93,7 @@ namespace model{
 							extptr->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_WARN(log, this->getId() << " not find extension:" << peId);
+							LOG4CPLUS_WARN(log, this->getId() << " not find device:" << peId);
 						}
 					}
 				}
@@ -165,10 +123,10 @@ namespace model{
 		std::string peId;
 
 		if (jsonReader.parse(attr, jsonEvent)) {
-			jsonEvent["extension"] = jsonEvent["sessionId"];
+			jsonEvent["id"] = jsonEvent["sessionId"];
 
-			if (jsonEvent["extension"].isString()) {
-				peId = jsonEvent["extension"].asString();
+			if (jsonEvent["id"].isString()) {
+				peId = jsonEvent["id"].asString();
 			}
 		}
 		chilli::model::EventType_t evt(jsonEvent);
@@ -195,10 +153,17 @@ namespace model{
 		return false;
 	}
 
-	void ProcessModule::removePerfromElement(const std::string & peId)
+	PerformElementPtr ProcessModule::removePerfromElement(const std::string & peId)
 	{
 		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
+		PerformElementPtr peptr;
+		const auto & it = this->m_PerformElements.find(peId);
+		if (it != this->m_PerformElements.end())
+			peptr = it->second;
+
 		this->m_PerformElements.erase(peId);
+
+		return peptr;
 	}
 
 	chilli::model::PerformElementPtr ProcessModule::getPerformElement(const std::string & peId)
@@ -207,6 +172,13 @@ namespace model{
 		auto & it = this->m_PerformElements.find(peId);
 		if (it != this->m_PerformElements.end()) {
 			return it->second;
+		}
+
+		for (auto & it :this->m_PerformElements){
+			std::regex regPattern(it.first);
+			if (std::regex_match(peId, regPattern)){
+				return it.second;
+			}
 		}
 
 		return nullptr;

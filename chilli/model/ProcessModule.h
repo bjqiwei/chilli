@@ -24,7 +24,7 @@ public:
 	virtual void PushEvent(const EventType_t & event) final;
 	//virtual PerformElementMap GetExtensions() final;
 	virtual bool addPerformElement(const std::string &peId, PerformElementPtr & extptr) final;
-	virtual void removePerfromElement(const std::string & peId) final;
+	virtual PerformElementPtr removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
 	virtual const log4cplus::Logger & getLogger()final;

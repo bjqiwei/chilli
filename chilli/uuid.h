@@ -33,6 +33,6 @@ static std::string uuid()
 	}
 
 #endif
-	std::cout << "create guid " << buffer << std::endl;
+	//std::cout << "create guid " << buffer << std::endl;
 	return buffer;
 }
