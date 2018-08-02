@@ -19,7 +19,7 @@ namespace env
 		:Context(eval, _parent), m_strSessionID(sessionid), m_jsrt(rt)
 	{
 		log =  log4cplus::Logger::getInstance("fsm.JsContext");
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
 		
 		InitializeInstanceFields();
 		//LOG4CPLUS_DEBUG(log, m_strSessionID << ",new a fsm.env.JsContext object finish.");
@@ -113,7 +113,7 @@ namespace env
 
 	Context *JsContext::getParent()
 	{
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",getParent:" << parent);
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",getParent:" << parent);
 		return parent;
 	}
 
@@ -264,7 +264,7 @@ namespace env
 		if (m_jsctx) 
 			JS_DestroyContext(m_jsctx);
 
-		LOG4CPLUS_DEBUG(log, m_strSessionID << ",destructioned a fsm.env.JsContext object:" << this );
+		LOG4CPLUS_TRACE(log, m_strSessionID << ",destructioned a fsm.env.JsContext object:" << this );
 	}
 
 	JS::Value JsContext::JsonValueToJsval(const Json::Value &value)const

@@ -612,7 +612,7 @@ bool fsm::StateMachineimp::addSendImplement(SendInterface * evtDsp)
 	if (m_mapSendObject.count(evtDsp->getTarget())) 
 		return false;
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;
-	LOG4CPLUS_DEBUG(log, m_strSessionID << ",addSendImplement:" << evtDsp->getTarget());
+	LOG4CPLUS_TRACE(log, m_strSessionID << ",addSendImplement:" << evtDsp->getTarget());
 	return true;
 }
 const std::string & fsm::StateMachineimp::getName() const {
