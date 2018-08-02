@@ -8,7 +8,7 @@ namespace chilli{
 
 		class Device :public model::PerformElement {
 		protected:
-			typedef std::shared_ptr<fsm::StateMachine> Connction;
+			typedef std::shared_ptr<fsm::StateMachine> Session;
 
 		public:
 			Device(model::ProcessModule * model, const std::string &id, const std::string &smFileName);
@@ -28,7 +28,7 @@ namespace chilli{
 			void processSend(const std::string &strContent, const void * param, bool & bHandled);
 
 		//private:
-			std::map<std::string, Connction> m_Connections;
+			std::map<std::string, Session> m_Sessions;
 			const std::string m_SMFileName;
 			helper::CEventBuffer<model::EventType_t> m_EvtBuffer;
 		};

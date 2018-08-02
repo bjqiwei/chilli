@@ -46,9 +46,9 @@ void ACDDevice::mainEventLoop()
 
 			LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
-			if (m_Connections.begin() == m_Connections.end()) {
-				Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
-				m_Connections[connectid] = connection;
+			if (m_Sessions.begin() == m_Sessions.end()) {
+				Session connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
+				m_Sessions[connectid] = connection;
 
 				for (auto & itt : this->m_Vars.getMemberNames())
 				{
@@ -63,13 +63,13 @@ void ACDDevice::mainEventLoop()
 				connection->start(false);
 			}
 
-			auto & it = m_Connections.begin();
+			auto & it = m_Sessions.begin();
 			it->second->pushEvent(evt);
 			it->second->mainEventLoop();
 
 			if (it->second->isInFinalState()) {
 				it->second->stop();
-				m_Connections.erase(it);
+				m_Sessions.erase(it);
 			}
 		}
 	}

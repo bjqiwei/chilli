@@ -21,14 +21,14 @@ namespace chilli {
 		void Device::Start()
 		{
 			LOG4CPLUS_INFO(log, this->getId()<< " Start.");
-			for (auto & it : m_Connections) {
+			for (auto & it : m_Sessions) {
 				it.second->start(false);
 			}
 		}
 
 		void Device::Stop()
 		{
-			for (auto & it : m_Connections) {
+			for (auto & it : m_Sessions) {
 				it.second->stop();
 			}
 			LOG4CPLUS_INFO(log, this->getId() << " Stop.");
@@ -36,7 +36,7 @@ namespace chilli {
 
 		bool Device::IsClosed()
 		{
-			return m_Connections.empty();
+			return m_Sessions.empty();
 		}
 
 		bool Device::pushEvent(const model::EventType_t &evt)
@@ -54,8 +54,9 @@ namespace chilli {
 					const Json::Value & jsonEvent = Event.event;
 
 					std::string eventName;
-					std::string connectid;
+					std::string sessionId = m_Id;
 					std::string type;
+					std::string deviceId;
 
 					if (jsonEvent["type"].isString())
 						type = jsonEvent["type"].asString();
@@ -64,10 +65,13 @@ namespace chilli {
 						eventName = jsonEvent["event"].asString();
 					}
 
-					if (jsonEvent["ConnectionID"].isString()) {
-						connectid = jsonEvent["ConnectionID"].asString();
+					if (jsonEvent["sessionID"].isString()) {
+						sessionId = jsonEvent["sessionID"].asString();
 					}
 
+					if (jsonEvent["id"].isString()) {
+						deviceId = jsonEvent["id"].asString();
+					}
 
 					fsm::TriggerEvent evt(eventName);
 
@@ -77,30 +81,31 @@ namespace chilli {
 
 					LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
-					if (m_Connections.find(connectid) == m_Connections.end()) {
-						Connction connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
-						m_Connections[connectid] = connection;
+					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
+						Session session(new fsm::StateMachine(sessionId, m_SMFileName, this->m_model));
+						m_Sessions[sessionId] = session;
 
+						session->setVar("_device.deviceID", deviceId);
 						for (auto & itt : this->m_Vars.getMemberNames())
 						{
-							connection->setVar(itt, this->m_Vars[itt]);
+							session->setVar(itt, this->m_Vars[itt]);
 						}
 
 						for (auto & itt : model::ProcessModule::g_Modules) {
-							connection->addSendImplement(itt.get());
+							session->addSendImplement(itt.get());
 						}
 
-						connection->addSendImplement(this);
-						connection->start(false);
+						session->addSendImplement(this);
+						session->start(false);
 					}
 
-					auto & it = m_Connections.find(connectid);
+					auto & it = m_Sessions.find(sessionId);
 					it->second->pushEvent(evt);
 					it->second->mainEventLoop();
 
 					if (it->second->isInFinalState()) {
 						it->second->stop();
-						m_Connections.erase(it);
+						m_Sessions.erase(it);
 					}
 				}
 			}

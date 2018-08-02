@@ -8,7 +8,7 @@ namespace chilli {
 namespace Call {
 
 	Call::Call(ProcessModule * model, const std::string &callid, const std::string &smFileName)
-		:PerformElement(model, callid)
+		:PerformElement(model, callid), m_SMFileName(smFileName)
 	{
 		std::string logName = "Call";
 		log = log4cplus::Logger::getInstance(logName);
@@ -50,10 +50,9 @@ namespace Call {
 	{
 		try
 		{
+			model::PerformElementPtr call;
 			model::EventType_t Event;
 			if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
-
-				return;
 
 				const Json::Value & jsonEvent = Event.event;
 
@@ -76,6 +75,7 @@ namespace Call {
 					
 					StateMachine call(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
 
+					m_StateMachines[m_Id] = call;
 					for (auto & itt : this->m_Vars.getMemberNames())
 					{
 						call->setVar(itt, this->m_Vars[itt]);
@@ -96,6 +96,11 @@ namespace Call {
 				if (it->second->isInFinalState()) {
 					it->second->stop();
 					m_StateMachines.erase(it);
+				}
+
+				if (this->IsClosed())
+				{
+					call = this->m_model->removePerfromElement(this->getId());
 				}
 			}
 		}

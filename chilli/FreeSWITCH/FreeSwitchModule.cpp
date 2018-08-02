@@ -69,17 +69,17 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 	m_User = eConfig->Attribute("user") ? eConfig->Attribute("user") : "";
 	m_Password = eConfig->Attribute("password") ? eConfig->Attribute("password") : "";
 
-	// extensions 
-	XMLElement * extensions = eConfig->FirstChildElement("Extensions");
+	// devices 
+	XMLElement * deviceList = eConfig->FirstChildElement("Devices");
 
-	if (extensions != nullptr) {
+	if (deviceList != nullptr) {
 
-		for (XMLElement *child = extensions->FirstChildElement("Extension");
+		for (XMLElement *child = deviceList->FirstChildElement("Device");
 			child != nullptr;
-			child = child->NextSiblingElement("Extension"))
+			child = child->NextSiblingElement("Device"))
 		{
 
-			const char * num = child->Attribute("ExtensionNumber");
+			const char * num = child->Attribute("DeviceID");
 			const char * sm = child->Attribute("StateMachine");
 
 			num = num ? num : "";
@@ -87,10 +87,10 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 
 			model::PerformElementPtr peptr(new FreeSwitchDevice(this, num, sm));
 			if (peptr != nullptr && this->addPerformElement(num, peptr)) {
-				peptr->setVar("_extension.Extension", num);
+				//peptr->setVar("_device.deviceID", num);
 			}
 			else {
-				LOG4CPLUS_ERROR(log, this->getId() << " alredy had extension:" << num);
+				LOG4CPLUS_ERROR(log, this->getId() << " alredy had device:" << num);
 			}
 		}
 	}
@@ -223,7 +223,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 			}
 		}
 		
-		LOG4CPLUS_DEBUG(log, this->getId() << " All Extension:" << this->GetExtensions().size());
+		LOG4CPLUS_DEBUG(log, this->getId() << " All device:" << this->GetExtensions().size());
 
 		if (lastAgent == ""){
 			for (auto it : this->GetExtensions())
@@ -273,7 +273,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		lastAgent = findAgent;
 		LOG4CPLUS_DEBUG(log, this->getId() << " find agent:" << findAgent);
 		if (!findAgent.empty()){
-			Json::Value ext = this->getExtension(findAgent)->getVar("_agent.Extension");
+			Json::Value ext = this->getExtension(findAgent)->getVar("_agent.Device");
 			if (ext.isString())
 			{
 				std::string cmd = "bgapi uuid_transfer " + uuid +" " + ext.asString() + " XML default";
@@ -367,7 +367,7 @@ void FreeSwitchModule::ConnectFS()
 						continue;
 					
 					model::EventType_t evt;
-					evt.event["extension"] = it.first;
+					evt.event["id"] = it.first;
 					evt.event["event"] = "GetStatus";
 					std::string name = "Status:";
 					size_t start = response.find(name);				
@@ -457,13 +457,13 @@ void FreeSwitchModule::ConnectFS()
 							}
 
 							if (dir == "inbound")
-								evt.event["extension"] = caller;
+								evt.event["id"] = caller;
 							else if (dir == "outbound")
-								evt.event["extension"] = called;
+								evt.event["id"] = called;
 
 				
 							evt.event["event"] = evt.event["EventName"];
-							evt.event["ConnectionID"] = evt.event["UniqueID"];
+							evt.event["sessionID"] = evt.event["UniqueID"];
 
 							//Channel _ Create：通道创建事件
 							//Channel _ Progress：通道振铃事件
@@ -471,9 +471,6 @@ void FreeSwitchModule::ConnectFS()
 							//Channel _ Bridge：通道桥接事件
 							//Channel _ Hangup：通道挂断事件
 
-							this->PushEvent(evt);
-
-							evt.event["extension"] = m_CallExt;
 							this->PushEvent(evt);
 						}
 						else {

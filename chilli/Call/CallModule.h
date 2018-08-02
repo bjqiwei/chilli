@@ -13,10 +13,15 @@ public:
 	virtual ~CallModule(void);
 	virtual bool LoadConfig(const std::string & configContext) override;
 
+protected:
+	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 	std::string m_SMFileName;
+	typedef std::string sessionID;
+	typedef std::string CallID;
+	std::map<sessionID, CallID>m_Calls;
 };
 }
 }

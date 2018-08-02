@@ -3,7 +3,7 @@
   <ACD id="acd001">
     <Device DeviceID="0001" StateMachine="./conf/ACD.xml"></Device>
   </ACD>
-  <ACD id="call001" StateMachine="./conf/Call.xml"/>
+  <Call id="call001" StateMachine="./conf/Call.xml"/>
   <Agents id="agent001" TCPPort="9995" WSPort="9996">
     <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>
   </Agents>
@@ -35,29 +35,11 @@
         <Extension>0109</Extension>
     </Group>
    </Groups>
-  <FreeSwitch id = "freeswitch001" host="47.88.171.173" port ="18021" password="qiwei">
-    <Extensions>
-      <Extension ExtensionNumber="1000" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1001" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1002" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1003" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1004" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1005" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1006" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1007" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1008" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1009" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1010" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1011" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1012" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1013" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1014" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1015" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1016" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1017" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1018" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-      <Extension ExtensionNumber="1019" StateMachine="./conf/FreeSwitchDevice.xml"></Extension>
-    </Extensions>
+  <FreeSwitch id = "freeswitch001" host="192.168.2.232" port ="8021" password="ClueCon">
+    <Devices>
+      <Device DeviceID="1000" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
+      <Device DeviceID=".*" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
+    </Devices>
   </FreeSwitch>
   <!--Avaya id = "tsapi001">
 		<TSAPI>

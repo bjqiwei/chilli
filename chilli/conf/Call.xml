@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" ?>
 
-<fsm name ="FreeSwitchCall" initial="Null" final="Destroy">
+<fsm name ="Call" initial="Null" final="Destroy">
 <datamodel>
 	<data id="status"/>
 </datamodel>
@@ -18,7 +18,7 @@
 		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_INIT'">
 			<transition target="Pending"/>
 		</event>
-		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_DESTROY'">
+		<event event="CONNECTION_CLEARED">
 			<transition target="Destroy"/>
 		</event>
 		<state id="Pending">

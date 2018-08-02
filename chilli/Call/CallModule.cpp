@@ -3,6 +3,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
+#include "../uuid.h"
 
 
 namespace chilli{
@@ -37,10 +38,45 @@ bool CallModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
+void CallModule::processSend(const std::string & strContent, const void * param, bool & bHandled)
+{
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (jsonReader.parse(strContent, jsonData)) {
+
+		if (jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
+		{
+			std::string sessionid = jsonData["dest"].asString();
+			if (m_Calls.find(sessionid) == m_Calls.end()) {
+				std::string newCallId = uuid();
+				model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
+				this->addPerformElement(newCallId, call);
+				m_Calls[sessionid] =newCallId;
+			}
+				
+			auto & call = m_Calls.find(sessionid);
+			jsonData["param"]["from"] = jsonData["from"];
+			jsonData["param"]["id"] = call->second;
+			jsonData["param"]["event"] = jsonData["event"];
+			jsonData["param"]["type"] = jsonData["type"];
+			chilli::model::EventType_t sendData(jsonData["param"]);
+
+			this->PushEvent(sendData);
+		}
+		bHandled = true;
+
+	}
+	else {
+		LOG4CPLUS_ERROR(log, this->getId() << strContent << " not json data.");
+	}
+}
+
 
 void CallModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
+	LOG4CPLUS_TRACE(log, this->getId() << "fireSend:" << strContent);
+	bool bHandled = false;
+	processSend(strContent, param, bHandled);
 }
 
 }

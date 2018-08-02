@@ -27,9 +27,7 @@ namespace FreeSwitch{
 		std::string m_Password;
 		esl_handle_t m_Handle = { { 0 } };
 		void ConnectFS();
-		std::string m_CallExt;
 		friend class FreeSwitchDevice;
-		friend class FreeSwitchCall;
 	};
 
 }
