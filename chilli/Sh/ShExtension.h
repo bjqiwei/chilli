@@ -1,7 +1,4 @@
 #pragma once
-
-#ifndef _CHILLI_SHDEV_SHEXTENSION_HEADER_
-#define _CHILLI_SHDEV_SHEXTENSION_HEADER_
 #include "..\Device\Device.h"
 #include <log4cplus\logger.h>
 #include <memory>
@@ -30,4 +27,3 @@ private:
 typedef std::shared_ptr<ShExtension> ShExtensionPtr;
 }
 }
-#endif //end shextension header
