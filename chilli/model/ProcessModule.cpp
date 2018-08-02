@@ -4,8 +4,6 @@
 
 namespace chilli{
 namespace model{
-	std::recursive_mutex ProcessModule::g_PEMtx;
-	model::PerformElementMap ProcessModule::g_PerformElements;
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId),
@@ -189,9 +187,8 @@ namespace model{
 
 	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
-		if (this->g_PerformElements.find(peId) == this->g_PerformElements.end()){
-			this->g_PerformElements[peId] = peptr;
+		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
+		if (this->m_PerformElements.find(peId) == this->m_PerformElements.end()){
 			this->m_PerformElements[peId] = peptr;
 			return true;
 		}
@@ -200,21 +197,15 @@ namespace model{
 
 	void ProcessModule::removePerfromElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
-		this->g_PerformElements.erase(peId);
+		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
 		this->m_PerformElements.erase(peId);
 	}
 
 	chilli::model::PerformElementPtr ProcessModule::getPerformElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
 		auto & it = this->m_PerformElements.find(peId);
 		if (it != this->m_PerformElements.end()) {
-			return it->second;
-		}
-
-		it = this->g_PerformElements.find(peId);
-		if (it != this->g_PerformElements.end()) {
 			return it->second;
 		}
 

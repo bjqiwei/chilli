@@ -35,8 +35,7 @@ public:
 protected:
 	log4cplus::Logger log;
 	const std::string m_Id;
-	static std::recursive_mutex g_PEMtx;
-	static model::PerformElementMap g_PerformElements;
+	std::recursive_mutex m_PEMtx;
 	model::PerformElementMap m_PerformElements;
 
 	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
