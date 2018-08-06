@@ -28,7 +28,7 @@ namespace FreeSwitch {
 
 	void FreeSwitchDevice::processSend(const std::string & strContent, const void * param, bool & bHandled)
 	{
-		m_model->processSend(strContent, param, bHandled, this);
+		m_model->processSend(strContent, param, bHandled, this->getLogger());
 		if (!bHandled) {
 			Device::processSend(strContent, param, bHandled);
 		}

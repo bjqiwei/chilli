@@ -18,7 +18,7 @@ namespace FreeSwitch{
 	protected:
 		//inherit from SendInterface
 		virtual void fireSend(const std::string &strContent, const void * param) override;
-		void processSend(const std::string &strContent, const void * param, bool & bHandled, model::PerformElement * pe);
+		void processSend(const std::string &strContent, const void * param, bool & bHandled, log4cplus::Logger & log);
 	private:
 		std::thread m_Thread;
 		std::string m_Host;
@@ -27,6 +27,7 @@ namespace FreeSwitch{
 		std::string m_Password;
 		esl_handle_t m_Handle = { { 0 } };
 		void ConnectFS();
+		std::map<std::string, std::string>m_Session_DeviceId;
 		friend class FreeSwitchDevice;
 	};
 

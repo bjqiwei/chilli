@@ -16,6 +16,7 @@ public:
 	virtual int Stop() override;
 	virtual bool LoadConfig(const std::string & configContext) override;
 private:
+	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 private:

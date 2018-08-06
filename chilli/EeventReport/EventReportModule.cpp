@@ -107,9 +107,16 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 }
 
 
+void EventReportModule::processSend(const std::string &strContent, const void * param, bool & bHandled)
+{
+
+}
+
 void EventReportModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
+	LOG4CPLUS_DEBUG(log, this->getId() << " fireSend:" << strContent);
+	bool bHandled = false;
+	processSend(strContent, param, bHandled);
 }
 
 
@@ -338,6 +345,7 @@ public:
 				response["param"]["initiatedCall"]["sessionID"] = uuid();
 
 				this->Send(response);
+				request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
 				model::EventType_t evt(request, GetId());
 				m_module->PushEvent(evt);
 			}

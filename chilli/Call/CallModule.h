@@ -18,6 +18,7 @@ protected:
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
+	virtual void run() override;
 	std::string m_SMFileName;
 	typedef std::string sessionID;
 	typedef std::string CallID;

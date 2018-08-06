@@ -100,12 +100,14 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
+	LOG4CPLUS_TRACE(log, this->getId() << " fireSend：" << strContent);
+	bool bHandled = false;
+	this->processSend(strContent, param, bHandled, log);
+
 }
 
-void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::PerformElement * pe)
+void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, log4cplus::Logger & log)
 {
-	log4cplus::Logger log = pe->getLogger();
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (!jsonReader.parse(strContent, jsonEvent) || !jsonEvent.isObject()) {
@@ -129,10 +131,6 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		dest = jsonEvent["dest"].asString();
 	}
 
-	if (dest != "this") {
-		return;
-	}
-
 	if (jsonEvent["event"].isString()) {
 		eventName = jsonEvent["event"].asString();
 	}
@@ -141,7 +139,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 	{
 		std::string caller = "";
 		std::string called = "";
-		std::string uuid = "";
+		std::string sessionId = "";
 		std::string display = "";
 
 		if (jsonEvent["param"]["caller"].isString())
@@ -155,25 +153,27 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		else
 			display = caller;
 
-		if (jsonEvent["param"]["ConnectionID"].isString())
-			uuid = jsonEvent["param"]["ConnectionID"].asString();
+		if (jsonEvent["param"]["sessionID"].isString())
+			sessionId = jsonEvent["param"]["sessionID"].asString();
 
-		std::string cmd = "bgapi originate {origination_uuid=" + uuid + "}user/" + caller + " &bridge({origination_caller_id_number=" + display + "}";
+		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}sofia/internal/" + caller + " &bridge({origination_caller_id_number=" + display + "}";
 		cmd.append(called+")");
 
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
 
+		m_Session_DeviceId[sessionId] = caller;
+
 		bHandled = true;
 	}
 	else if (eventName == "ClearCall")
 	{
-		std::string uuid = "";
+		std::string sessionId = "";
 
 		if (jsonEvent["param"]["ConnectionID"].isString())
-			uuid = jsonEvent["param"]["ConnectionID"].asString();
+			sessionId = jsonEvent["param"]["ConnectionID"].asString();
 
-		std::string cmd = "bgapi uuid_kill " + uuid;
+		std::string cmd = "bgapi uuid_kill " + sessionId;
 		esl_send(&m_Handle, cmd.c_str());
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
@@ -348,7 +348,7 @@ void FreeSwitchModule::ConnectFS()
 
 		LOG4CPLUS_INFO(log, this->getId() << " Connected to FreeSWITCH");
 
-		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "CHANNEL_CREATE CHANNEL_PROGRESS CHANNEL_ANSWER CHANNEL_BRIDGE CHANNEL_UNBRIDGE CHANNEL_HOLD CHANNEL_UNHOLD DTMF CHANNEL_HANGUP CHANNEL_DESTROY");
+		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "CHANNEL_CREATE CHANNEL_PROGRESS CHANNEL_ANSWER CHANNEL_BRIDGE CHANNEL_UNBRIDGE CHANNEL_HOLD CHANNEL_UNHOLD DTMF CHANNEL_HANGUP CHANNEL_DESTROY BACKGROUND_JOB");
 		LOG4CPLUS_DEBUG(log, this->getId() << " " << m_Handle.last_sr_reply);
 
 		/*
@@ -460,6 +460,10 @@ void FreeSwitchModule::ConnectFS()
 								evt.event["id"] = caller;
 							else if (dir == "outbound")
 								evt.event["id"] = called;
+							
+							if (caller.empty() && called.empty())
+								evt.event["id"] = m_Session_DeviceId[evt.event["UniqueID"].asString()];
+							
 
 				
 							evt.event["event"] = evt.event["EventName"];
@@ -472,6 +476,10 @@ void FreeSwitchModule::ConnectFS()
 							//Channel _ Hangup：通道挂断事件
 
 							this->PushEvent(evt);
+
+							if (eventName == "CHANNEL_DESTROY")
+								m_Session_DeviceId.erase(evt.event["sessionID"].asCString());
+							
 						}
 						else {
 							LOG4CPLUS_DEBUG(log, this->getId() << " " << m_Handle.last_event->body);

@@ -18,6 +18,12 @@
 			<transition target="Initiated"/>
 		</event>
 		<event event="CHANNEL_DESTROY">
+			<send cond="_state._id == 'Null'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+				<cause type="script">606</cause>
+				<msg>USER_NOT_REGISTERED</msg>
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_sessionid</sessionID>
+			</send>
 			<transition target="Destroy"/>
 		</event>
 		<event event="CHANNEL_ANSWER">

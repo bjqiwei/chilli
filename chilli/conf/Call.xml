@@ -3,19 +3,35 @@
 <fsm name ="Call" initial="Null" final="Destroy">
 <datamodel>
 	<data id="status"/>
+	<data id="caller"/>
+	<data id="called"/>
+	<data id="connectionID"/>
+	<data id="callID"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
 	<script src="./conf/DateFormat.js"/>
 </scriptmodel>
 	<state id="Null">
-		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_NEW'">
+		<event event="MakeCall">
+			<script>caller = _event.param.callingDevice; called = _event.param.calledDirectoryNumber; connectionID = _event.param.initiatedCall.connectionID; callID = _event.param.initiatedCall.callID;</script>
+			<send target="freeswitch001" type="cmd" destexpr="_event.param.callingDevice" event="MakeCall">
+				<caller type="script">_event.param.callingDevice</caller>
+				<called type="script">_event.param.calledDirectoryNumber</called>
+				<sessionID type="script">_event.param.initiatedCall.sessionID</sessionID>
+			</send>
 		</event>
-		<event event="CHANNEL_CREATE" cond="_event.ChannelState=='CS_INIT'">
+		<event event="Failed">
+			<send target="eventreport" type="event" event="Failed">
+				<failedConnection type="script">var param ={}; param.connectionID=connectionID; param.callID=callID;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
+				<failingDevice type="script">_event.param.deviceID</failingDevice>
+				<calledDevice type="script">called</calledDevice>
+				<cause type="script">_event.param.cause</cause>
+			</send>
 		</event>
-		<event event="CHANNEL_CREATE" cond="_event.ChannelState=='CS_ROUTING'">
+		<event event="CHANNEL_CREATE">
 		</event>
-		<event event="CHANNEL_STATE" cond="_event.ChannelState=='CS_INIT'">
+		<event event="CHANNEL_STATE">
 			<transition target="Pending"/>
 		</event>
 		<event event="CONNECTION_CLEARED">

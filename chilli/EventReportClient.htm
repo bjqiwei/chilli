@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<meta charset="utf-8"/>
+<TITLE>Event Report Client</TITLE>
+</HEAD>
+<BODY onload="init();">
+
+    <hr />
+    <input id="status" width="400" value="未登陆" disabled="disabled" />
+    <hr />
+
+    <font>服务器地址</font><input type="text" id="wsUri" value="ws://127.0.0.1:9986" /><p/>
+	<font>用户ID</font><input type="text" id="UserId" value="6001" />
+	<font>密码</font><input type="password" id="password" value="1234" /><p/>
+    <font>版本</font><input type="text" id="version" value="1.0.0.0" />
+    <input type="button" value="连接" onclick="StartConnect();" />
+	<input type="button" value="断开" onclick="DisConnect();" /><p/>
+	<input type="button" value="外呼" onclick="MakeCall();" /><font>主叫</font><input type="text" id="calling" value="1000" /><font>被叫</font><input type="text" id="called" value="5000" /><p/>
+	
+    <script type="text/javascript">
+
+		var websocket;
+		var invokeid = 0;
+		
+		function init(){
+		}
+		
+		function StartConnect() {
+		    if(websocket != undefined){
+                delete websocket;
+		    }
+			websocket = new WebSocket(document.getElementById("wsUri").value);
+            websocket.onopen = function(evt) { onOpen(evt) };
+            websocket.onclose = function(evt) { onClose(evt) };
+            websocket.onmessage = function(evt) { onMessage(evt) };
+            websocket.onerror = function(evt) { onError(evt) };
+        }
+
+		function DisConnect()
+		{		
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "disConnect";
+			doSend(JSON.stringify(request));
+			websocket.close();
+		}
+		
+		function MakeCall()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "MakeCall";
+			request.param = new Object();
+			request.param.callingDevice = document.getElementById("calling").value;
+			request.param.calledDirectoryNumber = document.getElementById("called").value;
+			doSend(JSON.stringify(request));
+		}
+		
+		function AlternateCall(active, other)
+		{
+		    var alternateCall = new Object();
+		    alternateCall.active = active;
+		    alternateCall.other = other;
+		    alternateCall.cmd = "AlternateCall";
+		    alternateCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function AnswerCall(alertingCall)
+		{
+		    var answerCall = new Object();
+		    answerCall.alertingCall = alertingCall;
+		    answerCall.cmd = "AnswerCall";
+		    answerCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function CallCompletion(feature,connection) {
+		    var callCompletion = new Object();
+		    callCompletion.feature = feature;
+		    callCompletion.connection = connection;
+		    callCompletion.cmd = "CallCompletion";
+		    callCompletion.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+        
+		function ClearCall(call)
+		{
+		    var clearCall = new Object();
+		    clearCall.call = call;
+		    clearCall.cmd = "ClearCall";
+		    clearCall.event = "cmd";
+		    doSend(JSON.stringify(login));
+		}
+
+		function ClearConnection(call)
+		{
+		    var clearConnection = new Object();
+		    clearConnection.call = call;
+		    clearConnection.cmd = "ClearConnection";
+		    clearConnection.event = "cmd";
+		    doSend(JSON.stringify(request));
+		}
+
+        function onOpen(evt)
+        {
+            document.getElementById("status").value = "已连接";
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "connect";
+			request.param = new Object();
+			request.param.LoginID= document.getElementById("UserId").value;
+			request.param.passWord = document.getElementById("password").value;
+			request.param.version = document.getElementById("version").value;
+			doSend(JSON.stringify(request));
+        }
+
+		function onClose(evt)
+		{
+			document.getElementById("status").value = "已断开连接";
+		}
+
+		function onMessage(evt)
+		{
+			writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+		}
+
+		function onError(evt)
+		{
+			writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+			document.getElementById("status").value = "已断开连接";
+		}
+
+		function doSend(message)
+		{
+			if(websocket.readyState == 1){
+				writeToScreen("SENT: " + message);
+				websocket.send(message);
+			}
+			else{
+				document.getElementById("status").value = "未连接";
+			}
+		}
+		
+		function writeToScreen(message)
+		{
+			var pre = document.createElement("p");
+			pre.style.wordWrap = "break-word";
+			pre.innerHTML = message;
+			output.appendChild(pre);
+		}
+		
+    </script>
+	<script type="text/javascript">
+		
+	</script>
+	<div id="output"></div>
+</BODY>
+</HTML>
