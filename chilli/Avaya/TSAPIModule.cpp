@@ -43,7 +43,7 @@ namespace chilli {
 				if (!InitAvayaAPI())
 					return -1;
 
-				m_thread = std::thread(&TSAPIModule::run, this);
+				m_thread2 = std::thread(&TSAPIModule::run2, this);
 			}
 			else {
 				LOG4CPLUS_WARN(log, this->getId() << " already running for this module.");
@@ -59,10 +59,10 @@ namespace chilli {
 				ProcessModule::Stop();
 				m_bRunning = false;
 
-				if (m_thread.joinable()) {
+				if (m_thread2.joinable()) {
 
 					bool ret = CloseStream();
-					m_thread.join();
+					m_thread2.join();
 					UnInitAvayaAPI();
 					return ret;
 				}
@@ -1187,7 +1187,7 @@ namespace chilli {
 			LOG4CPLUS_DEBUG(log, this->getId() << " exist call size:" << m_callid2ACDExtenion.size());
 		}
 
-		void TSAPIModule::run()
+		void TSAPIModule::run2()
 		{
 			CSTAEvent_t cstaEvent; // CSTA event buffer required for reteriving the Event Structure
 			unsigned short usEventBufSize; // CSTA event buffer size

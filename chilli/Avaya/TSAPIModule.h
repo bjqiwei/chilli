@@ -48,8 +48,8 @@ namespace chilli {
 			void removeAcdExtension(const std::string & ext);
 			std::map<uint32_t, std::string>m_callid2UUID;
 
-			std::thread m_thread;
-			void run();
+			std::thread m_thread2;
+			void run2();
 			friend class AvayaAgent;
 			friend class AvayaDevice;
 			friend class AvayaVDN;
