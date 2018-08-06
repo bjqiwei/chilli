@@ -251,7 +251,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="Group\Group.h" />
     <ClInclude Include="Group\GroupModule.h" />
     <ClInclude Include="IVR\IVRModule.h" />
-    <ClInclude Include="model\ConnectAdapter.h" />
     <ClInclude Include="model\PerformElement.h" />
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="model\TypeDef.h" />
@@ -288,7 +287,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClCompile Include="Group\Group.cpp" />
     <ClCompile Include="Group\GroupModule.cpp" />
     <ClCompile Include="IVR\IVRModule.cpp" />
-    <ClCompile Include="model\ConnectAdapter.cpp" />
     <ClCompile Include="model\PerformElement.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
     <ClCompile Include="mysql\MySqlModule.cpp" />

@@ -130,9 +130,6 @@
     <ClInclude Include="model\TypeDef.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="model\ConnectAdapter.h">
-      <Filter>model</Filter>
-    </ClInclude>
     <ClInclude Include="Avaya\AvayaAgent.h">
       <Filter>Avaya</Filter>
     </ClInclude>
@@ -224,9 +221,6 @@
     </ClCompile>
     <ClCompile Include="Sh\ShAPI.cpp">
       <Filter>Sh</Filter>
-    </ClCompile>
-    <ClCompile Include="model\ConnectAdapter.cpp">
-      <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\ProcessModule.cpp">
       <Filter>model</Filter>

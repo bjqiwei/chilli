@@ -4,7 +4,7 @@
     <Device DeviceID="0001" StateMachine="./conf/ACD.xml"></Device>
   </ACD>
   <Call id="call001" StateMachine="./conf/Call.xml"/>
-  <Agents id="agent001" TCPPort="9995" WSPort="9996">
+  <Agents id="agent001">
     <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>
   </Agents>
   <IVR id="ivr001">

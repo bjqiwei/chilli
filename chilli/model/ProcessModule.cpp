@@ -1,6 +1,5 @@
 #include "ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
-#include "ConnectAdapter.h"
 #include <regex>
 
 namespace chilli{

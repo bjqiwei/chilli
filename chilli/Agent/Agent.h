@@ -32,9 +32,6 @@ protected:
 	std::map<std::string, StateMachine> m_StateMachines;
 	const std::string m_SMFileName;
 	helper::CEventBuffer<model::EventType_t> m_EvtBuffer;
-
-	uint64_t m_curConnectId = 0;
-	uint64_t m_ConnectId = 0;
 };
 typedef std::shared_ptr<Agent>  AgentPtr;
 }

@@ -12,7 +12,6 @@
 #include "../tinyxml2/tinyxml2.h"
 #include <json/json.h>
 #include "../websocket/websocket.h"
-#include "../model/ConnectAdapter.h"
 #include "../uuid.h"
 
 
@@ -109,7 +108,16 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 
 void EventReportModule::processSend(const std::string &strContent, const void * param, bool & bHandled)
 {
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (jsonReader.parse(strContent, jsonData)) {
 
+		bHandled = true;
+
+	}
+	else {
+		LOG4CPLUS_ERROR(log, this->getId() << strContent << " not json data.");
+	}
 }
 
 void EventReportModule::fireSend(const std::string & strContent, const void * param)
@@ -246,7 +254,7 @@ done:
 	return true;
 }
 
-class EventReportWSConnection :public WebSocket::WSConnection, chilli::model::ConnectAdapter
+class EventReportWSConnection :public WebSocket::WSConnection
 {
 public:
 	explicit EventReportWSConnection(struct lws * wsi, model::ProcessModule * module) 
@@ -346,7 +354,7 @@ public:
 
 				this->Send(response);
 				request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
-				model::EventType_t evt(request, GetId());
+				model::EventType_t evt(request);
 				m_module->PushEvent(evt);
 			}
 		}
@@ -356,21 +364,10 @@ public:
 
 	};
 
-	virtual int Send(const char * lpBuf, int nBufLen) override
-	{
-		//LOG4CPLUS_DEBUG(log, m_SessionId << " Send:" << std::string(lpBuf, nBufLen));
-		return WSConnection::Send(lpBuf, nBufLen);
-	}
-
 	int Send(Json::Value send) {
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		return this->Send(sendData.c_str(), sendData.length());
-	}
-
-	virtual void Close() override
-	{
-		return WSConnection::Close();
+		return WSConnection::Send(sendData.c_str(), sendData.length());
 	}
 
 private:
