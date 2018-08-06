@@ -29,7 +29,7 @@ private:
 	bool listenTCP(int port);
 	bool listenWS(int port);
 
-	void run();
+	virtual void run() override;
 
 };
 }

@@ -28,7 +28,7 @@ namespace model{
 	{
 		if (!m_bRunning) {
 			m_bRunning = true;
-			m_thread = std::thread(&ProcessModule::run, this);
+			m_thread = std::thread(&ProcessModule::_run, this);
 		}
 		else {
 			LOG4CPLUS_WARN(log, this->getId() << " already running for this module.");
@@ -62,6 +62,11 @@ namespace model{
 	void ProcessModule::PushEvent(const EventType_t & Event)
 	{
 		this->m_RecEvtBuffer.Put(Event);
+	}
+
+	void ProcessModule::_run()
+	{
+		return this->run();
 	}
 
 	void ProcessModule::run()

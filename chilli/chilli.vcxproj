@@ -332,8 +332,8 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <Xml Include="conf\AvayaAgent.xml" />
     <Xml Include="conf\AvayaExtension.xml" />
     <Xml Include="conf\chilli.xml" />
-    <Xml Include="conf\FreeSwitchCall.xml" />
-    <Xml Include="conf\FreeSwitchExtension.xml" />
+    <Xml Include="conf\Call.xml" />
+    <Xml Include="conf\FreeSwitchDevice.xml" />
     <Xml Include="conf\Group.xml" />
     <Xml Include="conf\IVR.xml" />
   </ItemGroup>

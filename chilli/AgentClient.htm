@@ -1,22 +1,23 @@
-<HTML>
+ï»¿<HTML>
 <HEAD>
+<meta charset="utf-8"/>
 <TITLE>chilli Agent Client</TITLE>
 </HEAD>
 <BODY onload="init();">
 
     <hr />
-    <input id="status" width="400" value="Î´µÇÂ½" disabled="disabled" />
+    <input id="status" width="400" value="æœªç™»é™†" disabled="disabled" />
     <hr />
 
-    <font>·şÎñÆ÷µØÖ·</font><input type="text" id="wsUri" value="ws://127.0.0.1:9996" /><p/>
-	<font>×øÏ¯ID</font><input type="text" id="agentId" value="6001" />
-	<font>ÃÜÂë</font><input type="password" id="password" value="1234" /><p/>
-    <font>·Ö»ú</font><input type="text" id="device" value="1000" />
-    <font>¼¼ÄÜ×é</font><input type="text" id="group" value="" /><p />
-    <input type="button" value="µÇÂ½" onclick="Login();" />
-	<input type="button" value="µÇ³ö" onclick="Logout();" /><p/>
-	<font>µç»°</font><input type="text" id="idTel" value="" width="300"/><input type="button" value="Ìí¼Ó" onclick="AddTel();" />
-	<input type="button" value="¿ªÊ¼" onclick="StartConf();" /><p/>
+    <font>æœåŠ¡å™¨åœ°å€</font><input type="text" id="wsUri" value="ws://127.0.0.1:9996" /><p/>
+	<font>åå¸­ID</font><input type="text" id="agentId" value="6001" />
+	<font>å¯†ç </font><input type="password" id="password" value="1234" /><p/>
+    <font>åˆ†æœº</font><input type="text" id="device" value="1000" />
+    <font>æŠ€èƒ½ç»„</font><input type="text" id="group" value="" /><p />
+    <input type="button" value="ç™»é™†" onclick="Login();" />
+	<input type="button" value="ç™»å‡º" onclick="Logout();" /><p/>
+	<font>ç”µè¯</font><input type="text" id="idTel" value="" width="300"/><input type="button" value="æ·»åŠ " onclick="AddTel();" />
+	<input type="button" value="å¼€å§‹" onclick="StartConf();" /><p/>
 	
     <script type="text/javascript">
 
@@ -98,7 +99,7 @@
 
         function onOpen(evt)
         {
-            document.getElementById("status").value = "ÒÑÁ¬½Ó";
+            document.getElementById("status").value = "å·²è¿æ¥";
 			var login = new Object();
 			login.agentid= document.getElementById("agentId").value;
 			login.password = document.getElementById("password").value;
@@ -111,7 +112,7 @@
 
 		function onClose(evt)
 		{
-			document.getElementById("status").value = "ÒÑ¶Ï¿ªÁ¬½Ó";
+			document.getElementById("status").value = "å·²æ–­å¼€è¿æ¥";
 		}
 
 		function onMessage(evt)
@@ -122,7 +123,7 @@
 		function onError(evt)
 		{
 			writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-			document.getElementById("status").value = "ÒÑ¶Ï¿ªÁ¬½Ó";
+			document.getElementById("status").value = "å·²æ–­å¼€è¿æ¥";
 		}
 
 		function doSend(message)
@@ -132,7 +133,7 @@
 				websocket.send(message);
 			}
 			else{
-				document.getElementById("status").value = "Î´Á¬½Ó";
+				document.getElementById("status").value = "æœªè¿æ¥";
 			}
 		}
 		

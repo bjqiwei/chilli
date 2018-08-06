@@ -34,14 +34,16 @@ public:
 
 protected:
 	log4cplus::Logger log;
+	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
+	std::atomic<bool> m_bRunning = false;
+private:
 	const std::string m_Id;
 	std::recursive_mutex m_PEMtx;
 	model::PerformElementMap m_PerformElements;
 
-	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
-	std::atomic<bool> m_bRunning = false;
 	std::thread m_thread;
-	void run();
+	void _run();
+	virtual void run();
 
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other) = delete;

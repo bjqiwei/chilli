@@ -305,10 +305,10 @@
     <Xml Include="conf\IVR.xml">
       <Filter>conf</Filter>
     </Xml>
-    <Xml Include="conf\FreeSwitchExtension.xml">
+    <Xml Include="conf\FreeSwitchDevice.xml">
       <Filter>conf</Filter>
     </Xml>
-    <Xml Include="conf\FreeSwitchCall.xml">
+    <Xml Include="conf\Call.xml">
       <Filter>conf</Filter>
     </Xml>
   </ItemGroup>
