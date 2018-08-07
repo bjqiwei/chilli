@@ -58,6 +58,9 @@
     <Filter Include="FreeSWITCH">
       <UniqueIdentifier>{3f4e453c-8f58-4e1d-bc69-020370354b2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TCP">
+      <UniqueIdentifier>{14c27f9f-6599-4da7-9754-b0c17be4b5e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="welcome.wav">
@@ -178,6 +181,9 @@
     <ClInclude Include="Group\Group.h">
       <Filter>Group</Filter>
     </ClInclude>
+    <ClInclude Include="TCP\tcp.h">
+      <Filter>TCP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceModule.cpp">
@@ -266,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="Group\Group.cpp">
       <Filter>Group</Filter>
+    </ClCompile>
+    <ClCompile Include="TCP\tcp.cpp">
+      <Filter>TCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

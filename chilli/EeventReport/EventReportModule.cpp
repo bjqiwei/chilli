@@ -1,12 +1,3 @@
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/listener.h>
-#include <event2/util.h>
-#include <event2/event.h>
-#include <event2/thread.h>
-
-#pragma comment(lib,"ws2_32.lib")
-
 #include "EventReportModule.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
@@ -40,10 +31,7 @@ int EventReportModule::Stop(void)
 	if (m_bRunning){
 		ProcessModule::Stop();
 		m_bRunning = false;
-
-		if(m_Base)
-			event_base_loopexit(m_Base, nullptr);
-
+		TCPServer::Stop();
 		for (auto & it : this->m_Threads) {
 			if (it.joinable()) {
 				it.join();
@@ -62,7 +50,9 @@ int EventReportModule::Start()
 		m_bRunning = true;
 
 		if (this->m_tcpPort !=-1){
-			std::thread th(&EventReportModule::listenTCP, this, this->m_tcpPort);
+			TCPServer::setLogger(this->log);
+			TCPServer::setLogId(this->getId());
+			std::thread th(&EventReportModule::ListenTCP, this, this->m_tcpPort);
 			m_Threads.push_back(std::move(th));
 		}
 
@@ -105,7 +95,7 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-void EventReportModule::ConnOnClose(uint64_t id, const std::string & ErrorCode)
+void EventReportModule::ConnOnClose(uint64_t id)
 {
 	this->m_Connections.erase(id);
 }
@@ -287,137 +277,66 @@ void EventReportModule::run()
 	log4cplus::threadCleanup();
 }
 
-static void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
-static void conn_read_cb(struct bufferevent *bev, void *ctx);
-static void conn_writecb(struct bufferevent *, void *);
-static void conn_eventcb(struct bufferevent *, short, void *);
-
-static void listener_cb(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *sa, int socklen, void *user_data)
-{
-	EventReportModule * This = reinterpret_cast<EventReportModule *>(user_data);
-
-	struct event_base *base = evconnlistener_get_base(listener);
-	struct bufferevent *bev;
-	
-	bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
-	if (!bev) {
-		LOG4CPLUS_ERROR(This->getLogger(), This->getId() << " Error constructing bufferevent!");
-		event_base_loopbreak(base);
-		return;
+class TCPConnection :public EPConnection, public TCP::TCPConnection{
+public:
+	explicit TCPConnection(EventReportModule * module, struct event_base * base, int64_t fd) :EPConnection(module), TCP::TCPConnection(base, fd)
+	{
+		log = log4cplus::Logger::getInstance("TCPConnection");
+		LOG4CPLUS_DEBUG(log, m_Id << " construction");
+	}
+	virtual ~TCPConnection()
+	{
+		LOG4CPLUS_DEBUG(log, m_Id << " deconstruct");
 	}
 
-	bufferevent_setcb(bev, conn_read_cb, conn_writecb, conn_eventcb, user_data);
-	bufferevent_enable(bev, EV_WRITE | EV_READ);
-	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " accept client:" << bev);
+	virtual void OnOpen() override
+	{
 
-}
-
-static void conn_read_cb(struct bufferevent *bev, void * user_data)
-{
-	EventReportModule * This = reinterpret_cast<EventReportModule *>(user_data);
-	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << ":" << bev);
-	/* This callback is invoked when there is data to read on bev. */
-	struct evbuffer *input = bufferevent_get_input(bev);
-	struct evbuffer *output = bufferevent_get_output(bev);
-
-	/* Copy all the data from the input buffer to the output buffer. */
-	evbuffer_add_buffer(output, input);
-}
-
-static void conn_writecb(struct bufferevent *bev, void *user_data)
-{
-	EventReportModule * This = reinterpret_cast<EventReportModule *>(user_data);
-
-	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " write:" << bev);
-	struct evbuffer *output = bufferevent_get_output(bev);
-	
-}
-
-static void conn_eventcb(struct bufferevent *bev, short events, void * user_data)
-{
-	EventReportModule * This = reinterpret_cast<EventReportModule *>(user_data);
-
-	LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << ":" << bev);
-	if (events & BEV_EVENT_ERROR)
-		LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " Error from bufferevent");
-	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
-		LOG4CPLUS_DEBUG(This->getLogger(), This->getId() << " Connection closed." << bev);
-		bufferevent_free(bev);
-	}
-}
-
-bool EventReportModule::listenTCP(int port)
-{
-	struct sockaddr_in sin;
-	struct evconnlistener *listener;
-
-	LOG4CPLUS_INFO(log, this->getId() << " listen TCP Starting...");
-#ifdef WIN32
-	evthread_use_windows_threads();
-	WSADATA wsa_data;
-	WSAStartup(MAKEWORD(2, 2), &wsa_data);
-#else
-	evthread_use_pthreads();
-#endif
-
-	const char ** methods = event_get_supported_methods();
-	for (int i = 0; methods[i] != nullptr; ++i) {
-		//LOG4CPLUS_INFO(log, this->getId() << ",libevent supported method:" << methods[i]);
 	}
 
-	m_Base = event_base_new();
-	LOG4CPLUS_INFO(log, this->getId() << ",libevent current method:" <<  event_base_get_method(m_Base));
+	virtual void OnSend() override
+	{
 
-	if (!m_Base) {
-		LOG4CPLUS_ERROR(log, this->getId() << " Could not initialize libevent!");
-		goto done;
 	}
 
-	memset(&sin, 0, sizeof(sin));
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = htonl(0);
-	sin.sin_port = htons(port);
-
-	listener = evconnlistener_new_bind(m_Base, listener_cb, this,
-		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_THREADSAFE, -1,
-		(struct sockaddr*)&sin,
-		sizeof(sin));
-
-	if (!listener) {
-		LOG4CPLUS_ERROR(log, this->getId() << " Could not create a listener!");
-		goto done;
+	virtual void OnClosed() override
+	{
+		m_module->ConnOnClose(GetId());
 	}
 
-	LOG4CPLUS_INFO(log, this->getId() << ",start listen tcp port:" << port);
-
-	while (m_bRunning){
-		event_base_dispatch(m_Base);
+	virtual void OnError(uint32_t err) override
+	{
+		m_module->ConnOnError(GetId(), std::to_string(err));
 	}
 
-done:
-	if (listener){
-		evconnlistener_free(listener);
-		listener = nullptr;
+	virtual void OnReceived(const std::string & data) override
+	{
+		LOG4CPLUS_DEBUG(log, GetId() << " OnReceived:" << data);
+		m_module->ConnOnMessage(this, GetId(), data, std::to_string(this->GetId()));
 	}
-	
-	if (m_Base){
-		event_base_free(m_Base);
-		m_Base = nullptr;
+
+	virtual int Send(const char * lpBuf, int nBufLen) override
+	{
+		return TCP::TCPConnection::Send(lpBuf, nBufLen);
 	}
-	
-#ifdef WIN32
-	WSACleanup();
-#endif
-	LOG4CPLUS_INFO(log, this->getId() << " listen TCP Stoped.");
-	log4cplus::threadCleanup();
-	return true;
-}
+
+	virtual int Send(Json::Value) override
+	{
+		Json::FastWriter writer;
+		std::string sendData = writer.write(send);
+		LOG4CPLUS_DEBUG(log, GetId() << " Send:" << sendData);
+		return TCP::TCPConnection::Send(sendData.c_str(), sendData.length());
+	}
+
+private:
+	log4cplus::Logger log;
+};
 
 class WSConnection :public WebSocket::WSConnection, EPConnection
 {
 public:
 	explicit WSConnection(struct lws * wsi, EventReportModule * module) 
-		:WebSocket::WSConnection(wsi), EPConnection(module), m_module(module)
+		:WebSocket::WSConnection(wsi), EPConnection(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.WSConnection");
 		LOG4CPLUS_DEBUG(log, m_SessionId << " construction");
@@ -438,7 +357,7 @@ public:
 
 	virtual void OnClose(const std::string & errorCode) override
 	{
-		m_module->ConnOnClose(GetId(), errorCode);
+		m_module->ConnOnClose(GetId());
 	};
 
 	virtual void OnError(const std::string & errorCode) override
@@ -449,6 +368,7 @@ public:
 
 	virtual void OnMessage(const std::string & message) override
 	{
+		LOG4CPLUS_DEBUG(log, GetId() << " OnMessage:" << message);
 		m_module->ConnOnMessage(this, this->GetId(), message, m_SessionId);
 	};
 
@@ -459,11 +379,9 @@ public:
 	virtual int Send(Json::Value send) override {
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
+		LOG4CPLUS_DEBUG(log, GetId() << " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
-
-private:
-	EventReportModule * m_module;
 
 };
 
@@ -481,6 +399,17 @@ public:
 private:
 	EventReportModule * m_module;
 };
+
+TCP::TCPConnection * EventReportModule::OnAccept(event_base * base, int64_t fd)
+{
+	TCPConnection * conn = new chilli::EventReport::TCPConnection(this, base, fd);
+	return conn;
+}
+
+void EventReportModule::ListenTCP(uint32_t port)
+{
+	TCPServer::ListenTCP(port);
+}
 
 bool EventReportModule::listenWS(int port)
 {

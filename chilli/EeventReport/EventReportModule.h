@@ -3,6 +3,7 @@
 #include <log4cplus/logger.h>
 #include <thread>
 #include <vector>
+#include "../TCP/tcp.h"
 
 namespace chilli{
 namespace EventReport{
@@ -19,12 +20,7 @@ public:
 	//virtual void Close() = 0;
 	virtual int Send(const char * lpBuf, int nBufLen) = 0;
 	virtual int Send(Json::Value send) = 0;
-	virtual void OnOpen() = 0;
-	virtual void OnSend() = 0;
-	virtual void OnClose(const std::string & ErrorCode) = 0;
-	virtual void OnError(const std::string & errorCode) = 0;
-	virtual void OnMessage(const std::string & message) = 0;
-private:
+protected:
 	const uint64_t m_Id;
 	class EventReportModule * m_module = nullptr;
 	static std::atomic_uint64_t __newConnectionId;
@@ -32,7 +28,7 @@ private:
 
 typedef std::shared_ptr<EPConnection> EPConnectionPtr;
 
-class EventReportModule :public model::ProcessModule
+class EventReportModule :public model::ProcessModule, public TCP::TCPServer
 {
 public:
 	explicit EventReportModule(const std::string & id);
@@ -42,7 +38,7 @@ public:
 	virtual bool LoadConfig(const std::string & configContext) override;
 
 	//Connection interface
-	void ConnOnClose(uint64_t id,  const std::string & ErrorCode);
+	void ConnOnClose(uint64_t id);
 	void ConnOnError(uint64_t id, const std::string & errorCode);
 	void ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, const std::string & logId);
 private:
@@ -53,12 +49,14 @@ private:
 private:
 	std::vector<std::thread> m_Threads;
 
-	struct event_base * m_Base = nullptr;
 	int m_tcpPort = -1;
 	int m_wsPort = -1;
 	std::string m_wsUrl;
 
-	bool listenTCP(int port);
+public:
+	virtual TCP::TCPConnection * OnAccept(struct event_base * base, int64_t fd) override;
+private:
+	void ListenTCP(uint32_t port);
 	bool listenWS(int port);
 
 	std::map<uint32_t, EPConnectionPtr>m_Connections;
