@@ -105,6 +105,116 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
+void EventReportModule::ConnOnClose(uint64_t id, const std::string & ErrorCode)
+{
+	this->m_Connections.erase(id);
+}
+
+void EventReportModule::ConnOnError(uint64_t id, const std::string & errorCode)
+{
+	this->m_Connections.erase(id);
+}
+
+void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, const std::string & logId)
+{
+	//LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
+
+	Json::Value request;
+	Json::Reader jsonReader;
+	if (jsonReader.parse(message, request)) {
+
+		std::string requestid;
+		if (request["request"].isString())
+			requestid = request["request"].asString();
+
+		if (requestid == "heartBeat") {
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "heartBeat";
+			response["status"] = 0;
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+		}
+		else {
+			LOG4CPLUS_DEBUG(log, logId << " OnMessage:" << message);
+		}
+
+		if (requestid == "connect")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "connect";
+			response["status"] = 0;
+			response["param"]["version"] = "1.0.0.0";
+
+			EPConnectionPtr connptr(conn);
+			m_Connections[id] = connptr;
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+		}
+		else if (requestid == "disConnect")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "disConnect";
+			response["status"] = 0;
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+
+			m_Connections.erase(id);
+		}
+		else if (requestid == "MakeCall")
+		{
+			std::string calling;
+			std::string called;
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "MakeCall";
+
+			if (request["param"]["callingDevice"].isString())
+				calling = request["param"]["callingDevice"].asString();
+			else {
+				response["status"] = 1;
+				auto & c = m_Connections.find(id);
+				if (c != m_Connections.end())
+					c->second->Send(response);
+				return;
+			}
+
+			if (request["param"]["calledDirectoryNumber"].isString())
+				called = request["param"]["calledDirectoryNumber"].asString();
+			else {
+				response["status"] = 2;
+				auto & c = m_Connections.find(id);
+				if (c != m_Connections.end())
+					c->second->Send(response);
+				return;
+			}
+			response["status"] = 0;
+			response["param"]["initiatedCall"]["connectionID"] = uuid();
+			response["param"]["initiatedCall"]["callID"] = uuid();
+			response["param"]["initiatedCall"]["sessionID"] = uuid();
+
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+			request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
+			model::EventType_t evt(request);
+			this->PushEvent(evt);
+		}
+	}
+	else {
+		LOG4CPLUS_ERROR(log, logId << " OnMessage not json string:" << message);
+	}
+}
+
 
 void EventReportModule::processSend(const std::string &strContent, const void * param, bool & bHandled)
 {
@@ -112,6 +222,14 @@ void EventReportModule::processSend(const std::string &strContent, const void * 
 	Json::Reader jsonReader;
 	if (jsonReader.parse(strContent, jsonData)) {
 
+		jsonData.removeMember("id");
+		jsonData.removeMember("dest");
+		jsonData.removeMember("from");
+		jsonData.removeMember("target");
+
+		for (auto & it:m_Connections){
+			it.second->Send(jsonData);
+		}
 		bHandled = true;
 
 	}
@@ -127,6 +245,47 @@ void EventReportModule::fireSend(const std::string & strContent, const void * pa
 	processSend(strContent, param, bHandled);
 }
 
+void EventReportModule::run()
+{
+	LOG4CPLUS_INFO(log, this->getId() << " Starting...");
+	try
+	{
+
+		model::ProcessModulePtr callmodule;
+		for (auto & m : model::ProcessModule::g_Modules)
+		{
+			if (m->getId().find("call") != std::string::npos)
+			{
+				callmodule = m;
+			}
+		}
+
+		while (m_bRunning)
+		{
+			try
+			{
+				model::EventType_t evt;
+				if (m_RecEvtBuffer.Get(evt) && !evt.event.isNull())
+				{
+					const Json::Value & jsonEvent = evt.event;
+					callmodule->PushEvent(evt);
+				}
+			}
+			catch (std::exception & e)
+			{
+				LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+			}
+		}
+
+	}
+	catch (std::exception & e)
+	{
+		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+	}
+
+	LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
+	log4cplus::threadCleanup();
+}
 
 static void listener_cb(struct evconnlistener *, evutil_socket_t, struct sockaddr *, int socklen, void *);
 static void conn_read_cb(struct bufferevent *bev, void *ctx);
@@ -254,140 +413,73 @@ done:
 	return true;
 }
 
-class EventReportWSConnection :public WebSocket::WSConnection
+class WSConnection :public WebSocket::WSConnection, EPConnection
 {
 public:
-	explicit EventReportWSConnection(struct lws * wsi, model::ProcessModule * module) 
-		:WSConnection(wsi),m_module(module)
+	explicit WSConnection(struct lws * wsi, EventReportModule * module) 
+		:WebSocket::WSConnection(wsi), EPConnection(module), m_module(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.WSConnection");
-		LOG4CPLUS_TRACE(log, m_SessionId << " construction");
+		LOG4CPLUS_DEBUG(log, m_SessionId << " construction");
 	};
 
-	~EventReportWSConnection()
+	~WSConnection()
 	{
-		LOG4CPLUS_TRACE(log, m_SessionId << " deconstruct");
+		LOG4CPLUS_DEBUG(log, m_SessionId << " deconstruct");
+	}
+
+	virtual void OnOpen() override {
+
+	}
+
+	virtual void OnSend() override {
+
 	}
 
 	virtual void OnClose(const std::string & errorCode) override
 	{
-		delete this;
+		m_module->ConnOnClose(GetId(), errorCode);
 	};
 
 	virtual void OnError(const std::string & errorCode) override
 	{
 		
-		delete this;
+		m_module->ConnOnError(this->GetId(), errorCode);
 	};
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		//LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
-		
-		Json::Value request;
-		Json::Reader jsonReader;
-		if (jsonReader.parse(message, request)) {
-
-			std::string requestid;
-			if (request["request"].isString())
-				requestid = request["request"].asString();
-
-			if (requestid == "heartBeat") {
-				Json::Value response;
-				response["invokeID"] = request["invokeID"];
-				response["type"] = "response";
-				response["response"] = "heartBeat";
-				response["status"] = 0;
-				this->Send(response);
-			}
-			else {
-				LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
-			}
-
-			if (requestid == "connect")
-			{
-				Json::Value response;
-				response["invokeID"] = request["invokeID"];
-				response["type"] = "response";
-				response["response"] = "connect";
-				response["status"] = 0;
-				response["param"]["version"] = "1.0.0.0";
-				this->Send(response);
-			}
-			else if (requestid == "disConnect")
-			{
-				Json::Value response;
-				response["invokeID"] = request["invokeID"];
-				response["type"] = "response";
-				response["response"] = "disConnect";
-				response["status"] = 0;
-				this->Send(response);
-			}
-			else if (requestid == "MakeCall")
-			{
-				std::string calling;
-				std::string called;
-				Json::Value response;
-				response["invokeID"] = request["invokeID"];
-				response["type"] = "response";
-				response["response"] = "MakeCall";
-
-				if (request["param"]["callingDevice"].isString())
-					calling = request["param"]["callingDevice"].asString();
-				else {
-					response["status"] = 1;
-					this->Send(response);
-					return;
-				}
-
-				if (request["param"]["calledDirectoryNumber"].isString())
-					called = request["param"]["calledDirectoryNumber"].asString();
-				else {
-					response["status"] = 2;
-					this->Send(response);
-					return;
-				}
-				response["status"] = 0;
-				response["param"]["initiatedCall"]["connectionID"] = uuid();
-				response["param"]["initiatedCall"]["callID"] = uuid();
-				response["param"]["initiatedCall"]["sessionID"] = uuid();
-
-				this->Send(response);
-				request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
-				model::EventType_t evt(request);
-				m_module->PushEvent(evt);
-			}
-		}
-		else {
-			LOG4CPLUS_ERROR(log, m_SessionId << " OnMessage not json string:" << message);
-		}
-
+		m_module->ConnOnMessage(this, this->GetId(), message, m_SessionId);
 	};
 
-	int Send(Json::Value send) {
+	virtual int Send(const char * lpBuf, int nBufLen) override {
+		return WebSocket::WSConnection::Send(lpBuf, nBufLen);
+	}
+
+	virtual int Send(Json::Value send) override {
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		return WSConnection::Send(sendData.c_str(), sendData.length());
+		return this->Send(sendData.c_str(), sendData.length());
 	}
 
 private:
-	model::ProcessModule * m_module;
+	EventReportModule * m_module;
 
 };
 
 class EventReportWSServer :public WebSocket::WebSocketServer
 {
 public:
-	explicit EventReportWSServer(int port, model::ProcessModule * module)
+	explicit EventReportWSServer(int port, EventReportModule * module)
 		:WebSocketServer(port), m_module(module)
 	{};
 	virtual WebSocket::WSConnection * OnAccept(struct lws *wsi) override
 	{
-		WebSocket::WSConnection * wsc = new EventReportWSConnection(wsi, m_module);
+		WebSocket::WSConnection * wsc = new WSConnection(wsi, m_module);
 		return wsc;
 	}
 private:
-	model::ProcessModule * m_module;
+	EventReportModule * m_module;
 };
 
 bool EventReportModule::listenWS(int port)
@@ -407,46 +499,18 @@ bool EventReportModule::listenWS(int port)
 	return result;
 }
 
-void EventReportModule::run()
+std::atomic_uint64_t EPConnection::__newConnectionId = 0;
+EPConnection::EPConnection(EventReportModule * module):m_Id(__newConnectionId++), m_module(module)
 {
-	LOG4CPLUS_INFO(log, this->getId() << " Starting...");
-	try
-	{
+}
 
-		model::ProcessModulePtr callmodule;
-		for (auto & m : model::ProcessModule::g_Modules)
-		{
-			if (m->getId().find("call") != std::string::npos)
-			{
-				callmodule = m;
-			}
-		}
+EPConnection::~EPConnection()
+{
+}
 
-		while (m_bRunning)
-		{
-			try
-			{
-				model::EventType_t evt;
-				if (m_RecEvtBuffer.Get(evt) && !evt.event.isNull())
-				{
-					const Json::Value & jsonEvent = evt.event;
-					callmodule->PushEvent(evt);
-				}
-			}
-			catch (std::exception & e)
-			{
-				LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
-			}
-		}
-
-	}
-	catch (std::exception & e)
-	{
-		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
-	}
-
-	LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
-	log4cplus::threadCleanup();
+uint64_t EPConnection::GetId()
+{
+	return m_Id;
 }
 
 }
