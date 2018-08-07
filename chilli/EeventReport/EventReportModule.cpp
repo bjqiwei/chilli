@@ -281,7 +281,7 @@ class TCPConnection :public EPConnection, public TCP::TCPConnection{
 public:
 	explicit TCPConnection(EventReportModule * module, struct event_base * base, int64_t fd) :EPConnection(module), TCP::TCPConnection(base, fd)
 	{
-		log = log4cplus::Logger::getInstance("TCPConnection");
+		log = log4cplus::Logger::getInstance("chilli.TCPConnection");
 		LOG4CPLUS_DEBUG(log, m_Id << " construction");
 	}
 	virtual ~TCPConnection()

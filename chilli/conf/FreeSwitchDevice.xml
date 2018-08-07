@@ -31,10 +31,7 @@
 		</event>
 		
 		<event event="CHANNEL_HANGUP">
-			<send target="this" type="notify" destexpr="_device.AgentID" event="CONNECTION_CLEARED">
-				<connectionCleared type="script">var param ={}; param.connection={}; param.connection.callID = sessionID;param;</connectionCleared>
-			</send>
-			<send target="call001" type="notify" destexpr="sessionID" event="CONNECTION_CLEARED">
+			<send target="call001" type="event" destexpr="sessionID" event="CONNECTION_CLEARED">
 				<connectionCleared type="script">var param ={}; param.connection={}; param.connection.sessionID = sessionID; param.deviceID = _device.deviceID; param;</connectionCleared>
 			</send>
 			<transition target="Null"/>
@@ -42,13 +39,9 @@
 		
 		<state id="Initiated">
 			<onentry>
-				<send target="eventreport" type="notify" dest="eventreport" event="ServiceInitiated">
-				</send>
-				<send target="this" type="notify" destexpr="_device.AgentID" event="SERVICE_INITIATED">
-					<serviceInitiated type="script">var param ={}; param.connection={}; param.connection.callID = sessionID;param;</serviceInitiated>
-				</send>
-				<send target="call001" type="notify" destexpr="sessionID" event="SERVICE_INITIATED">
-					<serviceInitiated type="script">var param ={}; param.connection={}; param.connection.sessionID = sessionID; param.deviceID = _device.deviceID; param;</serviceInitiated>
+				<send target="call001" type="event" dest="sessionID" event="Initiated">
+					<sessionID type="script">sessionID</sessionID>
+					<deviceID type="script">_device.deviceID</deviceID>
 				</send>
 			</onentry>
 			<event event="CHANNEL_PROGRESS">
