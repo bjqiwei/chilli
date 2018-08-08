@@ -82,7 +82,7 @@ namespace chilli {
 					LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
-						Session session(new fsm::StateMachine(sessionId, m_SMFileName, this->m_model));
+						Session session(new fsm::StateMachine(log.getName(), sessionId, m_SMFileName, this->m_model));
 						m_Sessions[sessionId] = session;
 
 						session->setVar("_device.deviceID", deviceId);

@@ -86,7 +86,7 @@ void Agent::mainEventLoop()
 			LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 			if (m_StateMachines.begin() == m_StateMachines.end()) {
-				StateMachine sm(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
+				StateMachine sm(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
 				m_StateMachines[connectid] = sm;
 
 				for (auto & itt : this->m_Vars.getMemberNames())

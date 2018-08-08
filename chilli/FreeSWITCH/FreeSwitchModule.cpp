@@ -156,12 +156,26 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		if (jsonEvent["param"]["sessionID"].isString())
 			sessionId = jsonEvent["param"]["sessionID"].asString();
 
+		m_Session_DeviceId[sessionId] = caller;
+
+		if (caller.length() < 5){
+			caller = "sofia/internal/" + caller + "%192.168.2.232";
+		}
+		else {
+			caller = "sofia/external/" + caller + "@192.168.2.220";
+		}
+
+		if (called.length() < 5){
+			called = "sofia/internal/" + called + "%192.168.2.232";
+		}
+		else {
+			called = "sofia/external/" + called + "@192.168.2.220";
+		}
+
 		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge{origination_caller_id_number=" + display + "}" + called;
 
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
-
-		m_Session_DeviceId[sessionId] = caller;
 
 		bHandled = true;
 	}

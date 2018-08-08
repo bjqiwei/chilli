@@ -47,7 +47,7 @@ void ACDDevice::mainEventLoop()
 			LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
 
 			if (m_Sessions.begin() == m_Sessions.end()) {
-				Session connection(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
+				Session connection(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
 				m_Sessions[connectid] = connection;
 
 				for (auto & itt : this->m_Vars.getMemberNames())

@@ -73,7 +73,7 @@ namespace Call {
 
 				if (m_StateMachines.empty()) {
 					
-					StateMachine call(new fsm::StateMachine(m_Id, m_SMFileName, this->m_model));
+					StateMachine call(new fsm::StateMachine(log.getName(), m_Id, m_SMFileName, this->m_model));
 
 					m_StateMachines[m_Id] = call;
 					for (auto & itt : this->m_Vars.getMemberNames())
