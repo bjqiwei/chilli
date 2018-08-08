@@ -47,18 +47,36 @@ void CallModule::processSend(const std::string & strContent, const void * param,
 		if (jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
 		{
 			std::string sessionid = jsonData["dest"].asString();
+			std::string otherSessionId;
+			if(jsonData["param"].isMember("otherSessionID") && jsonData["param"]["otherSessionID"].isString())
+				otherSessionId = jsonData["param"]["otherSessionID"].asString();
+
 			if (m_Calls.find(sessionid) == m_Calls.end()) {
-				std::string newCallId = uuid();
-				model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
-				this->addPerformElement(newCallId, call);
-				m_Calls[sessionid] =newCallId;
+
+				if (m_Calls.find(otherSessionId) != m_Calls.end()){
+					m_Calls[sessionid] = m_Calls[otherSessionId];
+				}
+				else {
+					std::string newCallId = uuid();
+					std::string newConntionID = uuid();
+					model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
+					call->setVar("_callid", newCallId);
+					call->setVar("_connectionid", newConntionID);
+
+					this->addPerformElement(newCallId, call);
+					m_Calls[sessionid] = newCallId;
+				}
 			}
 				
 			auto & call = m_Calls.find(sessionid);
 			jsonData["id"] = call->second;
-			chilli::model::EventType_t sendData(jsonData);
 
+			chilli::model::EventType_t sendData(jsonData);
 			this->PushEvent(sendData);
+
+			if (jsonData["event"].isString() && jsonData["event"].asString() == "Null")
+				m_Calls.erase(sessionid);
+
 		}
 		bHandled = true;
 
@@ -99,8 +117,11 @@ void CallModule::run()
 
 							std::string sessionid = jsonEvent["param"]["initiatedCall"]["sessionID"].asString();
 							std::string newCallId = jsonEvent["param"]["initiatedCall"]["callID"].asString();
+							std::string newConnectionID = jsonEvent["param"]["initiatedCall"]["connectionID"].asString();
 							if (m_Calls.find(sessionid) == m_Calls.end()) {
 								model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
+								call->setVar("_callid", newCallId);
+								call->setVar("_connectionid", newConnectionID);
 								this->addPerformElement(newCallId, call);
 								m_Calls[sessionid] = newCallId;
 							}

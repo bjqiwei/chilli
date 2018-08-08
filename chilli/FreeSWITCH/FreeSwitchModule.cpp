@@ -100,7 +100,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, this->getId() << " fireSend：" << strContent);
+	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
 	bool bHandled = false;
 	this->processSend(strContent, param, bHandled, log);
 
@@ -172,7 +172,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 			called = "sofia/external/" + called + "@192.168.2.220";
 		}
 
-		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge{origination_caller_id_number=" + display + "}" + called;
+		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
 
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
@@ -423,6 +423,7 @@ void FreeSwitchModule::ConnectFS()
 							|| eventName == "CHANNEL_PROGRESS"
 							|| eventName == "CHANNEL_ANSWER"
 							|| eventName == "CHANNEL_BRIDGE"
+							|| eventName == "CHANNEL_UNBRIDGE"
 							|| eventName == "CHANNEL_HANGUP"
 							|| eventName == "CHANNEL_DESTROY")
 						{
@@ -469,18 +470,22 @@ void FreeSwitchModule::ConnectFS()
 								}
 							}
 
-							if (dir == "inbound")
-								evt.event["id"] = caller;
-							else if (dir == "outbound")
-								evt.event["id"] = called;
-							
-							if (caller.empty() && called.empty())
-								evt.event["id"] = m_Session_DeviceId[evt.event["UniqueID"].asString()];
-							
 
+							
+							std::string sessionId = evt.event["UniqueID"].asString();
+
+							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
+								if (dir == "inbound")
+									m_Session_DeviceId[sessionId] = caller.substr(0,caller.find("%"));
+								else if (dir == "outbound")
+									m_Session_DeviceId[sessionId] = called.substr(0,called.find("%"));
+								
+							}
+							
+							evt.event["id"] = m_Session_DeviceId[sessionId];
 				
 							evt.event["event"] = evt.event["EventName"];
-							evt.event["sessionID"] = evt.event["UniqueID"];
+							evt.event["sessionID"] = sessionId;
 
 							//Channel _ Create：通道创建事件
 							//Channel _ Progress：通道振铃事件
@@ -491,7 +496,7 @@ void FreeSwitchModule::ConnectFS()
 							this->PushEvent(evt);
 
 							if (eventName == "CHANNEL_DESTROY")
-								m_Session_DeviceId.erase(evt.event["sessionID"].asCString());
+								m_Session_DeviceId.erase(evt.event["sessionID"].asString());
 							
 						}
 						else {

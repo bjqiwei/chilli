@@ -14,15 +14,27 @@
 </scriptmodel>
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
-		    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
+		    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDNumber; called =_event.CallerDestinationNumber;</script>
 			<send target="call001" type="event" destexpr="sessionID" event="Initiated">
 				<sessionID type="script">sessionID</sessionID>
 				<deviceID type="script">_device.deviceID</deviceID>
+				<otherSessionID type="script">_event.OtherLegUniqueID</otherSessionID>
+				<caller type="script">caller</caller>
+				<called type="script">called</called>
 			</send>
 			<transition target="Initiated"/>
 		</event>
+		
+		<event event="CHANNEL_PROGRESS">
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Alerting">
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_event.sessionID</sessionID>
+			</send>
+			<transition target="Alerting"/>
+		</event>
+			
 		<event event="CHANNEL_DESTROY">
-			<send cond="_state._id == 'Null'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
 				<cause>USER_NOT_REGISTERED</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>
@@ -30,6 +42,10 @@
 			<transition target="Destroy"/>
 		</event>
 		<event event="CHANNEL_ANSWER">
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Connected">
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_event.sessionID</sessionID>
+			</send>
 			<transition target="Connected"/>
 		</event>
 		
@@ -39,37 +55,42 @@
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>
 			</send>
-			<transition target="Null2"/>
+			<!--transition target="Null"/-->
 		</event>
 		
 		<state id="Initiated">
-			<event event="CHANNEL_PROGRESS">
-			    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
-				<transition target="Alerting"/>
-			</event>
-		</state>
-		<state id="Null2">
+					
 			<event event="CHANNEL_DESTROY">
-			<transition target="Destroy"/>
-		</event>
-		</state>
-		<state id="Alerting">
-			<onentry>
-			</onentry>
-		</state>
-		<state id="Queued">
-		</state>
-		<state id="Failed">
-		</state>
-		<state id="Connected">
-			<onentry>
-			</onentry>
-			<event event="CHANNEL_BRIDGE">
-				<send target="this" type="notify" destexpr="_device.AgentID" event="ESTABLISHED">
-					<established type="script">var param ={}; param.connection={}; param.connection.callID = sessionID; param.called = called; param.recordfilename = recordfilename; param;</established>
-				</send>
+				<transition target="Destroy"/>
 			</event>
-			<state id="Held">
+			
+			<state id="Alerting">
+				<onentry>
+				</onentry>
+			</state>
+			
+			<state id="Queued">
+			</state>
+				
+			<state id="Failed">
+			</state>
+			
+			<state id="Connected">
+				<onentry>
+				</onentry>
+				<event event="CHANNEL_BRIDGE">
+					<send target="call001" type="event" destexpr="_event.sessionID" event="Bridge">
+						<deviceID type="script">_device.deviceID</deviceID>
+						<sessionID type="script">_event.sessionID</sessionID>
+					</send>
+				</event>
+				<event event="CHANNEL_HANGUP">
+					<!--transition target="Null"/-->
+				</event>
+				
+				<state id="Held">
+				</state>
+			
 			</state>
 		</state>
     </state>
