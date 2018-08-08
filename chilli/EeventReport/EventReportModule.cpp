@@ -230,7 +230,7 @@ void EventReportModule::processSend(const std::string &strContent, const void * 
 
 void EventReportModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
