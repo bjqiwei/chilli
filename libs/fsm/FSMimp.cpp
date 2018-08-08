@@ -32,10 +32,10 @@ namespace fsm {
 	static helper::TimerServer * g_TimerServer = nullptr;
 }
 
-fsm::StateMachineimp::StateMachineimp(const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerInterface * func)
+fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerInterface * func)
 	:m_xmlType(xtype), m_xmlDocPtr(nullptr), xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
 {
-	log = log4cplus::Logger::getInstance("fsm.StateMachine");
+	log = log4cplus::Logger::getInstance(logId.empty() ? "fsm.StateMachine" : logId);
 
 	if (m_xmlType == File)
 	{
@@ -572,6 +572,12 @@ bool fsm::StateMachineimp::processEntry(const xmlNodePtr &node)const
 		{
 			processSleep(actionNode);
 			continue;
+		}
+		if (isTransition(actionNode))
+		{
+			if (processTransition(actionNode)) {
+				break;//transition 元素下的元素将不再执行
+			}
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{

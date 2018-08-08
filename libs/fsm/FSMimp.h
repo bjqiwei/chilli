@@ -23,7 +23,7 @@ namespace fsm{
 	class  StateMachineimp {
 		friend class StateMachine;
 	protected:
-		StateMachineimp(const std::string &sessionid, const string &xml, int xtype, helper::OnTimerInterface * func);
+		StateMachineimp(const std::string & logId, const std::string &sessionid, const string &xml, int xtype, helper::OnTimerInterface * func);
 		virtual ~StateMachineimp();
 
 		StateMachineimp(const StateMachineimp &other) = delete;

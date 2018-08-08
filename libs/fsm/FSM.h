@@ -22,7 +22,7 @@ namespace fsm{
 	};
 	class FSM_EXPORT StateMachine {
 	public:
-		StateMachine(const std::string &sessionid, const string &xml, OnTimerInterface * func, xmlType xtype = xmlType::File);
+		StateMachine(const std::string & logId, const std::string &sessionid, const string &xml, OnTimerInterface * func, xmlType xtype = xmlType::File);
 		virtual ~StateMachine();
 		StateMachine(const StateMachine &other) = delete;
 		StateMachine & operator=(const StateMachine & other) = delete;
