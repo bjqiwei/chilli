@@ -16,25 +16,8 @@
 		<event event="MakeCall">
 			<script>caller = _event.param.callingDevice; called = _event.param.calledDirectoryNumber; connectionID = _event.param.initiatedCall.connectionID; callID = _event.param.initiatedCall.callID;</script>
 			<send target="freeswitch001" type="cmd" destexpr="_event.param.callingDevice" event="MakeCall">
-				<caller type="script">
-				var caller; 
-				if(_event.param.callingDevice.length &lt; 5){
-					caller = 'sofia/internal' + _event.param.callingDevice + '%192.168.2.232';
-				}
-				else{
-					caller = 'sofia/external/' + _event.param.callingDevice + '@192.168.2.220'
-				}
-				caller;</caller>
-				<called type="script">
-				var called; 
-				if(_event.param.calledDirectoryNumber.length &lt; 5){
-					called = 'sofia/internal' + _event.param.calledDirectoryNumber + '%192.168.2.232';
-				}
-				else{
-					called = 'sofia/external/' + _event.param.calledDirectoryNumber + '@192.168.2.220'
-				}
-				called;
-				</called>
+				<caller type="script">_event.param.callingDevice</caller>
+				<called type="script">_event.param.calledDirectoryNumber</called>
 				<display type="script">_event.param.callingDevice</display>
 				<sessionID type="script">_event.param.initiatedCall.sessionID</sessionID>
 			</send>
@@ -46,6 +29,8 @@
 				<calledDevice type="script">called</calledDevice>
 				<cause type="script">_event.param.cause</cause>
 			</send>
+			
+			<transition target="Blocked"/>
 		</event>
 		<event event="Initiated">
 			<send target="eventreport" type="event" event="ServiceInitiated">
@@ -54,16 +39,8 @@
 			</send>
 			<transition target="Pending"/>
 		</event>
-		<event event="CHANNEL_STATE">
-			<transition target="Pending"/>
-		</event>
-		<event event="CONNECTION_CLEARED">
-			<transition target="Destroy"/>
-		</event>
 		<state id="Pending">
 			<onentry>
-				<send target="eventreport" type="notify" dest="eventreport" event="ServiceInitiated">
-				</send>
 			</onentry>
 		</state>
 		<state id="Alerting">
@@ -84,6 +61,16 @@
 		</state>
 		<state id="Queued">
 		</state>
+		<state id="Blocked">
+			<event event="Null">
+				<send target="eventreport" type="event" event="ConnectionCleared">
+					<droppedConnection type="script">var param ={}; param.connectionID=connectionID; param.callID=callID;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
+					<releasingDevice type="script">caller</releasingDevice>
+				</send>
+				<transition target="Destroy"/>
+			</event>
+			
+		</state>
 		<state id="Delivered-Held">
 		</state>
 		<state id="Established-Held">
@@ -93,6 +80,12 @@
 		<state id="Queued-Held">
 		</state>
     </state>
-	<state id="Destroy"/>
+	<state id="Destroy">
+		<onentry>
+			<send target="eventreport" type="event" event="CallCleared">
+				<clearedCall type="script">var param ={}; param.connectionID=connectionID; param.callID=callID; param.deviceID=caller; param;</clearedCall>
+			</send>
+		</onentry>
+	</state>
 </fsm>
 

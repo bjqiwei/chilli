@@ -15,14 +15,17 @@
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
 		    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
+			<send target="call001" type="event" destexpr="sessionID" event="Initiated">
+				<sessionID type="script">sessionID</sessionID>
+				<deviceID type="script">_device.deviceID</deviceID>
+			</send>
 			<transition target="Initiated"/>
 		</event>
 		<event event="CHANNEL_DESTROY">
 			<send cond="_state._id == 'Null'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
-				<cause type="script">606</cause>
-				<msg>USER_NOT_REGISTERED</msg>
+				<cause>USER_NOT_REGISTERED</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_sessionid</sessionID>
+				<sessionID type="script">_event.sessionID</sessionID>
 			</send>
 			<transition target="Destroy"/>
 		</event>
@@ -31,23 +34,24 @@
 		</event>
 		
 		<event event="CHANNEL_HANGUP">
-			<send target="call001" type="event" destexpr="sessionID" event="CONNECTION_CLEARED">
-				<connectionCleared type="script">var param ={}; param.connection={}; param.connection.sessionID = sessionID; param.deviceID = _device.deviceID; param;</connectionCleared>
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+				<cause type="script">_event.HangupCause</cause>
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_event.sessionID</sessionID>
 			</send>
-			<transition target="Null"/>
+			<transition target="Null2"/>
 		</event>
 		
 		<state id="Initiated">
-			<onentry>
-				<send target="call001" type="event" dest="sessionID" event="Initiated">
-					<sessionID type="script">sessionID</sessionID>
-					<deviceID type="script">_device.deviceID</deviceID>
-				</send>
-			</onentry>
 			<event event="CHANNEL_PROGRESS">
 			    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDName; called =_event.CallerDestinationNumber;</script>
 				<transition target="Alerting"/>
 			</event>
+		</state>
+		<state id="Null2">
+			<event event="CHANNEL_DESTROY">
+			<transition target="Destroy"/>
+		</event>
 		</state>
 		<state id="Alerting">
 			<onentry>
@@ -71,6 +75,11 @@
     </state>
 	<state id="Destroy">
 		<onentry>
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Null">
+				<cause type="script">_event.HangupCause</cause>
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_event.sessionID</sessionID>
+			</send>
 		</onentry>
 	</state>
 </fsm>
