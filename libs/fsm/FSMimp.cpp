@@ -307,7 +307,7 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 	
 	if (!doneSomething)
 	{
-		LOG4CPLUS_WARN(log, m_strSessionID << ", this event " << helper::xml::getXmlNodeAttributesValue(eventNode, "event") << " done nothing,line:" << eventNode->line);
+		LOG4CPLUS_WARN(log, m_strSessionID << ", " << getCurrentStateID() << " state occur event " << helper::xml::getXmlNodeAttributesValue(eventNode, "event") << " done nothing,line:" << eventNode->line);
 	}
 	return doneSomething;
 }
