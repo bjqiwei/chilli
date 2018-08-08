@@ -128,7 +128,7 @@ lwsclose:
 					if (bufLen > 0)
 					{
 						std::string sdata = std::string(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).end());
-						LOG4CPLUS_DEBUG(wsclient->log, wsclient->m_SessionId << "Send:" << sdata);
+						LOG4CPLUS_TRACE(wsclient->log, wsclient->m_SessionId << "Send:" << sdata);
 
 						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 						if (len > 0){
