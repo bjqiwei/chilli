@@ -6,6 +6,7 @@
 #else
 #include <uuid/uuid.h> 
 #endif
+#include "stringhelper.h"
 
 static std::string uuid()
 {
@@ -34,5 +35,5 @@ static std::string uuid()
 
 #endif
 	//std::cout << "create guid " << buffer << std::endl;
-	return buffer;
+	return helper::string::toLower(std::string(buffer));
 }
