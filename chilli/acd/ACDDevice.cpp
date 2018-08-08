@@ -38,7 +38,7 @@ void ACDDevice::mainEventLoop()
 				eventName = jsonEvent["event"].asString();
 			}
 
-			fsm::TriggerEvent evt(eventName);
+			fsm::TriggerEvent evt(eventName, type);
 
 			for (auto & it : jsonEvent.getMemberNames()) {
 				evt.addVars(it, jsonEvent[it]);

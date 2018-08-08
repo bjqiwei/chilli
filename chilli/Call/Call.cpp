@@ -58,12 +58,16 @@ namespace Call {
 
 				std::string eventName;
 				std::string connectid;
+				std::string type;
 
 				if (jsonEvent["event"].isString()) {
 					eventName = jsonEvent["event"].asString();
 				}
+				if (jsonEvent["type"].isString()){
+					type = jsonEvent["type"].asString();
+				}
 
-				fsm::TriggerEvent evt(eventName);
+				fsm::TriggerEvent evt(eventName, type);
 
 				for (auto & it : jsonEvent.getMemberNames()) {
 					evt.addVars(it, jsonEvent[it]);
