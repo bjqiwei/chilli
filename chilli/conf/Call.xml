@@ -58,6 +58,12 @@
 				<initiatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</initiatedConnection>
 				<initiatingDevice type="script">_event.param.deviceID</initiatingDevice>
 			</send>
+			
+			<send target="freeswitch001" type="cmd" destexpr="called" event="DivertCall">
+				<sessionID type="script">_event.param.sessionID</sessionID>
+				<called type="script">_event.param.called</called>
+			</send>
+			
 			<transition target="Pending"/>
 		</event>
 		

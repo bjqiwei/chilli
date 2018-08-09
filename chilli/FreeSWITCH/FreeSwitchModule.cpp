@@ -223,6 +223,35 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
 		bHandled = true;
 	}
+	else if (eventName == "DivertCall")
+	{
+		std::string called = "";
+		std::string sessionId = "";
+		std::string display = "";
+
+		if (jsonEvent["param"]["called"].isString())
+			called = jsonEvent["param"]["called"].asString();
+
+		if (jsonEvent["param"]["display"].isString())
+			display = jsonEvent["param"]["display"].asString();
+
+		if (jsonEvent["param"]["sessionID"].isString())
+			sessionId = jsonEvent["param"]["sessionID"].asString();
+
+		if (called.length() < 5) {
+			called = "sofia/internal/" + called + "%192.168.2.232";
+		}
+		else {
+			called = "sofia/external/" + called + "@192.168.2.220";
+		}
+
+		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
+
+		esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
+		LOG4CPLUS_DEBUG(log, this->getId() << " esl_execute:bridge" << called << ", status:" << status);
+
+		bHandled = true;
+	}
 	else if (eventName == "StartRecord")
 	{
 		std::string uuid = "";
