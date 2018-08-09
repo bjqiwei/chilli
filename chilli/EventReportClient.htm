@@ -17,11 +17,13 @@
 	<input type="button" value="断开" onclick="DisConnect();" /><p/>
 	<input type="button" value="外呼" onclick="MakeCall();" /><font>主叫</font><input type="text" id="calling" value="1000" /><font>被叫</font><input type="text" id="called" value="5000" /><p/>
 	<input type="button" value="呼单路" onclick="MakeConnection();" /><font>被叫</font><input type="text" id="called2" value="5000" /><p/>
+	<input type="button" value="挂机" onclick="ClearConnection();" /><p/>
 	
     <script type="text/javascript">
 
 		var websocket;
 		var invokeid = 0;
+		var session;
 		
 		function init(){
 		}
@@ -70,6 +72,17 @@
 			doSend(JSON.stringify(request));
 		}
 		
+		function ClearConnection()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "ClearConnection";
+			request.param = new Object();
+			request.param.connectionToBeCleared = session;
+			doSend(JSON.stringify(request));
+		}
+		
 		function AlternateCall(active, other)
 		{
 		    var alternateCall = new Object();
@@ -107,15 +120,6 @@
 		    doSend(JSON.stringify(login));
 		}
 
-		function ClearConnection(call)
-		{
-		    var clearConnection = new Object();
-		    clearConnection.call = call;
-		    clearConnection.cmd = "ClearConnection";
-		    clearConnection.event = "cmd";
-		    doSend(JSON.stringify(request));
-		}
-
         function onOpen(evt)
         {
             document.getElementById("status").value = "已连接";
@@ -138,6 +142,13 @@
 		function onMessage(evt)
 		{
 			writeToScreen('<span style="font-size:80%;color: blue;">Receive: ' + evt.data+'</span>');
+			var event = JSON.parse(evt.data);
+			if(event.event === "ServiceInitiated")
+				session = event.param.initiatedConnection;
+			
+			else if(event.event === "Delivered")
+				session = event.param.connection;
+				
 		}
 
 		function onError(evt)

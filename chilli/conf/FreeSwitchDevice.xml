@@ -34,7 +34,7 @@
 		</event>
 			
 		<event event="CHANNEL_DESTROY">
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+			<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
 				<cause>USER_NOT_REGISTERED</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>
@@ -50,7 +50,7 @@
 		</event>
 		
 		<event event="CHANNEL_HANGUP">
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+			<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
 				<cause type="script">_event.HangupCause</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>

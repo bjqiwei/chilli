@@ -201,7 +201,6 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 		}
 		else if (requestid == "MakeConnection")
 		{
-			std::string calling;
 			std::string called;
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
@@ -226,6 +225,32 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (c != m_Connections.end())
 				c->second->Send(response);
 			request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
+			model::EventType_t evt(request);
+			this->PushEvent(evt);
+		}
+		else if (requestid == "ClearConnection")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "ClearConnection";
+
+			if (request["param"]["connectionToBeCleared"].isObject()){
+
+			}
+			else {
+				response["status"] = 3;
+				auto & c = m_Connections.find(id);
+				if (c != m_Connections.end())
+					c->second->Send(response);
+				return;
+			}
+			response["status"] = 0;
+
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+
 			model::EventType_t evt(request);
 			this->PushEvent(evt);
 		}

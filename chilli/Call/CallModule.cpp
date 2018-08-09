@@ -114,12 +114,19 @@ void CallModule::run()
 					{
 						if (jsonEvent["request"].isString() && 
 							(jsonEvent["request"].asString() == "MakeCall"
-							|| jsonEvent["request"].asString() == "MakeConnection"))
+							|| jsonEvent["request"].asString() == "MakeConnection"
+							|| jsonEvent["request"].asString() == "ClearConnection"))
 						{
+							Json::Value session;
+							if (jsonEvent["param"].isMember("initiatedCall"))
+								session = jsonEvent["param"]["initiatedCall"];
+							else if (jsonEvent["param"].isMember("connectionToBeCleared"))
+								session = jsonEvent["param"]["connectionToBeCleared"];
 
-							std::string sessionid = jsonEvent["param"]["initiatedCall"]["sessionID"].asString();
-							std::string newCallId = jsonEvent["param"]["initiatedCall"]["callID"].asString();
-							std::string newConnectionID = jsonEvent["param"]["initiatedCall"]["connectionID"].asString();
+							std::string sessionid = session["sessionID"].asString();
+							std::string newCallId = session["callID"].asString();
+							std::string newConnectionID = session["connectionID"].asString();
+
 							if (m_Calls.find(sessionid) == m_Calls.end()) {
 								model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
 								call->setVar("_callid", newCallId);

@@ -37,6 +37,11 @@
 			<transition target="Originated"/>
 		</event>
 		
+		<event event="ClearConnection">
+			<send target="freeswitch001" type="cmd" destexpr="called" event="ClearConnection">
+				<sessionID type="script">_event.param.connectionToBeCleared.sessionID</sessionID>
+			</send>
+		</event>
 		<event event="Failed">
 			<send target="eventreport" type="event" event="Failed">
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
