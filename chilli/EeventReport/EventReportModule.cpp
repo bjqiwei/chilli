@@ -199,6 +199,37 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			model::EventType_t evt(request);
 			this->PushEvent(evt);
 		}
+		else if (requestid == "MakeConnection")
+		{
+			std::string calling;
+			std::string called;
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = "MakeConnection";
+
+			if (request["param"]["initiatingDevice"].isString())
+				called = request["param"]["initiatingDevice"].asString();
+			else {
+				response["status"] = 2;
+				auto & c = m_Connections.find(id);
+				if (c != m_Connections.end())
+					c->second->Send(response);
+				return;
+			}
+			response["status"] = 0;
+			response["param"]["initiatedCall"]["connectionID"] = uuid();
+			response["param"]["initiatedCall"]["callID"] = uuid();
+			response["param"]["initiatedCall"]["sessionID"] = uuid();
+
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+			request["param"]["initiatedCall"] = response["param"]["initiatedCall"];
+			model::EventType_t evt(request);
+			this->PushEvent(evt);
+		}
+
 	}
 	else {
 		LOG4CPLUS_ERROR(log, logId << " OnMessage not json string:" << message);

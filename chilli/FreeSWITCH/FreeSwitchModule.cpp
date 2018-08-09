@@ -179,12 +179,43 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 
 		bHandled = true;
 	}
-	else if (eventName == "ClearCall")
+	else if (eventName == "MakeConnection")
+	{
+		std::string called = "";
+		std::string sessionId = "";
+		std::string display = "";
+
+		if (jsonEvent["param"]["called"].isString())
+			called = jsonEvent["param"]["called"].asString();
+
+		if (jsonEvent["param"]["display"].isString())
+			display = jsonEvent["param"]["display"].asString();
+
+		if (jsonEvent["param"]["sessionID"].isString())
+			sessionId = jsonEvent["param"]["sessionID"].asString();
+
+		m_Session_DeviceId[sessionId] = called;
+
+		if (called.length() < 5) {
+			called = "sofia/internal/" + called + "%192.168.2.232";
+		}
+		else {
+			called = "sofia/external/" + called + "@192.168.2.220";
+		}
+
+		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
+
+		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+
+		bHandled = true;
+	}
+	else if (eventName == "ClearConnection")
 	{
 		std::string sessionId = "";
 
-		if (jsonEvent["param"]["ConnectionID"].isString())
-			sessionId = jsonEvent["param"]["ConnectionID"].asString();
+		if (jsonEvent["param"]["sessionID"].isString())
+			sessionId = jsonEvent["param"]["sessionID"].asString();
 
 		std::string cmd = "bgapi uuid_kill " + sessionId;
 		esl_send(&m_Handle, cmd.c_str());

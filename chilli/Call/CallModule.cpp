@@ -112,7 +112,9 @@ void CallModule::run()
 					Json::Value jsonEvent = evt.event;
 					if (jsonEvent["type"] == "request")
 					{
-						if (jsonEvent["request"].asString() == "MakeCall")
+						if (jsonEvent["request"].isString() && 
+							(jsonEvent["request"].asString() == "MakeCall"
+							|| jsonEvent["request"].asString() == "MakeConnection"))
 						{
 
 							std::string sessionid = jsonEvent["param"]["initiatedCall"]["sessionID"].asString();

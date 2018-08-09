@@ -16,6 +16,7 @@
     <input type="button" value="连接" onclick="StartConnect();" />
 	<input type="button" value="断开" onclick="DisConnect();" /><p/>
 	<input type="button" value="外呼" onclick="MakeCall();" /><font>主叫</font><input type="text" id="calling" value="1000" /><font>被叫</font><input type="text" id="called" value="5000" /><p/>
+	<input type="button" value="呼单路" onclick="MakeConnection();" /><font>被叫</font><input type="text" id="called2" value="5000" /><p/>
 	
     <script type="text/javascript">
 
@@ -55,6 +56,17 @@
 			request.param = new Object();
 			request.param.callingDevice = document.getElementById("calling").value;
 			request.param.calledDirectoryNumber = document.getElementById("called").value;
+			doSend(JSON.stringify(request));
+		}
+		
+		function MakeConnection()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "MakeConnection";
+			request.param = new Object();
+			request.param.initiatingDevice = document.getElementById("called2").value;
 			doSend(JSON.stringify(request));
 		}
 		
