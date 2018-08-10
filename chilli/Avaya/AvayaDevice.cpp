@@ -9,8 +9,9 @@ namespace Avaya {
 	AvayaDevice::AvayaDevice(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
 		:m_model(model), Device(model, ext, smFileName)
 	{
-		std::string logName = "AvayaExtension";
+		std::string logName = "AvayaDevice";
 		log = log4cplus::Logger::getInstance(logName);
+		log.setAppendName("." + this->getId());
 	}
 
 	AvayaDevice::~AvayaDevice() {
@@ -18,7 +19,7 @@ namespace Avaya {
 
 	void AvayaDevice::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 		
