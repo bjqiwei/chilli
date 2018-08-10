@@ -15,6 +15,7 @@ namespace model
 		:Action(xNode, session,	filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Send");
+		log.setAppendName("." + m_strSession);
 
 		this->id = helper::xml::getXmlNodeAttributesValue(m_node,"id");
 		this->idexpr = helper::xml::getXmlNodeAttributesValue(m_node,"idexpr");
@@ -221,7 +222,7 @@ namespace model
 		if (!param.isNull())
 			sendValue["param"] = param;
 		content = sendValue.toStyledString();
-		//LOG4CPLUS_TRACE(log,m_strSession << ",send content:" << content);
+		//LOG4CPLUS_TRACE(log,",send content:" << content);
 	}
 
 }

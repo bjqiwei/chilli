@@ -11,6 +11,7 @@ namespace model
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Transition");
+		log.setAppendName("." + m_strSession);
 		m_strTarget = helper::xml::getXmlNodeAttributesValue(m_node,"target");
 	}
 

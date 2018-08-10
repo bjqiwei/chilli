@@ -8,6 +8,7 @@ namespace model{
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Timer");
+		log.setAppendName("." + m_strSession);
 		this->id = helper::xml::getXmlNodeAttributesValue(m_node,"id");
 		this->idexpr = helper::xml::getXmlNodeAttributesValue(m_node,"idexpr");
 		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");

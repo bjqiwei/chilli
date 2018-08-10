@@ -105,7 +105,7 @@ namespace env
 			JS_GetPendingException(cx, &exception);
 
 		if (!report) {
-			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << message);
+			LOG4CPLUS_ERROR(This->log, message);
 			return;
 		}
 
@@ -117,10 +117,10 @@ namespace env
 			ss << (JSREPORT_IS_STRICT(report->flags) ? "strict " : "") << "warning: ";
 		}
 
-		LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << ss.str());
+		LOG4CPLUS_ERROR(This->log, ss.str());
 
 		if (message)
-			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << message);
+			LOG4CPLUS_ERROR(This->log, message);
 
 
 		if (const char16_t* linebuf = report->linebuf()) {
@@ -130,7 +130,7 @@ namespace env
 			for (size_t i = 0; i < n; i++)
 				buf.push_back(static_cast<char>(linebuf[i]));
 
-			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << buf);
+			LOG4CPLUS_ERROR(This->log, buf);
 
 			//// linebuf usually ends with a newline. If not, add one here.
 			//if (n == 0 || linebuf[n - 1] != '\n')
@@ -149,7 +149,7 @@ namespace env
 				j++;
 			}
 			buf.push_back('^');
-			LOG4CPLUS_ERROR(This->log, This->m_strSessionID << "," << buf);
+			LOG4CPLUS_ERROR(This->log, buf);
 		}
 	}
 }

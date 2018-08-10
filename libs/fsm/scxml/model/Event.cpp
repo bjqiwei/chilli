@@ -11,6 +11,7 @@ namespace model
 	Event::Event(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session,filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Event");
+		log.setAppendName("." + m_strSession);
 		m_strEvent = helper::xml::getXmlNodeAttributesValue(m_node,"event");
 	}
 
