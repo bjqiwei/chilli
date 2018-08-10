@@ -21,13 +21,14 @@ namespace Agent {
 AgentModule::AgentModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a Agent module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " Constuction a Agent module.");
 }
 
 
 AgentModule::~AgentModule(void)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a Agent module.");
+	LOG4CPLUS_DEBUG(log, " Destruction a Agent module.");
 }
 
 
@@ -37,7 +38,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 
@@ -66,7 +67,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 			ext->setVar("_agent.Extension", extension);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, this->getId() << " alredy had agent:" << num);
+			LOG4CPLUS_ERROR(log, " alredy had agent:" << num);
 		}
 	}
 
@@ -76,7 +77,7 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 
 void AgentModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
+	LOG4CPLUS_WARN(log, " fireSend not implement.");
 }
 }
 }
