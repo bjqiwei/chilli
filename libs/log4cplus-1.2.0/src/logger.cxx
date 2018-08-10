@@ -315,6 +315,16 @@ Logger::getName () const
 }
 
 
+log4cplus::tstring const & Logger::getAppendName() const
+{
+    return value->getAppendName();
+}
+
+void Logger::setAppendName(const log4cplus::tstring & name)
+{
+    return value->setAppendName(name);
+}
+
 bool
 Logger::getAdditivity () const
 {

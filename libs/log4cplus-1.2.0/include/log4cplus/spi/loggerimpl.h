@@ -130,6 +130,12 @@ namespace log4cplus {
             log4cplus::tstring const & getName() const { return name; }
 
             /**
+            * Return the logger append name.
+            */
+            log4cplus::tstring const & getAppendName() const { return appendName; }
+            void setAppendName(const log4cplus::tstring & name) { appendName = name; }
+
+            /**
              * Get the additivity flag for this Logger instance.
              */
             bool getAdditivity() const;
@@ -173,6 +179,7 @@ namespace log4cplus {
           // Data
             /** The name of this logger */
             log4cplus::tstring name;
+            log4cplus::tstring appendName;
 
             /**
              * The assigned LogLevel of this logger.

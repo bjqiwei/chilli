@@ -243,6 +243,9 @@ namespace log4cplus
          */
         log4cplus::tstring const & getName() const;
 
+
+        log4cplus::tstring const & getAppendName() const;
+        void setAppendName(const log4cplus::tstring& name);
         /**
          * Get the additivity flag for this Logger instance.  
          */
