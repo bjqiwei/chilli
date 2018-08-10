@@ -12,13 +12,14 @@ namespace Call{
 CallModule::CallModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.CallModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a Call module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " Constuction a Call module.");
 }
 
 
 CallModule::~CallModule(void)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a ACD module.");
+	LOG4CPLUS_DEBUG(log, " Destruction a ACD module.");
 }
 
 
@@ -28,7 +29,7 @@ bool CallModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if(config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS) 
 	{ 
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -82,14 +83,14 @@ void CallModule::processSend(const std::string & strContent, const void * param,
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, this->getId() << strContent << " not json data.");
+		LOG4CPLUS_ERROR(log, strContent << " not json data.");
 	}
 }
 
 
 void CallModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
@@ -97,7 +98,7 @@ void CallModule::fireSend(const std::string & strContent, const void * param)
 void CallModule::run()
 {
 
-	LOG4CPLUS_INFO(log, this->getId() << " Starting...");
+	LOG4CPLUS_INFO(log, " Starting...");
 	try
 	{
 		while (m_bRunning)
@@ -159,7 +160,7 @@ void CallModule::run()
 							call->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_WARN(log, this->getId() << " not find call:" << peId);
+							LOG4CPLUS_WARN(log, " not find call:" << peId);
 						}
 					}
 
@@ -167,17 +168,17 @@ void CallModule::run()
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+				LOG4CPLUS_ERROR(log, " " << e.what());
 			}
 		}
 
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+		LOG4CPLUS_ERROR(log, " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
+	LOG4CPLUS_INFO(log, " Stoped.");
 	log4cplus::threadCleanup();
 }
 

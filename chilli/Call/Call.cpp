@@ -12,17 +12,18 @@ namespace Call {
 	{
 		std::string logName = "Call";
 		log = log4cplus::Logger::getInstance(logName);
-		LOG4CPLUS_DEBUG(log, this->getId() << " new a call object.");
+		log.setAppendName("." + this->getId());
+		LOG4CPLUS_DEBUG(log, " new a call object.");
 	}
 
 	Call::~Call() {
 		m_StateMachines.clear();
-		LOG4CPLUS_DEBUG(log, this->getId() << " destruction a call object.");
+		LOG4CPLUS_DEBUG(log, " destruction a call object.");
 	}
 
 	void Call::Start()
 	{
-		LOG4CPLUS_INFO(log, this->getId() << " Start.");
+		LOG4CPLUS_INFO(log, " Start.");
 		for (auto & it : m_StateMachines) {
 			it.second->start(false);
 		}
@@ -33,7 +34,7 @@ namespace Call {
 		for (auto & it : m_StateMachines) {
 			it.second->stop();
 		}
-		LOG4CPLUS_INFO(log, this->getId() << " Stop.");
+		LOG4CPLUS_INFO(log, " Stop.");
 	}
 
 	bool Call::IsClosed()
@@ -73,7 +74,7 @@ namespace Call {
 					evt.addVars(it, jsonEvent[it]);
 				}
 
-				LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
+				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
 				if (m_StateMachines.empty()) {
 					
@@ -110,7 +111,7 @@ namespace Call {
 		}
 		catch (std::exception & e)
 		{
-			LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+			LOG4CPLUS_ERROR(log, e.what());
 		}
 
 	}
@@ -134,13 +135,13 @@ namespace Call {
 
 		}
 		else {
-			LOG4CPLUS_ERROR(log, this->getId() << " " << strContent << " not json data.");
+			LOG4CPLUS_ERROR(log, strContent << " not json data.");
 		}
 	}
 
 	void Call::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 
