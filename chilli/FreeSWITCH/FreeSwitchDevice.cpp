@@ -9,18 +9,18 @@ namespace FreeSwitch {
 	FreeSwitchDevice::FreeSwitchDevice(FreeSwitchModule * model, const std::string &ext, const std::string &smFileName)
 		:m_model(model), Device(model, ext, smFileName)
 	{
-		std::string logName = "FreeSwitchDevice";
-		log = log4cplus::Logger::getInstance(logName);
-		LOG4CPLUS_DEBUG(log, this->getId() << " new a device object.");
+		std::string logName = "FSDevice.";
+		log = log4cplus::Logger::getInstance(logName.append(ext).append(".").append(getId()));
+		LOG4CPLUS_DEBUG(log, " new a device object.");
 	}
 
 	FreeSwitchDevice::~FreeSwitchDevice() {
-		LOG4CPLUS_DEBUG(log, this->getId() << " destruction a device object.");
+		LOG4CPLUS_DEBUG(log, " destruction a device object.");
 	}
 
 	void FreeSwitchDevice::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 		

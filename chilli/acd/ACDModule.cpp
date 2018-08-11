@@ -11,13 +11,14 @@ namespace ACD{
 ACDModule::ACDModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACDModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a ACD module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " Constuction a ACD module.");
 }
 
 
 ACDModule::~ACDModule(void)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a ACD module.");
+	LOG4CPLUS_DEBUG(log, " Destruction a ACD module.");
 }
 
 
@@ -27,7 +28,7 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if(config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS) 
 	{ 
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -45,7 +46,7 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 			ext->setVar("_extension.deviceID", num);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, this->getId() << " alredy had device:" << num);
+			LOG4CPLUS_ERROR(log, " alredy had device:" << num);
 		}
 	}
 	
@@ -55,7 +56,7 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 
 void ACDModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, this->getId() << " fireSend not implement.");
+	LOG4CPLUS_WARN(log, " fireSend not implement.");
 }
 
 }

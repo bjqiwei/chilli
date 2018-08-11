@@ -12,7 +12,8 @@ namespace EventReport{
 EventReportModule::EventReportModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.EventReportModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a EventReport module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " Constuction a EventReport module.");
 }
 
 
@@ -22,7 +23,7 @@ EventReportModule::~EventReportModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a EventReport module.");
+	LOG4CPLUS_DEBUG(log, " Destruction a EventReport module.");
 }
 
 int EventReportModule::Stop(void)
@@ -51,7 +52,6 @@ int EventReportModule::Start()
 
 		if (this->m_tcpPort !=-1){
 			TCPServer::setLogger(this->log);
-			TCPServer::setLogId(this->getId());
 			std::thread th(&EventReportModule::ListenTCP, this, this->m_tcpPort);
 			m_Threads.push_back(std::move(th));
 		}
@@ -71,7 +71,7 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -280,20 +280,20 @@ void EventReportModule::processSend(const std::string &strContent, const void * 
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, this->getId() << strContent << " not json data.");
+		LOG4CPLUS_ERROR(log, strContent << " not json data.");
 	}
 }
 
 void EventReportModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
 
 void EventReportModule::run()
 {
-	LOG4CPLUS_INFO(log, this->getId() << " Starting...");
+	LOG4CPLUS_INFO(log, " Starting...");
 	try
 	{
 
@@ -319,17 +319,17 @@ void EventReportModule::run()
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+				LOG4CPLUS_ERROR(log, " " << e.what());
 			}
 		}
 
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+		LOG4CPLUS_ERROR(log, " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
+	LOG4CPLUS_INFO(log, " Stoped.");
 	log4cplus::threadCleanup();
 }
 
@@ -472,7 +472,7 @@ bool EventReportModule::listenWS(int port)
 	bool result = true;
 
 	EventReportWSServer wsserver(port, this);
-	LOG4CPLUS_INFO(log, this->getId() << ",websocket start listen port:" << port);
+	LOG4CPLUS_INFO(log, ",websocket start listen port:" << port);
 	wsserver.InitInstance();
 
 	while (m_bRunning){

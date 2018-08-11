@@ -12,10 +12,11 @@ ACDDevice::ACDDevice(model::ProcessModule * model, const std::string &ext, const
 {
 	std::string logName = "ACD";
 	log = log4cplus::Logger::getInstance(logName);
-	LOG4CPLUS_DEBUG(log, this->getId() << " new a ACD device object.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " new a ACD device object.");
 }
 ACDDevice::~ACDDevice(){
-	LOG4CPLUS_DEBUG(log, this->getId() << " destruction a ACD device object.");
+	LOG4CPLUS_DEBUG(log, " destruction a ACD device object.");
 }
 
 void ACDDevice::mainEventLoop()
@@ -44,7 +45,7 @@ void ACDDevice::mainEventLoop()
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_DEBUG(log, this->getId() << " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
 			if (m_Sessions.begin() == m_Sessions.end()) {
 				Session connection(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
@@ -75,7 +76,7 @@ void ACDDevice::mainEventLoop()
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+		LOG4CPLUS_ERROR(log, " " << e.what());
 	}
 }
 

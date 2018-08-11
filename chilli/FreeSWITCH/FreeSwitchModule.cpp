@@ -15,7 +15,8 @@ namespace FreeSwitch{
 FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.FreeSwitchModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a FreeSwitch module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
 }
 
 
@@ -25,12 +26,12 @@ FreeSwitchModule::~FreeSwitchModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a FreeSwitch module.");
+	LOG4CPLUS_DEBUG(log, "Destruction a FreeSwitch module.");
 }
 
 int FreeSwitchModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Stop...  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
 	if (m_bRunning)
 	{
 		ProcessModule::Stop();
@@ -45,7 +46,7 @@ int FreeSwitchModule::Stop(void)
 
 int FreeSwitchModule::Start()
 {
-	LOG4CPLUS_DEBUG(log,this->getId() << " Start...  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log," Start...  FreeSwitch module");
 	if(!m_bRunning){
 		ProcessModule::Start();
 		m_bRunning = true;
@@ -60,7 +61,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	tinyxml2::XMLElement * eConfig = config.FirstChildElement();
@@ -90,7 +91,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 				//peptr->setVar("_device.deviceID", num);
 			}
 			else {
-				LOG4CPLUS_ERROR(log, this->getId() << " alredy had device:" << num);
+				LOG4CPLUS_ERROR(log, " alredy had device:" << num);
 			}
 		}
 	}
@@ -100,7 +101,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	bool bHandled = false;
 	this->processSend(strContent, param, bHandled, log);
 
@@ -111,7 +112,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (!jsonReader.parse(strContent, jsonEvent) || !jsonEvent.isObject()) {
-		LOG4CPLUS_ERROR(log, this->getId() << " " << strContent << " not json object.");
+		LOG4CPLUS_ERROR(log, " " << strContent << " not json object.");
 		return;
 	}
 
@@ -175,7 +176,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
 
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 
 		bHandled = true;
 	}
@@ -206,7 +207,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
 
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 
 		bHandled = true;
 	}
@@ -220,7 +221,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string cmd = "bgapi uuid_kill " + sessionId;
 		esl_send(&m_Handle, cmd.c_str());
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 		bHandled = true;
 	}
 	else if (eventName == "DivertCall")
@@ -248,7 +249,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
 
 		esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
-		LOG4CPLUS_DEBUG(log, this->getId() << " esl_execute:bridge" << called << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_execute:bridge" << called << ", status:" << status);
 
 		bHandled = true;
 	}
@@ -265,7 +266,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 
 		std::string cmd = "bgapi uuid_record " + uuid + " start " + filename;
 		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 		bHandled = true;
 	}
 	else if (eventName == "TransferAgent")
@@ -289,19 +290,19 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		/*
 		auto pe = this->getPerformElement(agentid);
 		if (pe != nullptr) {
-			LOG4CPLUS_DEBUG(log, this->getId() << agentid << " state:" << pe->getStateId());
+			LOG4CPLUS_DEBUG(log, agentid << " state:" << pe->getStateId());
 			if (pe->getStateId() == "Ready") {
 				findAgent = agentid;
 				goto _findAgent;
 			}
 		}
 		
-		LOG4CPLUS_DEBUG(log, this->getId() << " All device:" << this->GetExtensions().size());
+		LOG4CPLUS_DEBUG(log, " All device:" << this->GetExtensions().size());
 
 		if (lastAgent == ""){
 			for (auto it : this->GetExtensions())
 			{
-				LOG4CPLUS_DEBUG(log, this->getId() << it.first << " state:" << it.second->getStateId());
+				LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
 				if (it.second->getStateId() == "Ready") {
 					findAgent = it.first;
 					break;
@@ -321,7 +322,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 
 				if (bfindLastAgent == true)
 				{
-					LOG4CPLUS_DEBUG(log, this->getId() << it.first << " state:" << it.second->getStateId());
+					LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
 					if (it.second->getStateId() == "Ready") {
 						findAgent = it.first;
 						break;
@@ -333,7 +334,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 			{
 				for (auto it : this->GetExtensions())
 				{
-					LOG4CPLUS_DEBUG(log, this->getId() << it.first << " state:" << it.second->getStateId());
+					LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
 					if (it.second->getStateId() == "Ready"){
 						findAgent = it.first;
 						break;
@@ -344,14 +345,14 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		
 	_findAgent:
 		lastAgent = findAgent;
-		LOG4CPLUS_DEBUG(log, this->getId() << " find agent:" << findAgent);
+		LOG4CPLUS_DEBUG(log, " find agent:" << findAgent);
 		if (!findAgent.empty()){
 			Json::Value ext = this->getExtension(findAgent)->getVar("_agent.Device");
 			if (ext.isString())
 			{
 				std::string cmd = "bgapi uuid_transfer " + uuid +" " + ext.asString() + " XML default";
 				esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-				LOG4CPLUS_DEBUG(log, this->getId() << " esl_send:" << cmd << ", status:" << status);
+				LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 			}
 		}
 
@@ -401,28 +402,29 @@ void esl_logger(const char *file, const char *func, int line, int level, const c
 
 void FreeSwitchModule::ConnectFS()
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Run  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, " Run  FreeSwitch module");
 
 	//esl_handle_t handle = { { 0 } };
 
 	while (m_bRunning)
 	{
-		LOG4CPLUS_DEBUG(log, this->getId() << " connect freeswitch " << m_Host << ":" << m_Port);
+		LOG4CPLUS_DEBUG(log, " connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
 
 		if (!m_Handle.connected){
-			LOG4CPLUS_ERROR(log, this->getId() << " connect freeswitch " << m_Host << ":" << m_Port << " error,"
+			LOG4CPLUS_ERROR(log, " connect freeswitch " << m_Host << ":" << m_Port << " error,"
 				<< m_Handle.errnum << " " << m_Handle.err);
 			if (m_bRunning)
 				std::this_thread::sleep_for(std::chrono::seconds(5));
 			continue;
 		}
 
-		LOG4CPLUS_INFO(log, this->getId() << " Connected to FreeSWITCH");
+		LOG4CPLUS_INFO(log, " Connected to FreeSWITCH");
 
-		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "CHANNEL_CREATE CHANNEL_PROGRESS CHANNEL_ANSWER CHANNEL_BRIDGE CHANNEL_UNBRIDGE CHANNEL_HOLD CHANNEL_UNHOLD DTMF CHANNEL_HANGUP CHANNEL_DESTROY BACKGROUND_JOB");
-		LOG4CPLUS_DEBUG(log, this->getId() << " " << m_Handle.last_sr_reply);
+		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
+		esl_send(&m_Handle, "nixevent json API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
+		LOG4CPLUS_DEBUG(log, " " << m_Handle.last_sr_reply);
 
 		/*
 		for (auto &it : this->GetExtensions()) {
@@ -431,9 +433,9 @@ void FreeSwitchModule::ConnectFS()
 
 				std::string cmd = "bgapi sofia status profile internal reg ";
 				cmd.append(it.first);
-				LOG4CPLUS_DEBUG(log, this->getId() << " send:" << cmd);
+				LOG4CPLUS_DEBUG(log, " send:" << cmd);
 				if (ESL_SUCCESS == esl_send_recv_timed(&handle, cmd.c_str(), 2000)) {
-					LOG4CPLUS_DEBUG(log, this->getId() << " " << handle.last_sr_event->body);
+					LOG4CPLUS_DEBUG(log, handle.last_sr_event->body);
 					std::string response = handle.last_sr_event->body;
 
 					if (response.length() < 300)
@@ -478,14 +480,19 @@ void FreeSwitchModule::ConnectFS()
 						if (event["Event-Name"].isString()) {
 							eventName = event["Event-Name"].asString();
 						}
-						
+
+						LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
+
 						if (eventName == "CHANNEL_CREATE" 
 							|| eventName == "CHANNEL_PROGRESS"
 							|| eventName == "CHANNEL_ANSWER"
 							|| eventName == "CHANNEL_BRIDGE"
 							|| eventName == "CHANNEL_UNBRIDGE"
 							|| eventName == "CHANNEL_HANGUP"
-							|| eventName == "CHANNEL_DESTROY")
+							|| eventName == "CHANNEL_DESTROY"
+							|| eventName == "CHANNEL_OUTGOING"
+							|| eventName == "CHANNEL_ORIGINATE"
+							|| eventName == "CHANNEL_EXECUTE")
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");
@@ -496,11 +503,11 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Event-Calling-Function");
 							event.removeMember("Event-Calling-Line-Number");
 							event.removeMember("Event-Sequence");
-							//event.removeMember("Caller-Dialplan");
-							//event.removeMember("Caller-Caller-ID-Name");
-							//event.removeMember("Caller-Channel-Name");
+							event.removeMember("Caller-Dialplan");
+							event.removeMember("Caller-Caller-ID-Name");
+							event.removeMember("Caller-Channel-Name");
 							event.removeMember("Caller-Context");
-							//event.removeMember("Caller-Orig-Caller-ID-Name");
+							event.removeMember("Caller-Orig-Caller-ID-Name");
 							event.removeMember("Caller-Network-Addr");
 							event.removeMember("Caller-Privacy-Hide-Name");
 							event.removeMember("Caller-Privacy-Hide-Number");
@@ -509,12 +516,19 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Caller-Screen-Bit");
 							event.removeMember("Caller-Source");
 							event.removeMember("Channel-HIT-Dialplan");
-							//event.removeMember("Channel-Name");
-							//event.removeMember("Channel-Presence-ID");
+							event.removeMember("Channel-Name");
+							event.removeMember("Channel-Presence-ID");
 							event.removeMember("Event-Date-GMT");
 							event.removeMember("Event-Date-Timestamp");
 							event.removeMember("Caller-Unique-ID");
-							//event.removeMember("Unique-ID");
+							event.removeMember("Caller-Direction");
+							event.removeMember("CallerLogical-Direction");
+							event.removeMember("Channel-Call-UUID");
+							event.removeMember("Channel-Name");
+							event.removeMember("Channel-Call-State");
+							event.removeMember("Presence-Call-Direction");
+							event.removeMember("Channel-State-Number");
+
 
 							std::string caller = event["Caller-ANI"].asString();
 							std::string called = event["Caller-Destination-Number"].asString();
@@ -522,9 +536,8 @@ void FreeSwitchModule::ConnectFS()
 
 							model::EventType_t evt;
 							for (auto & varname : event.getMemberNames()) {
-								std::string tmp = varname.substr(0, sizeof("variable_")-1);
-								if (tmp != "variable_"){
-									std::string newvarname = varname;
+								std::string newvarname = varname;
+								if (newvarname.find("variable_") == std::string::npos) {
 									helper::string::replaceString(newvarname, "-", "");
 									evt.event[newvarname] = event[varname];
 								}
@@ -532,7 +545,7 @@ void FreeSwitchModule::ConnectFS()
 
 
 							
-							std::string sessionId = evt.event["UniqueID"].asString();
+							std::string sessionId = evt.event.removeMember("UniqueID").asString();
 
 							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
 								if (dir == "inbound")
@@ -559,9 +572,6 @@ void FreeSwitchModule::ConnectFS()
 								m_Session_DeviceId.erase(evt.event["sessionID"].asString());
 							
 						}
-						else {
-							LOG4CPLUS_DEBUG(log, this->getId() << " " << m_Handle.last_event->body);
-						}
 					}
 					
 				}
@@ -569,14 +579,14 @@ void FreeSwitchModule::ConnectFS()
 			else if (status == ESL_BREAK)
 				continue;
 			else{
-				LOG4CPLUS_ERROR(log, this->getId() << " " << m_Handle.err);
+				LOG4CPLUS_ERROR(log, " " << m_Handle.err);
 				break;
 			}
 		}
 
 		esl_disconnect(&m_Handle);
 	}
-	LOG4CPLUS_DEBUG(log, this->getId() << " Stoped  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, " Stoped  FreeSwitch module");
 	log4cplus::threadCleanup();
 }
 }

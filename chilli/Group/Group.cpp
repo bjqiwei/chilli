@@ -11,11 +11,12 @@ namespace Group {
 	{
 		std::string logName = "GroupImp";
 		log = log4cplus::Logger::getInstance(logName);
-		LOG4CPLUS_DEBUG(log, this->getId() << " new a group object.");
+		log.setAppendName("." + this->getId());
+		LOG4CPLUS_DEBUG(log, " new a group object.");
 	}
 
 	Group::~Group() {
-		LOG4CPLUS_DEBUG(log, this->getId() << " destruction a group object.");
+		LOG4CPLUS_DEBUG(log, " destruction a group object.");
 	}
 
 	void Group::processSend(const std::string & strContent, const void * param, bool & bHandled)
@@ -34,7 +35,7 @@ namespace Group {
 
 		}
 		else {
-			LOG4CPLUS_ERROR(log, this->getId() << " " << strContent << " not json data.");
+			LOG4CPLUS_ERROR(log, " " << strContent << " not json data.");
 		}
 
 		if (!bHandled) {
@@ -44,7 +45,7 @@ namespace Group {
 
 	void Group::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		bool bHandled = false;
 		this->processSend(strContent, param, bHandled);
 	}
