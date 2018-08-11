@@ -20,7 +20,8 @@ namespace DataBase{
 MySqlModule::MySqlModule(const std::string & id) :ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.MySqlModule");
-	LOG4CPLUS_DEBUG(log, this->getId() << " Constuction a module.");
+	log.setAppendName("." + this->getId());
+	LOG4CPLUS_DEBUG(log, " Constuction a module.");
 }
 
 
@@ -30,12 +31,12 @@ MySqlModule::~MySqlModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, this->getId() << " Destruction a module.");
+	LOG4CPLUS_DEBUG(log, " Destruction a module.");
 }
 
 int MySqlModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Stop module");
+	LOG4CPLUS_DEBUG(log, " Stop module");
 	if (m_bRunning) {
 		ProcessModule::Stop();
 		m_bRunning = false;
@@ -51,7 +52,7 @@ int MySqlModule::Stop(void)
 
 int MySqlModule::Start()
 {
-	LOG4CPLUS_DEBUG(log, this->getId() << " Start module");
+	LOG4CPLUS_DEBUG(log, " Start module");
 	if (!m_bRunning){
 		ProcessModule::Start();
 		m_bRunning = true;
@@ -65,7 +66,7 @@ bool MySqlModule::LoadConfig(const std::string & configContext)
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS){
-		LOG4CPLUS_ERROR(log, this->getId() << " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	XMLElement * mysql = config.FirstChildElement("MySql");
@@ -127,11 +128,11 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 	catch (sql::SQLException &e) {
 		std::ostringstream oss;
 		oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLStateCStr() << ")";
-		LOG4CPLUS_DEBUG(log, this->getId() << " " <<oss.str());
+		LOG4CPLUS_DEBUG(log, " " <<oss.str());
 
 	}
 	catch (std::runtime_error &e) {
-		LOG4CPLUS_ERROR(log, this->getId() << " ERROR: " << e.what());
+		LOG4CPLUS_ERROR(log, " ERROR: " << e.what());
 	}
 
 	if (connect && !connect->isClosed())
@@ -142,11 +143,11 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 
 void MySqlModule::fireSend(const std::string &strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, this->getId() << " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	Json::Value jsonEvent;
 	Json::Reader jsonReader;
 	if (!jsonReader.parse(strContent, jsonEvent)) {
-		LOG4CPLUS_ERROR(log, this->getId() << " " << strContent << " not json data.");
+		LOG4CPLUS_ERROR(log, " " << strContent << " not json data.");
 		return;
 	}
 
@@ -189,7 +190,7 @@ void MySqlModule::fireSend(const std::string &strContent, const void * param)
 
 	chilli::model::SQLEventType_t event(sql, from);
 	event.m_ConnectionID = conctionId;
-	LOG4CPLUS_INFO(log, this->getId() << " sql:"  << event.m_sql);
+	LOG4CPLUS_INFO(log, " sql:"  << event.m_sql);
 	m_SqlBuffer.Put(event);
 
 }
@@ -242,7 +243,7 @@ static std::string  MetadataInfo(sql::DatabaseMetaData *dbcon_meta)
 
 void MySqlModule::executeSql()
 {
-	LOG4CPLUS_INFO(log, this->getId() << " Starting...");
+	LOG4CPLUS_INFO(log, " Starting...");
 	while (m_bRunning)
 	{
 		sql::Driver *driver = get_driver_instance();
@@ -251,7 +252,7 @@ void MySqlModule::executeSql()
 		try {
 			connect.reset(driver->connect(m_Host.c_str(), m_UserID.c_str(), m_Password.c_str()));
 			//connect->setAutoCommit(0);
-			LOG4CPLUS_DEBUG(log, this->getId() << " Database connection  autocommit mode = " << connect->getAutoCommit());
+			LOG4CPLUS_DEBUG(log, " Database connection  autocommit mode = " << connect->getAutoCommit());
 
 			/* select appropriate database schema */
 			if (!m_DataBase.empty()) {
@@ -263,7 +264,7 @@ void MySqlModule::executeSql()
 			model::SQLEventType_t Event;
 			while (m_SqlBuffer.Get(Event) && !Event.m_sql.empty())
 			{
-				LOG4CPLUS_DEBUG(log, this->getId() << " " << Event.m_ExtNumber << " executeSql:" << Event.m_sql);
+				LOG4CPLUS_DEBUG(log, Event.m_ExtNumber << " executeSql:" << Event.m_sql);
 				if (Event.m_sql.empty())
 					break;
 
@@ -329,7 +330,7 @@ void MySqlModule::executeSql()
 				catch (sql::SQLException &e) {
 					std::ostringstream oss;
 					oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-					LOG4CPLUS_DEBUG(log, this->getId() << " " << oss.str());
+					LOG4CPLUS_DEBUG(log, " " << oss.str());
 					
 					if (Event.m_times++ < 5){
 						m_SqlBuffer.Put(Event);
@@ -356,7 +357,7 @@ void MySqlModule::executeSql()
 		catch (sql::SQLException &e) {
 			std::ostringstream oss;
 			oss << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLStateCStr() << ")";
-			LOG4CPLUS_DEBUG(log, this->getId() << " " << oss.str());
+			LOG4CPLUS_DEBUG(log, oss.str());
 			std::this_thread::sleep_for(std::chrono::seconds(30));
 			if (connect && connect->isClosed()){
 				continue;
@@ -364,7 +365,7 @@ void MySqlModule::executeSql()
 
 		}
 		catch (std::runtime_error &e) {
-			LOG4CPLUS_ERROR(log, this->getId() << " ERROR: " << e.what());
+			LOG4CPLUS_ERROR(log, " ERROR: " << e.what());
 			std::this_thread::sleep_for(std::chrono::seconds(30));
 			if (connect && connect->isClosed()) {
 				continue;
@@ -375,7 +376,7 @@ void MySqlModule::executeSql()
 			connect->close();
 
 	}
-	LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
+	LOG4CPLUS_INFO(log, " Stoped.");
 	log4cplus::threadCleanup();
 }
 }

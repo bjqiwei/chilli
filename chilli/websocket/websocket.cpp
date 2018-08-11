@@ -328,7 +328,7 @@ lwsclose:
 
 	void lwsl_log(int level, const char *line)
 	{
-		log4cplus::Logger log = log4cplus::Logger::getInstance("wslog");
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("wslog");
 		std::string msg(line,strlen(line)-1);
 		if (level == LLL_ERR)
 			LOG4CPLUS_ERROR(log, msg);

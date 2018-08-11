@@ -30,7 +30,7 @@ namespace model{
 			m_thread = std::thread(&ProcessModule::_run, this);
 		}
 		else {
-			LOG4CPLUS_WARN(log, this->getId() << " already running for this module.");
+			LOG4CPLUS_WARN(log, " already running for this module.");
 		}
 		return 0;
 	}
@@ -70,7 +70,7 @@ namespace model{
 
 	void ProcessModule::run()
 	{
-		LOG4CPLUS_INFO(log, this->getId() << " Starting...");
+		LOG4CPLUS_INFO(log, " Starting...");
 		try
 		{
 			for (auto & it : m_PerformElements) {
@@ -97,13 +97,13 @@ namespace model{
 							extptr->mainEventLoop();
 						}
 						else {
-							LOG4CPLUS_WARN(log, this->getId() << " not find device:" << peId);
+							LOG4CPLUS_WARN(log, " not find device:" << peId);
 						}
 					}
 				}
 				catch (std::exception & e)
 				{
-					LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+					LOG4CPLUS_ERROR(log, e.what());
 				}
 			}
 
@@ -113,10 +113,10 @@ namespace model{
 		}
 		catch (std::exception & e)
 		{
-			LOG4CPLUS_ERROR(log, this->getId() << " " << e.what());
+			LOG4CPLUS_ERROR(log, e.what());
 		}
 
-		LOG4CPLUS_INFO(log, this->getId() << " Stoped.");
+		LOG4CPLUS_INFO(log, " Stoped.");
 		log4cplus::threadCleanup();
 	}
 	

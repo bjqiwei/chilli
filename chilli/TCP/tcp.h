@@ -34,15 +34,12 @@ public:
 
 	void setLogger(log4cplus::Logger log);
 	log4cplus::Logger getLogger();
-	void setLogId(std::string id);
-	const std::string getLogId();
 
 	void ListenTCP(uint32_t port);
 	void Stop();
 	virtual TCPConnection * OnAccept(struct event_base * base, int64_t fd);
 private:
 	struct event_base * m_Base = nullptr;
-	std::string m_logId;
 	log4cplus::Logger loger;
 };
 }
