@@ -143,6 +143,10 @@ void CallModule::run()
 							chilli::model::EventType_t sendData(jsonEvent);
 							call->pushEvent(sendData);
 							call->mainEventLoop();
+
+							if (call->IsClosed())
+								this->removePerfromElement(call->getId());
+							
 						}
 
 					}

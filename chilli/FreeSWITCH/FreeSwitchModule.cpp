@@ -7,6 +7,7 @@
 #include <json/json.h>
 #include "../stringHelper.h"
 #include "../uuid.h"
+#include <regex>
 
 
 namespace chilli{
@@ -86,13 +87,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 			num = num ? num : "";
 			sm = sm ? sm : "";
 
-			model::PerformElementPtr peptr(new FreeSwitchDevice(this, num, sm));
-			if (peptr != nullptr && this->addPerformElement(num, peptr)) {
-				//peptr->setVar("_device.deviceID", num);
-			}
-			else {
-				LOG4CPLUS_ERROR(log, " alredy had device:" << num);
-			}
+			m_device_StateMachine[num] = sm;
 		}
 	}
 
@@ -587,6 +582,72 @@ void FreeSwitchModule::ConnectFS()
 		esl_disconnect(&m_Handle);
 	}
 	LOG4CPLUS_DEBUG(log, " Stoped  FreeSwitch module");
+	log4cplus::threadCleanup();
+}
+void FreeSwitchModule::run()
+{
+	LOG4CPLUS_INFO(log, " Starting...");
+	try
+	{
+
+		while (m_bRunning)
+		{
+			try
+			{
+				model::EventType_t Event;
+				if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
+				{
+					const Json::Value & jsonEvent = Event.event;
+					std::string peId;
+					if (jsonEvent["id"].isString()) {
+						peId = jsonEvent["id"].asString();
+					}
+
+
+
+					if (this->getPerformElement(peId) == nullptr) {
+
+						for (auto & it : this->m_device_StateMachine) {
+							std::regex regPattern(it.first);
+							if (std::regex_match(peId, regPattern)) {
+								model::PerformElementPtr peptr(new FreeSwitchDevice(this, peId, it.second));
+								if (peptr != nullptr && this->addPerformElement(peId, peptr)) {
+									peptr->setVar("_device.deviceID", peId);
+								}
+
+							}
+						}
+
+					}
+
+					auto extptr = getPerformElement(peId);
+
+					if (extptr != nullptr) {
+						extptr->pushEvent(Event);
+						extptr->mainEventLoop();
+
+						if (extptr->IsClosed())
+							this->removePerfromElement(peId);
+						
+					}
+					else {
+						LOG4CPLUS_WARN(log, " not find device:" << peId);
+					}
+				}
+			}
+			catch (std::exception & e)
+			{
+				LOG4CPLUS_ERROR(log, e.what());
+			}
+		}
+
+	}
+	catch (std::exception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
+
+	LOG4CPLUS_INFO(log, " Stoped.");
 	log4cplus::threadCleanup();
 }
 }

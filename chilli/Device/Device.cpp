@@ -57,7 +57,6 @@ namespace chilli {
 					std::string eventName;
 					std::string sessionId = m_Id;
 					std::string type;
-					std::string deviceId;
 
 					if (jsonEvent["type"].isString())
 						type = jsonEvent["type"].asString();
@@ -70,10 +69,6 @@ namespace chilli {
 						sessionId = jsonEvent["sessionID"].asString();
 					}
 
-					if (jsonEvent["id"].isString()) {
-						deviceId = jsonEvent["id"].asString();
-					}
-
 					fsm::TriggerEvent evt(eventName, type);
 
 					for (auto & it : jsonEvent.getMemberNames()) {
@@ -83,10 +78,9 @@ namespace chilli {
 					LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
-						Session session(new fsm::StateMachine(log.getName(), sessionId, m_SMFileName, this->m_model));
+						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
 						m_Sessions[sessionId] = session;
 
-						session->setVar("_device.deviceID", deviceId);
 						for (auto & itt : this->m_Vars.getMemberNames())
 						{
 							session->setVar(itt, this->m_Vars[itt]);

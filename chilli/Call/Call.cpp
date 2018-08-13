@@ -103,10 +103,6 @@ namespace Call {
 					m_StateMachines.erase(it);
 				}
 
-				if (this->IsClosed())
-				{
-					call = this->m_model->removePerfromElement(this->getId());
-				}
 			}
 		}
 		catch (std::exception & e)

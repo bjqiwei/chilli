@@ -178,13 +178,6 @@ namespace model{
 			return it->second;
 		}
 
-		for (auto & it :this->m_PerformElements){
-			std::regex regPattern(it.first);
-			if (std::regex_match(peId, regPattern)){
-				return it.second;
-			}
-		}
-
 		return nullptr;
 	}
 
