@@ -26,6 +26,7 @@ public:
 	virtual bool addPerformElement(const std::string &peId, PerformElementPtr & extptr) final;
 	virtual PerformElementPtr removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
+	virtual PerformElementPtr getPerformElementByGlobal(const std::string & peId) final;
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
 	virtual const log4cplus::Logger & getLogger()final;
 	virtual const std::string getId()final;
@@ -38,9 +39,9 @@ protected:
 	std::atomic<bool> m_bRunning = false;
 private:
 	const std::string m_Id;
-	std::recursive_mutex m_PEMtx;
+	static std::recursive_mutex g_PEMtx;
 	model::PerformElementMap m_PerformElements;
-
+	static model::PerformElementMap g_PerformElements;
 	std::thread m_thread;
 	void _run();
 	virtual void run();

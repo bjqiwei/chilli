@@ -5,6 +5,8 @@
 namespace chilli{
 namespace model{
 	std::vector<ProcessModulePtr> ProcessModule::g_Modules;
+	std::recursive_mutex ProcessModule::g_PEMtx;
+	model::PerformElementMap ProcessModule::g_PerformElements;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId),
 		m_Id(modelId)
@@ -149,8 +151,9 @@ namespace model{
 
 	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)
 	{
-		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
-		if (this->m_PerformElements.find(peId) == this->m_PerformElements.end()){
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		if (this->g_PerformElements.find(peId) == this->g_PerformElements.end()){
+			this->g_PerformElements[peId] = peptr;
 			this->m_PerformElements[peId] = peptr;
 			return true;
 		}
@@ -159,12 +162,13 @@ namespace model{
 
 	PerformElementPtr ProcessModule::removePerfromElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 		PerformElementPtr peptr;
-		const auto & it = this->m_PerformElements.find(peId);
-		if (it != this->m_PerformElements.end())
+		const auto & it = this->g_PerformElements.find(peId);
+		if (it != this->g_PerformElements.end())
 			peptr = it->second;
 
+		this->g_PerformElements.erase(peId);
 		this->m_PerformElements.erase(peId);
 
 		return peptr;
@@ -172,9 +176,21 @@ namespace model{
 
 	chilli::model::PerformElementPtr ProcessModule::getPerformElement(const std::string & peId)
 	{
-		std::unique_lock<std::recursive_mutex> lck(m_PEMtx);
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 		auto & it = this->m_PerformElements.find(peId);
 		if (it != this->m_PerformElements.end()) {
+			return it->second;
+		}
+
+		return nullptr;
+	}
+
+	chilli::model::PerformElementPtr ProcessModule::getPerformElementByGlobal(const std::string & peId)
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+
+		auto & it = this->g_PerformElements.find(peId);
+		if (it != this->g_PerformElements.end()) {
 			return it->second;
 		}
 
