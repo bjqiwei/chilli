@@ -244,7 +244,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
 
 		esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_execute:bridge" << called << ", status:" << status);
+		LOG4CPLUS_DEBUG(log, " esl_execute:bridge " << called << ", status:" << status);
 
 		bHandled = true;
 	}

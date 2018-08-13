@@ -7,62 +7,73 @@
 	<data id="oricaller" expr="null"/>
 	<data id="called" expr="null" />
 	<data id="caller" expr="null"/>
+	<data id="cause" expr="0"/>
+	<data id="FSCause" expr="null"/>
+	<data id="CallDirection"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
 	<script src="./conf/DateFormat.js"/>
+	<script>
+		FSCause = {};
+		FSCause["USER_NOT_REGISTERED"] = 1066;
+		FSCause["USER_BUSY"] = 1017;
+		FSCause["CALL_REJECTED"] = 1021;
+		FSCause["NORMAL_CLEARING"] = 0;
+	</script>
 </scriptmodel>
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
-		    <script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDNumber; called =_event.CallerDestinationNumber;</script>
-			<send target="call001" type="event" destexpr="sessionID" event="Initiated">
-				<sessionID type="script">sessionID</sessionID>
-				<deviceID type="script">_device.deviceID</deviceID>
-				<otherSessionID type="script">_event.OtherLegUniqueID</otherSessionID>
-				<caller type="script">caller</caller>
-				<called type="script">called</called>
-				<dir type="script">_event.CallDirection</dir>
-			</send>
 			<transition target="Initiated"/>
-		</event>
-		
-		<event event="CHANNEL_PROGRESS">
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Alerting">
-				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_event.sessionID</sessionID>
-			</send>
-			<transition target="Alerting"/>
 		</event>
 			
 		<event event="CHANNEL_DESTROY">
-			<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
-				<cause>USER_NOT_REGISTERED</cause>
+			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+				<cause type="script">cause=FSCause["USER_NOT_REGISTERED"];</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>
 			</send>
 			<transition target="Destroy"/>
 		</event>
-		<event event="CHANNEL_ANSWER">
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Connected">
-				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_event.sessionID</sessionID>
-			</send>
-			<transition target="Connected"/>
-		</event>
 		
-		<event event="CHANNEL_HANGUP">
-			<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
-				<cause type="script">_event.HangupCause</cause>
-				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_event.sessionID</sessionID>
-			</send>
-			<transition target="Hangup"/>
-		</event>
 		
 		<state id="Initiated">
-					
+			<onentry>
+				<script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDNumber; called =_event.CallerDestinationNumber; CallDirection = _event.CallDirection;</script>
+				<!--
+				<send target="call001" type="event" destexpr="sessionID" event="Initiated">
+					<sessionID type="script">sessionID</sessionID>
+					<deviceID type="script">_device.deviceID</deviceID>
+					<otherSessionID type="script">_event.OtherLegUniqueID</otherSessionID>
+					<caller type="script">caller</caller>
+					<called type="script">called</called>
+					<dir type="script">_event.CallDirection</dir>
+				</send>
+				-->
+			</onentry>
+			
+			<event event="CHANNEL_HANGUP">
+				<transition target="Hangup"/>
+			</event>
+			
 			<event event="CHANNEL_DESTROY">
 				<transition target="Destroy"/>
+			</event>
+			
+			<event event="CHANNEL_ANSWER">
+				<send target="call001" type="event" destexpr="_event.sessionID" event="Connected">
+					<deviceID type="script">_device.deviceID</deviceID>
+					<sessionID type="script">_event.sessionID</sessionID>
+				</send>
+				<transition target="Connected"/>
+			</event>
+			
+			<event event="CHANNEL_PROGRESS">
+				<send target="call001" type="event" destexpr="_event.sessionID" event="Alerting">
+					<deviceID type="script">_device.deviceID</deviceID>
+					<sessionID type="script">_event.sessionID</sessionID>
+				</send>
+				<transition target="Alerting"/>
 			</event>
 			
 			<state id="Alerting">
@@ -93,15 +104,22 @@
 				</state>
 			
 			</state>
+			
+			<state id="Hangup">
+				<onentry>
+					<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+						<cause type="script">cause = FSCause[_event.HangupCause]</cause>
+						<deviceID type="script">_device.deviceID</deviceID>
+						<sessionID type="script">_event.sessionID</sessionID>
+					</send>
+				</onentry>
 		</state>
-		<state id="Hangup">
-			<transition target="Destroy" />
 		</state>
 	</state>
 	<state id="Destroy">
 		<onentry>
 			<send target="call001" type="event" destexpr="_event.sessionID" event="Null">
-				<cause type="script">_event.HangupCause</cause>
+				<cause type="script">cause</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.sessionID</sessionID>
 			</send>

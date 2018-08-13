@@ -59,18 +59,13 @@
 				<initiatingDevice type="script">_event.param.deviceID</initiatingDevice>
 			</send>
 			
-			<send target="freeswitch001" type="cmd" destexpr="called" event="DivertCall">
-				<sessionID type="script">_event.param.sessionID</sessionID>
-				<called type="script">_event.param.called</called>
-			</send>
-			
 			<transition target="Pending"/>
 		</event>
 		
 		<event event="Null">
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
-					<releasingDevice type="script">caller</releasingDevice>
+					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
 				</send>
 				<script>delete sessionlist[_event.param.sessionID]</script>
 				<transition target="Destroy"/>
@@ -105,7 +100,10 @@
 		</state>
 		<state id="Delivered">
 			<event event="Connected">
-
+				<send target="eventreport" type="event" event="Answered">
+					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
+					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+				</send>
 			</event>
 			
 			<event event="Null">
@@ -180,7 +178,7 @@
 	<state id="Destroy">
 		<onentry>
 			<send target="eventreport" type="event" event="CallCleared">
-				<clearedCall type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=caller; param;</clearedCall>
+				<clearedCall type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.param.deviceID; param;</clearedCall>
 			</send>
 		</onentry>
 	</state>

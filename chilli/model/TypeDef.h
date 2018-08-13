@@ -25,4 +25,15 @@ namespace model {
 		uint32_t m_times = 0;
 	}SQLEventType_t;
 }
+
+enum 
+{
+INVALID_REQUEST = 1000,
+INVALID_CALLING_DEVICE=1001,
+INVALID_CALLED_DEVICE =1002,
+INVALID_CALL_CONNECTION = 1003,
+
+USER_NOT_REGISTERED =1606,
+};
+
 }
