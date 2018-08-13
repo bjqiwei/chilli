@@ -11,7 +11,7 @@ namespace EventReport{
 
 EventReportModule::EventReportModule(const std::string & id) :ProcessModule(id)
 {
-	log = log4cplus::Logger::getInstance("chilli.EventReportModule");
+	log = log4cplus::Logger::getInstance("chilli.ERModule");
 	log.setAppendName("." + this->getId());
 	LOG4CPLUS_DEBUG(log, " Constuction a EventReport module.");
 }
@@ -105,7 +105,7 @@ void EventReportModule::ConnOnError(uint64_t id, const std::string & errorCode)
 	this->m_Connections.erase(id);
 }
 
-void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, const std::string & logId)
+void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log)
 {
 	//LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
 
@@ -128,7 +128,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 				c->second->Send(response);
 		}
 		else {
-			LOG4CPLUS_DEBUG(log, logId << " OnMessage:" << message);
+			LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
 		}
 
 		if (requestid == "connect")
@@ -257,7 +257,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, logId << " OnMessage not json string:" << message);
+		LOG4CPLUS_ERROR(log, " OnMessage not json string:" << message);
 	}
 }
 
@@ -338,6 +338,7 @@ public:
 	explicit TCPConnection(EventReportModule * module, struct event_base * base, int64_t fd) :EPConnection(module), TCP::TCPConnection(base, fd)
 	{
 		log = log4cplus::Logger::getInstance("chilli.TCPConnection");
+		log.setAppendName("." + to_string(this->GetId()));
 		LOG4CPLUS_DEBUG(log, m_Id << " construction");
 	}
 	virtual ~TCPConnection()
@@ -367,8 +368,8 @@ public:
 
 	virtual void OnReceived(const std::string & data) override
 	{
-		LOG4CPLUS_DEBUG(log, GetId() << " OnReceived:" << data);
-		m_module->ConnOnMessage(this, GetId(), data, std::to_string(this->GetId()));
+		LOG4CPLUS_DEBUG(log, " OnReceived:" << data);
+		m_module->ConnOnMessage(this, GetId(), data, log);
 	}
 
 	virtual int Send(const char * lpBuf, int nBufLen) override
@@ -380,7 +381,7 @@ public:
 	{
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		LOG4CPLUS_DEBUG(log, GetId() << " Send:" << sendData);
+		LOG4CPLUS_DEBUG(log, " Send:" << sendData);
 		return TCP::TCPConnection::Send(sendData.c_str(), sendData.length());
 	}
 
@@ -395,12 +396,13 @@ public:
 		:WebSocket::WSConnection(wsi), EPConnection(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.WSConnection");
-		LOG4CPLUS_DEBUG(log, m_SessionId << " construction");
+		log.setAppendName("." + std::to_string(this->GetId()));
+		LOG4CPLUS_DEBUG(log, " construction");
 	};
 
 	~WSConnection()
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << " deconstruct");
+		LOG4CPLUS_DEBUG(log, " deconstruct");
 	}
 
 	virtual void OnOpen() override {
@@ -424,8 +426,8 @@ public:
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		LOG4CPLUS_DEBUG(log, GetId() << " OnMessage:" << message);
-		m_module->ConnOnMessage(this, this->GetId(), message, m_SessionId);
+		LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
+		m_module->ConnOnMessage(this, this->GetId(), message, log);
 	};
 
 	virtual int Send(const char * lpBuf, int nBufLen) override {
@@ -435,7 +437,7 @@ public:
 	virtual int Send(Json::Value send) override {
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		LOG4CPLUS_DEBUG(log, GetId() << " Send:" << sendData);
+		LOG4CPLUS_DEBUG(log, " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
 

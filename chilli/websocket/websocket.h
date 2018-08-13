@@ -58,7 +58,6 @@ namespace WebSocket {
 
 	protected:
 		log4cplus::Logger log;
-		std::string m_SessionId;
 		Status m_state = CONNECTING;
 		virtual void OnOpen();
 		virtual void OnSend();

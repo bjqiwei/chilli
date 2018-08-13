@@ -14,7 +14,7 @@ namespace FreeSwitch{
 
 FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
-	log = log4cplus::Logger::getInstance("chilli.FreeSwitchModule");
+	log = log4cplus::Logger::getInstance("chilli.FSModule");
 	log.setAppendName("." + this->getId());
 	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
 }

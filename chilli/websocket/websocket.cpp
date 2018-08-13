@@ -128,7 +128,7 @@ lwsclose:
 					if (bufLen > 0)
 					{
 						std::string sdata = std::string(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).end());
-						LOG4CPLUS_TRACE(wsclient->log, wsclient->m_SessionId << "Send:" << sdata);
+						LOG4CPLUS_TRACE(wsclient->log, "Send:" << sdata);
 
 						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 						if (len > 0){
@@ -149,7 +149,7 @@ lwsclose:
 				}
 			}
 			else {
-				LOG4CPLUS_DEBUG(This->log, "Close a connection " << (wsclient ? wsclient->m_SessionId : ""));
+				LOG4CPLUS_DEBUG(This->log, "Close a connection ");
 				return -1;
 			}
 		}
@@ -408,10 +408,6 @@ lwsclose:
 
 	WSConnection::WSConnection(const std::string & ws, struct lws_context *ctx) :m_Context(ctx), m_url(ws), wsi(nullptr)
 	{
-		std::stringstream str;
-		str << this << ":";
-		m_SessionId = str.str();
-
 		this->log = log4cplus::Logger::getInstance("wsclient");
 		//LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << m_url);
 		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
@@ -424,9 +420,6 @@ lwsclose:
 
 	WSConnection::WSConnection(struct lws_context *ctx) :m_Context(ctx), wsi(nullptr)
 	{
-		std::stringstream str;
-		str << this << ":";
-		m_SessionId = str.str();
 		this->log = log4cplus::Logger::getInstance("wsclient");
 
 		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
@@ -439,9 +432,6 @@ lwsclose:
 
 	WSConnection::WSConnection(struct lws * _wsi) :m_Context(nullptr), wsi(_wsi)
 	{
-		std::stringstream str;
-		str << this << ":";
-		m_SessionId = str.str();
 		this->log = log4cplus::Logger::getInstance("wsclient");
 
 		//LOG4CPLUS_DEBUG(log, m_SessionId << "wsi:" << wsi);
@@ -477,7 +467,7 @@ lwsclose:
 		strncpy_s(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
 
 		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path)) {
-			LOG4CPLUS_ERROR(log, m_SessionId << " parse uri error.");
+			LOG4CPLUS_ERROR(log, " parse uri error.");
 			return;
 		}
 
@@ -499,7 +489,7 @@ lwsclose:
 		con_info.userdata = this;
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		wsi = lws_client_connect_via_info(&con_info);
-		LOG4CPLUS_TRACE(log, m_SessionId << "wsi:" << wsi);
+		LOG4CPLUS_TRACE(log, "wsi:" << wsi);
 
 		WSClientSet.insert(std::make_pair(wsi, this));
 
@@ -535,7 +525,7 @@ lwsclose:
 			lws_cancel_service(m_Context);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, m_SessionId << " closed");
+			LOG4CPLUS_ERROR(log, " closed");
 		}
 
 		return 0;
@@ -544,33 +534,33 @@ lwsclose:
 
 	void WSConnection::OnOpen()
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << "OnOpen");
+		LOG4CPLUS_DEBUG(log, "OnOpen");
 	}
 
 	void WSConnection::OnSend()
 	{
-		LOG4CPLUS_TRACE(log, m_SessionId << "OnSend");
+		LOG4CPLUS_TRACE(log, "OnSend");
 	}
 
 	void WSConnection::OnClose(const std::string & ErrorCode)
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << "OnClose:" << ErrorCode);
+		LOG4CPLUS_DEBUG(log, "OnClose:" << ErrorCode);
 	}
 
 	void WSConnection::OnError(const std::string & errorCode)
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << "OnError:" << errorCode);
+		LOG4CPLUS_DEBUG(log, "OnError:" << errorCode);
 	}
 
 	void WSConnection::OnMessage(const std::string & message)
 	{
-		LOG4CPLUS_DEBUG(log, m_SessionId << "OnMessage:" << message);
+		LOG4CPLUS_DEBUG(log, "OnMessage:" << message);
 	}
 
 	void WSConnection::SetWSUrl(const std::string & url)
 	{
 		this->m_url = url;
-		LOG4CPLUS_DEBUG(log, m_SessionId << "WS:" << this->m_url);
+		LOG4CPLUS_DEBUG(log, "WS:" << this->m_url);
 	}
 
 	const std::string & WSConnection::GetWSUrl()
