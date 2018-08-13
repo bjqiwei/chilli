@@ -21,6 +21,7 @@ public:
 
 	virtual bool pushEvent(const EventType_t &evt) = 0;
 	virtual void mainEventLoop() = 0;
+	virtual void PushEvent(const EventType_t &evt) final;
 
 	virtual const std::string & getId() final;
 	virtual log4cplus::Logger getLogger()final;

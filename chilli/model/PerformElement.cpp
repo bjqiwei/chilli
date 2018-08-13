@@ -15,6 +15,12 @@ namespace model {
 		
 	}
 
+	void PerformElement::PushEvent(const EventType_t & evt)
+	{
+		if (m_model)
+			m_model->PushEvent(evt);
+	}
+
 	const std::string & PerformElement::getId() {
 		return m_Id;
 	}
