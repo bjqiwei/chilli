@@ -20,16 +20,24 @@ namespace Avaya {
 	void AvayaDevice::fireSend(const std::string &strContent, const void * param)
 	{
 		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		Json::Value jsonData;
+		Json::Reader jsonReader;
+
+		if (!jsonReader.parse(strContent, jsonData)) {
+			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			return;
+		}
+
 		bool bHandled = false;
-		this->processSend(strContent, param, bHandled);
+		this->processSend(jsonData, param, bHandled);
 		
 	}
 
-	void AvayaDevice::processSend(const std::string & strContent, const void * param, bool & bHandled)
+	void AvayaDevice::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 	{
-		m_model->processSend(strContent, param, bHandled, this);
+		m_model->processSend(jsonData, param, bHandled, this);
 		if (!bHandled) {
-			Device::processSend(strContent, param, bHandled);
+			Device::processSend(jsonData, param, bHandled);
 		}
 	}
 

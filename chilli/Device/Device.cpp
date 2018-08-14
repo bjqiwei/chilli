@@ -69,6 +69,11 @@ namespace chilli {
 						sessionId = jsonEvent["param"]["sessionID"].asString();
 					}
 
+					if (sessionId.empty()){
+						LOG4CPLUS_WARN(log, "sessionid is null");
+						return;
+					}
+
 					fsm::TriggerEvent evt(eventName, type);
 
 					for (auto & it : jsonEvent.getMemberNames()) {
@@ -140,13 +145,12 @@ namespace chilli {
 			Json::Value jsonData;
 			Json::Reader jsonReader;
 
-			if (jsonReader.parse(strContent, jsonData)) {
-				bool bHandled = false;
-				processSend(jsonData, param, bHandled);
-			}
-			else {
+			if (!jsonReader.parse(strContent, jsonData)) {
 				LOG4CPLUS_ERROR(log, strContent << " not json data.");
+				return;
 			}
+			bool bHandled = false;
+			processSend(jsonData, param, bHandled);
 		}
 
 	}

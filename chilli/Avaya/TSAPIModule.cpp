@@ -340,15 +340,9 @@ namespace chilli {
 			return bReturnValue;
 		}
 
-		void TSAPIModule::processSend(const std::string & strContent, const void * param, bool & bHandled, model::PerformElement * pe)
+		void TSAPIModule::processSend(Json::Value & jsonEvent, const void * param, bool & bHandled, model::PerformElement * pe)
 		{
 			log4cplus::Logger log = pe->getLogger();
-			Json::Value jsonEvent;
-			Json::Reader jsonReader;
-			if (!jsonReader.parse(strContent, jsonEvent)) {
-				LOG4CPLUS_ERROR(log, this->getId()<< " " << " not json data.");
-				return;
-			}
 
 			std::string eventName;
 			std::string typeName;

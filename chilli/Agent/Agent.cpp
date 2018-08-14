@@ -20,7 +20,7 @@ Agent::~Agent(){
 	LOG4CPLUS_DEBUG(log, " destruction a Agent object.");
 }
 
-void Agent::processSend(const std::string & strContent, const void * param, bool & bHandled)
+void Agent::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 {
 
 }
@@ -28,8 +28,14 @@ void Agent::processSend(const std::string & strContent, const void * param, bool
 void Agent::fireSend(const std::string & strContent,const void * param)
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (!jsonReader.parse(strContent, jsonData)) {
+		LOG4CPLUS_ERROR(log, this->getId() << " " << " not json data.");
+		return;
+	}
 	bool bHandled = false;
-	processSend(strContent, param, bHandled);
+	processSend(jsonData, param, bHandled);
 }
 
 void Agent::Start()

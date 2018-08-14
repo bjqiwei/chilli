@@ -19,16 +19,23 @@ AvayaAgent::~AvayaAgent(){
 void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	Json::Value jsonEvent;
+	Json::Reader jsonReader;
+	if (!jsonReader.parse(strContent, jsonEvent)) {
+		LOG4CPLUS_ERROR(log, this->getId() << " " << " not json data.");
+		return;
+	}
+
 	bool bHandled = false;
-	this->processSend(strContent, param, bHandled);
+	this->processSend(jsonEvent, param, bHandled);
 	
 }
 
-void AvayaAgent::processSend(const std::string & strContent, const void * param, bool & bHandled)
+void AvayaAgent::processSend(Json::Value & jsonEvent, const void * param, bool & bHandled)
 {
-	m_model->processSend(strContent, param, bHandled, this);
+	m_model->processSend(jsonEvent, param, bHandled, this);
 	if (!bHandled) {
-		Agent::processSend(strContent, param, bHandled);
+		Agent::processSend(jsonEvent, param, bHandled);
 	}
 }
 

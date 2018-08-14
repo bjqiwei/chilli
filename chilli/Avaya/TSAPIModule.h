@@ -28,7 +28,7 @@ namespace chilli {
 			bool OpenStream(const char * serviceId, const char * userId, const char * password);		// for opening an ACS Stream
 
 			bool CloseStream();
-			void processSend(const std::string &strContent, const void * param, bool & bHandled, model::PerformElement * pe);
+			void processSend(Json::Value &jsonData, const void * param, bool & bHandled, model::PerformElement * pe);
 			
 			ACSHandle_t m_lAcsHandle = 0;	// Handle for ACS Stream
 			ATTPrivateData_t m_stPrivateData;	// Private Data for using extended features of TSAPI service
