@@ -65,8 +65,8 @@ namespace chilli {
 						eventName = jsonEvent["event"].asString();
 					}
 
-					if (jsonEvent["sessionID"].isString()) {
-						sessionId = jsonEvent["sessionID"].asString();
+					if (jsonEvent["param"]["sessionID"].isString()) {
+						sessionId = jsonEvent["param"]["sessionID"].asString();
 					}
 
 					fsm::TriggerEvent evt(eventName, type);
@@ -110,26 +110,26 @@ namespace chilli {
 			}
 		}
 
-		void Device::processSend(const std::string & strContent, const void * param, bool & bHandled)
+		void Device::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 		{
-			Json::Value jsonData;
-			Json::Reader jsonReader;
-			if (jsonReader.parse(strContent, jsonData)) {
-
-				if (jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
-				{
-					jsonData["param"]["from"] = jsonData["from"];
-					jsonData["param"]["extension"] = jsonData["dest"];
-					jsonData["param"]["event"] = jsonData["event"];
-					jsonData["param"]["type"] = jsonData["type"];
-					chilli::model::EventType_t sendData(jsonData["param"]);
-					this->m_model->PushEvent(sendData);
+	
+			if (jsonData.isObject() && jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
+			{
+				Json::Value newEvent;
+				newEvent["from"] = jsonData["from"];
+				newEvent["id"] = jsonData["dest"];
+				newEvent["event"] = jsonData["event"];
+				newEvent["type"] = jsonData["type"];
+				newEvent["param"] = jsonData["param"];
+			
+				auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
+				if (pe != nullptr) {
+					pe->PushEvent(chilli::model::EventType_t(newEvent));
+				}
+				else {
+					LOG4CPLUS_WARN(log, "not find device:" << newEvent["id"].asString());
 				}
 				bHandled = true;
-		
-			}
-			else {
-				LOG4CPLUS_ERROR(log, strContent << " not json data.");
 			}
 
 		}
@@ -137,8 +137,16 @@ namespace chilli {
 		void Device::fireSend(const std::string &strContent, const void * param)
 		{
 			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
-			bool bHandled = false;
-			processSend(strContent, param, bHandled);
+			Json::Value jsonData;
+			Json::Reader jsonReader;
+
+			if (jsonReader.parse(strContent, jsonData)) {
+				bool bHandled = false;
+				processSend(jsonData, param, bHandled);
+			}
+			else {
+				LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			}
 		}
 
 	}

@@ -22,7 +22,7 @@ namespace Call {
 		virtual void fireSend(const std::string &strContent, const void * param) override;
 
 	protected:
-		void processSend(const std::string &strContent, const void * param, bool & bHandled);
+		void processSend(Json::Value &jsonData, const void * param, bool & bHandled);
 		std::map<std::string, StateMachine> m_StateMachines;
 		const std::string m_SMFileName;
 		helper::CEventBuffer<model::EventType_t> m_EvtBuffer;
