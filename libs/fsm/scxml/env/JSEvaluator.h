@@ -52,6 +52,7 @@
 #include "js/Initialization.h"
 #include "js/StructuredClone.h"
 #include "js/TrackedOptimizationInfo.h"
+#include <exception>
 
 
 namespace fsm
@@ -60,6 +61,20 @@ namespace env
 {
 		
 
+	class jsexception : public std::runtime_error {
+	public:
+		jsexception(const char * what, const char * file, uint32_t line, uint32_t column) :std::runtime_error(what),m_file(file?file:""),m_line(line),m_column(column)
+		{
+
+		}
+		~jsexception()
+		{
+
+		}
+		std::string m_file;
+		uint32_t m_line;
+		uint32_t m_column;
+	};
 	/// <summary>
 	/// Evaluator implementation enabling use of JS expressions 
 	/// 

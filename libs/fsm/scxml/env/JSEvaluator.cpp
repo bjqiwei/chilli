@@ -105,51 +105,10 @@ namespace env
 			JS_GetPendingException(cx, &exception);
 
 		if (!report) {
-			LOG4CPLUS_ERROR(This->log, message);
-			return;
+			throw jsexception(message, 0, 0, 0);
 		}
-
-		std::stringstream ss;
-		ss << (report->filename ? report->filename : "<no filename="">")
-			<< ":" << report->lineno << ":" << report->column << " ";
-
-		if (JSREPORT_IS_WARNING(report->flags)) {
-			ss << (JSREPORT_IS_STRICT(report->flags) ? "strict " : "") << "warning: ";
-		}
-
-		LOG4CPLUS_ERROR(This->log, ss.str());
-
-		if (message)
-			LOG4CPLUS_ERROR(This->log, message);
-
-
-		if (const char16_t* linebuf = report->linebuf()) {
-			size_t n = report->linebufLength();
-
-			std::string buf;
-			for (size_t i = 0; i < n; i++)
-				buf.push_back(static_cast<char>(linebuf[i]));
-
-			LOG4CPLUS_ERROR(This->log, buf);
-
-			//// linebuf usually ends with a newline. If not, add one here.
-			//if (n == 0 || linebuf[n - 1] != '\n')
-			//	fputc('\n', file);
-
-
-			n = report->tokenOffset();
-			buf.clear();
-			for (size_t i = 0, j = 0; i < n; i++) {
-				if (linebuf[i] == '\t') {
-					for (size_t k = (j + 8) & ~7; j < k; j++)
-						buf.push_back('.');
-					continue;
-				}
-				buf.push_back('.');
-				j++;
-			}
-			buf.push_back('^');
-			LOG4CPLUS_ERROR(This->log, buf);
+		else {
+			throw jsexception(message, report->filename, report->lineno, report->column);
 		}
 	}
 }

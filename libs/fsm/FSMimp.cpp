@@ -315,6 +315,8 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 
 bool fsm::StateMachineimp::processTransition(const xmlNodePtr &actionNode)const
 {
+	try{
+
 	model::Transition transition(actionNode,m_strSessionID,m_strStateFile);
 	if (!transition.isEnabledCondition(this->getRootContext()))
 		return false ;
@@ -327,11 +329,23 @@ bool fsm::StateMachineimp::processTransition(const xmlNodePtr &actionNode)const
 	{
 		LOG4CPLUS_ERROR(log, m_strStateFile<<" file,not find the target:" << transition.getTarget() << " state, line:" << actionNode->line);
 	}
+
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return true;
 }
 
 bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 {
+	try
+	{
 	using namespace helper::xml;
 	model::Send send(Node,m_strSessionID,m_strStateFile);
 
@@ -350,12 +364,23 @@ bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 
 		LOG4CPLUS_ERROR(log, " not find the send target:" << send.getTarget());
 	}
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return true;
 }
 
 
 bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 {
+	try{
+
 	if (!Node) return false;
 	model::Timer timer(Node,m_strSessionID,m_strStateFile);
 
@@ -377,11 +402,22 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	
 	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc , const_cast<StateMachineimp *>(this));
 
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return true;
 }
 
 bool fsm::StateMachineimp::processLog(const xmlNodePtr &Node)const
 {
+	try{
+
 	if (!Node) return false;
 	model::Log log(Node,m_strSessionID,m_strStateFile);
 	
@@ -390,12 +426,23 @@ bool fsm::StateMachineimp::processLog(const xmlNodePtr &Node)const
 	}else{
 		return false;
 	}
-	
+
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return true;
 }
 
 bool fsm::StateMachineimp::processScript(const xmlNodePtr &node) const
 {
+	try{
+
 	if (!node) return false;
 	model::Script script(node,m_strSessionID,m_strStateFile);
 
@@ -403,12 +450,23 @@ bool fsm::StateMachineimp::processScript(const xmlNodePtr &node) const
 		script.execute(this->getRootContext());
 		return true;
 	}
-	
+
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return false;
 }
 
 bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 {
+	try{
+
 	if (!node) return false;
 	model::Raise raise(node,m_strSessionID,m_strStateFile);
 
@@ -421,11 +479,23 @@ bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 		return true;
 	}
 
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
+
 	return false;
 }
 
 bool fsm::StateMachineimp::processSleep(const xmlNodePtr &node)const
 {
+	try{
+
 	if (!node) return false;
 	model::Sleep sleep(node,m_strSessionID,m_strStateFile);
 
@@ -434,6 +504,15 @@ bool fsm::StateMachineimp::processSleep(const xmlNodePtr &node)const
 		return true;
 	}
 
+	}
+	catch (fsm::env::jsexception & e)
+	{
+		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+	}
+	catch (std::exception &e)
+	{
+		LOG4CPLUS_ERROR(log, e.what());
+	}
 	return false;
 }
 
