@@ -39,60 +39,31 @@ bool CallModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-void CallModule::processSend(const std::string & strContent, const void * param, bool & bHandled)
+void CallModule::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 {
-	Json::Value jsonData;
-	Json::Reader jsonReader;
-	if (jsonReader.parse(strContent, jsonData)) {
 
-		if (jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
-		{
-			std::string sessionid = jsonData["dest"].asString();
-			std::string otherSessionId;
-			if(jsonData["param"].isMember("otherSessionID") && jsonData["param"]["otherSessionID"].isString())
-				otherSessionId = jsonData["param"]["otherSessionID"].asString();
-
-			if (m_Calls.find(sessionid) == m_Calls.end()) {
-
-				if (m_Calls.find(otherSessionId) != m_Calls.end()){
-					m_Calls[sessionid] = m_Calls[otherSessionId];
-				}
-				else {
-					std::string newCallId = uuid();
-					std::string newConntionID = uuid();
-					model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
-					call->setVar("_callid", newCallId);
-					call->setVar("_connectionid", newConntionID);
-
-					this->addPerformElement(newCallId, call);
-					m_Calls[sessionid] = newCallId;
-				}
-			}
-				
-			auto & call = m_Calls.find(sessionid);
-			jsonData["id"] = call->second;
-
-			chilli::model::EventType_t sendData(jsonData);
-			this->PushEvent(sendData);
-
-			if (jsonData["event"].isString() && jsonData["event"].asString() == "Null")
-				m_Calls.erase(sessionid);
-
-		}
+	if (jsonData["dest"].isString() && jsonData["dest"].asString() != "this")
+	{
+		this->PushEvent(chilli::model::EventType_t(jsonData));
 		bHandled = true;
+	}
 
-	}
-	else {
-		LOG4CPLUS_ERROR(log, strContent << " not json data.");
-	}
+	
 }
 
 
 void CallModule::fireSend(const std::string & strContent, const void * param)
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+	if (!jsonReader.parse(strContent, jsonData)) {
+		LOG4CPLUS_ERROR(log, strContent << " not json data.");
+		return;
+	}
+
 	bool bHandled = false;
-	processSend(strContent, param, bHandled);
+	processSend(jsonData, param, bHandled);
 }
 
 void CallModule::run()
@@ -110,64 +81,65 @@ void CallModule::run()
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 
-					Json::Value jsonEvent = evt.event;
-					if (jsonEvent["type"] == "request")
-					{
-						if (jsonEvent["request"].isString() && 
-							(jsonEvent["request"].asString() == "MakeCall"
-							|| jsonEvent["request"].asString() == "MakeConnection"
-							|| jsonEvent["request"].asString() == "ClearConnection"))
-						{
-							Json::Value session;
-							if (jsonEvent["param"].isMember("initiatedCall"))
-								session = jsonEvent["param"]["initiatedCall"];
-							else if (jsonEvent["param"].isMember("connectionToBeCleared"))
-								session = jsonEvent["param"]["connectionToBeCleared"];
-
-							std::string sessionid = session["sessionID"].asString();
-							std::string newCallId = session["callID"].asString();
-							std::string newConnectionID = session["connectionID"].asString();
-
-							if (m_Calls.find(sessionid) == m_Calls.end()) {
-								model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
-								call->setVar("_callid", newCallId);
-								call->setVar("_connectionid", newConnectionID);
-								this->addPerformElement(newCallId, call);
-								m_Calls[sessionid] = newCallId;
-							}
-
-							auto & call = this->getPerformElement(newCallId);
-
-							jsonEvent["id"] = newCallId;
-							jsonEvent["event"] = jsonEvent["request"];
-							chilli::model::EventType_t sendData(jsonEvent);
-							call->pushEvent(sendData);
-							call->mainEventLoop();
-
-							if (call->IsClosed())
-								this->removePerfromElement(call->getId());
-							
-						}
-
+					Json::Value  & jsonEvent = evt.event;
+					if (jsonEvent["type"] == "request"){
+						jsonEvent["event"] = jsonEvent["request"];
 					}
-					else {
-						
-						std::string peId;
-						if (jsonEvent["id"].isString()) {
-							peId = jsonEvent["id"].asString();
-						}
 
-						auto call = getPerformElement(peId);
+					std::string sessionid; 
+					if (jsonEvent["param"].isMember("sessionID"))
+						sessionid = jsonEvent["param"]["sessionID"].asString();
 
-						if (call != nullptr) {
-							call->pushEvent(evt);
-							call->mainEventLoop();
+					std::string newCallId;
+					if(jsonEvent["param"].isMember("callID"))
+						newCallId = jsonEvent["param"]["callID"].asString();
+
+					std::string newConnectionID;
+					if(jsonEvent["param"].isMember("connectionID"))
+						newConnectionID = jsonEvent["param"]["connectionID"].asString();
+
+					if (sessionid.empty()){
+						LOG4CPLUS_WARN(log, "sessionID is null");
+						continue;
+					}
+					if (m_Calls.find(sessionid) == m_Calls.end()) {
+
+						std::string otherSessionId;
+						if (jsonEvent["param"].isMember("otherSessionID") && jsonEvent["param"]["otherSessionID"].isString())
+							otherSessionId = jsonEvent["param"]["otherSessionID"].asString();
+
+						if (m_Calls.find(otherSessionId) != m_Calls.end()) {
+							m_Calls[sessionid] = m_Calls[otherSessionId];
 						}
 						else {
-							LOG4CPLUS_WARN(log, " not find call:" << peId);
+							if (newCallId.empty())
+								newCallId = uuid();
+							if (newConnectionID.empty())
+								newConnectionID = uuid();
+
+							model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
+							call->setVar("_callid", newCallId);
+							call->setVar("_connectionid", newConnectionID);
+							this->addPerformElement(newCallId, call);
+							m_Calls[sessionid] = newCallId;
 						}
 					}
 
+					newCallId = m_Calls[sessionid];
+
+					auto & call = this->getPerformElement(newCallId);
+
+					jsonEvent["id"] = newCallId;
+						
+						
+					call->pushEvent(chilli::model::EventType_t(jsonEvent));
+					call->mainEventLoop();
+
+					if (call->IsClosed())
+						this->removePerfromElement(call->getId());
+					
+					if (jsonEvent["event"].isString() && jsonEvent["event"].asString() == "Null")
+						m_Calls.erase(sessionid);
 				}
 			}
 			catch (std::exception & e)

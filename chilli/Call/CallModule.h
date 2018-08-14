@@ -14,7 +14,7 @@ public:
 	virtual bool LoadConfig(const std::string & configContext) override;
 
 protected:
-	void processSend(const std::string &strContent, const void * param, bool & bHandled);
+	void processSend(Json::Value &jsonData, const void * param, bool & bHandled);
 private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;

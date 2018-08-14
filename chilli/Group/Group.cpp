@@ -19,35 +19,24 @@ namespace Group {
 		LOG4CPLUS_DEBUG(log, " destruction a group object.");
 	}
 
-	void Group::processSend(const std::string & strContent, const void * param, bool & bHandled)
+	void Group::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 	{
-		Json::Value jsonData;
-		Json::Reader jsonReader;
-		if (jsonReader.parse(strContent, jsonData)) {
-
-			jsonData["param"]["from"] = jsonData["from"];
-			jsonData["param"]["extension"] = jsonData["dest"];
-			jsonData["param"]["event"] = jsonData["event"];
-			jsonData["param"]["type"] = jsonData["type"];
-			chilli::model::EventType_t sendData(jsonData["param"]);
-			this->m_model->PushEvent(sendData);
-			bHandled = true;
-
-		}
-		else {
-			LOG4CPLUS_ERROR(log, " " << strContent << " not json data.");
-		}
-
-		if (!bHandled) {
-			Device::processSend(strContent, param, bHandled);
-		}
+		return Device::processSend(jsonData, param, bHandled);	
 	}
 
 	void Group::fireSend(const std::string &strContent, const void * param)
 	{
 		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		Json::Value jsonData;
+		Json::Reader jsonReader;
+
+		if (!jsonReader.parse(strContent, jsonData)) {
+			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			return;
+		}
+
 		bool bHandled = false;
-		this->processSend(strContent, param, bHandled);
+		this->processSend(jsonData, param, bHandled);
 	}
 
 }
