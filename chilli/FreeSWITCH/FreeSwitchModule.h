@@ -23,6 +23,8 @@ namespace FreeSwitch{
 		bool MakeConnection(Json::Value & param, log4cplus::Logger & log);
 		bool ClearConnection(Json::Value & param, log4cplus::Logger & log);
 		bool StartRecord(Json::Value & param, log4cplus::Logger & log);
+		bool Divert(Json::Value &param, log4cplus::Logger & log);
+		bool PlayFile(Json::Value & param, log4cplus::Logger & log);
 	private:
 		std::thread m_Thread;
 		std::string m_Host;

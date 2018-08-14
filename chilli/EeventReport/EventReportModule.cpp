@@ -119,6 +119,9 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			requestid = request["request"].asString();
 
 		if (requestid == "heartBeat") {
+
+			LOG4CPLUS_TRACE(log, " OnMessage:" << message);
+
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
@@ -286,6 +289,43 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 				c->second->Send(response);
 			return;
 
+		}
+		else if (requestid == "PlayFile")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = request["request"];
+			response["status"] = 0;
+
+			if (request["param"]["connection"].isObject()) {
+				if (request["param"]["connection"]["deviceID"].isString()) {
+					std::string deviceid = request["param"]["connection"]["deviceID"].asString();
+					auto & it = this->getPerformElementByGlobal(deviceid);
+					if (it != nullptr) {
+
+						auto & c = m_Connections.find(id);
+						if (c != m_Connections.end())
+							c->second->Send(response);
+
+						request["param"]["sessionID"] = request["param"]["connection"]["sessionID"];
+						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
+						request["param"]["callID"] = request["param"].removeMember("connection")["callID"];
+						request["cmd"] = request.removeMember("request");
+						request["event"] = "cmd";
+						request["id"] = deviceid;
+						model::EventType_t evt(request);
+						it->PushEvent(evt);
+						return;
+					}
+				}
+			}
+
+			response["status"] = chilli::INVALID_CALL;
+			auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+			return;
 		}
 
 		else {
@@ -472,7 +512,7 @@ public:
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
+		//LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
 		m_module->ConnOnMessage(this, this->GetId(), message, log);
 	};
 

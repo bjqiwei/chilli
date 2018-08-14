@@ -148,32 +148,7 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 	}
 	else if (eventName == "DivertCall")
 	{
-		std::string called = "";
-		std::string sessionId = "";
-		std::string display = "";
-
-		if (jsonData["param"]["called"].isString())
-			called = jsonData["param"]["called"].asString();
-
-		if (jsonData["param"]["display"].isString())
-			display = jsonData["param"]["display"].asString();
-
-		if (jsonData["param"]["sessionID"].isString())
-			sessionId = jsonData["param"]["sessionID"].asString();
-
-		if (called.length() < 5) {
-			called = "sofia/internal/" + called + "%192.168.2.232";
-		}
-		else {
-			called = "sofia/external/" + called + "@192.168.2.220";
-		}
-
-		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
-
-		esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_execute:bridge " << called << ", status:" << status);
-
-		bHandled = true;
+		bHandled = Divert(jsonData["param"], log);
 	}
 	else if (eventName == "StartRecord")
 	{
@@ -378,6 +353,50 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 	return true;
 }
 
+bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string called = "";
+	std::string sessionId = "";
+	std::string display = "";
+
+	if (param["called"].isString())
+		called = param["called"].asString();
+
+	if (param["display"].isString())
+		param["display"].asString();
+
+	if (param["sessionID"].isString())
+		param["sessionID"].asString();
+
+	if (called.length() < 5) {
+		called = "sofia/internal/" + called + "%192.168.2.232";
+	}
+	else {
+		called = "sofia/external/" + called + "@192.168.2.220";
+	}
+
+	esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_execute:bridge " << called << ", status:" << status);
+
+	return true;
+}
+
+bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId;
+	std::string filename;
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	if (param["filename"].isString())
+		filename = param["filename"].asString();
+
+	esl_status_t status = esl_execute(&m_Handle, "playback", filename.c_str(), sessionId.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_execute:playback " << filename << ", status:" << status);
+	return true;
+}
+
 void esl_logger(const char *file, const char *func, int line, int level, const char *fmt, ...)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("esl_log");
@@ -469,7 +488,8 @@ void FreeSwitchModule::ConnectFS()
 							|| eventName == "CHANNEL_DESTROY"
 							|| eventName == "CHANNEL_OUTGOING"
 							|| eventName == "CHANNEL_ORIGINATE"
-							|| eventName == "CHANNEL_EXECUTE")
+							|| eventName == "CHANNEL_EXECUTE"
+							|| eventName == "CHANNEL_EXECUTE_COMPLETE")
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");
@@ -506,6 +526,8 @@ void FreeSwitchModule::ConnectFS()
 							event.removeMember("Presence-Call-Direction");
 							event.removeMember("Channel-State-Number");
 
+							if (eventName == "CHANNEL_EXECUTE_COMPLETE")
+								eventName = event["Application"].asString();
 
 							std::string caller = event["Caller-ANI"].asString();
 							std::string called = event["Caller-Destination-Number"].asString();
@@ -533,7 +555,6 @@ void FreeSwitchModule::ConnectFS()
 							}
 							
 							evt.event["id"] = m_Session_DeviceId[sessionId];
-				
 							evt.event["event"] = eventName;
 							evt.event["param"]["sessionID"] = sessionId;
 

@@ -10,6 +10,9 @@
 	<data id="cause" expr="0"/>
 	<data id="FSCause" expr="null"/>
 	<data id="CallDirection"/>
+	<data id="_connectionid"/>
+	<data id="_callid"/>
+	<data id="_filename"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -19,7 +22,9 @@
 		FSCause["USER_NOT_REGISTERED"] = 1066;
 		FSCause["USER_BUSY"] = 1017;
 		FSCause["CALL_REJECTED"] = 1021;
+		FSCause["FILE NOT FOUND"] = 1401,
 		FSCause["NORMAL_CLEARING"] = 0;
+		FSCause["FILE PLAYED"]=0;
 	</script>
 </scriptmodel>
 	<state id="Null">
@@ -79,7 +84,7 @@
 			</event>
 			
 			<event event="cmd" cond="_event.cmd=='ClearConnection'">
-				<send target="this" type="cmd" destexpr="_event.param.sessionID" event="ClearConnection">
+				<send target="this" type="cmd" dest="this" event="ClearConnection">
 					<deviceID type="script">_device.deviceID</deviceID>
 					<sessionID type="script">_event.param.sessionID</sessionID>
 				</send>
@@ -108,9 +113,33 @@
 					<transition target="Hangup"/>
 				</event>
 				
+				<event event="cmd" cond="_event.cmd=='PlayFile'">
+					<send target="this" type="cmd" dest="this" event="PlayFile">
+						<filename type="script">_event.param.filename</filename>
+						<sessionID type="script">_event.param.sessionID</sessionID>
+					</send>
+					<transition target="Playing"/>
+				</event>
 				<state id="Held">
 				</state>
-			
+				<state id="Playing">
+					<onentry>
+						<script>
+							_filename = _event.param.filename;
+							_connectionid = _event.param.connectionID;
+							_callid = _event.param.callID;
+						</script>
+					</onentry>
+					<event event="cmd" cond="_event.cmd =='PlayFile'">
+					</event>
+					<event event="playback">
+						<send target="eventreport" type="event" event="PlayFileEnd">
+							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
+						</send>
+						<transition target="Connected"/>
+					</event>
+				</state>
 			</state>
 			
 			<state id="Hangup">

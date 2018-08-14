@@ -37,13 +37,17 @@ namespace FreeSwitch {
 
 	void FreeSwitchDevice::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 	{
-		if (jsonData["cmd"].asString() == "ClearConnection")
+		if (jsonData["event"].asString() == "ClearConnection")
 		{
-			m_model->ClearConnection(jsonData["param"], this->log);
+			bHandled = m_model->ClearConnection(jsonData["param"], this->log);
 		}
-		if (jsonData["cmd"].asString() == "StartRecord")
+		if (jsonData["event"].asString() == "StartRecord")
 		{
-			m_model->StartRecord(jsonData["param"], this->log);
+			bHandled = m_model->StartRecord(jsonData["param"], this->log);
+		}
+		if (jsonData["event"].asString() == "PlayFile")
+		{
+			bHandled = m_model->PlayFile(jsonData["param"], this->log);
 		}
 		else
 			m_model->processSend(jsonData, param, bHandled, log);
