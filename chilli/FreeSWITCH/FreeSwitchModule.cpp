@@ -97,127 +97,54 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	Json::Value jsonData;
+	Json::Reader jsonReader;
+
+	if (!jsonReader.parse(strContent, jsonData)) {
+		LOG4CPLUS_ERROR(log, strContent << " not json data.");
+		return;
+	}
+
 	bool bHandled = false;
-	this->processSend(strContent, param, bHandled, log);
+	this->processSend(jsonData, param, bHandled, log);
 
 }
 
-void FreeSwitchModule::processSend(const std::string & strContent, const void * param, bool & bHandled, log4cplus::Logger & log)
+void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, bool & bHandled, log4cplus::Logger & log)
 {
-	Json::Value jsonEvent;
-	Json::Reader jsonReader;
-	if (!jsonReader.parse(strContent, jsonEvent) || !jsonEvent.isObject()) {
-		LOG4CPLUS_ERROR(log, " " << strContent << " not json object.");
-		return;
-	}
+
 
 	std::string eventName;
 	std::string typeName;
 	std::string dest;
 
-	if (jsonEvent["type"].isString()) {
-		typeName = jsonEvent["type"].asString();
+	if (jsonData["type"].isString()) {
+		typeName = jsonData["type"].asString();
 	}
 
 	if (typeName != "cmd") {
 		return;
 	}
 
-	if (jsonEvent["dest"].isString()) {
-		dest = jsonEvent["dest"].asString();
+	if (jsonData["dest"].isString()) {
+		dest = jsonData["dest"].asString();
 	}
 
-	if (jsonEvent["event"].isString()) {
-		eventName = jsonEvent["event"].asString();
+	if (jsonData["event"].isString()) {
+		eventName = jsonData["event"].asString();
 	}
 
 	if (eventName == "MakeCall")
 	{
-		std::string caller = "";
-		std::string called = "";
-		std::string sessionId = "";
-		std::string display = "";
-
-		if (jsonEvent["param"]["caller"].isString())
-			caller = jsonEvent["param"]["caller"].asString();
-
-		if (jsonEvent["param"]["called"].isString())
-			called = jsonEvent["param"]["called"].asString();
-
-		if (jsonEvent["param"]["display"].isString())
-			display = jsonEvent["param"]["display"].asString();
-		else
-			display = caller;
-
-		if (jsonEvent["param"]["sessionID"].isString())
-			sessionId = jsonEvent["param"]["sessionID"].asString();
-
-		m_Session_DeviceId[sessionId] = caller;
-
-		if (caller.length() < 5){
-			caller = "sofia/internal/" + caller + "%192.168.2.232";
-		}
-		else {
-			caller = "sofia/external/" + caller + "@192.168.2.220";
-		}
-
-		if (called.length() < 5){
-			called = "sofia/internal/" + called + "%192.168.2.232";
-		}
-		else {
-			called = "sofia/external/" + called + "@192.168.2.220";
-		}
-
-		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
-
-		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
-
-		bHandled = true;
+		bHandled = MakeCall(jsonData["param"], log);
 	}
 	else if (eventName == "MakeConnection")
 	{
-		std::string called = "";
-		std::string sessionId = "";
-		std::string display = "";
-
-		if (jsonEvent["param"]["called"].isString())
-			called = jsonEvent["param"]["called"].asString();
-
-		if (jsonEvent["param"]["display"].isString())
-			display = jsonEvent["param"]["display"].asString();
-
-		if (jsonEvent["param"]["sessionID"].isString())
-			sessionId = jsonEvent["param"]["sessionID"].asString();
-
-		m_Session_DeviceId[sessionId] = called;
-
-		if (called.length() < 5) {
-			called = "sofia/internal/" + called + "%192.168.2.232";
-		}
-		else {
-			called = "sofia/external/" + called + "@192.168.2.220";
-		}
-
-		std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
-
-		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
-
-		bHandled = true;
+		bHandled = MakeConnection(jsonData["param"], log);
 	}
 	else if (eventName == "ClearConnection")
 	{
-		std::string sessionId = "";
-
-		if (jsonEvent["param"]["sessionID"].isString())
-			sessionId = jsonEvent["param"]["sessionID"].asString();
-
-		std::string cmd = "bgapi uuid_kill " + sessionId;
-		esl_send(&m_Handle, cmd.c_str());
-		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
-		bHandled = true;
+		bHandled = ClearConnection(jsonData["param"], log);
 	}
 	else if (eventName == "DivertCall")
 	{
@@ -225,14 +152,14 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string sessionId = "";
 		std::string display = "";
 
-		if (jsonEvent["param"]["called"].isString())
-			called = jsonEvent["param"]["called"].asString();
+		if (jsonData["param"]["called"].isString())
+			called = jsonData["param"]["called"].asString();
 
-		if (jsonEvent["param"]["display"].isString())
-			display = jsonEvent["param"]["display"].asString();
+		if (jsonData["param"]["display"].isString())
+			display = jsonData["param"]["display"].asString();
 
-		if (jsonEvent["param"]["sessionID"].isString())
-			sessionId = jsonEvent["param"]["sessionID"].asString();
+		if (jsonData["param"]["sessionID"].isString())
+			sessionId = jsonData["param"]["sessionID"].asString();
 
 		if (called.length() < 5) {
 			called = "sofia/internal/" + called + "%192.168.2.232";
@@ -250,19 +177,7 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 	}
 	else if (eventName == "StartRecord")
 	{
-		std::string uuid = "";
-		std::string filename = "";
-
-		if (jsonEvent["param"]["ConnectionID"].isString())
-			uuid = jsonEvent["param"]["ConnectionID"].asString();
-
-		if (jsonEvent["param"]["filename"].isString())
-			filename = jsonEvent["param"]["filename"].asString();
-
-		std::string cmd = "bgapi uuid_record " + uuid + " start " + filename;
-		esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-		LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
-		bHandled = true;
+		bHandled = StartRecord(jsonData["param"], log);
 	}
 	else if (eventName == "TransferAgent")
 	{
@@ -270,14 +185,14 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		std::string origcaller = "";
 		std::string agentid = "";
 
-		if (jsonEvent["param"]["ConnectionID"].isString())
-			uuid = jsonEvent["param"]["ConnectionID"].asString();
+		if (jsonData["param"]["ConnectionID"].isString())
+			uuid = jsonData["param"]["ConnectionID"].asString();
 
-		if (jsonEvent["param"]["origcaller"].isString())
-			origcaller = jsonEvent["param"]["origcaller"].asString();
+		if (jsonData["param"]["origcaller"].isString())
+			origcaller = jsonData["param"]["origcaller"].asString();
 
-		if (jsonEvent["param"]["agentId"].isString())
-			agentid = jsonEvent["param"]["agentId"].asString();
+		if (jsonData["param"]["agentId"].isString())
+			agentid = jsonData["param"]["agentId"].asString();
 
 		static std::string lastAgent;
 		std::string findAgent;
@@ -355,6 +270,114 @@ void FreeSwitchModule::processSend(const std::string & strContent, const void * 
 		*/
 	}
 }
+bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string caller = "";
+	std::string called = "";
+	std::string sessionId = "";
+	std::string display = "";
+
+	if (param["caller"].isString())
+		caller = param["caller"].asString();
+
+	if (param["called"].isString())
+		called = param["called"].asString();
+
+	if (param["display"].isString())
+		display = param["display"].asString();
+	else
+		display = caller;
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	m_Session_DeviceId[sessionId] = caller;
+
+	if (caller.length() < 5) {
+		caller = "sofia/internal/" + caller + "%192.168.2.232";
+	}
+	else {
+		caller = "sofia/external/" + caller + "@192.168.2.220";
+	}
+
+	if (called.length() < 5) {
+		called = "sofia/internal/" + called + "%192.168.2.232";
+	}
+	else {
+		called = "sofia/external/" + called + "@192.168.2.220";
+	}
+
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
+
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+
+	return true;
+
+}
+bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string called = "";
+	std::string sessionId = "";
+	std::string display = "";
+
+	if (param["called"].isString())
+		called = param["called"].asString();
+
+	if (param["display"].isString())
+		display = param["display"].asString();
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	m_Session_DeviceId[sessionId] = called;
+
+	if (called.length() < 5) {
+		called = "sofia/internal/" + called + "%192.168.2.232";
+	}
+	else {
+		called = "sofia/external/" + called + "@192.168.2.220";
+	}
+
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
+
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	return true;
+
+}
+bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId = "";
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	std::string cmd = "bgapi uuid_kill " + sessionId;
+	esl_send(&m_Handle, cmd.c_str());
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+
+	return true;
+}
+
+bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
+{
+	std::string uuid = "";
+	std::string filename = "";
+
+	if (param["ConnectionID"].isString())
+		uuid = param["ConnectionID"].asString();
+
+	if (param["filename"].isString())
+		filename = param["filename"].asString();
+
+	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename;
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	return true;
+}
+
 void esl_logger(const char *file, const char *func, int line, int level, const char *fmt, ...)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("esl_log");
@@ -421,47 +444,6 @@ void FreeSwitchModule::ConnectFS()
 		esl_send(&m_Handle, "nixevent json API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
 		LOG4CPLUS_DEBUG(log, " " << m_Handle.last_sr_reply);
 
-		/*
-		for (auto &it : this->GetExtensions()) {
-			if (typeid(*it.second) == typeid(FreeSwitchExtension))
-			{
-
-				std::string cmd = "bgapi sofia status profile internal reg ";
-				cmd.append(it.first);
-				LOG4CPLUS_DEBUG(log, " send:" << cmd);
-				if (ESL_SUCCESS == esl_send_recv_timed(&handle, cmd.c_str(), 2000)) {
-					LOG4CPLUS_DEBUG(log, handle.last_sr_event->body);
-					std::string response = handle.last_sr_event->body;
-
-					if (response.length() < 300)
-						continue;
-					
-					model::EventType_t evt;
-					evt.event["id"] = it.first;
-					evt.event["event"] = "GetStatus";
-					std::string name = "Status:";
-					size_t start = response.find(name);				
-					if (start != std::string::npos) {
-						response = response.substr(start + name.length());
-						helper::string::ltrim(response);
-						std::string value = response.substr(0,response.find_first_of("(\n"));
-						evt.event["Status"] = value;
-					}
-
-					response = handle.last_sr_event->body;
-					name = "Auth-User:";
-					start = response.find(name);
-					if (start != std::string::npos) {
-						response = response.substr(start + name.length());
-						helper::string::ltrim(response);
-						std::string value = response.substr(0, response.find_first_of("(\n"));
-						evt.event["Auth-User"] = value;
-					}
-					this->PushEvent(evt);
-				}
-			}
-		}
-		*/
 		while (m_bRunning){
 			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, true, NULL);
 			if (status == ESL_SUCCESS){
@@ -473,7 +455,7 @@ void FreeSwitchModule::ConnectFS()
 
 						std::string eventName;
 						if (event["Event-Name"].isString()) {
-							eventName = event["Event-Name"].asString();
+							eventName = event.removeMember("Event-Name").asString();
 						}
 
 						LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
@@ -534,13 +516,13 @@ void FreeSwitchModule::ConnectFS()
 								std::string newvarname = varname;
 								if (newvarname.find("variable_") == std::string::npos) {
 									helper::string::replaceString(newvarname, "-", "");
-									evt.event[newvarname] = event[varname];
+									evt.event["param"][newvarname] = event[varname];
 								}
 							}
 
 
 							
-							std::string sessionId = evt.event.removeMember("UniqueID").asString();
+							std::string sessionId = evt.event["param"].removeMember("UniqueID").asString();
 
 							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
 								if (dir == "inbound")
@@ -552,8 +534,8 @@ void FreeSwitchModule::ConnectFS()
 							
 							evt.event["id"] = m_Session_DeviceId[sessionId];
 				
-							evt.event["event"] = evt.event["EventName"];
-							evt.event["sessionID"] = sessionId;
+							evt.event["event"] = eventName;
+							evt.event["param"]["sessionID"] = sessionId;
 
 							//Channel _ Create：通道创建事件
 							//Channel _ Progress：通道振铃事件
@@ -603,6 +585,10 @@ void FreeSwitchModule::run()
 						peId = jsonEvent["id"].asString();
 					}
 
+					if (peId.empty()){
+						LOG4CPLUS_WARN(log, " not find device:" << peId);
+						continue;
+					}
 
 
 					if (this->getPerformElement(peId) == nullptr) {
@@ -615,6 +601,7 @@ void FreeSwitchModule::run()
 									peptr->setVar("_device.deviceID", peId);
 								}
 
+								break;
 							}
 						}
 

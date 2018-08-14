@@ -28,28 +28,30 @@
 		</event>
 			
 		<event event="CHANNEL_DESTROY">
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Failed">
+			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
 				<cause type="script">cause=FSCause["USER_NOT_REGISTERED"];</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_event.sessionID</sessionID>
+				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
 			<transition target="Destroy"/>
 		</event>
 		
+		<event event="CHANNEL_HANGUP">
+			<transition target="Hangup"/>
+		</event>
 		
 		<state id="Initiated">
 			<onentry>
-				<script>sessionID = _event.sessionID; caller = _event.CallerOrigCallerIDNumber; called =_event.CallerDestinationNumber; CallDirection = _event.CallDirection;</script>
-				<!--
+				<script>sessionID = _event.param.sessionID; caller = _event.param.CallerOrigCallerIDNumber; called =_event.param.CallerDestinationNumber; CallDirection = _event.param.CallDirection;</script>
 				<send target="call001" type="event" destexpr="sessionID" event="Initiated">
 					<sessionID type="script">sessionID</sessionID>
 					<deviceID type="script">_device.deviceID</deviceID>
-					<otherSessionID type="script">_event.OtherLegUniqueID</otherSessionID>
+					<otherSessionID type="script">_event.param.OtherLegUniqueID</otherSessionID>
 					<caller type="script">caller</caller>
 					<called type="script">called</called>
-					<dir type="script">_event.CallDirection</dir>
+					<dir type="script">_event.param.CallDirection</dir>
 				</send>
-				-->
+	
 			</onentry>
 			
 			<event event="CHANNEL_HANGUP">
@@ -61,21 +63,27 @@
 			</event>
 			
 			<event event="CHANNEL_ANSWER">
-				<send target="call001" type="event" destexpr="_event.sessionID" event="Connected">
+				<send target="call001" type="event" destexpr="_event.param.sessionID" event="Connected">
 					<deviceID type="script">_device.deviceID</deviceID>
-					<sessionID type="script">_event.sessionID</sessionID>
+					<sessionID type="script">_event.param.sessionID</sessionID>
 				</send>
 				<transition target="Connected"/>
 			</event>
 			
 			<event event="CHANNEL_PROGRESS">
-				<send target="call001" type="event" destexpr="_event.sessionID" event="Alerting">
+				<send target="call001" type="event" destexpr="_event.param.sessionID" event="Alerting">
 					<deviceID type="script">_device.deviceID</deviceID>
-					<sessionID type="script">_event.sessionID</sessionID>
+					<sessionID type="script">_event.param.sessionID</sessionID>
 				</send>
 				<transition target="Alerting"/>
 			</event>
 			
+			<event event="cmd" cond="_event.cmd=='ClearConnection'">
+				<send target="this" type="cmd" destexpr="_event.param.sessionID" event="ClearConnection">
+					<deviceID type="script">_device.deviceID</deviceID>
+					<sessionID type="script">_event.param.sessionID</sessionID>
+				</send>
+			</event>
 			<state id="Alerting">
 				<onentry>
 				</onentry>
@@ -91,9 +99,9 @@
 				<onentry>
 				</onentry>
 				<event event="CHANNEL_BRIDGE">
-					<send target="call001" type="event" destexpr="_event.sessionID" event="Bridge">
+					<send target="call001" type="event" destexpr="_event.param.sessionID" event="Bridge">
 						<deviceID type="script">_device.deviceID</deviceID>
-						<sessionID type="script">_event.sessionID</sessionID>
+						<sessionID type="script">_event.param.sessionID</sessionID>
 					</send>
 				</event>
 				<event event="CHANNEL_HANGUP">
@@ -107,10 +115,10 @@
 			
 			<state id="Hangup">
 				<onentry>
-					<send cond="_event.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.sessionID" event="Failed">
-						<cause type="script">cause = FSCause[_event.HangupCause]</cause>
+					<send cond="_event.param.HangupCause !== 'NORMAL_CLEARING'" target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
+						<cause type="script">cause = FSCause[_event.param.HangupCause]</cause>
 						<deviceID type="script">_device.deviceID</deviceID>
-						<sessionID type="script">_event.sessionID</sessionID>
+						<sessionID type="script">_event.param.sessionID</sessionID>
 					</send>
 				</onentry>
 		</state>
@@ -118,10 +126,10 @@
 	</state>
 	<state id="Destroy">
 		<onentry>
-			<send target="call001" type="event" destexpr="_event.sessionID" event="Null">
+			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Null">
 				<cause type="script">cause</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
-				<sessionID type="script">_event.sessionID</sessionID>
+				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
 		</onentry>
 	</state>

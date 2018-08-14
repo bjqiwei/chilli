@@ -16,32 +16,27 @@
 			<script>sessionlist = {};</script>
 		</onentry>
 		<event event="MakeCall">
-			<script>caller = _event.param.callingDevice; called = _event.param.calledDirectoryNumber;</script>
-			<send target="freeswitch001" type="cmd" destexpr="_event.param.callingDevice" event="MakeCall">
-				<caller type="script">_event.param.callingDevice</caller>
-				<called type="script">_event.param.calledDirectoryNumber</called>
-				<display type="script">_event.param.callingDevice</display>
-				<sessionID type="script">_event.param.initiatedCall.sessionID</sessionID>
+			<script>caller = _event.param.caller; called = _event.param.called;</script>
+			<send target="freeswitch001" type="cmd" dest="this" event="MakeCall">
+				<caller type="script">_event.param.caller</caller>
+				<called type="script">_event.param.called</called>
+				<display type="script">_event.param.caller</display>
+				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
-			<script>sessionlist[_event.param.initiatedCall.sessionID]={};</script>
+			<script>sessionlist[_event.param.sessionID]={};</script>
 		</event>
 		
 		<event event="MakeConnection">
-			<script>called = _event.param.initiatingDevice;</script>
-			<send target="freeswitch001" type="cmd" destexpr="called" event="MakeConnection">
-				<called type="script">_event.param.initiatingDevice</called>
-				<display type="script"></display>
-				<sessionID type="script">_event.param.initiatedCall.sessionID</sessionID>
+			<script>called = _event.param.called;</script>
+			<send target="freeswitch001" type="cmd" dest="this" event="MakeConnection">
+				<called type="script">_event.param.called</called>
+				<display type="script">_event.param.called</display>
+				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
-			<script>sessionlist[_event.param.initiatedCall.sessionID]={};</script>
+			<script>sessionlist[_event.param.sessionID]={};</script>
 			<transition target="Originated"/>
 		</event>
 		
-		<event event="ClearConnection">
-			<send target="freeswitch001" type="cmd" destexpr="called" event="ClearConnection">
-				<sessionID type="script">_event.param.connectionToBeCleared.sessionID</sessionID>
-			</send>
-		</event>
 		<event event="Failed">
 			<send target="eventreport" type="event" event="Failed">
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
@@ -54,10 +49,12 @@
 		</event>
 		
 		<event event="Initiated">
+			<!--
 			<send target="eventreport" type="event" event="ServiceInitiated">
 				<initiatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</initiatedConnection>
 				<initiatingDevice type="script">_event.param.deviceID</initiatingDevice>
 			</send>
+			-->
 			
 			<transition target="Pending"/>
 		</event>
@@ -83,7 +80,21 @@
 				</send>
 				<transition target="Originated"/>
 			</event>
+			<event event="Alerting">
+				<send target="eventreport" type="event" event="Received">
+					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
+					<alertingDevice type="script">_event.param.deviceID</alertingDevice>
+					<callingDevice type="script">caller</callingDevice>
+					<calledDevice type="script">called</calledDevice>
+				</send>
+			</event>
 			<event event="Connected">
+			
+				<send target="eventreport" type="event" event="Answered">
+					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
+					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+				</send>
+				
 				<send target="eventreport" type="event" event="Originated">
 					<originatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</originatedConnection>
 					<callingDevice type="script">caller</callingDevice>
@@ -173,6 +184,8 @@
 			<onentry>
 				<transition cond="sessionlist.empty()" target="Destroy"></transition>
 			</onentry>
+			<event event="Failed">
+			</event>
 		</state>
     </state>
 	<state id="Destroy">

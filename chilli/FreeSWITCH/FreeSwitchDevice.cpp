@@ -22,16 +22,34 @@ namespace FreeSwitch {
 	void FreeSwitchDevice::fireSend(const std::string &strContent, const void * param)
 	{
 		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		Json::Value jsonData;
+		Json::Reader jsonReader;
+
+		if (!jsonReader.parse(strContent, jsonData)) {
+			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			return;
+		}
+
 		bool bHandled = false;
-		this->processSend(strContent, param, bHandled);
+		this->processSend(jsonData, param, bHandled);
 		
 	}
 
-	void FreeSwitchDevice::processSend(const std::string & strContent, const void * param, bool & bHandled)
+	void FreeSwitchDevice::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
 	{
-		m_model->processSend(strContent, param, bHandled, this->getLogger());
+		if (jsonData["cmd"].asString() == "ClearConnection")
+		{
+			m_model->ClearConnection(jsonData["param"], this->log);
+		}
+		if (jsonData["cmd"].asString() == "StartRecord")
+		{
+			m_model->StartRecord(jsonData["param"], this->log);
+		}
+		else
+			m_model->processSend(jsonData, param, bHandled, log);
+
 		if (!bHandled) {
-			Device::processSend(strContent, param, bHandled);
+			Device::processSend(jsonData, param, bHandled);
 		}
 	}
 
