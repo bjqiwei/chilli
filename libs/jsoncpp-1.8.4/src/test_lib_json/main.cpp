@@ -1730,10 +1730,10 @@ struct WriterTest : JsonTest::TestCase {};
 JSONTEST_FIXTURE(WriterTest, dropNullPlaceholders) {
   Json::FastWriter writer;
   Json::Value nullValue;
-  JSONTEST_ASSERT(writer.write(nullValue) == "null\n");
+  JSONTEST_ASSERT(writer.write(nullValue) == "null");
 
   writer.dropNullPlaceholders();
-  JSONTEST_ASSERT(writer.write(nullValue) == "\n");
+  JSONTEST_ASSERT(writer.write(nullValue) == "");
 }
 
 struct StreamWriterTest : JsonTest::TestCase {};
