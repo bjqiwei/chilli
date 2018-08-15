@@ -130,7 +130,7 @@ void CallModule::run()
 
 					newCallId = m_Calls[sessionid];
 
-					auto & call = this->getPerformElement(newCallId);
+					const auto & call = this->getPerformElement(newCallId);
 
 					jsonEvent["id"] = newCallId;
 						

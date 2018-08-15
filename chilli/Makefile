@@ -14,6 +14,7 @@ SRC = ./
 ACDSRC = ./ACD/
 AgentSRC= ./Agent/
 AvayaSRC= ./Avaya/
+CallSRC= ./Call/
 
 INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
 
@@ -21,6 +22,7 @@ OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
 Agent_OBJ_DIR = $(OBJ_DIR)Agent/
 Avaya_OBJ_DIR = $(OBJ_DIR)Avaya/
+Call_OBJ_DIR = $(OBJ_DIR)Call/
 
 
 CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
@@ -34,8 +36,8 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(ACD_OBJ_DIR)ACDModule.o $(ACD_OBJ_DIR)ACDDevice.o\
 	  $(Agent_OBJ_DIR)AgentModule.o $(Agent_OBJ_DIR)Agent.o\
       $(Avaya_OBJ_DIR)AvayaACD.o $(Avaya_OBJ_DIR)AvayaAgent.o $(Avaya_OBJ_DIR)AvayaDevice.o $(Avaya_OBJ_DIR)AvayaAPI.o $(Avaya_OBJ_DIR)AvayaVDN.o $(Avaya_OBJ_DIR)TSAPIModule.o\
-	  $(OBJ_DIR)SiaHttpServer.o $(OBJ_DIR)SiaSession.o $(OBJ_DIR)SiaTcpMonitor.o\
-	  $(OBJ_DIR)cfgFile.o $(OBJ_DIR)tinyxml2.o
+	  $(Call_OBJ_DIR)Call.o $(Call_OBJ_DIR)CallModule.o\
+	  $(OBJ_DIR)cfgFile.o $(OBJ_DIR)CallModule.o
 
 
 MODULE_APP:chkobjdir $(OBJ)
@@ -85,11 +87,11 @@ $(Avaya_OBJ_DIR)SiaTcpMonitor.o:$(AvayaSRC)SiaTcpMonitor.cpp
 	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)SiaTcpMonitor.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)SiaTcpMonitor.o
 
 
-$(OBJ_DIR)cfgFile.o:$(SIASRC)cfgFile.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)cfgFile.cpp $(INCLUDE) -o $(OBJ_DIR)cfgFile.o
+$(Call_OBJ_DIR)Call.o:$(CallSRC)Call.cpp
+	$(COMPILE) $(CXXFLAGS) $(CallSRC)Call.cpp $(INCLUDE) -o $(Call_OBJ_DIR)Call.o
 
-$(OBJ_DIR)tinyxml2.o:$(SIASRC)tinyxml2.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)tinyxml2.cpp $(INCLUDE) -o $(OBJ_DIR)tinyxml2.o
+$(Call_OBJ_DIR)CallModule.o:$(CallSRC)CallModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(CallSRC)CallModule.cpp $(INCLUDE) -o $(Call_OBJ_DIR)CallModule.o
 
 chkobjdir:
 	@if test ! -d $(OBJ_DIR);\
@@ -110,6 +112,11 @@ chkobjdir:
 	@if test ! -d $(Avaya_OBJ_DIR);\
 	then \
 		mkdir $(Avaya_OBJ_DIR); \
+	fi
+	
+	@if test ! -d $(Call_OBJ_DIR);\
+	then \
+		mkdir $(Call_OBJ_DIR); \
 	fi
 
 clean:

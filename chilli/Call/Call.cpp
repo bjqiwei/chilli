@@ -94,7 +94,7 @@ namespace Call {
 					call->start(false);
 				}
 
-				auto & it = m_StateMachines.begin();
+				const auto & it = m_StateMachines.begin();
 				it->second->pushEvent(evt);
 				it->second->mainEventLoop();
 
@@ -123,7 +123,7 @@ namespace Call {
 			newEvent["event"] = jsonData["event"];
 			newEvent["type"] = jsonData["type"];
 			newEvent["param"] = jsonData["param"];
-			auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
+			const auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
 			if (pe != nullptr){
 				pe->PushEvent(chilli::model::EventType_t(newEvent));
 			}
