@@ -32,7 +32,7 @@ namespace chilli {
 			
 			ACSHandle_t m_lAcsHandle = 0;	// Handle for ACS Stream
 			ATTPrivateData_t m_stPrivateData;	// Private Data for using extended features of TSAPI service
-			std::atomic_uint32_t m_ulInvokeID = 1;			// This application uses, Application generated InvokeID
+			std::atomic<uint32_t> m_ulInvokeID;			// This application uses, Application generated InvokeID
 			std::string m_ServiceID;
 			std::string m_UserID;
 			std::string m_Password;

@@ -1,8 +1,4 @@
 #pragma once
-
-#ifndef _CHILLI_SERVICEMODULE_HEADER_
-#define _CHILLI_SERVICEMODULE_HEADER_
-
 #include <winsock2.h>
 #include <windows.h>
 #include <log4cplus/logger.h>
@@ -11,14 +7,13 @@ namespace chilli{
 
 	#define SERVICENAME_DEFAULT ("chilli")
 	#define SERVICEDESCRIPTION ("The chilli service.")
-	#define  WINSERVERPARAMETER ("-startservice")
+	#define  WINSERVERPARAMETER ("--service")
 
 	class ServiceModule
 	{
 	public:
 		ServiceModule(void){};
 		~ServiceModule(void){};
-		static bool m_bService;
 		static char m_szServiceName[256];
 		static SERVICE_STATUS_HANDLE m_hServiceStatus;
 		static SERVICE_STATUS m_status;
@@ -46,5 +41,3 @@ namespace chilli{
 	};
 
 }//end namespace chilli
-
-#endif //_SERVICEMODULE_HEADER_

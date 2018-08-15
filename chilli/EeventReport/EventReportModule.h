@@ -23,7 +23,7 @@ public:
 protected:
 	const uint64_t m_Id;
 	class EventReportModule * m_module = nullptr;
-	static std::atomic_uint64_t __newConnectionId;
+	static std::atomic<uint64_t> __newConnectionId;
 };
 
 typedef std::shared_ptr<EPConnection> EPConnectionPtr;

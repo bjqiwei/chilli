@@ -1,8 +1,6 @@
 #pragma once
-#ifndef _CHILLI_SHDEV_MODULE_HEADER_
-#define _CHILLI_SHDEV_MODULE_HEADER_
-#include "..\model\ProcessModule.h"
-#include <log4cplus\logger.h>
+#include "../model/ProcessModule.h"
+#include <log4cplus/logger.h>
 #include "ShAPI.h"
 
 namespace chilli{
@@ -48,5 +46,4 @@ private:
 typedef ShDevModule * ShDevModulePtr;
 }
 }
-#endif // end shdev module header
 

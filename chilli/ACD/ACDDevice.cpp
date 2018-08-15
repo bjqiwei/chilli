@@ -65,7 +65,7 @@ void ACDDevice::mainEventLoop()
 				connection->start(false);
 			}
 
-			auto & it = m_Sessions.begin();
+			auto it = m_Sessions.begin();
 			it->second->pushEvent(evt);
 			it->second->mainEventLoop();
 

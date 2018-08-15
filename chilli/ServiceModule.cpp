@@ -6,12 +6,35 @@
 #include <log4cplus/loggingmacros.h>
 
 
+bool uni_service_run(const char *name, uint32_t install)
+{
+	if (install == 1)
+		return chilli::ServiceModule::RegisterServer(true) == 0;
+	else if (install == 2)
+		return chilli::ServiceModule::RegisterServer(false) == 0;
+	else {
+
+		log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ServiceModule");
+		chilli::ServiceModule::Init();
+		SERVICE_TABLE_ENTRY st[] =
+		{
+			{ chilli::ServiceModule::m_szServiceName, chilli::ServiceModule::Start },
+			{ NULL, NULL }
+		};
+		if (!::StartServiceCtrlDispatcher(st))
+		{
+			LOG4CPLUS_DEBUG(log, "error startup as  a console app with a -startservice...");
+		}
+	}
+
+	return true;
+}
+
 namespace chilli{
 
 	log4cplus::Logger ServiceModule::log = log4cplus::Logger::getInstance("chilli.ServiceModule");
 	HANDLE ServiceModule::stopEvent = NULL;
 	HANDLE ServiceModule::stopEvented = NULL;
-	bool ServiceModule::m_bService = false;
 	char ServiceModule::m_szServiceName[256] = SERVICENAME_DEFAULT;
 	SERVICE_STATUS_HANDLE ServiceModule::m_hServiceStatus = NULL;
 	SERVICE_STATUS ServiceModule::m_status;
@@ -121,10 +144,10 @@ namespace chilli{
 		}
 
 		if (bResult){
-			LOG4CPLUS_TRACE(log,"service is instatlled");
+			LOG4CPLUS_INFO(log,"service is instatlled");
 		}
 		else{
-			LOG4CPLUS_TRACE(log,"service is not instatlled");
+			LOG4CPLUS_INFO(log,"service is not instatlled");
 		}
 		return bResult;
 	}
@@ -151,8 +174,8 @@ namespace chilli{
 		strcat_s(szFilePath, " ");
 		strcat_s(szFilePath,WINSERVERPARAMETER);
 		
-		LOG4CPLUS_TRACE(log, "servicename (" << m_szServiceName << ")");
-		LOG4CPLUS_TRACE(log," FilePath (" << szFilePath << ")");
+		LOG4CPLUS_INFO(log, "servicename (" << m_szServiceName << ")");
+		LOG4CPLUS_INFO(log," FilePath (" << szFilePath << ")");
 
 		SC_HANDLE hService = ::CreateService(
 			hSCM, m_szServiceName, m_szServiceName,

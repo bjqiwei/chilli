@@ -113,7 +113,7 @@ void Agent::mainEventLoop()
 				sm->start(false);
 			}
 
-			auto & it = m_StateMachines.begin();
+			auto it = m_StateMachines.begin();
 			it->second->pushEvent(evt);
 			it->second->mainEventLoop();
 

@@ -1,9 +1,11 @@
 #pragma once
-#include "..\CEventBuffer.h"
+#include "../CEventBuffer.h"
 #include "PerformElement.h"
 #include "FSM.h"
 #include <map>
 #include <memory>
+#include <atomic>
+#include <thread>
 #include "TypeDef.h"
 #include <log4cplus/logger.h>
 
@@ -36,7 +38,7 @@ public:
 protected:
 	log4cplus::Logger log;
 	helper::CEventBuffer<EventType_t> m_RecEvtBuffer;
-	std::atomic<bool> m_bRunning = false;
+	std::atomic<bool> m_bRunning;
 private:
 	const std::string m_Id;
 	static std::recursive_mutex g_PEMtx;

@@ -273,6 +273,12 @@
     <ClCompile Include="ServiceModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="uni_daemon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uni_cmdline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="conf\ACD.xml">
