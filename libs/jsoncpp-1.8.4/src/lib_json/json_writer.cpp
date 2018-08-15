@@ -347,7 +347,7 @@ JSONCPP_STRING FastWriter::write(const Value& root) {
   document_.clear();
   writeValue(root);
   if (!omitEndingLineFeed_)
-    //document_ += "\n";
+	  ;//document_ += "\n";
   return document_;
 }
 
