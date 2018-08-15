@@ -2,6 +2,8 @@
 #include "TSAPIModule.h"
 #include <log4cplus/loggingmacros.h>
 #include <scxml/TriggerEvent.h>
+#include <json/config.h>
+#include <json/json.h>
 
 namespace chilli {
 namespace Avaya {
@@ -21,10 +23,12 @@ namespace Avaya {
 	{
 		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		Json::Value jsonData;
-		Json::Reader jsonReader;
+		Json::CharReaderBuilder b;
+		std::shared_ptr<Json::CharReader> reader(b.newCharReader());
 
-		if (!jsonReader.parse(strContent, jsonData)) {
-			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+		std::string err;
+		if (!reader->parse(strContent.c_str(), strContent.c_str()+ strContent.length(), &jsonData, &err)) {
+			LOG4CPLUS_ERROR(log, strContent << " not json data." << err);
 			return;
 		}
 

@@ -76,9 +76,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServiceModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="model\ProcessModule.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -116,9 +113,6 @@
       <Filter>FreeSWITCH</Filter>
     </ClInclude>
     <ClInclude Include="Sh\shpa3api.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dynamiclibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Avaya\TSAPIModule.h">
@@ -186,9 +180,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ServiceModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sh\ShDevModule.cpp">
       <Filter>Sh</Filter>
     </ClCompile>

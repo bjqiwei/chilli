@@ -104,7 +104,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;$(SolutionDir)libs\apr-1.5.2\include;$(SolutionDir)libs\apr-util-1.5.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +131,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-win32\lib\*.dll
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;$(SolutionDir)libs\apr-1.5.2\include;$(SolutionDir)libs\apr-util-1.5.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,7 +160,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;$(SolutionDir)libs\apr-1.5.2\include;$(SolutionDir)libs\apr-util-1.5.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -195,7 +195,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-win32\lib\*.dll
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>VERSION="1.0.0.0";WIN32;_CONSOLE;LOG4CPLUS_BUILD_DLL;HAVE_CONFIG_H;ESL_DECLARE_STATIC;XP_WIN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\log4cplus-1.2.0\include\;$(SolutionDir)\libs\libwebsockets-2.2.1\;$(SolutionDir)\libs\libwebsockets-2.2.1\lib\;$(SolutionDir)\libs\jsoncpp-1.8.4\include\;$(SolutionDir)\libs\fsm\;$(SolutionDir)\libs\FreeSWITCH\esl\include\;$(SolutionDir)libs\libevent-2.1.8-stable\WIN32-Code\nmake;$(SolutionDir)libs\libevent-2.1.8-stable\include;$(SolutionDir)libs\libevent-2.1.8-stable\compat;$(ProjectDir)\Avaya\hdrs;$(SolutionDir)libs\mysql-connector-c++-noinstall-1.1.8-win32\include;$(SolutionDir)libs\openssl-1.0.2n\inc32;$(SolutionDir)libs\apr-1.5.2\include;$(SolutionDir)libs\apr-util-1.5.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -243,7 +243,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="Call\Call.h" />
     <ClInclude Include="Call\CallModule.h" />
     <ClInclude Include="CEventBuffer.h" />
-    <ClInclude Include="Dynamiclibrary.h" />
     <ClInclude Include="EeventReport\EventReportModule.h" />
     <ClInclude Include="Device\Device.h" />
     <ClInclude Include="FreeSWITCH\FreeSwitchDevice.h" />
@@ -255,7 +254,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="model\ProcessModule.h" />
     <ClInclude Include="model\TypeDef.h" />
     <ClInclude Include="mysql\MySqlModule.h" />
-    <ClInclude Include="ServiceModule.h" />
     <ClInclude Include="chilli.h" />
     <ClInclude Include="Sh\ShAPI.h" />
     <ClInclude Include="Sh\ShDevModule.h" />
@@ -291,7 +289,6 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClCompile Include="model\PerformElement.cpp" />
     <ClCompile Include="model\ProcessModule.cpp" />
     <ClCompile Include="mysql\MySqlModule.cpp" />
-    <ClCompile Include="ServiceModule.cpp" />
     <ClCompile Include="chilli.cpp" />
     <ClCompile Include="Sh\ShAPI.cpp" />
     <ClCompile Include="Sh\ShDevModule.cpp" />

@@ -1402,7 +1402,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(conferenceCall.newCall);
 							event[eventName]["cause"] = 0;
 
-							for (int i = 0; i < conferenceCall.connList.count; i++)
+							for (uint32_t i = 0; i < conferenceCall.connList.count; i++)
 							{
 								event[eventName]["connList"].append(
 									AvayaAPI::cstaConnectionIDJson(
@@ -1518,7 +1518,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(transferCall.newCall);
 							event[eventName]["cause"] = 0;
 
-							for (int i = 0; i < transferCall.connList.count; i++)
+							for (uint32_t i = 0; i < transferCall.connList.count; i++)
 							{
 								event[eventName]["connList"].append(
 									AvayaAPI::cstaConnectionIDJson(
@@ -1743,7 +1743,7 @@ namespace chilli {
 
 							auto &it = m_callid2UUID.find(connection.callID);
 							if (it == m_callid2UUID.end())
-								m_callid2UUID[connection.callID] = uuid();
+								m_callid2UUID[connection.callID] = helper::uuid();
 
 							event["uuid"] = m_callid2UUID[connection.callID];
 

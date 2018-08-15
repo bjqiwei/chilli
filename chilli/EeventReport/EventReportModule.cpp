@@ -112,8 +112,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 	//LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
 
 	Json::Value request;
-	Json::Reader jsonReader;
-	if (jsonReader.parse(message, request)) {
+	Json::CharReaderBuilder b;
+	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+	std::string jsonerr;
+	if (jsonReader->parse(message.c_str(), message.c_str() + message.length(), &request, &jsonerr)) {
 
 		std::string requestid;
 		if (request["request"].isString())
@@ -200,12 +202,12 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			}
 
 			response["status"] = 0;
-			response["param"]["initiatedCall"]["connectionID"] = uuid();
-			response["param"]["initiatedCall"]["callID"] = uuid();
-			response["param"]["initiatedCall"]["sessionID"] = uuid();
+			response["param"]["initiatedCall"]["connectionID"] = helper::uuid();
+			response["param"]["initiatedCall"]["callID"] = helper::uuid();
+			response["param"]["initiatedCall"]["sessionID"] = helper::uuid();
 
 			response["param"]["calledCall"] = response["param"]["initiatedCall"];
-			response["param"]["calledCall"]["sessionID"] = uuid();
+			response["param"]["calledCall"]["sessionID"] = helper::uuid();
 
 			auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
@@ -245,9 +247,9 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			}
 
 			response["status"] = 0;
-			response["param"]["initiatedCall"]["connectionID"] = uuid();
-			response["param"]["initiatedCall"]["callID"] = uuid();
-			response["param"]["initiatedCall"]["sessionID"] = uuid();
+			response["param"]["initiatedCall"]["connectionID"] = helper::uuid();
+			response["param"]["initiatedCall"]["callID"] = helper::uuid();
+			response["param"]["initiatedCall"]["sessionID"] = helper::uuid();
 			auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
@@ -353,7 +355,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, " OnMessage not json string:" << message);
+		LOG4CPLUS_ERROR(log, " OnMessage not json string:" << message << ":" << jsonerr);
 	}
 }
 
@@ -361,8 +363,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 void EventReportModule::processSend(const std::string &strContent, const void * param, bool & bHandled)
 {
 	Json::Value jsonData;
-	Json::Reader jsonReader;
-	if (jsonReader.parse(strContent, jsonData)) {
+	Json::CharReaderBuilder b;
+	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+	std::string jsonerr;
+	if (jsonReader->parse(strContent.c_str(), strContent.c_str()+ strContent.length(), &jsonData, &jsonerr)) {
 
 		jsonData.removeMember("id");
 		jsonData.removeMember("dest");
@@ -376,7 +380,7 @@ void EventReportModule::processSend(const std::string &strContent, const void * 
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, strContent << " not json data.");
+		LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
 	}
 }
 
