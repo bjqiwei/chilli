@@ -35,7 +35,7 @@ namespace Avaya {
 			if (callid == 0)
 			{
 				LOG4CPLUS_WARN(log, " callid is invalid," << jsonEvent.toStyledString());
-				return -1;
+				return false;
 
 			}
 

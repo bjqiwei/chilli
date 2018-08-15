@@ -477,7 +477,7 @@ public:
 		return TCP::TCPConnection::Send(lpBuf, nBufLen);
 	}
 
-	virtual int Send(Json::Value) override
+	virtual int Send(Json::Value send) override
 	{
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);

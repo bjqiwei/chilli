@@ -1980,7 +1980,7 @@ namespace chilli {
 							event["conferenced"]["secondaryOldCall"] = AvayaAPI::cstaConnectionIDJson(conferenced.secondaryOldCall);
 							event["callid"] = conferenced.primaryOldCall.callID;
 							
-							for (int i = 0; i < conferenced.conferenceConnections.count; i++)
+							for (uint32_t i = 0; i < conferenced.conferenceConnections.count; i++)
 							{
 								event["conferenced"]["connections"].append(
 									AvayaAPI::cstaConnectionIDJson(
