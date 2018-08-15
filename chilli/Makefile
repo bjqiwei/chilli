@@ -13,15 +13,17 @@ LINK = g++
 SRC = ./
 ACDSRC = ./ACD/
 AgentSRC= ./Agent/
+AvayaSRC= ./Avaya/
 
-INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
+INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
 
 OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
 Agent_OBJ_DIR = $(OBJ_DIR)Agent/
+Avaya_OBJ_DIR = $(OBJ_DIR)Avaya/
 
 
-CFLAGS = -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
+CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
 CXXFLAGS = $(CFLAGS) -std=c++11
 
 LDFLAGS= -L./. -L/usr/local/lib -static-libstdc++ -static-libgcc -Wall -g -O1 -lpthread 
@@ -31,7 +33,7 @@ LDFLAGS:= $(LDFLAGS) -lpthread -lm -ldl -lrt -lz -luuid -levent_extra -levent_co
 OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(ACD_OBJ_DIR)ACDModule.o $(ACD_OBJ_DIR)ACDDevice.o\
 	  $(Agent_OBJ_DIR)AgentModule.o $(Agent_OBJ_DIR)Agent.o\
-      $(OBJ_DIR)SiaTcpServer.o $(OBJ_DIR)StatModule.o $(OBJ_DIR)MD5.o\
+      $(Avaya_OBJ_DIR)AvayaACD.o $(Avaya_OBJ_DIR)AvayaAgent.o $(Avaya_OBJ_DIR)AvayaDevice.o $(Avaya_OBJ_DIR)AvayaAPI.o $(Avaya_OBJ_DIR)AvayaVDN.o $(Avaya_OBJ_DIR)TSAPIModule.o\
 	  $(OBJ_DIR)SiaHttpServer.o $(OBJ_DIR)SiaSession.o $(OBJ_DIR)SiaTcpMonitor.o\
 	  $(OBJ_DIR)cfgFile.o $(OBJ_DIR)tinyxml2.o
 
@@ -61,26 +63,26 @@ $(Agent_OBJ_DIR)AgentModule.o:$(AgentSRC)AgentModule.cpp
 $(Agent_OBJ_DIR)Agent.o:$(AgentSRC)Agent.cpp
 	$(COMPILE) $(CXXFLAGS) $(AgentSRC)Agent.cpp $(INCLUDE) -o $(Agent_OBJ_DIR)Agent.o
 
-$(OBJ_DIR)TcpServerModule.o:$(SIASRC)TcpServerModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)TcpServerModule.cpp $(INCLUDE) -o $(OBJ_DIR)TcpServerModule.o
+$(Avaya_OBJ_DIR)AvayaACD.o:$(AvayaSRC)AvayaACD.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaACD.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaACD.o
 
-$(OBJ_DIR)SiaTcpServer.o:$(SIASRC)SiaTcpServer.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)SiaTcpServer.cpp $(INCLUDE) -o $(OBJ_DIR)SiaTcpServer.o
+$(Avaya_OBJ_DIR)AvayaAgent.o:$(AvayaSRC)AvayaAgent.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaAgent.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaAgent.o
 
-$(OBJ_DIR)MD5.o:$(SIASRC)MD5.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)MD5.cpp $(INCLUDE) -o $(OBJ_DIR)MD5.o
+$(Avaya_OBJ_DIR)AvayaAPI.o:$(AvayaSRC)AvayaAPI.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaAPI.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaAPI.o
 
-$(OBJ_DIR)StatModule.o:$(SIASRC)StatModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)StatModule.cpp $(INCLUDE) -o $(OBJ_DIR)StatModule.o
+$(Avaya_OBJ_DIR)AvayaDevice.o:$(AvayaSRC)AvayaDevice.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaDevice.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaDevice.o
 
-$(OBJ_DIR)SiaHttpServer.o:$(SIASRC)SiaHttpServer.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)SiaHttpServer.cpp $(INCLUDE) -o $(OBJ_DIR)SiaHttpServer.o
+$(Avaya_OBJ_DIR)AvayaVDN.o:$(AvayaSRC)AvayaVDN.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaVDN.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaVDN.o
 
-$(OBJ_DIR)SiaSession.o:$(SIASRC)SiaSession.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)SiaSession.cpp $(INCLUDE) -o $(OBJ_DIR)SiaSession.o
+$(Avaya_OBJ_DIR)TSAPIModule.o:$(AvayaSRC)TSAPIModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)TSAPIModule.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)TSAPIModule.o
 
-$(OBJ_DIR)SiaTcpMonitor.o:$(SIASRC)SiaTcpMonitor.cpp
-	$(COMPILE) $(CXXFLAGS) $(SIASRC)SiaTcpMonitor.cpp $(INCLUDE) -o $(OBJ_DIR)SiaTcpMonitor.o
+$(Avaya_OBJ_DIR)SiaTcpMonitor.o:$(AvayaSRC)SiaTcpMonitor.cpp
+	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)SiaTcpMonitor.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)SiaTcpMonitor.o
 
 
 $(OBJ_DIR)cfgFile.o:$(SIASRC)cfgFile.cpp
@@ -103,6 +105,11 @@ chkobjdir:
 	@if test ! -d $(Agent_OBJ_DIR);\
 	then \
 		mkdir $(Agent_OBJ_DIR); \
+	fi
+	
+	@if test ! -d $(Avaya_OBJ_DIR);\
+	then \
+		mkdir $(Avaya_OBJ_DIR); \
 	fi
 
 clean:

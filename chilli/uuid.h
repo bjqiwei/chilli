@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <apr_uuid.h>
-#include "stringhelper.h"
+#include "stringHelper.h"
 
 namespace helper {
 static std::string uuid()
@@ -13,6 +13,7 @@ static std::string uuid()
 
 	apr_uuid_format(buffer, &uuid);
 	//std::cout << "create guid " << buffer << std::endl;
-	return helper::string::toLower(std::string(buffer));
+	std::string str(buffer);
+	return helper::string::toLower(str);
 }
 }

@@ -1,7 +1,4 @@
 #pragma once
-#ifndef _STRING_HELPER_HEADER_
-#define _STRING_HELPER_HEADER_
-
 #include <string>
 #include <algorithm>
 #include<iostream>
@@ -74,5 +71,3 @@ namespace helper
 		}
 	}
 }//end namespace helper
-
-#endif // end string helper header
