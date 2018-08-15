@@ -90,7 +90,7 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 		const char *path = nullptr;
 		char urlbuff[1024];
 		memset(urlbuff, 0, sizeof(urlbuff));
-		strncpy_s(urlbuff, m_wsUrl.c_str(), sizeof(urlbuff));
+		strncpy(urlbuff, m_wsUrl.c_str(), sizeof(urlbuff));
 		lws_parse_uri(urlbuff, &prot, &address, &m_wsPort, &path);
 	}
 
@@ -130,7 +130,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["type"] = "response";
 			response["response"] = "heartBeat";
 			response["status"] = 0;
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 		}
@@ -149,7 +149,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 			EPConnectionPtr connptr(conn);
 			m_Connections[id] = connptr;
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 		}
@@ -160,7 +160,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["type"] = "response";
 			response["response"] = "disConnect";
 			response["status"] = 0;
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 
@@ -183,7 +183,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (calling.empty())
 			{
 				response["status"] = chilli::INVALID_CALLING_DEVICE;
-				auto & c = m_Connections.find(id);
+				const auto & c = m_Connections.find(id);
 				if (c != m_Connections.end())
 					c->second->Send(response);
 				return;
@@ -195,7 +195,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 			if(called.empty()){
 				response["status"] = chilli::INVALID_CALLED_DEVICE;
-				auto & c = m_Connections.find(id);
+				const auto & c = m_Connections.find(id);
 				if (c != m_Connections.end())
 					c->second->Send(response);
 				return;
@@ -209,7 +209,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["param"]["calledCall"] = response["param"]["initiatedCall"];
 			response["param"]["calledCall"]["sessionID"] = helper::uuid();
 
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 
@@ -240,7 +240,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 			if(called.empty()){
 				response["status"] = chilli::INVALID_CALLED_DEVICE;
-				auto & c = m_Connections.find(id);
+				const auto & c = m_Connections.find(id);
 				if (c != m_Connections.end())
 					c->second->Send(response);
 				return;
@@ -250,7 +250,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["param"]["initiatedCall"]["connectionID"] = helper::uuid();
 			response["param"]["initiatedCall"]["callID"] = helper::uuid();
 			response["param"]["initiatedCall"]["sessionID"] = helper::uuid();
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 
@@ -273,10 +273,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (request["param"]["connectionToBeCleared"].isObject()){
 				if (request["param"]["connectionToBeCleared"]["deviceID"].isString()) {
 					std::string deviceid = request["param"]["connectionToBeCleared"]["deviceID"].asString();
-					auto & it = this->getPerformElementByGlobal(deviceid);
+					const auto & it = this->getPerformElementByGlobal(deviceid);
 					if (it != nullptr){
 
-						auto & c = m_Connections.find(id);
+						const auto & c = m_Connections.find(id);
 						if (c != m_Connections.end())
 							c->second->Send(response);
 
@@ -294,7 +294,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			}
 			
 			response["status"] = chilli::INVALID_CALL;
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 			return;
@@ -311,10 +311,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (request["param"]["connection"].isObject()) {
 				if (request["param"]["connection"]["deviceID"].isString()) {
 					std::string deviceid = request["param"]["connection"]["deviceID"].asString();
-					auto & it = this->getPerformElementByGlobal(deviceid);
+					const auto & it = this->getPerformElementByGlobal(deviceid);
 					if (it != nullptr) {
 
-						auto & c = m_Connections.find(id);
+						const auto & c = m_Connections.find(id);
 						if (c != m_Connections.end())
 							c->second->Send(response);
 
@@ -334,7 +334,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			}
 
 			response["status"] = chilli::INVALID_CALL;
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 			return;
@@ -347,7 +347,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["response"] = request["request"];
 			response["status"] = chilli::INVALID_REQUEST;
 
-			auto & c = m_Connections.find(id);
+			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);
 
@@ -586,7 +586,7 @@ bool EventReportModule::listenWS(int port)
 	return result;
 }
 
-std::atomic_uint64_t EPConnection::__newConnectionId = 0;
+std::atomic<uint64_t> EPConnection::__newConnectionId;
 EPConnection::EPConnection(EventReportModule * module):m_Id(__newConnectionId++), m_module(module)
 {
 }

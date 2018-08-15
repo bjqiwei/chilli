@@ -22,7 +22,7 @@
 #include "IVR/IVRModule.h"
 #include "Avaya/TSAPIModule.h"
 #include "mysql/MySqlModule.h"
-#include "EeventReport/EventReportModule.h"
+#include "EventReport/EventReportModule.h"
 #include "Call/CallModule.h"
 
 #define _STRVERSION(str) #str

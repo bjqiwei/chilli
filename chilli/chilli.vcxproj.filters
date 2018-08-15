@@ -148,7 +148,7 @@
     <ClInclude Include="stringHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EeventReport\EventReportModule.h">
+    <ClInclude Include="EventReport\EventReportModule.h">
       <Filter>EventReport</Filter>
     </ClInclude>
     <ClInclude Include="model\PerformElement.h">
@@ -240,7 +240,7 @@
     <ClCompile Include="Avaya\AvayaACD.cpp">
       <Filter>Avaya</Filter>
     </ClCompile>
-    <ClCompile Include="EeventReport\EventReportModule.cpp">
+    <ClCompile Include="EventReport\EventReportModule.cpp">
       <Filter>EventReport</Filter>
     </ClCompile>
     <ClCompile Include="model\PerformElement.cpp">

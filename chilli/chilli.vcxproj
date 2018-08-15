@@ -243,7 +243,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClInclude Include="Call\Call.h" />
     <ClInclude Include="Call\CallModule.h" />
     <ClInclude Include="CEventBuffer.h" />
-    <ClInclude Include="EeventReport\EventReportModule.h" />
+    <ClInclude Include="EventReport\EventReportModule.h" />
     <ClInclude Include="Device\Device.h" />
     <ClInclude Include="FreeSWITCH\FreeSwitchDevice.h" />
     <ClInclude Include="FreeSWITCH\FreeSwitchModule.h" />
@@ -280,7 +280,7 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
     <ClCompile Include="Avaya\TSAPIModule.cpp" />
     <ClCompile Include="Call\Call.cpp" />
     <ClCompile Include="Call\CallModule.cpp" />
-    <ClCompile Include="EeventReport\EventReportModule.cpp" />
+    <ClCompile Include="EventReport\EventReportModule.cpp" />
     <ClCompile Include="Device\Device.cpp" />
     <ClCompile Include="FreeSWITCH\FreeSwitchDevice.cpp" />
     <ClCompile Include="FreeSWITCH\FreeSwitchModule.cpp" />

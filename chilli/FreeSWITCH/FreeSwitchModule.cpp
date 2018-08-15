@@ -99,10 +99,12 @@ void FreeSwitchModule::fireSend(const std::string & strContent, const void * par
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	Json::Value jsonData;
-	Json::Reader jsonReader;
+	Json::CharReaderBuilder b;
+	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+	std::string jsonerr;
 
-	if (!jsonReader.parse(strContent, jsonData)) {
-		LOG4CPLUS_ERROR(log, strContent << " not json data.");
+	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
+		LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
 		return;
 	}
 
@@ -468,10 +470,12 @@ void FreeSwitchModule::ConnectFS()
 			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, true, NULL);
 			if (status == ESL_SUCCESS){
 				if (m_Handle.last_event && m_Handle.last_event->body) {
-					Json::Reader reader;
 					Json::Value event;
+					Json::CharReaderBuilder b;
+					std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+					std::string jsonerr;
 
-					if (reader.parse(m_Handle.last_event->body, event) && event.isObject()) {
+					if (jsonReader->parse(m_Handle.last_event->body, m_Handle.last_event->body + std::strlen(m_Handle.last_event->body), &event, &jsonerr) && event.isObject()) {
 
 						std::string eventName;
 						if (event["Event-Name"].isString()) {
