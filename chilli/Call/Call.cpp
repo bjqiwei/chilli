@@ -139,13 +139,16 @@ namespace Call {
 	{
 		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 		Json::Value jsonData;
-		Json::Reader jsonReader;
-		if (jsonReader.parse(strContent, jsonData)) {
+		Json::CharReaderBuilder b;
+		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+		std::string jsonerr;
+
+		if (jsonReader->parse(strContent.c_str(),strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
 			bool bHandled = false;
 			this->processSend(jsonData, param, bHandled);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
 		}
 	}
 

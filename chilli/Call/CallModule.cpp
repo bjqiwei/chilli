@@ -114,9 +114,9 @@ void CallModule::run()
 						}
 						else {
 							if (newCallId.empty())
-								newCallId = uuid();
+								newCallId = helper::uuid();
 							if (newConnectionID.empty())
-								newConnectionID = uuid();
+								newConnectionID = helper::uuid();
 
 							model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
 							call->setVar("_callid", newCallId);

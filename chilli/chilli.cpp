@@ -6,6 +6,12 @@
 #include "ServiceModule.h"
 #include "chilli.h"
 #include "signal.h"
+#include <apr_general.h>
+#include <log4cplus/helpers/loglog.h>
+#include <log4cplus/configurator.h>
+#include <log4cplus/loggingmacros.h>
+#include "tinyxml2/tinyxml2.h"
+
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
 #include "Agent/AgentModule.h"
@@ -16,10 +22,6 @@
 #include "mysql/MySqlModule.h"
 #include "EeventReport/EventReportModule.h"
 #include "Call/CallModule.h"
-#include <log4cplus/helpers/loglog.h>
-#include <log4cplus/configurator.h>
-#include <log4cplus/loggingmacros.h>
-#include "tinyxml2/tinyxml2.h"
 
 #define  FREESWITCHNODE "FreeSwitch"
 #define  AVAYANODE      "Avaya"
@@ -66,6 +68,9 @@ void SignalHandler(int  sig)
 
 int main(int argc, char* argv[])
 {
+	apr_status_t rv;
+	rv = apr_initialize();
+
 	chilli::App::AppInit();
 
 	log4cplus::initialize();
@@ -222,6 +227,7 @@ int main(int argc, char* argv[])
 
 	// When we get here, the service has been stopped
 	int nExitCode = 0;
+	apr_terminate();
 	return nExitCode;
 }
 

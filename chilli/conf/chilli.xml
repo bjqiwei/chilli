@@ -21,6 +21,7 @@
       <Conf ChannelID="6" Type="BASE" Enable="1"></Conf>
       <Conf ChannelID="7" Type="BASE" Enable="1"></Conf>
    </Conferences>
+   <!--
    <Groups id="group001">
       <Group ExtensionNumber ="5000" StateMachine="./conf/Group.xml">
         <Extension>0100</Extension>
@@ -35,6 +36,7 @@
         <Extension>0109</Extension>
     </Group>
    </Groups>
+   -->
   <FreeSwitch id = "freeswitch001" host="192.168.2.232" port ="8021" password="ClueCon">
     <Devices>
       <Device DeviceID="1000" StateMachine="./conf/FreeSwitchDevice.xml"></Device>

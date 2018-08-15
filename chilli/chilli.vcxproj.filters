@@ -178,6 +178,9 @@
     <ClInclude Include="TCP\tcp.h">
       <Filter>TCP</Filter>
     </ClInclude>
+    <ClInclude Include="ServiceModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sh\ShDevModule.cpp">
@@ -266,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="TCP\tcp.cpp">
       <Filter>TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceModule.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

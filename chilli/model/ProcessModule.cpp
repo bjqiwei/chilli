@@ -125,10 +125,12 @@ namespace model{
 	void ProcessModule::OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
 	{
 		Json::Value jsonEvent;
-		Json::Reader jsonReader;
+		Json::CharReaderBuilder b;
+		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+		std::string jsonerr;
 		std::string peId;
 
-		if (jsonReader.parse(attr, jsonEvent)) {
+		if (jsonReader->parse(attr.c_str(),attr.c_str()+attr.length(), &jsonEvent, &jsonerr)) {
 			jsonEvent["id"] = jsonEvent["sessionId"];
 
 			if (jsonEvent["id"].isString()) {

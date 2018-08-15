@@ -143,10 +143,12 @@ namespace chilli {
 		{
 			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
 			Json::Value jsonData;
-			Json::Reader jsonReader;
+			Json::CharReaderBuilder b;
+			std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+			std::string jsonerr;
 
-			if (!jsonReader.parse(strContent, jsonData)) {
-				LOG4CPLUS_ERROR(log, strContent << " not json data.");
+			if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
+				LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
 				return;
 			}
 			bool bHandled = false;
