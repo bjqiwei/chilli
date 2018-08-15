@@ -1,6 +1,6 @@
 #pragma once
 #include "AvayaDevice.h"
-#include <log4cplus\logger.h>
+#include <log4cplus/logger.h>
 
 
 namespace chilli{

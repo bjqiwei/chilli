@@ -1,3 +1,4 @@
+#include <thread>
 #include "AvayaAPI.h"
 #include <atomic>
 #include <apr_dso.h>
@@ -6,7 +7,7 @@
 #if defined ( TSLIB_WINDOWS_32 )
 #define TSAPIPROC           RetCode_t (pascal *
 #elif defined ( TSLIB_LINUX )
-#define TSAPIPROC           RetCode_t
+#define TSAPIPROC           RetCode_t (*
 #endif
 
 //CSTA32
@@ -757,7 +758,7 @@ extern "C"
 #endif
 
 namespace AvayaAPI {
-	static std::atomic_ulong  g_Reference = 0;
+	static std::atomic<uint32_t>  g_Reference;
 
 	Proc_acsOpenStream m_acsOpenStream = nullptr;
 	Proc_acsCloseStream m_acsCloseStream = nullptr;

@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Agent\Agent.h"
-#include <log4cplus\logger.h>
+#include "../Agent/Agent.h"
+#include <log4cplus/logger.h>
 
 
 namespace chilli{

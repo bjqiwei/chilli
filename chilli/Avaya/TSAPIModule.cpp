@@ -270,7 +270,7 @@ namespace chilli {
 		{
 			bool bResult = false;
 
-			strcpy_s(m_stPrivateData.vendor, "VERSION");
+			strcpy(m_stPrivateData.vendor, "VERSION");
 			m_stPrivateData.data[0] = PRIVATE_DATA_ENCODING;
 
 			if (AvayaAPI::attMakeVersionString("2-8", &(m_stPrivateData.data[1])) > 0)
@@ -1660,7 +1660,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "MONITOR_ENDED";
-							event["monitorEnded"]["cause"] = max(cause, 0);
+							event["monitorEnded"]["cause"] = max((int)cause, 0);
 							event["monitorEnded"]["reason"] = AvayaAPI::cstaEventCauseString(cause);
 
 							model::EventType_t evt(event);
@@ -1680,7 +1680,7 @@ namespace chilli {
 							event["event"] = "CALL_CLEARED";
 							event["callCleared"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(callCleared.localConnectionInfo);
 							event["callCleared"]["connection"] = AvayaAPI::cstaConnectionIDJson(callCleared.clearedCall);
-							event["callCleared"]["cause"] = max(callCleared.cause,0);
+							event["callCleared"]["cause"] = max((int)callCleared.cause,0);
 							event["callCleared"]["reason"] = AvayaAPI::cstaEventCauseString(callCleared.cause);
 							event["callid"] = callCleared.clearedCall.callID;
 							
@@ -1703,7 +1703,7 @@ namespace chilli {
 							event["event"] = "CONNECTION_CLEARED";
 							event["connectionCleared"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(connectionCleared.localConnectionInfo);
 							event["connectionCleared"]["connection"] = AvayaAPI::cstaConnectionIDJson(connectionCleared.droppedConnection);
-							event["connectionCleared"]["cause"] = max(connectionCleared.cause,0);
+							event["connectionCleared"]["cause"] = max((int)connectionCleared.cause,0);
 							event["connectionCleared"]["reason"] = AvayaAPI::cstaEventCauseString(connectionCleared.cause);
 							event["connectionCleared"]["releasing"] = releasing;
 							event["callid"] = connectionCleared.droppedConnection.callID;
@@ -1741,7 +1741,7 @@ namespace chilli {
 							event["delivered"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 							event["callid"] = connection.callID;
 
-							auto &it = m_callid2UUID.find(connection.callID);
+							auto it = m_callid2UUID.find(connection.callID);
 							if (it == m_callid2UUID.end())
 								m_callid2UUID[connection.callID] = helper::uuid();
 
@@ -1771,7 +1771,7 @@ namespace chilli {
 							event["event"] = "ESTABLISHED";
 							event["established"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(localConnect);
 							event["established"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
-							event["established"]["cause"] = max(cause,0);
+							event["established"]["cause"] = max((int)cause,0);
 							event["established"]["reason"] = AvayaAPI::cstaEventCauseString(cause);
 							event["established"]["calling"] = calling;
 							event["established"]["called"] = called;
@@ -1794,7 +1794,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "SERVICE_INITIATED";
-							event["serviceInitiated"]["cause"] = max(serviceInitiated.cause,0);
+							event["serviceInitiated"]["cause"] = max((int)serviceInitiated.cause,0);
 							event["serviceInitiated"]["reason"] = AvayaAPI::cstaEventCauseString(serviceInitiated.cause);
 							event["serviceInitiated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(serviceInitiated.localConnectionInfo);
 							event["serviceInitiated"]["connection"] = AvayaAPI::cstaConnectionIDJson(serviceInitiated.initiatedConnection);
@@ -1816,7 +1816,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "ORIGINATED";
-							event["originated"]["cause"] = max(originated.cause, 0);
+							event["originated"]["cause"] = max((int)originated.cause, 0);
 							event["originated"]["reason"] = AvayaAPI::cstaEventCauseString(originated.cause);
 							event["originated"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(originated.localConnectionInfo);
 							event["originated"]["connection"] = AvayaAPI::cstaConnectionIDJson(originated.originatedConnection);
@@ -1839,7 +1839,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "HELD";
-							event["held"]["cause"] = max(held.cause, 0);
+							event["held"]["cause"] = max((int)held.cause, 0);
 							event["held"]["reason"] = AvayaAPI::cstaEventCauseString(held.cause);
 							event["held"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(held.localConnectionInfo);
 							event["held"]["connection"] = AvayaAPI::cstaConnectionIDJson(held.heldConnection);
@@ -1861,7 +1861,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "RETRIEVED";
-							event["retrieved"]["cause"] = max(retrieved.cause, 0);
+							event["retrieved"]["cause"] = max((int)retrieved.cause, 0);
 							event["retrieved"]["reason"] = AvayaAPI::cstaEventCauseString(retrieved.cause);
 							event["retrieved"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(retrieved.localConnectionInfo);
 							event["retrieved"]["connection"] = AvayaAPI::cstaConnectionIDJson(retrieved.retrievedConnection);
@@ -1886,7 +1886,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "QUEUED";
-							event["queued"]["cause"] = max(queued.cause, 0);
+							event["queued"]["cause"] = max((int)queued.cause, 0);
 							event["queued"]["reason"] = AvayaAPI::cstaEventCauseString(queued.cause);
 							event["queued"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(queued.localConnectionInfo);
 							event["queued"]["connection"] = AvayaAPI::cstaConnectionIDJson(queued.queuedConnection);
@@ -1915,7 +1915,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "FAILED";
-							event["failed"]["cause"] = max(failed.cause, 0);
+							event["failed"]["cause"] = max((int)failed.cause, 0);
 							event["failed"]["reason"] = AvayaAPI::cstaEventCauseString(failed.cause);
 							event["failed"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(failed.localConnectionInfo);
 							event["failed"]["connection"] = AvayaAPI::cstaConnectionIDJson(failed.failedConnection);
@@ -1944,7 +1944,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "TRANSFERRED";
-							event["transferred"]["cause"] = max(transferred.cause, 0);
+							event["transferred"]["cause"] = max((int)transferred.cause, 0);
 							event["transferred"]["reason"] = AvayaAPI::cstaEventCauseString(transferred.cause);
 							event["transferred"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(transferred.localConnectionInfo);
 							event["transferred"]["transferring"] = transferring;
@@ -1971,7 +1971,7 @@ namespace chilli {
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
 							event["event"] = "CONFERENCED";
-							event["conferenced"]["cause"] = max(conferenced.cause, 0);
+							event["conferenced"]["cause"] = max((int)conferenced.cause, 0);
 							event["conferenced"]["reason"] = AvayaAPI::cstaEventCauseString(conferenced.cause);
 							event["conferenced"]["controller"] = controller;
 							event["conferenced"]["addedParty"] = addedParty;
@@ -2008,7 +2008,7 @@ namespace chilli {
 							event["event"] = "DIVERTED";
 							event["diverted"]["diverting"] = diverting;
 							event["diverted"]["diverted"] = cdiverted;
-							event["diverted"]["cause"] = max(diverted.cause, 0);
+							event["diverted"]["cause"] = max((int)diverted.cause, 0);
 							event["diverted"]["reason"] = AvayaAPI::cstaEventCauseString(diverted.cause);
 							event["diverted"]["localConnect"] = AvayaAPI::cstaLocalConnectionStateString(localConnect);
 
