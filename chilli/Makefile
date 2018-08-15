@@ -18,6 +18,8 @@ CallSRC = ./Call/
 DeviceSRC = ./Device/
 EventReportSrc = ./EventReport/
 FreeSWITCHSrc = ./FreeSWITCH/
+GroupSrc = ./Group/
+IVRSrc = ./IVR/
 
 INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
 
@@ -29,6 +31,8 @@ Call_OBJ_DIR = $(OBJ_DIR)Call/
 Device_OBJ_DIR = $(OBJ_DIR)Device/
 EventReport_OBJ_DIR = $(OBJ_DIR)EventReport/
 FreeSWITCH_OBJ_DIR = $(OBJ_DIR)FreeSWITCH/
+Group_OBJ_DIR = $(OBJ_DIR)Group/
+IVR_OBJ_DIR = $(OBJ_DIR)IVR/
 
 
 CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
@@ -45,8 +49,9 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(Call_OBJ_DIR)Call.o $(Call_OBJ_DIR)CallModule.o\
 	  $(Device_OBJ_DIR)Device.o\
 	  $(EventReport_OBJ_DIR)EventReportModule.o\
-	  $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o 
-
+	  $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o\
+	  $(Group_OBJ_DIR)Group.o $(Group_OBJ_DIR)GroupModule.o\
+	  $(IVR_OBJ_DIR)IVRModule.o 
 
 MODULE_APP:chkobjdir $(OBJ)
 	$(LINK) -v -g -o $(MODULE_APP)  $(OBJ) $(LDFLAGS)  
@@ -111,6 +116,15 @@ $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o:$(FreeSWITCHSrc)FreeSwitchDevice.cpp
 	
 $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o:$(FreeSWITCHSrc)FreeSwitchModule.cpp
 	$(COMPILE) $(CXXFLAGS) $(FreeSWITCHSrc)FreeSwitchModule.cpp $(INCLUDE) -o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o
+	
+$(Group_OBJ_DIR)GroupModule.o:$(GroupSrc)GroupModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(GroupSrc)GroupModule.cpp $(INCLUDE) -o $(Group_OBJ_DIR)GroupModule.o
+	
+$(Group_OBJ_DIR)Group.o:$(GroupSrc)Group.cpp
+	$(COMPILE) $(CXXFLAGS) $(GroupSrc)Group.cpp $(INCLUDE) -o $(Group_OBJ_DIR)Group.o
+	
+$(IVR_OBJ_DIR)IVRModule.o:$(IVRSrc)IVRModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(IVRSrc)IVRModule.cpp $(INCLUDE) -o $(IVR_OBJ_DIR)IVRModule.o
 
 chkobjdir:
 	@if test ! -d $(OBJ_DIR);\
@@ -152,7 +166,17 @@ chkobjdir:
 	then \
 		mkdir $(FreeSWITCH_OBJ_DIR); \
 	fi
-
+	
+	@if test ! -d $(Group_OBJ_DIR);\
+	then \
+		mkdir $(Group_OBJ_DIR); \
+	fi
+	
+	@if test ! -d $(IVR_OBJ_DIR);\
+	then \
+		mkdir $(IVR_OBJ_DIR); \
+	fi
+	
 clean:
 	rm -rdf $(MODULE_APP)
 	rm -rf $(OBJ_DIR)*
