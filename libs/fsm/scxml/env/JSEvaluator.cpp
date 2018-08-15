@@ -104,6 +104,8 @@ namespace env
 		if (JS_IsExceptionPending(cx))
 			JS_GetPendingException(cx, &exception);
 
+		JS_ClearPendingException(cx);
+
 		if (!report) {
 			throw jsexception(message, 0, 0, 0);
 		}
