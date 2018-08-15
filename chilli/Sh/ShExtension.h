@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Device\Device.h"
-#include <log4cplus\logger.h>
+#include "../Device/Device.h"
+#include <log4cplus/logger.h>
 #include <memory>
 
 namespace chilli{

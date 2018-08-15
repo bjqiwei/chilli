@@ -25,8 +25,7 @@ namespace WebSocket {
 		struct lws_context * GetContext();
 		virtual WSConnection * OnAccept(struct lws *wsi);
 
-		friend int callback_lws(struct lws *wsi, enum lws_callback_reasons reason,
-			void *user, void *in, size_t len);
+		friend int callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 	};
 
 	typedef enum {

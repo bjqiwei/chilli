@@ -70,7 +70,7 @@ int ShDevModule::Start()
 
 	EVENT_SET_INFO EventMode;
 	EventMode.dwWorkMode = EVENT_CALLBACKA;
-	EventMode.lpHandlerParam = EvtHandler;
+	EventMode.lpHandlerParam = (LPVOID)EvtHandler;
 
 	if (SsmSetEvent(0xffff, -1, true, &EventMode) != 0)
 	{

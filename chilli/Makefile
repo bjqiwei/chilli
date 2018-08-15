@@ -22,6 +22,10 @@ GroupSrc = ./Group/
 IVRSrc = ./IVR/
 modelSrc = ./model/
 mysqlSrc = ./mysql/
+ShSrc = ./Sh/
+TCPSrc = ./TCP/
+tinyxml2Src = ./tinyxml2/
+websocketSrc =./websocket/
 
 INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs -I../libs/mysql-connector-c++-1.1.1-linux-glibc2.3-x86-64bit/include
 
@@ -37,6 +41,10 @@ Group_OBJ_DIR = $(OBJ_DIR)Group/
 IVR_OBJ_DIR = $(OBJ_DIR)IVR/
 model_OBJ_DIR = $(OBJ_DIR)model/
 mysql_OBJ_DIR = $(OBJ_DIR)mysql/
+Sh_OBJ_DIR = $(OBJ_DIR)Sh/
+TCP_OBJ_DIR = $(OBJ_DIR)TCP/
+tinyxml2_OBJ_DIR = $(OBJ_DIR)tinyxml2/
+websocket_OBJ_DIR = $(OBJ_DIR)websocket/
 
 
 CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
@@ -58,6 +66,11 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(IVR_OBJ_DIR)IVRModule.o\
 	  $(model_OBJ_DIR)PerformElement.o $(model_OBJ_DIR)ProcessModule.o\
 	  $(mysql_OBJ_DIR)MySqlModule.o\
+	  $(Sh_OBJ_DIR)ShAPI.o $(Sh_OBJ_DIR)ShDevModule.o $(Sh_OBJ_DIR)ShExtension.o\
+	  $(TCP_OBJ_DIR)tcp.o\
+	  $(tinyxml2_OBJ_DIR)tinyxml2.o\
+	  $(websocket_OBJ_DIR)websocket.o
+	  
 
 MODULE_APP:chkobjdir $(OBJ)
 	$(LINK) -v -g -o $(MODULE_APP)  $(OBJ) $(LDFLAGS)  
@@ -140,7 +153,26 @@ $(model_OBJ_DIR)ProcessModule.o:$(modelSrc)ProcessModule.cpp
 	
 $(mysql_OBJ_DIR)MySqlModule.o:$(mysqlSrc)MySqlModule.cpp
 	$(COMPILE) $(CXXFLAGS) $(mysqlSrc)MySqlModule.cpp $(INCLUDE) -o $(mysql_OBJ_DIR)MySqlModule.o
-
+	
+$(Sh_OBJ_DIR)ShAPI.o:$(ShSrc)ShAPI.cpp
+	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShAPI.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShAPI.o
+	
+$(Sh_OBJ_DIR)ShDevModule.o:$(ShSrc)ShDevModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShDevModule.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShDevModule.o
+	
+$(Sh_OBJ_DIR)ShExtension.o:$(ShSrc)ShExtension.cpp
+	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShExtension.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShExtension.o
+	
+$(TCP_OBJ_DIR)tcp.o:$(TCPSrc)tcp.cpp
+	$(COMPILE) $(CXXFLAGS) $(TCPSrc)tcp.cpp $(INCLUDE) -o $(TCP_OBJ_DIR)tcp.o
+	
+$(tinyxml2_OBJ_DIR)tinyxml2.o:$(tinyxml2Src)tinyxml2.cpp
+	$(COMPILE) $(CXXFLAGS) $(tinyxml2Src)tinyxml2.cpp $(INCLUDE) -o $(tinyxml2_OBJ_DIR)tinyxml2.o
+	
+$(websocket_OBJ_DIR)websocket.o:$(websocketSrc)websocket.cpp
+	$(COMPILE) $(CXXFLAGS) $(websocketSrc)websocket.cpp $(INCLUDE) -o $(websocket_OBJ_DIR)websocket.o
+	
+	
 chkobjdir:
 	@if test ! -d $(OBJ_DIR);\
 	then \
@@ -202,6 +234,25 @@ chkobjdir:
 		mkdir $(mysql_OBJ_DIR); \
 	fi
 	
+	@if test ! -d $(Sh_OBJ_DIR);\
+	then \
+		mkdir $(Sh_OBJ_DIR); \
+	fi
+
+	@if test ! -d $(TCP_OBJ_DIR);\
+	then \
+		mkdir $(TCP_OBJ_DIR); \
+	fi
+	
+	@if test ! -d $(tinyxml2_OBJ_DIR);\
+	then \
+		mkdir $(tinyxml2_OBJ_DIR); \
+	fi
+	
+	@if test ! -d $(websocket_OBJ_DIR);\
+	then \
+		mkdir $(websocket_OBJ_DIR); \
+	fi
 	
 clean:
 	rm -rdf $(MODULE_APP)

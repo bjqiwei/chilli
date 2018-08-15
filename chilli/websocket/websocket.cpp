@@ -3,6 +3,8 @@
 #include <sstream>
 #include <map>
 #include <mutex>
+#include <thread>
+#include <atomic>
 
 namespace WebSocket {
 	static std::map<struct lws *, WSConnection *> WSClientSet;
@@ -15,15 +17,14 @@ namespace WebSocket {
 	* bound to a specific protocol also turn up here.
 	*/
 
-	static int
-		callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
+	int callback_lws(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 	{
 
 		WSConnection * wsclient = nullptr;
 		WebSocketServer * This = reinterpret_cast<WebSocketServer*>(lws_context_user(lws_get_context(wsi)));
 
 		//std::lock_guard<std::recursive_mutex> lcx(wsClientSetMtx);
-		auto & it = WSClientSet.find(wsi);
+		const auto & it = WSClientSet.find(wsi);
 		if (it != WSClientSet.end())
 			wsclient = it->second;
 
@@ -356,7 +357,7 @@ lwsclose:
 		m_Info.timeout_secs = 5;
 		m_Info.user = this;
 
-		static std::atomic_bool initssl = false;
+		static std::atomic<bool> initssl;
 		if (initssl == false){
 			initssl = true;
 			m_Info.options = m_Info.options | LWS_SERVER_OPTION_ALLOW_NON_SSL_ON_SSL_PORT;
@@ -464,7 +465,7 @@ lwsclose:
 		char m_urlbuff[1024];
 
 		memset(m_urlbuff, 0, sizeof(m_urlbuff));
-		strncpy_s(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
+		strncpy(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
 
 		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path)) {
 			LOG4CPLUS_ERROR(log, " parse uri error.");

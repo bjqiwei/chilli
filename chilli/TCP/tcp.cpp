@@ -5,6 +5,7 @@
 #include <event2/util.h>
 #include <event2/event.h>
 #include <event2/thread.h>
+#include <cstring>
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -26,7 +27,9 @@ namespace TCP {
 		struct event_base *base = evconnlistener_get_base(listener);
 		TCPConnection * client = This->OnAccept(base, fd);
 		sockaddr_in * sa_in = (sockaddr_in *)sa;
-		LOG4CPLUS_DEBUG(This->getLogger(), " accept client:" << client << ":" << inet_ntoa(sa_in->sin_addr) << ":" << ntohs(sa_in->sin_port));
+		char ip[64];
+		evutil_inet_ntop(AF_INET, sa_in, ip, sizeof(ip));
+		LOG4CPLUS_DEBUG(This->getLogger(), " accept client:" << client << ":" << ip << ":" << ntohs(sa_in->sin_port));
 		client->OnOpen();
 	}
 

@@ -4,7 +4,7 @@
 
 
 namespace SHAPI {
-	static std::atomic_ulong  g_Reference = 0;
+	static std::atomic<uint32_t>  g_Reference;
 #ifndef TcNo7_EXPORTS
 	Proc_SsmStartCti SsmStartCti = nullptr;
 	Proc_SsmStartCtiEx SsmStartCtiEx = nullptr;
