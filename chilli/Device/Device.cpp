@@ -99,7 +99,7 @@ namespace chilli {
 						session->start(false);
 					}
 
-					auto & it = m_Sessions.find(sessionId);
+					const auto & it = m_Sessions.find(sessionId);
 					it->second->pushEvent(evt);
 					it->second->mainEventLoop();
 
@@ -127,7 +127,7 @@ namespace chilli {
 				newEvent["type"] = jsonData["type"];
 				newEvent["param"] = jsonData["param"];
 			
-				auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
+				const auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
 				if (pe != nullptr) {
 					pe->PushEvent(chilli::model::EventType_t(newEvent));
 				}

@@ -15,6 +15,7 @@ ACDSRC = ./ACD/
 AgentSRC= ./Agent/
 AvayaSRC= ./Avaya/
 CallSRC= ./Call/
+DeviceSRC= ./Device/
 
 INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
 
@@ -23,6 +24,7 @@ ACD_OBJ_DIR = $(OBJ_DIR)ACD/
 Agent_OBJ_DIR = $(OBJ_DIR)Agent/
 Avaya_OBJ_DIR = $(OBJ_DIR)Avaya/
 Call_OBJ_DIR = $(OBJ_DIR)Call/
+Device_OBJ_DIR = $(OBJ_DIR)Device/
 
 
 CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
@@ -37,7 +39,7 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(Agent_OBJ_DIR)AgentModule.o $(Agent_OBJ_DIR)Agent.o\
       $(Avaya_OBJ_DIR)AvayaACD.o $(Avaya_OBJ_DIR)AvayaAgent.o $(Avaya_OBJ_DIR)AvayaDevice.o $(Avaya_OBJ_DIR)AvayaAPI.o $(Avaya_OBJ_DIR)AvayaVDN.o $(Avaya_OBJ_DIR)TSAPIModule.o\
 	  $(Call_OBJ_DIR)Call.o $(Call_OBJ_DIR)CallModule.o\
-	  $(OBJ_DIR)cfgFile.o $(OBJ_DIR)CallModule.o
+	  $(Device_OBJ_DIR)Device.o
 
 
 MODULE_APP:chkobjdir $(OBJ)
@@ -92,6 +94,9 @@ $(Call_OBJ_DIR)Call.o:$(CallSRC)Call.cpp
 
 $(Call_OBJ_DIR)CallModule.o:$(CallSRC)CallModule.cpp
 	$(COMPILE) $(CXXFLAGS) $(CallSRC)CallModule.cpp $(INCLUDE) -o $(Call_OBJ_DIR)CallModule.o
+	
+$(Device_OBJ_DIR)Device.o:$(DeviceSRC)Device.cpp
+	$(COMPILE) $(CXXFLAGS) $(DeviceSRC)Device.cpp $(INCLUDE) -o $(Device_OBJ_DIR)Device.o
 
 chkobjdir:
 	@if test ! -d $(OBJ_DIR);\
@@ -118,6 +123,11 @@ chkobjdir:
 	then \
 		mkdir $(Call_OBJ_DIR); \
 	fi
+
+	@if test ! -d $(Device_OBJ_DIR);\
+	then \
+		mkdir $(Device_OBJ_DIR); \
+	fi	
 
 clean:
 	rm -rdf $(MODULE_APP)
