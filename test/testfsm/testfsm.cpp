@@ -36,7 +36,7 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
-		fsm::StateMachine mysmscxml("0123456",strStateFile, &my_timer);
+		fsm::StateMachine mysmscxml("fsm","0123456",strStateFile, &my_timer);
 		SendImp mySend;
 
 		std::thread th([&]() {

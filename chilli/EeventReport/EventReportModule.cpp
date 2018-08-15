@@ -1,6 +1,7 @@
 #include "EventReportModule.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
+#include <json/config.h>
 #include <json/json.h>
 #include "../websocket/websocket.h"
 #include "../uuid.h"
@@ -173,7 +174,9 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["response"] = "MakeCall";
 
 			if (request["param"]["callingDevice"].isString())
-				calling = request["param"].removeMember("callingDevice").asString();
+				calling = request["param"]["callingDevice"].asString();
+
+			request["param"].removeMember("callingDevice");
 			
 			if (calling.empty())
 			{
@@ -185,7 +188,8 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			}
 
 			if (request["param"]["calledDirectoryNumber"].isString())
-				called = request["param"].removeMember("calledDirectoryNumber").asString();
+				called = request["param"]["calledDirectoryNumber"].asString();
+			request["param"].removeMember("calledDirectoryNumber");
 
 			if(called.empty()){
 				response["status"] = chilli::INVALID_CALLED_DEVICE;
@@ -228,7 +232,9 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["response"] = "MakeConnection";
 
 			if (request["param"]["initiatingDevice"].isString())
-				called = request["param"].removeMember("initiatingDevice").asString();
+				called = request["param"]["initiatingDevice"].asString();
+
+			request["param"].removeMember("initiatingDevice");
 
 			if(called.empty()){
 				response["status"] = chilli::INVALID_CALLED_DEVICE;
@@ -272,8 +278,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						if (c != m_Connections.end())
 							c->second->Send(response);
 
-						request["param"]["sessionID"] = request["param"].removeMember("connectionToBeCleared")["sessionID"];
-						request["cmd"] = request.removeMember("request");
+						request["param"]["sessionID"] = request["param"]["connectionToBeCleared"]["sessionID"];
+						request["param"].removeMember("connectionToBeCleared");
+						request["cmd"] = request["request"];
+						request.removeMember("request");
 						request["event"] = "cmd";
 						request["id"] = deviceid;
 						model::EventType_t evt(request);
@@ -310,8 +318,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 						request["param"]["sessionID"] = request["param"]["connection"]["sessionID"];
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
-						request["param"]["callID"] = request["param"].removeMember("connection")["callID"];
-						request["cmd"] = request.removeMember("request");
+						request["param"]["callID"] = request["param"]["connection"]["callID"];
+						request["param"].removeMember("connection");
+						request["cmd"] = request["request"];
+						request.removeMember("request");
 						request["event"] = "cmd";
 						request["id"] = deviceid;
 						model::EventType_t evt(request);

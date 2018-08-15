@@ -2,6 +2,7 @@
 #include "../Device/Device.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
+#include <json/config.h>
 #include <json/json.h>
 
 

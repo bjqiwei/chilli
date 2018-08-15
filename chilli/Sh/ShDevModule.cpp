@@ -1,6 +1,7 @@
 #include "ShDevModule.h"
 #include "ShExtension.h"
 #include <log4cplus/loggingmacros.h>
+#include <json/config.h>
 #include <json/json.h>
 
 namespace chilli{

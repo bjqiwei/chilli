@@ -3,6 +3,7 @@
 #define _SCXML_TRIGGEREVENT_HEADER_
 #include "../config.h"
 #include <string>
+#include <json/config.h>
 #include <json/json.h>
 
 namespace fsm

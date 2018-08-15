@@ -1,6 +1,7 @@
 #include "MySqlModule.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
+#include <json/config.h>
 #include <json/json.h>
 #include <cppconn/driver.h>
 #include <cppconn/connection.h>

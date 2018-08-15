@@ -1,4 +1,5 @@
 #include "TcpClientModule.h"
+#include <json/config.h>
 #include <json/json.h>
 #include <event2/thread.h>
 

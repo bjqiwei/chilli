@@ -3,6 +3,7 @@
 #include <log4cplus/loggingmacros.h>
 #include "../../common/xmlHelper.h"
 #include "../../common/stringHelper.h"
+#include <json/config.h>
 #include <json/json.h>
 
 namespace fsm

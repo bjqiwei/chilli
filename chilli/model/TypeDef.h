@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <stdint.h>
+#include <json/config.h>
 #include <json/json.h>
 
 namespace chilli {

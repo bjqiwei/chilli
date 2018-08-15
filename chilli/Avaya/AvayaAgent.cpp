@@ -1,6 +1,7 @@
 #include "AvayaAgent.h"
 #include "TSAPIModule.h"
 #include <log4cplus/loggingmacros.h>
+#include <json/config.h>
 #include <json/json.h>
 
 namespace chilli{

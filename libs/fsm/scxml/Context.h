@@ -2,6 +2,7 @@
 #ifndef FSM_CONTEXT_HEADER_
 #define FSM_CONTEXT_HEADER_
 #include <string>
+#include <json/config.h>
 #include <json/json.h>
 
 

@@ -59,7 +59,7 @@ private:
 	void ListenTCP(uint32_t port);
 	bool listenWS(int port);
 
-	std::map<uint32_t, EPConnectionPtr>m_Connections;
+	std::map<uint64_t, EPConnectionPtr>m_Connections;
 
 };
 }

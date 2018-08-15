@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include <string>
+#include <json/config.h>
 #include <json/json.h>
 #include <log4cplus/logger.h>
 #include "scxml/TriggerEvent.h"

@@ -1,6 +1,7 @@
 ﻿#include "TcpClientModule.h"
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
+#include <iostream>
 
 
 #define INT_SIZE                        sizeof(unsigned int)

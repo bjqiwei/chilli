@@ -1,5 +1,6 @@
 #include "Agent.h"
 #include <log4cplus/loggingmacros.h>
+#include <json/config.h>
 #include <json/json.h>
 #include "../model/ProcessModule.h"
 

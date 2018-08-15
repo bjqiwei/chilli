@@ -3,6 +3,7 @@
 #include <csta.h>
 #include <attpriv.h>
 #include <cstdint>
+#include <json/config.h>
 #include <json/json.h>
 
 namespace AvayaAPI{

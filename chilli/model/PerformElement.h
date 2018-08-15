@@ -3,6 +3,7 @@
 #include <FSM.h>
 #include <log4cplus/logger.h>
 #include "TypeDef.h"
+#include <json/config.h>
 #include <json/json.h>
 
 namespace chilli{

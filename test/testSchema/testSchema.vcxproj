@@ -186,7 +186,7 @@ xcopy /Y StateMachine.xml $(OutDir)</Command>
     <Xsd Include="scm.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\libxml2-2.9.3\win32\VC14\libxml2.vcxproj">
+    <ProjectReference Include="..\..\libs\libxml2-2.9.3\win\VC14\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
   </ItemGroup>

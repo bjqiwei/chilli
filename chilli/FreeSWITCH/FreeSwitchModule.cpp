@@ -4,6 +4,7 @@
 #include "FreeSwitchDevice.h"
 #include <log4cplus/loggingmacros.h>
 #include "../tinyxml2/tinyxml2.h"
+#include <json/config.h>
 #include <json/json.h>
 #include "../stringHelper.h"
 #include "../uuid.h"
@@ -474,7 +475,8 @@ void FreeSwitchModule::ConnectFS()
 
 						std::string eventName;
 						if (event["Event-Name"].isString()) {
-							eventName = event.removeMember("Event-Name").asString();
+							eventName = event["Event-Name"].asString();
+							event.removeMember("Event-Name");
 						}
 
 						LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
@@ -544,7 +546,8 @@ void FreeSwitchModule::ConnectFS()
 
 
 							
-							std::string sessionId = evt.event["param"].removeMember("UniqueID").asString();
+							std::string sessionId = evt.event["param"]["UniqueID"].asString();
+							evt.event["param"].removeMember("UniqueID");
 
 							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
 								if (dir == "inbound")

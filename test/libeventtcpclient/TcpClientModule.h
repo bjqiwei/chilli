@@ -3,6 +3,7 @@
 
 #include <event2/event.h>
 #include "CEventBuffer.h"
+#include <json/config.h>
 #include <json/json.h>
 #include <atomic>
 #include <thread>
