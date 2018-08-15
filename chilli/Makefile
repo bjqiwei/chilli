@@ -20,8 +20,10 @@ EventReportSrc = ./EventReport/
 FreeSWITCHSrc = ./FreeSWITCH/
 GroupSrc = ./Group/
 IVRSrc = ./IVR/
+modelSrc = ./model/
+mysqlSrc = ./mysql/
 
-INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
+INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs -I../libs/mysql-connector-c++-1.1.1-linux-glibc2.3-x86-64bit/include
 
 OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
@@ -33,6 +35,8 @@ EventReport_OBJ_DIR = $(OBJ_DIR)EventReport/
 FreeSWITCH_OBJ_DIR = $(OBJ_DIR)FreeSWITCH/
 Group_OBJ_DIR = $(OBJ_DIR)Group/
 IVR_OBJ_DIR = $(OBJ_DIR)IVR/
+model_OBJ_DIR = $(OBJ_DIR)model/
+mysql_OBJ_DIR = $(OBJ_DIR)mysql/
 
 
 CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
@@ -51,7 +55,9 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(EventReport_OBJ_DIR)EventReportModule.o\
 	  $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o\
 	  $(Group_OBJ_DIR)Group.o $(Group_OBJ_DIR)GroupModule.o\
-	  $(IVR_OBJ_DIR)IVRModule.o 
+	  $(IVR_OBJ_DIR)IVRModule.o\
+	  $(model_OBJ_DIR)PerformElement.o $(model_OBJ_DIR)ProcessModule.o\
+	  $(mysql_OBJ_DIR)MySqlModule.o\
 
 MODULE_APP:chkobjdir $(OBJ)
 	$(LINK) -v -g -o $(MODULE_APP)  $(OBJ) $(LDFLAGS)  
@@ -126,6 +132,15 @@ $(Group_OBJ_DIR)Group.o:$(GroupSrc)Group.cpp
 $(IVR_OBJ_DIR)IVRModule.o:$(IVRSrc)IVRModule.cpp
 	$(COMPILE) $(CXXFLAGS) $(IVRSrc)IVRModule.cpp $(INCLUDE) -o $(IVR_OBJ_DIR)IVRModule.o
 
+$(model_OBJ_DIR)PerformElement.o:$(modelSrc)PerformElement.cpp
+	$(COMPILE) $(CXXFLAGS) $(modelSrc)PerformElement.cpp $(INCLUDE) -o $(model_OBJ_DIR)PerformElement.o
+	
+$(model_OBJ_DIR)ProcessModule.o:$(modelSrc)ProcessModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(modelSrc)ProcessModule.cpp $(INCLUDE) -o $(model_OBJ_DIR)ProcessModule.o
+	
+$(mysql_OBJ_DIR)MySqlModule.o:$(mysqlSrc)MySqlModule.cpp
+	$(COMPILE) $(CXXFLAGS) $(mysqlSrc)MySqlModule.cpp $(INCLUDE) -o $(mysql_OBJ_DIR)MySqlModule.o
+
 chkobjdir:
 	@if test ! -d $(OBJ_DIR);\
 	then \
@@ -176,6 +191,17 @@ chkobjdir:
 	then \
 		mkdir $(IVR_OBJ_DIR); \
 	fi
+	
+	@if test ! -d $(model_OBJ_DIR);\
+	then \
+		mkdir $(model_OBJ_DIR); \
+	fi
+
+	@if test ! -d $(mysql_OBJ_DIR);\
+	then \
+		mkdir $(mysql_OBJ_DIR); \
+	fi
+	
 	
 clean:
 	rm -rdf $(MODULE_APP)

@@ -1,0 +1,4 @@
+1、安装boost库 yum install boost-devel
+2、安装cmake
+3、cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles"
+4、make && make install

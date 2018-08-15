@@ -19,7 +19,7 @@ namespace model{
 			Stop();
 		}
 
-		for (auto & it = m_PerformElements.begin(); it != m_PerformElements.end();) {
+		for (auto it = m_PerformElements.begin(); it != m_PerformElements.end();) {
 			removePerfromElement(it++->first);
 		}
 
@@ -179,7 +179,7 @@ namespace model{
 	chilli::model::PerformElementPtr ProcessModule::getPerformElement(const std::string & peId)
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
-		auto & it = this->m_PerformElements.find(peId);
+		const auto & it = this->m_PerformElements.find(peId);
 		if (it != this->m_PerformElements.end()) {
 			return it->second;
 		}
@@ -191,7 +191,7 @@ namespace model{
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 
-		auto & it = this->g_PerformElements.find(peId);
+		const auto & it = this->g_PerformElements.find(peId);
 		if (it != this->g_PerformElements.end()) {
 			return it->second;
 		}
