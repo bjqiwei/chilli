@@ -146,9 +146,11 @@ void MySqlModule::fireSend(const std::string &strContent, const void * param)
 {
 	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
 	Json::Value jsonEvent;
-	Json::Reader jsonReader;
-	if (!jsonReader.parse(strContent, jsonEvent)) {
-		LOG4CPLUS_ERROR(log, " " << strContent << " not json data.");
+	Json::CharReaderBuilder b;
+	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
+	std::string jsonerr;
+	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonEvent, &jsonerr)) {
+		LOG4CPLUS_ERROR(log, " " << strContent << " not json data." << jsonerr);
 		return;
 	}
 

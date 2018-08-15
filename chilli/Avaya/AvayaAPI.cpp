@@ -1,6 +1,6 @@
 #include "AvayaAPI.h"
 #include <atomic>
-#include "../Dynamiclibrary.h"
+#include <apr_dso.h>
 
 
 #if defined ( TSLIB_WINDOWS_32 )
@@ -879,8 +879,9 @@ namespace AvayaAPI {
 	Proc_addATTPrivate m_addATTPrivate = nullptr;
 	Proc_getATTPrivate m_getATTPrivate = nullptr;
 
-	static Dynamiclibrary CSTA32("CSTA32.DLL");
-	static Dynamiclibrary ATTPRV32("ATTPRV32.DLL");
+	static apr_dso_handle_t * CSTA32 = nullptr;
+	static apr_dso_handle_t * ATTPRV32 = nullptr;
+	static apr_pool_t * avaya_api_pool = nullptr;
 
 	const char * cstaErrorString(CSTAUniversalFailure_t error)
 	{
@@ -1165,45 +1166,51 @@ namespace AvayaAPI {
 
 	bool InitAvayaAPI() {
 		if (g_Reference.fetch_add(1) == 0) {
-			if (!CSTA32.Open()){
+
+			apr_pool_create(&avaya_api_pool, nullptr);
+			if (apr_dso_load(&CSTA32, "CSTA32.dll", avaya_api_pool) != APR_SUCCESS) {
 				return false;
 			}
-			m_acsOpenStream = (Proc_acsOpenStream)CSTA32.GetFunction("acsOpenStream");
-			m_acsCloseStream = (Proc_acsCloseStream)CSTA32.GetFunction("acsCloseStream");
-			m_acsAbortStream = (Proc_acsAbortStream)CSTA32.GetFunction("acsAbortStream");
-			m_acsFlushEventQueue = (Proc_acsFlushEventQueue)CSTA32.GetFunction("acsFlushEventQueue");
-			m_acsGetEventPoll = (Proc_acsGetEventPoll)CSTA32.GetFunction("acsGetEventPoll");
-			m_acsGetEventBlock = (Proc_acsGetEventBlock)CSTA32.GetFunction("acsGetEventBlock");
+			apr_dso_handle_sym_t sym;
+
+			if(apr_dso_sym(&sym, CSTA32, "acsOpenStream") == APR_SUCCESS) m_acsOpenStream = (Proc_acsOpenStream)sym;
+			
+			if (apr_dso_sym(&sym, CSTA32, "acsCloseStream") == APR_SUCCESS) m_acsCloseStream = (Proc_acsCloseStream)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsAbortStream") == APR_SUCCESS) m_acsAbortStream = (Proc_acsAbortStream)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsFlushEventQueue") == APR_SUCCESS) m_acsFlushEventQueue = (Proc_acsFlushEventQueue)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsGetEventPoll") == APR_SUCCESS) m_acsGetEventPoll = (Proc_acsGetEventPoll)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsGetEventBlock") == APR_SUCCESS) m_acsGetEventBlock = (Proc_acsGetEventBlock)sym;
 #if defined ( TSLIB_WINDOWS_32 )
-			m_acsEventNotify = (Proc_acsEventNotify)CSTA32.GetFunction("acsEventNotify");
-			m_acsSetESR = (Proc_acsSetESR)CSTA32.GetFunction("acsSetESR");
+			if (apr_dso_sym(&sym, CSTA32, "acsEventNotify") == APR_SUCCESS) m_acsEventNotify = (Proc_acsEventNotify)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsSetESR") == APR_SUCCESS) m_acsSetESR = (Proc_acsSetESR)sym;
 #elif defined ( TSLIB_LINUX )
-			m_acsGetFile = (Proc_acsGetFile)CSTA32.GetFunction("acsGetFile");
+			if (apr_dso_sym(&sym, CSTA32, "acsGetFile") == APR_SUCCESS) m_acsGetFile = (Proc_acsGetFile)sym;
 #endif
-			m_acsEnumServerNames = (Proc_acsEnumServerNames)CSTA32.GetFunction("acsEnumServerNames");
-			m_acsQueryAuthInfo = (Proc_acsQueryAuthInfo)CSTA32.GetFunction("acsQueryAuthInfo");
-			m_acsGetServerID = (Proc_acsGetServerID)CSTA32.GetFunction("acsGetServerID");
-			m_acsSetHeartbeatInterval = (Proc_acsSetHeartbeatInterval)CSTA32.GetFunction("acsSetHeartbeatInterval");
-			m_acsReturnCodeString = (Proc_acsReturnCodeString)CSTA32.GetFunction("acsReturnCodeString");
-			m_acsReturnCodeVerboseString = (Proc_acsReturnCodeVerboseString)CSTA32.GetFunction("acsReturnCodeVerboseString");
-			m_acsErrorString = (Proc_acsErrorString)CSTA32.GetFunction("acsErrorString");
-			m_cstaErrorString = (Proc_cstaErrorString)CSTA32.GetFunction("cstaErrorString");
-			m_cstaAlternateCall = (Proc_cstaAlternateCall)CSTA32.GetFunction("cstaAlternateCall");
-			m_cstaAnswerCall = (Proc_cstaAnswerCall)CSTA32.GetFunction("cstaAnswerCall");
-			m_cstaCallCompletion = (Proc_cstaCallCompletion)CSTA32.GetFunction("cstaCallCompletion");
-			m_cstaClearCall = (Proc_cstaClearCall)CSTA32.GetFunction("cstaClearCall");
-			m_cstaClearConnection = (Proc_cstaClearConnection)CSTA32.GetFunction("cstaClearConnection");
-			m_cstaConferenceCall = (Proc_cstaConferenceCall)CSTA32.GetFunction("cstaConferenceCall");
-			m_cstaConsultationCall = (Proc_cstaConsultationCall)CSTA32.GetFunction("cstaConsultationCall");
-			m_cstaDeflectCall = (Proc_cstaDeflectCall)CSTA32.GetFunction("cstaDeflectCall");
-			m_cstaGroupPickupCall = (Proc_cstaGroupPickupCall)CSTA32.GetFunction("cstaGroupPickupCall");
-			m_cstaHoldCall = (Proc_cstaHoldCall)CSTA32.GetFunction("cstaHoldCall");
-			m_cstaMakeCall = (Proc_cstaMakeCall)CSTA32.GetFunction("cstaMakeCall");
-			m_cstaMakePredictiveCall = (Proc_cstaMakePredictiveCall)CSTA32.GetFunction("cstaMakePredictiveCall");
-			m_cstaPickupCall = (Proc_cstaPickupCall)CSTA32.GetFunction("cstaPickupCall");
-			m_cstaReconnectCall = (Proc_cstaReconnectCall)CSTA32.GetFunction("cstaReconnectCall");
-			m_cstaRetrieveCall = (Proc_cstaRetrieveCall)CSTA32.GetFunction("cstaRetrieveCall");
-			m_cstaTransferCall = (Proc_cstaTransferCall)CSTA32.GetFunction("cstaTransferCall");
+			if (apr_dso_sym(&sym, CSTA32, "acsEnumServerNames") == APR_SUCCESS) m_acsEnumServerNames = (Proc_acsEnumServerNames)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsQueryAuthInfo") == APR_SUCCESS) m_acsQueryAuthInfo = (Proc_acsQueryAuthInfo)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsGetServerID") == APR_SUCCESS) m_acsGetServerID = (Proc_acsGetServerID)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsSetHeartbeatInterval") == APR_SUCCESS) m_acsSetHeartbeatInterval = (Proc_acsSetHeartbeatInterval)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsReturnCodeString") == APR_SUCCESS) m_acsReturnCodeString = (Proc_acsReturnCodeString)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsReturnCodeVerboseString") == APR_SUCCESS) m_acsReturnCodeVerboseString = (Proc_acsReturnCodeVerboseString)sym;
+			if (apr_dso_sym(&sym, CSTA32, "acsErrorString") == APR_SUCCESS) m_acsErrorString = (Proc_acsErrorString)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaErrorString") == APR_SUCCESS) m_cstaErrorString = (Proc_cstaErrorString)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaAlternateCall") == APR_SUCCESS) m_cstaAlternateCall = (Proc_cstaAlternateCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaAnswerCall") == APR_SUCCESS) m_cstaAnswerCall = (Proc_cstaAnswerCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaCallCompletion") == APR_SUCCESS) m_cstaCallCompletion = (Proc_cstaCallCompletion)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaClearCall") == APR_SUCCESS) m_cstaClearCall = (Proc_cstaClearCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaClearConnection") == APR_SUCCESS) m_cstaClearConnection = (Proc_cstaClearConnection)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaConferenceCall") == APR_SUCCESS) m_cstaConferenceCall = (Proc_cstaConferenceCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaConsultationCall") == APR_SUCCESS) m_cstaConsultationCall = (Proc_cstaConsultationCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaDeflectCall") == APR_SUCCESS) m_cstaDeflectCall = (Proc_cstaDeflectCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaGroupPickupCall") == APR_SUCCESS) m_cstaGroupPickupCall = (Proc_cstaGroupPickupCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaHoldCall") == APR_SUCCESS) m_cstaHoldCall = (Proc_cstaHoldCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaMakeCall") == APR_SUCCESS) m_cstaMakeCall = (Proc_cstaMakeCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaMakePredictiveCall") == APR_SUCCESS) m_cstaMakePredictiveCall = (Proc_cstaMakePredictiveCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaPickupCall") == APR_SUCCESS) m_cstaPickupCall = (Proc_cstaPickupCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaReconnectCall") == APR_SUCCESS) m_cstaReconnectCall = (Proc_cstaReconnectCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaRetrieveCall") == APR_SUCCESS) m_cstaRetrieveCall = (Proc_cstaRetrieveCall)sym;
+			if (apr_dso_sym(&sym, CSTA32, "cstaTransferCall") == APR_SUCCESS) m_cstaTransferCall = (Proc_cstaTransferCall)sym;
+			/*
 			m_cstaSetMsgWaitingInd = (Proc_cstaSetMsgWaitingInd)CSTA32.GetFunction("cstaSetMsgWaitingInd");
 			m_cstaSetDoNotDisturb = (Proc_cstaSetDoNotDisturb)CSTA32.GetFunction("cstaSetDoNotDisturb");
 			m_cstaSetForwarding = (Proc_cstaSetForwarding)CSTA32.GetFunction("cstaSetForwarding");
@@ -1239,59 +1246,60 @@ namespace AvayaAPI {
 			m_cstaGetAPICaps = (Proc_cstaGetAPICaps)CSTA32.GetFunction("cstaGetAPICaps");
 			m_cstaGetDeviceList = (Proc_cstaGetDeviceList)CSTA32.GetFunction("cstaGetDeviceList");
 			m_cstaQueryCallMonitor = (Proc_cstaQueryCallMonitor)CSTA32.GetFunction("cstaQueryCallMonitor");
-			
-			if (!ATTPRV32.Open()) {
+			*/
+
+			if (apr_dso_load(&ATTPRV32, "ATTPRV32.dll", avaya_api_pool) != APR_SUCCESS) {
 				return false;
 			}
 
-			m_attMakeVersionString = (Proc_attMakeVersionString)ATTPRV32.GetFunction("attMakeVersionString");
-			m_encodePrivate = (Proc_encodePrivate)ATTPRV32.GetFunction("encodePrivate");
-			m_attPrivateData = (Proc_attPrivateData)ATTPRV32.GetFunction("attPrivateData");
-			m_attClearConnection = (Proc_attClearConnection)ATTPRV32.GetFunction("attClearConnection");
-			m_attConsultationCall = (Proc_attConsultationCall)ATTPRV32.GetFunction("attConsultationCall");
-			m_attMakeCall = (Proc_attMakeCall)ATTPRV32.GetFunction("attMakeCall");
-			m_attDirectAgentCall = (Proc_attDirectAgentCall)ATTPRV32.GetFunction("attDirectAgentCall");
-			m_attMakePredictiveCall = (Proc_attMakePredictiveCall)ATTPRV32.GetFunction("attMakePredictiveCall");
-			m_attSupervisorAssistCall = (Proc_attSupervisorAssistCall)ATTPRV32.GetFunction("attSupervisorAssistCall");
-			m_attReconnectCall = (Proc_attReconnectCall)ATTPRV32.GetFunction("attReconnectCall");
-			m_attSendDTMFTone = (Proc_attSendDTMFTone)ATTPRV32.GetFunction("attSendDTMFTone");
-			m_attSetAgentState = (Proc_attSetAgentState)ATTPRV32.GetFunction("attSetAgentState");
-			m_attQueryAcdSplit = (Proc_attQueryAcdSplit)ATTPRV32.GetFunction("attQueryAcdSplit");
-			m_attQueryAgentLogin = (Proc_attQueryAgentLogin)ATTPRV32.GetFunction("attQueryAgentLogin");
-			m_attQueryAgentState = (Proc_attQueryAgentState)ATTPRV32.GetFunction("attQueryAgentState");
-			m_attQueryCallClassifier = (Proc_attQueryCallClassifier)ATTPRV32.GetFunction("attQueryCallClassifier");
-			m_attQueryDeviceName = (Proc_attQueryDeviceName)ATTPRV32.GetFunction("attQueryDeviceName");
-			m_attQueryStationStatus = (Proc_attQueryStationStatus)ATTPRV32.GetFunction("attQueryStationStatus");
-			m_attQueryTimeOfDay = (Proc_attQueryTimeOfDay)ATTPRV32.GetFunction("attQueryTimeOfDay");
-			m_attQueryTrunkGroup = (Proc_attQueryTrunkGroup)ATTPRV32.GetFunction("attQueryTrunkGroup");
-			m_attMonitorFilter = (Proc_attMonitorFilter)ATTPRV32.GetFunction("attMonitorFilter");
-			m_attMonitorStopOnCall = (Proc_attMonitorStopOnCall)ATTPRV32.GetFunction("attMonitorStopOnCall");
-			m_attRouteSelect = (Proc_attRouteSelect)ATTPRV32.GetFunction("attRouteSelect");
-			m_attSysStat = (Proc_attSysStat)ATTPRV32.GetFunction("attSysStat");
-			m_attSingleStepConferenceCall = (Proc_attSingleStepConferenceCall)ATTPRV32.GetFunction("attSingleStepConferenceCall");
-			m_attSelectiveListeningHold = (Proc_attSelectiveListeningHold)ATTPRV32.GetFunction("attSelectiveListeningHold");
-			m_attSelectiveListeningRetrieve = (Proc_attSelectiveListeningRetrieve)ATTPRV32.GetFunction("attSelectiveListeningRetrieve");
-			m_attSetAgentStateExt = (Proc_attSetAgentStateExt)ATTPRV32.GetFunction("attSetAgentStateExt");
-			m_attSetBillRate = (Proc_attSetBillRate)ATTPRV32.GetFunction("attSetBillRate");
-			m_attQueryUCID = (Proc_attQueryUCID)ATTPRV32.GetFunction("attQueryUCID");
-			m_attSetAdviceOfCharge = (Proc_attSetAdviceOfCharge)ATTPRV32.GetFunction("attSetAdviceOfCharge");
-			m_attSendDTMFToneExt = (Proc_attSendDTMFToneExt)ATTPRV32.GetFunction("attSendDTMFToneExt");
-			m_attMonitorFilterExt = (Proc_attMonitorFilterExt)ATTPRV32.GetFunction("attMonitorFilterExt");
-			m_attV6SetAgentState = (Proc_attV6SetAgentState)ATTPRV32.GetFunction("attV6SetAgentState");
-			m_attV6MakeCall = (Proc_attV6MakeCall)ATTPRV32.GetFunction("attV6MakeCall");
-			m_attV6ClearConnection = (Proc_attV6ClearConnection)ATTPRV32.GetFunction("attV6ClearConnection");
-			m_attV6ConsultationCall = (Proc_attV6ConsultationCall)ATTPRV32.GetFunction("attV6ConsultationCall");
-			m_attV6DirectAgentCall = (Proc_attV6DirectAgentCall)ATTPRV32.GetFunction("attV6DirectAgentCall");
-			m_attV6MakePredictiveCall = (Proc_attV6MakePredictiveCall)ATTPRV32.GetFunction("attV6MakePredictiveCall");
-			m_attV6SupervisorAssistCall = (Proc_attV6SupervisorAssistCall)ATTPRV32.GetFunction("attV6SupervisorAssistCall");
-			m_attV6ReconnectCall = (Proc_attV6ReconnectCall)ATTPRV32.GetFunction("attV6ReconnectCall");
-			m_attV6RouteSelect = (Proc_attV6RouteSelect)ATTPRV32.GetFunction("attV6RouteSelect");
-			m_attV7RouteSelect = (Proc_attV7RouteSelect)ATTPRV32.GetFunction("attV7RouteSelect");
-			m_attSingleStepTransferCall = (Proc_attSingleStepTransferCall)ATTPRV32.GetFunction("attSingleStepTransferCall");
-			m_attMonitorCallsViaDevice = (Proc_attMonitorCallsViaDevice)ATTPRV32.GetFunction("attMonitorCallsViaDevice");
-			m_initATTPrivate = (Proc_initATTPrivate)ATTPRV32.GetFunction("initATTPrivate");
-			m_addATTPrivate = (Proc_addATTPrivate)ATTPRV32.GetFunction("addATTPrivate");
-			m_getATTPrivate = (Proc_getATTPrivate)ATTPRV32.GetFunction("getATTPrivate");
+			if(apr_dso_sym(&sym, ATTPRV32,"attMakeVersionString") == APR_SUCCESS) m_attMakeVersionString = (Proc_attMakeVersionString)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "encodePrivate") == APR_SUCCESS) m_encodePrivate = (Proc_encodePrivate)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attPrivateData") == APR_SUCCESS) m_attPrivateData = (Proc_attPrivateData)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attClearConnection") == APR_SUCCESS) m_attClearConnection = (Proc_attClearConnection)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attConsultationCall") == APR_SUCCESS) m_attConsultationCall = (Proc_attConsultationCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMakeCall") == APR_SUCCESS) m_attMakeCall = (Proc_attMakeCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attDirectAgentCall") == APR_SUCCESS) m_attDirectAgentCall = (Proc_attDirectAgentCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMakePredictiveCall") == APR_SUCCESS) m_attMakePredictiveCall = (Proc_attMakePredictiveCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSupervisorAssistCall") == APR_SUCCESS) m_attSupervisorAssistCall = (Proc_attSupervisorAssistCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attReconnectCall") == APR_SUCCESS) m_attReconnectCall = (Proc_attReconnectCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSendDTMFTone") == APR_SUCCESS) m_attSendDTMFTone = (Proc_attSendDTMFTone)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSetAgentState") == APR_SUCCESS) m_attSetAgentState = (Proc_attSetAgentState)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryAcdSplit") == APR_SUCCESS) m_attQueryAcdSplit = (Proc_attQueryAcdSplit)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryAgentLogin") == APR_SUCCESS) m_attQueryAgentLogin = (Proc_attQueryAgentLogin)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryAgentState") == APR_SUCCESS) m_attQueryAgentState = (Proc_attQueryAgentState)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryCallClassifier") == APR_SUCCESS) m_attQueryCallClassifier = (Proc_attQueryCallClassifier)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryDeviceName") == APR_SUCCESS) m_attQueryDeviceName = (Proc_attQueryDeviceName)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryStationStatus") == APR_SUCCESS) m_attQueryStationStatus = (Proc_attQueryStationStatus)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryTimeOfDay") == APR_SUCCESS) m_attQueryTimeOfDay = (Proc_attQueryTimeOfDay)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryTrunkGroup") == APR_SUCCESS) m_attQueryTrunkGroup = (Proc_attQueryTrunkGroup)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMonitorFilter") == APR_SUCCESS) m_attMonitorFilter = (Proc_attMonitorFilter)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMonitorStopOnCall") == APR_SUCCESS) m_attMonitorStopOnCall = (Proc_attMonitorStopOnCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attRouteSelect") == APR_SUCCESS) m_attRouteSelect = (Proc_attRouteSelect)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSysStat") == APR_SUCCESS) m_attSysStat = (Proc_attSysStat)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSingleStepConferenceCall") == APR_SUCCESS) m_attSingleStepConferenceCall = (Proc_attSingleStepConferenceCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSelectiveListeningHold") == APR_SUCCESS) m_attSelectiveListeningHold = (Proc_attSelectiveListeningHold)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSelectiveListeningRetrieve") == APR_SUCCESS) m_attSelectiveListeningRetrieve = (Proc_attSelectiveListeningRetrieve)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSetAgentStateExt") == APR_SUCCESS) m_attSetAgentStateExt = (Proc_attSetAgentStateExt)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSetBillRate") == APR_SUCCESS) m_attSetBillRate = (Proc_attSetBillRate)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attQueryUCID") == APR_SUCCESS) m_attQueryUCID = (Proc_attQueryUCID)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSetAdviceOfCharge") == APR_SUCCESS) m_attSetAdviceOfCharge = (Proc_attSetAdviceOfCharge)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSendDTMFToneExt") == APR_SUCCESS) m_attSendDTMFToneExt = (Proc_attSendDTMFToneExt)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMonitorFilterExt") == APR_SUCCESS) m_attMonitorFilterExt = (Proc_attMonitorFilterExt)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6SetAgentState") == APR_SUCCESS) m_attV6SetAgentState = (Proc_attV6SetAgentState)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6MakeCall") == APR_SUCCESS) m_attV6MakeCall = (Proc_attV6MakeCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6ClearConnection") == APR_SUCCESS) m_attV6ClearConnection = (Proc_attV6ClearConnection)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6ConsultationCall") == APR_SUCCESS) m_attV6ConsultationCall = (Proc_attV6ConsultationCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6DirectAgentCall") == APR_SUCCESS) m_attV6DirectAgentCall = (Proc_attV6DirectAgentCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6MakePredictiveCall") == APR_SUCCESS) m_attV6MakePredictiveCall = (Proc_attV6MakePredictiveCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6SupervisorAssistCall") == APR_SUCCESS) m_attV6SupervisorAssistCall = (Proc_attV6SupervisorAssistCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6ReconnectCall") == APR_SUCCESS) m_attV6ReconnectCall = (Proc_attV6ReconnectCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV6RouteSelect") == APR_SUCCESS) m_attV6RouteSelect = (Proc_attV6RouteSelect)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attV7RouteSelect") == APR_SUCCESS) m_attV7RouteSelect = (Proc_attV7RouteSelect)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attSingleStepTransferCall") == APR_SUCCESS) m_attSingleStepTransferCall = (Proc_attSingleStepTransferCall)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "attMonitorCallsViaDevice") == APR_SUCCESS) m_attMonitorCallsViaDevice = (Proc_attMonitorCallsViaDevice)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "initATTPrivate") == APR_SUCCESS) m_initATTPrivate = (Proc_initATTPrivate)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "addATTPrivate") == APR_SUCCESS) m_addATTPrivate = (Proc_addATTPrivate)sym;
+			if (apr_dso_sym(&sym, ATTPRV32, "getATTPrivate") == APR_SUCCESS) m_getATTPrivate = (Proc_getATTPrivate)sym;
 		}
 		return true;
 	}
