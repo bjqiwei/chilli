@@ -27,7 +27,7 @@ TCPSrc = ./TCP/
 tinyxml2Src = ./tinyxml2/
 websocketSrc =./websocket/
 
-INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs -I../libs/mysql-connector-c++-1.1.1-linux-glibc2.3-x86-64bit/include
+INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
 
 OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
@@ -47,12 +47,13 @@ tinyxml2_OBJ_DIR = $(OBJ_DIR)tinyxml2/
 websocket_OBJ_DIR = $(OBJ_DIR)websocket/
 
 
-CFLAGS = -D__linux__ -D__LINUX__ -DLUA_USE_LINUX -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
+CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
 CXXFLAGS = $(CFLAGS) -std=c++11
 
-LDFLAGS= -L./. -L/usr/local/lib -static-libstdc++ -static-libgcc -Wall -g -O1 -lpthread 
-LDFLAGS:= $(LDFLAGS) ../libs/jsoncpp-1.8.4/src/lib_json/libjsoncpp.a ../libs/fsm/build/libfsm.a ../libs/libxml2-2.9.3/.libs/libxml2.a $(MOZJSDIR)mozglue/build/libmozglue.a $(MOZJSDIR)js/src/libmozjs-45.so $(MOZJSDIR)mfbt/Compression.o $(MOZJSDIR)mfbt/Decimal.o $(MOZJSDIR)mfbt/Unified_cpp_mfbt0.o
-LDFLAGS:= $(LDFLAGS) -lpthread -lm -ldl -lrt -lz -luuid -levent_extra -levent_core -levent_pthreads -llog4cplus  -llua -lm -ldl  -lrt
+LDFLAGS= -L./. -L/usr/local/lib -L/usr/local/apr/lib/ -static-libstdc++ -static-libgcc -Wall -g -O1 
+LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.a ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -lxml2 -levent_extra -levent_core -levent_pthreads -llog4cplus -ljs_static -lmozglue\
+	$(MOZJSDIR)mfbt/Compression.o $(MOZJSDIR)mfbt/Decimal.o $(MOZJSDIR)mfbt/Unified_cpp_mfbt0.o
+LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -lm -ldl -lrt -lz -lm -ldl  -lrt
 
 OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(ACD_OBJ_DIR)ACDModule.o $(ACD_OBJ_DIR)ACDDevice.o\

@@ -1,0 +1,1 @@
+进入 log4cplus-1.2.0 ./configure CXXFLAGS="-std=c++11" --enable-static && make && make install
