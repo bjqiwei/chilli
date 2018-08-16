@@ -9,7 +9,7 @@ namespace model{
 	model::PerformElementMap ProcessModule::g_PerformElements;
 
 	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId),
-		m_Id(modelId)
+		m_bRunning(false), m_Id(modelId)
 	{
 	}
 
@@ -154,11 +154,15 @@ namespace model{
 	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+
 		if (this->g_PerformElements.find(peId) == this->g_PerformElements.end()){
 			this->g_PerformElements[peId] = peptr;
+		}
+		if (this->m_PerformElements.find(peId) == this->m_PerformElements.end()) {
 			this->m_PerformElements[peId] = peptr;
 			return true;
 		}
+
 		return false;
 	}
 
@@ -166,8 +170,8 @@ namespace model{
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 		PerformElementPtr peptr;
-		const auto & it = this->g_PerformElements.find(peId);
-		if (it != this->g_PerformElements.end())
+		const auto & it = this->m_PerformElements.find(peId);
+		if (it != this->m_PerformElements.end())
 			peptr = it->second;
 
 		this->g_PerformElements.erase(peId);
@@ -191,11 +195,21 @@ namespace model{
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 
-		const auto & it = this->g_PerformElements.find(peId);
-		if (it != this->g_PerformElements.end()) {
-			return it->second;
-		}
+		do 
+		{
+			const auto & it = this->m_PerformElements.find(peId);
+			if (it != this->m_PerformElements.end()) {
+				return it->second;
+			}
+		} while (0);
 
+		do 
+		{
+			const auto & it = this->g_PerformElements.find(peId);
+			if (it != this->g_PerformElements.end()) {
+				return it->second;
+			}
+		} while (0);
 		return nullptr;
 	}
 

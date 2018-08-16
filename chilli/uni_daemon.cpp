@@ -31,12 +31,23 @@ bool uni_daemon_run(bool detach)
 {
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	daemon_running = TRUE;
-	apr_signal(SIGTERM,sigterm_handler);
 
 	LOG4CPLUS_INFO(log, "Run as Daemon");
 	if(detach == TRUE) {
 		apr_proc_detach(APR_PROC_DETACH_DAEMONIZE);
 	}
+
+	apr_signal(SIGTERM, sigterm_handler);
+	apr_signal(SIGINT, sigterm_handler);
+#ifdef SIGTSTP
+	apr_signal(SIGTSTP, sigterm_handler);
+#endif
+#ifdef SIGQUIT
+	apr_signal(SIGQUIT, sigterm_handler);
+#endif
+#ifdef SIGTERM
+	apr_signal(SIGTERM, sigterm_handler);
+#endif
 
 	/* start server */
 	chilli::App::Start();

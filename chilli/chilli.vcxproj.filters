@@ -71,6 +71,7 @@
     <None Include="conf\log4cplus.properties">
       <Filter>conf</Filter>
     </None>
+    <None Include="EventReportClient.htm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

@@ -226,6 +226,9 @@ xcopy /Y $(SolutionDir)\libs\mysql-connector-c++-noinstall-1.1.9-winx64\lib\*.dl
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="conf\log4cplus.properties" />
+    <None Include="EventReportClient.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="ReadMe.txt" />
     <None Include="welcome.wav" />
   </ItemGroup>

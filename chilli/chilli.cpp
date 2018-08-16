@@ -270,7 +270,7 @@ void chilli::App::AppInit(void)
 		readlink(buff, path, max_path);
 
 		assert(strrchr(path, '/'));
-		*strrchr(path, '.') = 0;
+		if(strrchr(path, '.')) *strrchr(path, '.') = 0;
 		strFileNameNoExtension = strrchr(path, '/') + 1;
 		*strrchr(path, '/') = 0;
 #endif
@@ -379,6 +379,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 
 void chilli::App::Start()
 {
+	AppInit();
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";

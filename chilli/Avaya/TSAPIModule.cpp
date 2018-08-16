@@ -16,7 +16,7 @@ namespace chilli {
 		ATTPrivateData_t g_stPrivateData;
 		using namespace AvayaAPI;
 		// Constructor of the TSAPIModule 
-		TSAPIModule::TSAPIModule(const std::string & id):ProcessModule(id)
+		TSAPIModule::TSAPIModule(const std::string & id):ProcessModule(id), m_ulInvokeID(1)
 		{
 			log = log4cplus::Logger::getInstance("chilli.TSAPIModule");
 			LOG4CPLUS_DEBUG(log, " Constuction a module.");
@@ -1741,7 +1741,7 @@ namespace chilli {
 							event["delivered"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 							event["callid"] = connection.callID;
 
-							auto it = m_callid2UUID.find(connection.callID);
+							const auto & it = m_callid2UUID.find(connection.callID);
 							if (it == m_callid2UUID.end())
 								m_callid2UUID[connection.callID] = helper::uuid();
 

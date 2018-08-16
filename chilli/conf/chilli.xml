@@ -43,6 +43,7 @@
       <Device DeviceID=".*" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
     </Devices>
   </FreeSwitch>
+  <!--
   <Avaya id = "tsapi001">
 		<TSAPI>
 			<TLink>AVAYA#CM#CSTA#AES</TLink>
@@ -62,5 +63,6 @@
       <Extension ExtensionNumber="0100" StateMachine="./conf/AvayaACD.xml"></Extension>
     </ACD>
 	</Avaya>
+  -->
   <!--MySql id="mysql" Host="127.0.0.1:3306" UserID="root" Password="deduct" DataBase="CTI"/-->
 </Config>

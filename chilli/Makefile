@@ -27,7 +27,7 @@ TCPSrc = ./TCP/
 tinyxml2Src = ./tinyxml2/
 websocketSrc =./websocket/
 
-INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/freeswitch/esl/include -I../libs/Avaya/TSAPI/hdrs
+INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/apr-1.5.2/include -I../libs/apr-util-1.5.4/include -I../libs/FreeSWITCH/esl/include -I../libs/Avaya/TSAPI/hdrs
 
 OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
@@ -47,11 +47,11 @@ tinyxml2_OBJ_DIR = $(OBJ_DIR)tinyxml2/
 websocket_OBJ_DIR = $(OBJ_DIR)websocket/
 
 
-CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -DTRIMMED -c -g -O1 
+CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -c -g -O1 
 CXXFLAGS = $(CFLAGS) -std=c++11
 
 LDFLAGS= -L./. -L/usr/local/lib -L/usr/local/apr/lib/ -static-libstdc++ -static-libgcc -Wall -g -O1 
-LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.a ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -lxml2 -levent_extra -levent_core -levent_pthreads -llog4cplus -ljs_static -lmozglue\
+LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.a ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -lxml2 -levent_extra -levent_core -levent_pthreads -llog4cplus -lmozjs-45 -lmozglue\
 	$(MOZJSDIR)mfbt/Compression.o $(MOZJSDIR)mfbt/Decimal.o $(MOZJSDIR)mfbt/Unified_cpp_mfbt0.o
 LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -lm -ldl -lrt -lz -lm -ldl  -lrt
 
