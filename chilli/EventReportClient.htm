@@ -45,7 +45,7 @@
 			var request = new Object();
 			request.invokeID = invokeid++;
 			request.type = "request";
-			request.request = "disConnect";
+			request.request = "DisConnect";
 			doSend(JSON.stringify(request));
 			websocket.close();
 		}
@@ -139,7 +139,7 @@
 			var request = new Object();
 			request.invokeID = invokeid++;
 			request.type = "request";
-			request.request = "connect";
+			request.request = "Connect";
 			request.param = new Object();
 			request.param.LoginID= document.getElementById("UserId").value;
 			request.param.passWord = document.getElementById("password").value;

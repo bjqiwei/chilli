@@ -7,6 +7,9 @@
 #include "../uuid.h"
 #include "../model/TypeDef.h"
 
+#define _STRVERSION(str) #str
+#define STRVERSION(str) _STRVERSION(str)
+static const char* appversion = STRVERSION(APPVERSION);
 
 namespace chilli{
 namespace EventReport{
@@ -121,14 +124,14 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 		if (request["request"].isString())
 			requestid = request["request"].asString();
 
-		if (requestid == "heartBeat") {
+		if (requestid == "HeartBeat") {
 
 			LOG4CPLUS_TRACE(log, " OnMessage:" << message);
 
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
-			response["response"] = "heartBeat";
+			response["response"] = "HeartBeat";
 			response["status"] = 0;
 			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
@@ -138,14 +141,14 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
 		}
 
-		if (requestid == "connect")
+		if (requestid == "Connect")
 		{
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
-			response["response"] = "connect";
+			response["response"] = "Connect";
 			response["status"] = 0;
-			response["param"]["version"] = "1.0.0.0";
+			response["param"]["version"] = appversion;
 
 			EPConnectionPtr connptr(conn);
 			m_Connections[id] = connptr;
@@ -153,12 +156,12 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (c != m_Connections.end())
 				c->second->Send(response);
 		}
-		else if (requestid == "disConnect")
+		else if (requestid == "DisConnect")
 		{
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
-			response["response"] = "disConnect";
+			response["response"] = "DisConnect";
 			response["status"] = 0;
 			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
@@ -434,6 +437,13 @@ void EventReportModule::run()
 }
 
 class TCPConnection :public EPConnection, public TCP::TCPConnection{
+private:
+	const uint32_t INT_SIZE = sizeof(uint32_t);
+	union contextlen {
+		char buffer[sizeof(uint32_t)];
+		uint32_t nlen;
+		uint32_t hlen;
+	};
 public:
 	explicit TCPConnection(EventReportModule * module, struct event_base * base, int64_t fd) :EPConnection(module), TCP::TCPConnection(base, fd)
 	{
@@ -466,15 +476,42 @@ public:
 		m_module->ConnOnError(GetId(), std::to_string(err));
 	}
 
-	virtual void OnReceived(const std::string & data) override
+	virtual void OnReceived(const std::string & oriData) override
 	{
-		LOG4CPLUS_DEBUG(log, " OnReceived:" << data);
-		m_module->ConnOnMessage(this, GetId(), data, log);
+		LOG4CPLUS_TRACE(log, " OnReceived:" << oriData);
+		contextlen hlen;
+		m_reciveBuffer.append(oriData);
+		size_t len = m_reciveBuffer.length();
+
+		while (len >= INT_SIZE) {
+			memcpy(hlen.buffer, m_reciveBuffer.data(), INT_SIZE);
+			hlen.hlen = ntohl(hlen.nlen);
+
+			if (len >= hlen.hlen) {
+				std::string data = m_reciveBuffer.substr(0, hlen.hlen);
+				m_reciveBuffer.erase(0, hlen.hlen);
+				data = data.substr(INT_SIZE);
+				m_module->ConnOnMessage(this, GetId(), data, log);
+			}
+			else {// 不够一个完整的包，跳出循环   
+				break;
+			}
+
+			len = m_reciveBuffer.length();
+		}
+		
 	}
 
 	virtual int Send(const char * lpBuf, int nBufLen) override
 	{
-		return TCP::TCPConnection::Send(lpBuf, nBufLen);
+		contextlen nlen;
+		std::string buffer;
+		nlen.nlen = htonl(nBufLen + INT_SIZE);
+		buffer.append(nlen.buffer, INT_SIZE);
+		buffer.append(lpBuf, nBufLen);
+
+		LOG4CPLUS_TRACE(log, " Send:" << buffer);
+		return TCP::TCPConnection::Send(buffer.c_str(), buffer.length());
 	}
 
 	virtual int Send(Json::Value send) override
@@ -482,11 +519,12 @@ public:
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
 		LOG4CPLUS_DEBUG(log, " Send:" << sendData);
-		return TCP::TCPConnection::Send(sendData.c_str(), sendData.length());
+		return this->Send(sendData.c_str(), sendData.length());
 	}
 
 private:
 	log4cplus::Logger log;
+	std::string m_reciveBuffer;
 };
 
 class WSConnection :public WebSocket::WSConnection, EPConnection

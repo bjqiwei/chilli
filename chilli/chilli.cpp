@@ -27,7 +27,7 @@
 
 #define _STRVERSION(str) #str
 #define STRVERSION(str) _STRVERSION(str)
-const char* appversion = STRVERSION(APPVERSION);
+static const char* appversion = STRVERSION(APPVERSION);
 
 #define  FREESWITCHNODE "FreeSwitch"
 #define  AVAYANODE      "Avaya"
@@ -380,6 +380,8 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 void chilli::App::Start()
 {
 	AppInit();
+	log4cplus::initialize();
+	static log4cplus::ConfigureAndWatchThread logconfig("./conf/log4cplus.properties", 10 * 1000);
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
