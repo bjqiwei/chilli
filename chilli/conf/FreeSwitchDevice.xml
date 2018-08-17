@@ -25,6 +25,9 @@
 		FSCause["FILE NOT FOUND"] = 1401,
 		FSCause["NORMAL_CLEARING"] = 0;
 		FSCause["FILE PLAYED"]=0;
+		FSCause["RECOVERY_ON_TIMER_EXPIRE"]=1102;
+		FSCause["ORIGINATOR_CANCEL"]=1487;
+		FSCause["PLAYBACK ERROR"] = 1402;
 	</script>
 </scriptmodel>
 	<state id="Null">

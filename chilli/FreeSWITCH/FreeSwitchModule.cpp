@@ -463,7 +463,7 @@ void FreeSwitchModule::ConnectFS()
 		LOG4CPLUS_INFO(log, " Connected to FreeSWITCH");
 
 		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
-		esl_send(&m_Handle, "nixevent json API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
+		esl_send(&m_Handle, "nixevent json CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
 		LOG4CPLUS_DEBUG(log, " " << m_Handle.last_sr_reply);
 
 		while (m_bRunning){
@@ -482,8 +482,6 @@ void FreeSwitchModule::ConnectFS()
 							eventName = event["Event-Name"].asString();
 							event.removeMember("Event-Name");
 						}
-
-						LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
 
 						if (eventName == "CHANNEL_CREATE" 
 							|| eventName == "CHANNEL_PROGRESS"
@@ -576,6 +574,9 @@ void FreeSwitchModule::ConnectFS()
 							if (eventName == "CHANNEL_DESTROY")
 								m_Session_DeviceId.erase(evt.event["sessionID"].asString());
 							
+						}
+						else {
+							LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
 						}
 					}
 					

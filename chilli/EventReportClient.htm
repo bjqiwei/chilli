@@ -18,7 +18,7 @@
 	<input type="button" value="外呼" onclick="MakeCall();" /><font>主叫</font><input type="text" id="calling" value="1000" /><font>被叫</font><input type="text" id="called" value="5000" /><p/>
 	<input type="button" value="呼单路" onclick="MakeConnection();" /><font>被叫</font><input type="text" id="called2" value="5000" /><p/>
 	<input type="button" value="放音" onclick="PlayFile();" /><font>语音文件</font><input type="text" id="filename" value="cmwwpstn.wav" /><p/>
-	<input type="button" value="挂机" onclick="ClearConnection();" /><p/>
+	<input type="button" value="挂机" onclick="ClearCall();" /><p/>
 	
     <script type="text/javascript">
 
@@ -124,13 +124,15 @@
 		    doSend(JSON.stringify(login));
 		}
         
-		function ClearCall(call)
+		function ClearCall()
 		{
-		    var clearCall = new Object();
-		    clearCall.call = call;
-		    clearCall.cmd = "ClearCall";
-		    clearCall.event = "cmd";
-		    doSend(JSON.stringify(login));
+		    var request = new Object();
+		    request.invokeID = invokeid++;
+		    request.type = "request";
+		    request.request = "ClearCall";
+		    request.param = new Object();
+		    request.param.callToBeCleared = session;
+		    doSend(JSON.stringify(request));
 		}
 
         function onOpen(evt)

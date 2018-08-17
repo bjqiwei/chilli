@@ -272,7 +272,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
-			response["response"] = "ClearConnection";
+			response["response"] = requestid;
 			response["status"] = 0;
 
 			if (request["param"]["connectionToBeCleared"].isObject()){
@@ -298,6 +298,45 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 				}
 			}
 			
+			response["status"] = chilli::INVALID_CALL;
+			const auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+			return;
+
+		}
+		else if (requestid == "ClearCall")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = requestid;
+			response["status"] = 0;
+
+			if (request["param"]["callToBeCleared"].isObject()) {
+				if (request["param"]["callToBeCleared"]["callID"].isString()) {
+					std::string callid = request["param"]["callToBeCleared"]["callID"].asString();
+					const auto & it = this->getPerformElementByGlobal(callid);
+					if (it != nullptr) {
+
+						const auto & c = m_Connections.find(id);
+						if (c != m_Connections.end())
+							c->second->Send(response);
+
+						request["param"]["sessionID"] = request["param"]["callToBeCleared"]["sessionID"];
+						request["param"]["connectionID"] = request["param"]["callToBeCleared"]["connectionID"];
+						request["param"]["callID"] = request["param"]["callToBeCleared"]["callID"];
+						request["param"]["deviceID"] = request["param"]["callToBeCleared"]["deviceID"];
+
+						request["param"].removeMember("callToBeCleared");
+
+						model::EventType_t evt(request);
+						it->PushEvent(evt);
+						return;
+					}
+				}
+			}
+
 			response["status"] = chilli::INVALID_CALL;
 			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())

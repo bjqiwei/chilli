@@ -19,6 +19,7 @@
 #include "chilli.h"
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
+#include <iostream>
 
 static bool daemon_running;
 
@@ -31,6 +32,7 @@ bool uni_daemon_run(bool detach)
 {
 	daemon_running = TRUE;
 
+	std::cout << "Run as Daemon" << std::endl;
 	if(detach == TRUE) {
 		apr_proc_detach(APR_PROC_DETACH_DAEMONIZE);
 	}
