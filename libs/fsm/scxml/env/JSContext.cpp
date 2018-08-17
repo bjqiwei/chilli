@@ -274,11 +274,11 @@ namespace env
 		if (value.isBool()){
 			val.setBoolean(value.asBool());
 
-		}else if (value.isDouble()){
-			val.setDouble(value.asDouble());
-
-		}else if(value.isInt() || value.isIntegral() || value.isNumeric()){
+		}else if(value.isInt()){
 			val.setInt32(value.asInt());
+		}
+		else if (value.isDouble()) {
+			val.setDouble(value.asDouble());
 
 		}else if (value.isNull()){
 			val.setNull();
