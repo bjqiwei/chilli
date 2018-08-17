@@ -42,7 +42,7 @@
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
 				<failingDevice type="script">_event.param.deviceID</failingDevice>
 				<calledDevice type="script">called</calledDevice>
-				<cause type="script">_event.param.cause</cause>
+				<cause type="script">parseInt(_event.param.cause)</cause>
 			</send>
 			
 			<transition target="Blocked"/>

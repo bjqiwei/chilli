@@ -29,10 +29,8 @@ static void sigterm_handler(int signo)
 
 bool uni_daemon_run(bool detach)
 {
-	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	daemon_running = TRUE;
 
-	LOG4CPLUS_INFO(log, "Run as Daemon");
 	if(detach == TRUE) {
 		apr_proc_detach(APR_PROC_DETACH_DAEMONIZE);
 	}
@@ -51,7 +49,6 @@ bool uni_daemon_run(bool detach)
 
 	/* start server */
 	chilli::App::Start();
-
 	while(daemon_running) apr_sleep(1000000);
 
 	/* shutdown server */

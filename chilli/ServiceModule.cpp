@@ -1,9 +1,6 @@
 #include "ServiceModule.h"
 #include "chilli.h"
-#include <log4cplus/logger.h>
-#include <log4cplus/helpers/loglog.h>
-#include <log4cplus/configurator.h>
-#include <log4cplus/loggingmacros.h>
+#include <iostream>
 
 
 bool uni_service_run(const char *name, uint32_t install)
@@ -14,7 +11,6 @@ bool uni_service_run(const char *name, uint32_t install)
 		return chilli::ServiceModule::RegisterServer(false) == 0;
 	else {
 
-		log4cplus::Logger log = log4cplus::Logger::getInstance("chilli.ServiceModule");
 		chilli::ServiceModule::Init();
 		SERVICE_TABLE_ENTRY st[] =
 		{
@@ -23,7 +19,7 @@ bool uni_service_run(const char *name, uint32_t install)
 		};
 		if (!::StartServiceCtrlDispatcher(st))
 		{
-			LOG4CPLUS_DEBUG(log, "error startup as  a console app with a -startservice...");
+			std::cout << "error startup as  a console app with a service..." << std::endl;
 		}
 	}
 
@@ -32,7 +28,6 @@ bool uni_service_run(const char *name, uint32_t install)
 
 namespace chilli{
 
-	log4cplus::Logger ServiceModule::log = log4cplus::Logger::getInstance("chilli.ServiceModule");
 	HANDLE ServiceModule::stopEvent = NULL;
 	HANDLE ServiceModule::stopEvented = NULL;
 	char ServiceModule::m_szServiceName[256] = SERVICENAME_DEFAULT;
@@ -43,7 +38,6 @@ namespace chilli{
 	{		
 		//lstrcpy(m_szServiceName,SERVICENAME_DEFAULT);
 		
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 		// set up the initial service status 
 		
 		m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
@@ -53,23 +47,19 @@ namespace chilli{
 		m_status.dwServiceSpecificExitCode = 0;
 		m_status.dwCheckPoint = 0;
 		m_status.dwWaitHint = 0;
-		LOG4CPLUS_INFO(log,"ServiceModule Init finished,type=SERVICE_WIN32_OWN_PROCESS,state=SERVICE_STOPPED,accepter=SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN,exitcode=0.");
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
+		//LOG4CPLUS_INFO(log,"ServiceModule Init finished,type=SERVICE_WIN32_OWN_PROCESS,state=SERVICE_STOPPED,accepter=SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN,exitcode=0.");
 	}
 
 	long ServiceModule::UnregisterServer(void)
 	{
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 		if (IsInstalled()){
 			Uninstall();
 		}
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 		return 0;
 	}
 
 	long ServiceModule::RegisterServer(bool bService)
 	{
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 		if (IsInstalled()){
 			Uninstall();
 		}
@@ -78,21 +68,19 @@ namespace chilli{
 		{
 			Install();
 		}
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 		return 0;
 	}
 
 
 	bool ServiceModule::Uninstall(void)
 	{
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 
 		SC_HANDLE hSCM = ::OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 
 		if (hSCM == NULL)
 		{
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log, "Couldn't open service manager:" << err);
+			std::cout << "Couldn't open service manager:" << err << std::endl;
 			return false;
 		}
 
@@ -102,7 +90,7 @@ namespace chilli{
 		{
 			DWORD err = GetLastError();
 			::CloseServiceHandle(hSCM);
-			LOG4CPLUS_ERROR(log, "Couldn't open service:" << err);
+			std::cout << "Couldn't open service:" << err << std::endl;
 			return false;
 		}
 		SERVICE_STATUS status;
@@ -112,12 +100,14 @@ namespace chilli{
 		if (!bDelete)
 		{
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log,"Service could not be deleted errorcode="<< err);
+			std::cout << "Service could not be deleted errorcode=" << err << std::endl;
 		}
-	
+		else
+		{
+			std::cout << "Service Uninstalled." << std::endl;
+		}
 		::CloseServiceHandle(hService);
 		::CloseServiceHandle(hSCM);
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 		return bDelete;
 	}
 
@@ -140,14 +130,14 @@ namespace chilli{
 		}
 		else{
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log, "Couldn't open service manager:" << err);
+			std::cout << "Couldn't open service manager:" << err << std::endl;
 		}
 
 		if (bResult){
-			LOG4CPLUS_INFO(log,"service is instatlled");
+			std::cout << "service is already instatlled" << std::endl;
 		}
 		else{
-			LOG4CPLUS_INFO(log,"service is not instatlled");
+			std::cout << "service is not instatlled yet" << std::endl;
 		}
 		return bResult;
 	}
@@ -155,7 +145,6 @@ namespace chilli{
 
 	bool ServiceModule::Install(void)
 	{
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 
 		SERVICE_DESCRIPTION desc;
 		desc.lpDescription = SERVICEDESCRIPTION;
@@ -164,7 +153,7 @@ namespace chilli{
 		if (hSCM == NULL)
 		{
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log, "Couldn't open service manager:" << err);
+			std::cout << "Couldn't open service manager:" << err << std::endl;
 			return FALSE;
 		}
 
@@ -174,8 +163,8 @@ namespace chilli{
 		strcat_s(szFilePath, " ");
 		strcat_s(szFilePath,WINSERVERPARAMETER);
 		
-		LOG4CPLUS_INFO(log, "servicename (" << m_szServiceName << ")");
-		LOG4CPLUS_INFO(log," FilePath (" << szFilePath << ")");
+		std::cout << "servicename (" << m_szServiceName << ")" << std::endl;
+		std::cout << " FilePath (" << szFilePath << ")" << std::endl;
 
 		SC_HANDLE hService = ::CreateService(
 			hSCM, m_szServiceName, m_szServiceName,
@@ -185,20 +174,20 @@ namespace chilli{
 	
 		if (hService == NULL) {
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log, "Error creating chilli service (" << err << ")");
+			std::cout << "Error creating chilli service (" << err << ")" << std::endl;
 			CloseServiceHandle(hSCM);
 			return false;
 		}
 
+		std::cout << "service is instatlled" << std::endl;
 		/* Set desc, and don't care if it succeeds */
 		if (!ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &desc)) {
 			DWORD err = GetLastError();
-			LOG4CPLUS_ERROR(log, "chilli installed, but could not set the service description (" << err << ")");
+			std::cout << "chilli installed, but could not set the service description (" << err << ")" << std::endl;
 		}
 
 		::CloseServiceHandle(hService);
 		::CloseServiceHandle(hSCM);
-		LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 		return true;
 
 	}
@@ -207,7 +196,6 @@ namespace chilli{
 	void ServiceModule::SetServiceStatus(DWORD dwState)
 	{
 		m_status.dwCurrentState = dwState;
-		LOG4CPLUS_INFO(log,"Set Service status=" << GetServiceStatusStrName(dwState));
 		::SetServiceStatus(m_hServiceStatus, &m_status);
 	}
 
@@ -236,11 +224,11 @@ const char * chilli::ServiceModule::GetServiceStatusStrName(unsigned long dwStat
 void WINAPI chilli::ServiceModule::Start(DWORD  dwArgc, LPTSTR* lpszArgv)
 {
 	// Register the control request handler
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " Start.");	
+
 	chilli::ServiceModule::m_hServiceStatus = RegisterServiceCtrlHandler(chilli::ServiceModule::m_szServiceName, ServiceCtrlHandler);
 	if (chilli::ServiceModule::m_hServiceStatus == NULL)
 	{
-		LOG4CPLUS_ERROR(log,"ServiceCtrlHandler not installed");
+		std::cout << "ServiceCtrlHandler not installed" << std::endl;
 		return;
 	}
 	chilli::ServiceModule::SetServiceStatus(SERVICE_START_PENDING);
@@ -248,19 +236,12 @@ void WINAPI chilli::ServiceModule::Start(DWORD  dwArgc, LPTSTR* lpszArgv)
 	stopEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
 	stopEvented = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-	log4cplus::initialize();
-#ifdef DEBUG
-	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
-#endif
-	log4cplus::ConfigureAndWatchThread logconfig(LOG4CPLUS_TEXT("conf/log4cplus.properties"), 10 * 1000);
-
 	chilli::App::Start();
 
 	chilli::ServiceModule::SetServiceStatus(SERVICE_RUNNING);
 	WaitForSingleObject(stopEvent,INFINITE);
 	chilli::App::Stop();
 	SetEvent(stopEvented);
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 }
 
 void chilli::ServiceModule::Stop()
@@ -273,31 +254,31 @@ void chilli::ServiceModule::Stop()
 
 void WINAPI chilli::ServiceModule::ServiceCtrlHandler(DWORD  dwOpcode)
 {
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");	
+	
 	switch (dwOpcode)
 	{
 	case SERVICE_CONTROL_STOP:
-		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_STOP");
+		//LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_STOP");
 		goto stoping;
 	case SERVICE_CONTROL_SHUTDOWN:
-		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_SHUTDOWN");
+		//LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_SHUTDOWN");
 stoping:
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOP_PENDING);
 		Stop();
 		chilli::ServiceModule::SetServiceStatus(SERVICE_STOPPED);
 		break;
 	case SERVICE_CONTROL_PAUSE:
-		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_PAUSE");
+		//LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_PAUSE");
 		break;
 	case SERVICE_CONTROL_CONTINUE:
-		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_CONTINUE");
+		//LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_CONTINUE");
 		break;
 	case SERVICE_CONTROL_INTERROGATE:
-		LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_INTERROGATE");
+		//LOG4CPLUS_DEBUG(log, "SERVICE_CONTROL_INTERROGATE");
 		break;
 	default:
-		LOG4CPLUS_WARN(log, "Bad service request:" << dwOpcode);
+		//LOG4CPLUS_WARN(log, "Bad service request:" << dwOpcode);
+		break;
 	}
 
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
 }

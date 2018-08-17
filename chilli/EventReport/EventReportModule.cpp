@@ -125,8 +125,14 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			requestid = request["request"].asString();
 
 		if (requestid == "HeartBeat") {
-
 			LOG4CPLUS_TRACE(log, " OnMessage:" << message);
+		}
+		else {
+			LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
+		}
+
+		if (requestid == "HeartBeat")
+		{
 
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
@@ -137,11 +143,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			if (c != m_Connections.end())
 				c->second->Send(response);
 		}
-		else {
-			LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
-		}
-
-		if (requestid == "Connect")
+		else if (requestid == "Connect")
 		{
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];

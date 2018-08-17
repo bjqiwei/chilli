@@ -202,12 +202,6 @@ int main(int argc, char* argv[])
 	chilli::App::AppInit();
 	log4cplus::initialize();
 
-#ifdef DEBUG
-	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
-#endif
-	log4cplus::PropertyConfigurator::doConfigure("conf/log4cplus.properties");
-	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-
 	if (options.foreground == true) {
 #ifdef WIN32
 		if (options.install != 0){
@@ -380,8 +374,10 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 void chilli::App::Start()
 {
 	AppInit();
-	log4cplus::initialize();
-	static log4cplus::ConfigureAndWatchThread logconfig("./conf/log4cplus.properties", 10 * 1000);
+#ifdef DEBUG
+	log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
+#endif
+	static log4cplus::ConfigureAndWatchThread logconfig("conf/log4cplus.properties", 10 * 1000);
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
