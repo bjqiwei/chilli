@@ -32,16 +32,13 @@
 				<display type="script">_event.param.called</display>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
-			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called;</script>
+			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;</script>
 			<transition target="Originated"/>
 		</event>
 		
 		<event event="ClearCall">
 			<send cond = "sessionlist.size() > 0" target="freeswitch001" type="cmd" destexpr="sessionlist[sessionlist.get(0)].deviceID" event="ClearConnection">
 				<sessionID type="script">sessionlist.get(0)</sessionID>
-			</send>
-			<send cond = "sessionlist.size() > 1" target="freeswitch001" type="cmd" destexpr="sessionlist[sessionlist.get(1)].deviceID" event="ClearConnection">
-				<sessionID type="script">sessionlist.get(1)</sessionID>
 			</send>
 		</event>
 		
@@ -63,7 +60,7 @@
 				<initiatingDevice type="script">_event.param.deviceID</initiatingDevice>
 			</send>
 			-->
-			<script>sessionlist[_event.param.sessionID]={}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
+			<script>sessionlist[_event.param.sessionID]= sessionlist[_event.param.sessionID] || {}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
 			<transition target="Pending"/>
 		</event>
 		
@@ -71,6 +68,15 @@
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
+					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
+					<called type="script">sessionlist[_event.param.sessionID].called</called>
+					<createTime type="script">_event.param.createTime</createTime>
+					<ringTime type="script">_event.param.ringTime</ringTime>
+					<answeredTime type="script">_event.param.answeredTime</answeredTime>
+					<hangupTime type="script">_event.param.hangupTime</hangupTime>
+					<hangupDirection type="script">_event.param.hangupDirection</hangupDirection>
+					<recordPath type="script">_event.param.recordPath</recordPath>
+					<cause type="script">_event.param.cause</cause>
 				</send>
 				<script>delete sessionlist[_event.param.sessionID]</script>
 				<transition target="Destroy"/>
@@ -81,7 +87,7 @@
 			</onentry>
 			<event event="Initiated">
 				<script>caller = _event.param.caller; called = _event.param.called;</script>
-				<script>sessionlist[_event.param.sessionID]={}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
+				<script>sessionlist[_event.param.sessionID]= sessionlist[_event.param.sessionID]|| {}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
 				<send target="eventreport" type="event" event="Originated">
 					<originatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</originatedConnection>
 					<callingDevice type="script">caller</callingDevice>
@@ -130,6 +136,16 @@
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
+					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
+					<called type="script">sessionlist[_event.param.sessionID].called</called>
+					<createTime type="script">_event.param.createTime</createTime>
+					<ringTime type="script">_event.param.ringTime</ringTime>
+					<answeredTime type="script">_event.param.answeredTime</answeredTime>
+					<hangupTime type="script">_event.param.hangupTime</hangupTime>
+					<hangupDirection type="script">_event.param.hangupDirection</hangupDirection>
+					<recordPath type="script">_event.param.recordPath</recordPath>
+					<cause type="script">_event.param.cause</cause>
+					
 				</send>
 				<script>delete sessionlist[_event.param.sessionID]</script>
 				<transition target="Terminated"/>
@@ -168,7 +184,7 @@
 		</state>
 		<state id="Originated">
 			<event event="Initiated">
-				<script>sessionlist[_event.param.sessionID]={}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
+				<script>sessionlist[_event.param.sessionID] = sessionlist[_event.param.sessionID] || {}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
 			</event>
 			<event event="Alerting">
 				<send target="eventreport" type="event" event="Delivered">
