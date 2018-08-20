@@ -29,6 +29,7 @@
 		FSCause["RECOVERY_ON_TIMER_EXPIRE"]=1102;
 		FSCause["ORIGINATOR_CANCEL"]=1487;
 		FSCause["PLAYBACK ERROR"] = 1402;
+		FSCause["NORMAL_TEMPORARY_FAILURE"] = 1503;
 	</script>
 </scriptmodel>
 	<state id="Null">
@@ -174,7 +175,7 @@
 				<cause type="script">cause</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.param.sessionID</sessionID>
-				<createTime type="script">_event.param.CallerChannelCreatedTime</createTime>
+				<createdTime type="script">_event.param.CallerChannelCreatedTime</createdTime>
 				<ringTime type="script">_event.param.CallerChannelProgressTime</ringTime>
 				<answeredTime type="script">_event.param.CallerChannelAnsweredTime</answeredTime>
 				<hangupTime type="script">_event.param.CallerChannelHangupTime</hangupTime>

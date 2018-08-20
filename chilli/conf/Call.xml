@@ -29,14 +29,14 @@
 			<script>called = _event.param.called;</script>
 			<send target="freeswitch001" type="cmd" dest="this" event="MakeConnection">
 				<called type="script">
-				var called; 
+				var called_; 
 				if(_event.param.called.length &lt; 5){
-					called = 'sofia/internal/' + _event.param.called + '%192.168.2.232';
+					called_ = 'sofia/internal/' + _event.param.called + '%192.168.2.232';
 				}
 				else{
-					called = 'sofia/external/' + _event.param.called + '@192.168.2.220'
+					called_ = 'sofia/external/' + _event.param.called + '@192.168.2.231:5080'
 				}
-				called;
+				called_;
 				</called>
 				<display type="script">_event.param.called</display>
 				<sessionID type="script">_event.param.sessionID</sessionID>
@@ -55,7 +55,7 @@
 			<send target="eventreport" type="event" event="Failed">
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
 				<failingDevice type="script">_event.param.deviceID</failingDevice>
-				<calledDevice type="script">called</calledDevice>
+				<calledDevice type="script">sessionlist[_event.param.sessionID].called</calledDevice>
 				<cause type="script">parseInt(_event.param.cause)</cause>
 			</send>
 			
@@ -79,7 +79,7 @@
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
 					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
 					<called type="script">sessionlist[_event.param.sessionID].called</called>
-					<createTime type="script">_event.param.createTime</createTime>
+					<createdTime type="script">_event.param.createdTime</createdTime>
 					<ringTime type="script">_event.param.ringTime</ringTime>
 					<answeredTime type="script">_event.param.answeredTime</answeredTime>
 					<hangupTime type="script">_event.param.hangupTime</hangupTime>
@@ -147,7 +147,7 @@
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
 					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
 					<called type="script">sessionlist[_event.param.sessionID].called</called>
-					<createTime type="script">_event.param.createTime</createTime>
+					<createdTime type="script">_event.param.createdTime</createdTime>
 					<ringTime type="script">_event.param.ringTime</ringTime>
 					<answeredTime type="script">_event.param.answeredTime</answeredTime>
 					<hangupTime type="script">_event.param.hangupTime</hangupTime>
@@ -164,7 +164,7 @@
 				<send target="eventreport" type="event" event="Failed">
 					<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
 					<failingDevice type="script">_event.param.deviceID</failingDevice>
-					<calledDevice type="script">called</calledDevice>
+					<calledDevice type="script">sessionlist[_event.param.sessionID].called</calledDevice>
 					<cause type="script">_event.param.cause</cause>
 				</send>
 				
@@ -202,6 +202,14 @@
 				</send>
 				<transition target="Delivered"/>
 			</event>
+			
+			<event event="Connected">
+				<send target="eventreport" type="event" event="Answered">
+					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
+					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+				</send>
+			</event>
+			
 		</state>
 		<state id="Queued">
 		</state>
