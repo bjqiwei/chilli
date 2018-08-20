@@ -287,9 +287,8 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 						request["param"]["sessionID"] = request["param"]["connectionToBeCleared"]["sessionID"];
 						request["param"].removeMember("connectionToBeCleared");
-						request["cmd"] = request["request"];
+						request["event"] = request["request"];
 						request.removeMember("request");
-						request["event"] = "cmd";
 						request["id"] = deviceid;
 						model::EventType_t evt(request);
 						it->PushEvent(evt);
@@ -366,9 +365,8 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
 						request["param"]["callID"] = request["param"]["connection"]["callID"];
 						request["param"].removeMember("connection");
-						request["cmd"] = request["request"];
+						request["event"] = request["request"];
 						request.removeMember("request");
-						request["event"] = "cmd";
 						request["id"] = deviceid;
 						model::EventType_t evt(request);
 						it->PushEvent(evt);

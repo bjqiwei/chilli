@@ -13,6 +13,7 @@
 	<data id="_connectionid"/>
 	<data id="_callid"/>
 	<data id="_filename"/>
+	<data id="_hangupDirection" expr="1"/> <!--挂机方向，0:本端挂机，1:对端挂机-->
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -86,7 +87,8 @@
 				<transition target="Alerting"/>
 			</event>
 			
-			<event event="cmd" cond="_event.cmd=='ClearConnection'">
+			<event event="ClearConnection">
+				<script>_hangupDirection = 0;</script>
 				<send target="this" type="cmd" dest="this" event="ClearConnection">
 					<deviceID type="script">_device.deviceID</deviceID>
 					<sessionID type="script">_event.param.sessionID</sessionID>
@@ -116,7 +118,7 @@
 					<transition target="Hangup"/>
 				</event>
 				
-				<event event="cmd" cond="_event.cmd=='PlayFile'">
+				<event event="PlayFile">
 					<send target="this" type="cmd" dest="this" event="PlayFile">
 						<filename type="script">_event.param.filename</filename>
 						<sessionID type="script">_event.param.sessionID</sessionID>
@@ -162,6 +164,13 @@
 				<cause type="script">cause</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.param.sessionID</sessionID>
+				<createTime type="script">_event.param.CallerChannelCreatedTime</createTime>
+				<ringTime type="script">_event.param.CallerChannelProgressTime</ringTime>
+				<answeredTime type="script">_event.param.CallerChannelAnsweredTime</answeredTime>
+				<hangupTime type="script">_event.param.CallerChannelHangupTime</hangupTime>
+				<cause type="script">cause = FSCause[_event.param.HangupCause]</cause>
+				<hangupDirection type="script">_hangupDirection</hangupDirection>
+				<recordPath type="script">""</recordPath>
 			</send>
 		</onentry>
 	</state>

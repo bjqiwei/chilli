@@ -133,6 +133,13 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 		dest = jsonData["dest"].asString();
 	}
 
+	if (dest != "this") {
+		jsonData["id"] = dest;
+		model::EventType_t evt(jsonData);
+		this->PushEvent(evt);
+		return;
+	}
+
 	if (jsonData["event"].isString()) {
 		eventName = jsonData["event"].asString();
 	}
