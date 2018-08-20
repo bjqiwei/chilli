@@ -271,26 +271,13 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	if (param["display"].isString())
 		display = param["display"].asString();
 	else
-		display = caller;
+		display = dialStringFindNumber(caller);
 
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
 
-	m_Session_DeviceId[sessionId] = caller;
+	m_Session_DeviceId[sessionId] = dialStringFindNumber(caller);
 
-	if (caller.length() < 5) {
-		caller = "sofia/internal/" + caller + "%192.168.2.232";
-	}
-	else {
-		caller = "sofia/external/" + caller + "@192.168.2.220";
-	}
-
-	if (called.length() < 5) {
-		called = "sofia/internal/" + called + "%192.168.2.232";
-	}
-	else {
-		called = "sofia/external/" + called + "@192.168.2.220";
-	}
 
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
 
@@ -315,14 +302,8 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
 
-	m_Session_DeviceId[sessionId] = called;
-
-	if (called.length() < 5) {
-		called = "sofia/internal/" + called + "%192.168.2.232";
-	}
-	else {
-		called = "sofia/external/" + called + "@192.168.2.220";
-	}
+	
+	m_Session_DeviceId[sessionId] = dialStringFindNumber(called);
 
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
 
@@ -405,6 +386,15 @@ bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & log)
 	esl_status_t status = esl_execute(&m_Handle, "playback", filename.c_str(), sessionId.c_str());
 	LOG4CPLUS_DEBUG(log, " esl_execute:playback " << filename << ", status:" << status);
 	return true;
+}
+
+std::string FreeSwitchModule::dialStringFindNumber(const std::string & dialString)
+{
+	std::string number;
+	number = dialString.substr(0, dialString.find("%"));
+	number = number.substr(0, number.find("@"));
+	number = number.substr(min(number.find_last_of("/") + 1, number.length()));
+	return number;
 }
 
 void esl_logger(const char *file, const char *func, int line, int level, const char *fmt, ...)
