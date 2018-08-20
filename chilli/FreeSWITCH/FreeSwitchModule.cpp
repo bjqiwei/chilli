@@ -460,7 +460,7 @@ void FreeSwitchModule::ConnectFS()
 		LOG4CPLUS_INFO(log, " Connected to FreeSWITCH");
 
 		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
-		esl_send(&m_Handle, "nixevent json CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
+		esl_send(&m_Handle, "nixevent json CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
 		LOG4CPLUS_DEBUG(log, " " << m_Handle.last_sr_reply);
 
 		while (m_bRunning){
@@ -490,7 +490,8 @@ void FreeSwitchModule::ConnectFS()
 							|| eventName == "CHANNEL_OUTGOING"
 							|| eventName == "CHANNEL_ORIGINATE"
 							|| eventName == "CHANNEL_EXECUTE"
-							|| eventName == "CHANNEL_EXECUTE_COMPLETE")
+							|| eventName == "CHANNEL_EXECUTE_COMPLETE"
+							|| eventName == "CHANNEL_PROGRESS_MEDIA")
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");

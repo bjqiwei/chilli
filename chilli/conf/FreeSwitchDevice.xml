@@ -87,6 +87,14 @@
 				<transition target="Alerting"/>
 			</event>
 			
+			<event event="CHANNEL_PROGRESS_MEDIA">
+				<send target="call001" type="event" destexpr="_event.param.sessionID" event="Alerting">
+					<deviceID type="script">_device.deviceID</deviceID>
+					<sessionID type="script">_event.param.sessionID</sessionID>
+				</send>
+				<transition target="Alerting"/>
+			</event>
+			
 			<event event="ClearConnection">
 				<script>_hangupDirection = 0;</script>
 				<send target="this" type="cmd" dest="this" event="ClearConnection">
@@ -97,6 +105,8 @@
 			<state id="Alerting">
 				<onentry>
 				</onentry>
+				<event event="CHANNEL_PROGRESS_MEDIA">
+				</event>
 			</state>
 			
 			<state id="Queued">
