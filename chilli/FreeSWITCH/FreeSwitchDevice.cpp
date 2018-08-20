@@ -43,11 +43,11 @@ namespace FreeSwitch {
 		{
 			bHandled = m_model->ClearConnection(jsonData["param"], this->log);
 		}
-		if (jsonData["event"].asString() == "StartRecord")
+		else if (jsonData["event"].asString() == "StartRecord")
 		{
 			bHandled = m_model->StartRecord(jsonData["param"], this->log);
 		}
-		if (jsonData["event"].asString() == "PlayFile")
+		else if (jsonData["event"].asString() == "PlayFile")
 		{
 			bHandled = m_model->PlayFile(jsonData["param"], this->log);
 		}

@@ -278,8 +278,10 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 
 	m_Session_DeviceId[sessionId] = dialStringFindNumber(caller);
 
+	std::string jobid = helper::uuid();
+	m_Job_Session[jobid] = sessionId;
 
-	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")";
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
@@ -305,7 +307,10 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	
 	m_Session_DeviceId[sessionId] = dialStringFindNumber(called);
 
-	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()";
+	std::string jobid = helper::uuid();
+	m_Job_Session[jobid] = sessionId;
+
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
@@ -319,8 +324,10 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
 
-	std::string cmd = "bgapi uuid_kill " + sessionId;
-	esl_send(&m_Handle, cmd.c_str());
+	std::string jobid = helper::uuid();
+	m_Job_Session[jobid] = sessionId;
+
+	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 
@@ -338,7 +345,10 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 	if (param["filename"].isString())
 		filename = param["filename"].asString();
 
-	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename;
+	std::string jobid = helper::uuid();
+	m_Job_Session[jobid] = uuid;
+
+	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
 	return true;
@@ -491,7 +501,8 @@ void FreeSwitchModule::ConnectFS()
 							|| eventName == "CHANNEL_ORIGINATE"
 							|| eventName == "CHANNEL_EXECUTE"
 							|| eventName == "CHANNEL_EXECUTE_COMPLETE"
-							|| eventName == "CHANNEL_PROGRESS_MEDIA")
+							|| eventName == "CHANNEL_PROGRESS_MEDIA"
+							|| eventName == "BACKGROUND_JOB")
 						{
 							event.removeMember("Core-UUID");
 							event.removeMember("FreeSWITCH-Hostname");
@@ -545,7 +556,10 @@ void FreeSwitchModule::ConnectFS()
 							}
 
 
-							
+							if (eventName == "BACKGROUND_JOB"){
+								evt.event["param"]["UniqueID"] = m_Job_Session[evt.event["param"]["JobUUID"].asString()];
+							}
+
 							std::string sessionId = evt.event["param"]["UniqueID"].asString();
 							evt.event["param"].removeMember("UniqueID");
 
@@ -572,6 +586,9 @@ void FreeSwitchModule::ConnectFS()
 							if (eventName == "CHANNEL_DESTROY")
 								m_Session_DeviceId.erase(evt.event["sessionID"].asString());
 							
+							if (eventName == "BACKGROUND_JOB")
+								m_Job_Session.erase(evt.event["JobUUID"].asString());
+
 						}
 						else {
 							LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);

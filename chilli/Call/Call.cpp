@@ -73,8 +73,9 @@ namespace Call {
 				for (auto & it : jsonEvent.getMemberNames()) {
 					evt.addVars(it, jsonEvent[it]);
 				}
-
-				LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+				
+				Json::FastWriter writer;
+				LOG4CPLUS_DEBUG(log, " Recived a event," << writer.write(Event.event));
 
 				if (m_StateMachines.empty()) {
 					

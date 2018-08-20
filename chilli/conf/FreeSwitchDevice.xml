@@ -30,16 +30,17 @@
 		FSCause["ORIGINATOR_CANCEL"]=1487;
 		FSCause["PLAYBACK ERROR"] = 1402;
 		FSCause["NORMAL_TEMPORARY_FAILURE"] = 1503;
+		FSCause["DESTINATION_OUT_OF_ORDER"] = 1027;
 	</script>
 </scriptmodel>
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
 			<transition target="Initiated"/>
 		</event>
-			
-		<event event="CHANNEL_DESTROY">
+		
+		<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate' &amp;&amp; _event.param._body.indexOf('-ERR')!=-1">
 			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
-				<cause type="script">cause=FSCause["USER_NOT_REGISTERED"];</cause>
+				<cause type="script">cause=FSCause[_event.param._body.substr(5,_event.param._body.length-6)];</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>

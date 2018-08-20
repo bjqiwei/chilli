@@ -36,6 +36,7 @@ namespace FreeSwitch{
 		esl_handle_t m_Handle = { { 0 } };
 		void ConnectFS();
 		std::map<std::string, std::string>m_Session_DeviceId;
+		std::map<std::string, std::string>m_Job_Session;
 		std::map<std::string, std::string>m_device_StateMachine;
 		virtual void run() override;
 		friend class FreeSwitchDevice;
