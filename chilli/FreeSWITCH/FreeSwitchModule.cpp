@@ -47,7 +47,7 @@ int FreeSwitchModule::Stop(void)
 
 int FreeSwitchModule::Start()
 {
-	LOG4CPLUS_DEBUG(log," Start...  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Start...  FreeSwitch module");
 	if(!m_bRunning){
 		ProcessModule::Start();
 		m_bRunning = true;

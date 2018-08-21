@@ -13,14 +13,13 @@ namespace Group {
 	GroupModule::GroupModule(const std::string & id) :ProcessModule(id)
 	{
 		log = log4cplus::Logger::getInstance("chilli.GroupModule");
-		log.setAppendName("." + this->getId());
-		LOG4CPLUS_DEBUG(log, " Constuction a  module.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a  module.");
 	}
 
 	// Destructor of GroupModule
 	GroupModule::~GroupModule()
 	{
-		LOG4CPLUS_DEBUG(log, " Destruction a module.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " Destruction a module.");
 	}
 
 	int GroupModule::Start()
@@ -49,7 +48,7 @@ namespace Group {
 		tinyxml2::XMLDocument config;
 		if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 		{
-			LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+			LOG4CPLUS_ERROR(log, "." + this->getId(), " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 			return false;
 		}
 
@@ -80,7 +79,7 @@ namespace Group {
 				ext->setVar("_extension.Extensions", extensions);
 			}
 			else {
-				LOG4CPLUS_ERROR(log, " alredy had extension:" << num);
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " alredy had extension:" << num);
 			}
 		}
 
@@ -89,8 +88,8 @@ namespace Group {
 
 	void GroupModule::fireSend(const std::string & strContent, const void * param)
 	{
-		LOG4CPLUS_DEBUG(log, strContent);
-		LOG4CPLUS_WARN(log, " fireSend not implement.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), strContent);
+		LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
 	}
 }
 }

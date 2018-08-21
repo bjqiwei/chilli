@@ -319,7 +319,7 @@ const char * ShDevModule::GetString_EventType( int nEvent )
 	case E_RCV_IPA_DONGLE_REMOVED			:return "E_RCV_IPA_DONGLE_REMOVED";//			= 0x007c, 	// IPA series: removal of USB-key detected	
 	default:		{
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("ShDevModule.GetString_EventType");
-		LOG4CPLUS_ERROR(log, "." + this->getId(), "UNKNOWN the event:" << nEvent);
+		LOG4CPLUS_ERROR(log, "", "UNKNOWN the event:" << nEvent);
 		return "UNKNOWN";
 		}
 	}

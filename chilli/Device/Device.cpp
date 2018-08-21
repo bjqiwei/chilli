@@ -11,7 +11,6 @@ namespace chilli {
 		{
 			std::string logName = "Device";
 			log = log4cplus::Logger::getInstance(logName);
-			log.setAppendName("." + getId());
 			//LOG4CPLUS_DEBUG(log, " new a device object.");
 		}
 
@@ -21,7 +20,7 @@ namespace chilli {
 
 		void Device::Start()
 		{
-			LOG4CPLUS_INFO(log, " Start.");
+			LOG4CPLUS_INFO(log, "." + this->getId(), " Start.");
 			for (auto & it : m_Sessions) {
 				it.second->start(false);
 			}
@@ -32,7 +31,7 @@ namespace chilli {
 			for (auto & it : m_Sessions) {
 				it.second->stop();
 			}
-			LOG4CPLUS_INFO(log, " Stop.");
+			LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
 		}
 
 		bool Device::IsClosed()
@@ -70,7 +69,7 @@ namespace chilli {
 					}
 
 					if (sessionId.empty()){
-						LOG4CPLUS_WARN(log, "sessionid is null");
+						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionid is null");
 						return;
 					}
 
@@ -81,7 +80,7 @@ namespace chilli {
 					}
 
 					Json::FastWriter writer;
-					LOG4CPLUS_DEBUG(log, " Recived a event," << writer.write(Event.event));
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << writer.write(Event.event));
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
 						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
@@ -112,7 +111,7 @@ namespace chilli {
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, e.what());
+				LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
 			}
 		}
 
@@ -133,7 +132,7 @@ namespace chilli {
 					pe->PushEvent(chilli::model::EventType_t(newEvent));
 				}
 				else {
-					LOG4CPLUS_WARN(log, "not find device:" << newEvent["id"].asString());
+					LOG4CPLUS_WARN(log, "." + this->getId(), "not find device:" << newEvent["id"].asString());
 				}
 				bHandled = true;
 			}
@@ -142,14 +141,14 @@ namespace chilli {
 
 		void Device::fireSend(const std::string &strContent, const void * param)
 		{
-			LOG4CPLUS_TRACE(log, "fireSend:" << strContent);
+			LOG4CPLUS_TRACE(log, "." + this->getId(), "fireSend:" << strContent);
 			Json::Value jsonData;
 			Json::CharReaderBuilder b;
 			std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 			std::string jsonerr;
 
 			if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-				LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+				LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
 				return;
 			}
 			bool bHandled = false;

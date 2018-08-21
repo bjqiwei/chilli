@@ -17,8 +17,7 @@ namespace EventReport{
 EventReportModule::EventReportModule(const std::string & id) :ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.ERModule");
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log, " Constuction a EventReport module.");
+	LOG4CPLUS_DEBUG(log, "." + ProcessModule::getId(), " Constuction a EventReport module.");
 }
 
 
@@ -28,7 +27,7 @@ EventReportModule::~EventReportModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, " Destruction a EventReport module.");
+	LOG4CPLUS_DEBUG(log, "." + ProcessModule::getId(), " Destruction a EventReport module.");
 }
 
 int EventReportModule::Stop(void)
@@ -57,6 +56,7 @@ int EventReportModule::Start()
 
 		if (this->m_tcpPort !=-1){
 			TCPServer::setLogger(this->log);
+			TCPServer::setId(ProcessModule::getId());
 			std::thread th(&EventReportModule::ListenTCP, this, this->m_tcpPort);
 			m_Threads.push_back(std::move(th));
 		}
@@ -76,7 +76,7 @@ bool EventReportModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, "." + ProcessModule::getId(), " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -110,7 +110,7 @@ void EventReportModule::ConnOnError(uint64_t id, const std::string & errorCode)
 	this->m_Connections.erase(id);
 }
 
-void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log)
+void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log, const std::string & logId)
 {
 	//LOG4CPLUS_DEBUG(log, m_SessionId << " OnMessage:" << message);
 
@@ -125,10 +125,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			requestid = request["request"].asString();
 
 		if (requestid == "HeartBeat") {
-			LOG4CPLUS_TRACE(log, " OnMessage:" << message);
+			LOG4CPLUS_TRACE(log, "." + logId, " OnMessage:" << message);
 		}
 		else {
-			LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
+			LOG4CPLUS_DEBUG(log, "." + logId, " OnMessage:" << message);
 		}
 
 		if (requestid == "HeartBeat")
@@ -397,7 +397,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, " OnMessage not json string:" << message << ":" << jsonerr);
+		LOG4CPLUS_ERROR(log, "."+ logId, " OnMessage not json string:" << message << ":" << jsonerr);
 	}
 }
 
@@ -422,20 +422,20 @@ void EventReportModule::processSend(const std::string &strContent, const void * 
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+		LOG4CPLUS_ERROR(log, "." + ProcessModule::getId(), strContent << " not json data." << jsonerr);
 	}
 }
 
 void EventReportModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + ProcessModule::getId(), " fireSend:" << strContent);
 	bool bHandled = false;
 	processSend(strContent, param, bHandled);
 }
 
 void EventReportModule::run()
 {
-	LOG4CPLUS_INFO(log, " Starting...");
+	LOG4CPLUS_INFO(log, "." + ProcessModule::getId(), " Starting...");
 	try
 	{
 
@@ -461,17 +461,17 @@ void EventReportModule::run()
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, " " << e.what());
+				LOG4CPLUS_ERROR(log, "." + ProcessModule::getId(), " " << e.what());
 			}
 		}
 
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, " " << e.what());
+		LOG4CPLUS_ERROR(log, "." + ProcessModule::getId(), " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, " Stoped.");
+	LOG4CPLUS_INFO(log, "." + ProcessModule::getId(), " Stoped.");
 	log4cplus::threadCleanup();
 }
 
@@ -487,12 +487,11 @@ public:
 	explicit TCPConnection(EventReportModule * module, struct event_base * base, int64_t fd) :EPConnection(module), TCP::TCPConnection(base, fd)
 	{
 		log = log4cplus::Logger::getInstance("chilli.TCPConnection");
-		log.setAppendName("." + to_string(this->GetId()));
-		LOG4CPLUS_DEBUG(log, m_Id << " construction");
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " construction");
 	}
 	virtual ~TCPConnection()
 	{
-		LOG4CPLUS_DEBUG(log, m_Id << " deconstruct");
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " deconstruct");
 	}
 
 	virtual void OnOpen() override
@@ -507,17 +506,17 @@ public:
 
 	virtual void OnClosed() override
 	{
-		m_module->ConnOnClose(GetId());
+		m_module->ConnOnClose(getId());
 	}
 
 	virtual void OnError(uint32_t err) override
 	{
-		m_module->ConnOnError(GetId(), std::to_string(err));
+		m_module->ConnOnError(getId(), std::to_string(err));
 	}
 
 	virtual void OnReceived(const std::string & oriData) override
 	{
-		LOG4CPLUS_TRACE(log, " OnReceived:" << oriData);
+		LOG4CPLUS_TRACE(log, "." + std::to_string(this->getId()), " OnReceived:" << oriData);
 		contextlen hlen;
 		m_reciveBuffer.append(oriData);
 		size_t len = m_reciveBuffer.length();
@@ -530,7 +529,7 @@ public:
 				std::string data = m_reciveBuffer.substr(0, hlen.hlen);
 				m_reciveBuffer.erase(0, hlen.hlen);
 				data = data.substr(INT_SIZE);
-				m_module->ConnOnMessage(this, GetId(), data, log);
+				m_module->ConnOnMessage(this, getId(), data, log, std::to_string(this->getId()));
 			}
 			else {// 不够一个完整的包，跳出循环   
 				break;
@@ -549,7 +548,7 @@ public:
 		buffer.append(nlen.buffer, INT_SIZE);
 		buffer.append(lpBuf, nBufLen);
 
-		LOG4CPLUS_TRACE(log, " Send:" << buffer);
+		LOG4CPLUS_TRACE(log, "." + std::to_string(this->getId()), " Send:" << buffer);
 		return TCP::TCPConnection::Send(buffer.c_str(), buffer.length());
 	}
 
@@ -557,7 +556,7 @@ public:
 	{
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		LOG4CPLUS_DEBUG(log, " Send:" << sendData);
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
 
@@ -573,13 +572,12 @@ public:
 		:WebSocket::WSConnection(wsi), EPConnection(module)
 	{
 		this->log = log4cplus::Logger::getInstance("chilli.WSConnection");
-		log.setAppendName("." + std::to_string(this->GetId()));
-		LOG4CPLUS_DEBUG(log, " construction");
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " construction");
 	};
 
 	~WSConnection()
 	{
-		LOG4CPLUS_DEBUG(log, " deconstruct");
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " deconstruct");
 	}
 
 	virtual void OnOpen() override {
@@ -592,19 +590,19 @@ public:
 
 	virtual void OnClose(const std::string & errorCode) override
 	{
-		m_module->ConnOnClose(GetId());
+		m_module->ConnOnClose(getId());
 	};
 
 	virtual void OnError(const std::string & errorCode) override
 	{
 		
-		m_module->ConnOnError(this->GetId(), errorCode);
+		m_module->ConnOnError(this->getId(), errorCode);
 	};
 
 	virtual void OnMessage(const std::string & message) override
 	{
-		//LOG4CPLUS_DEBUG(log, " OnMessage:" << message);
-		m_module->ConnOnMessage(this, this->GetId(), message, log);
+		//LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId())," OnMessage:" << message);
+		m_module->ConnOnMessage(this, this->getId(), message, log, std::to_string(this->getId()));
 	};
 
 	virtual int Send(const char * lpBuf, int nBufLen) override {
@@ -614,7 +612,7 @@ public:
 	virtual int Send(Json::Value send) override {
 		Json::FastWriter writer;
 		std::string sendData = writer.write(send);
-		LOG4CPLUS_DEBUG(log, " Send:" << sendData);
+		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
 
@@ -651,7 +649,7 @@ bool EventReportModule::listenWS(int port)
 	bool result = true;
 
 	EventReportWSServer wsserver(port, this);
-	LOG4CPLUS_INFO(log, ",websocket start listen port:" << port);
+	LOG4CPLUS_INFO(log, "." + ProcessModule::getId(), ",websocket start listen port:" << port);
 	wsserver.InitInstance();
 
 	while (m_bRunning){
@@ -672,7 +670,7 @@ EPConnection::~EPConnection()
 {
 }
 
-uint64_t EPConnection::GetId()
+uint64_t EPConnection::getId()
 {
 	return m_Id;
 }

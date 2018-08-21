@@ -283,13 +283,13 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 {
 	bool bResult = true;
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	LOG4CPLUS_INFO(log, "config file: " << strConfigFile);
+	LOG4CPLUS_INFO(log, "", "config file: " << strConfigFile);
 
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument config;
 	if (config.LoadFile(strConfigFile.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, "load config file error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, "", "load config file error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	if (tinyxml2::XMLElement *eConfig = config.FirstChildElement("Config")){
@@ -364,7 +364,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 
 	}
 	else {
-		LOG4CPLUS_ERROR(log, "config file missing Config element.");
+		LOG4CPLUS_ERROR(log,"", "config file missing Config element.");
 		return false;
 	}
 
@@ -379,7 +379,7 @@ void chilli::App::Start()
 #endif
 	static log4cplus::ConfigureAndWatchThread logconfig("conf/log4cplus.properties", 10 * 1000);
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
+	LOG4CPLUS_TRACE(log,"",  __FUNCTION__ << " start.");
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
 
@@ -387,18 +387,18 @@ void chilli::App::Start()
 		it->Start();
 	}
 
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
+	LOG4CPLUS_TRACE(log, "", __FUNCTION__ << " end.");
 
 }
 
 void chilli::App::Stop()
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " start.");
+	LOG4CPLUS_TRACE(log,"", __FUNCTION__ << " start.");
 	for (auto & it : model::ProcessModule::g_Modules){
 		it->Stop();
 	}
 	model::ProcessModule::g_Modules.clear();
-	LOG4CPLUS_TRACE(log, __FUNCTION__ << " end.");
+	LOG4CPLUS_TRACE(log, "", __FUNCTION__ << " end.");
 
 }

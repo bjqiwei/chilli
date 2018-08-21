@@ -11,12 +11,11 @@ namespace Group {
 	{
 		std::string logName = "GroupImp";
 		log = log4cplus::Logger::getInstance(logName);
-		log.setAppendName("." + this->getId());
-		LOG4CPLUS_DEBUG(log, " new a group object.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " new a group object.");
 	}
 
 	Group::~Group() {
-		LOG4CPLUS_DEBUG(log, " destruction a group object.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a group object.");
 	}
 
 	void Group::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
@@ -26,14 +25,14 @@ namespace Group {
 
 	void Group::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 		Json::Value jsonData;
 		Json::CharReaderBuilder b;
 		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 		std::string jsonerr;
 
 		if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-			LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
 			return;
 		}
 

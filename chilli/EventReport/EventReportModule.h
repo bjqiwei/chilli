@@ -14,7 +14,7 @@ public:
 
 	virtual ~EPConnection();
 
-	uint64_t GetId();
+	uint64_t getId();
 public:
 	//virtual void Open() = 0;
 	//virtual void Close() = 0;
@@ -40,7 +40,7 @@ public:
 	//Connection interface
 	void ConnOnClose(uint64_t id);
 	void ConnOnError(uint64_t id, const std::string & errorCode);
-	void ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log);
+	void ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log, const std::string & logId);
 private:
 	void processSend(const std::string &strContent, const void * param, bool & bHandled);
 	//inherit from SendInterface
