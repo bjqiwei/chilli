@@ -37,7 +37,7 @@ public:
         LOG4CPLUS_TRACE_METHOD(logger, LOG4CPLUS_TEXT("SlowObject::doSomething()"));
         {
             log4cplus::thread::MutexGuard guard (mutex);
-            LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Actually doing something..."));
+            LOG4CPLUS_INFO(logger, "", LOG4CPLUS_TEXT("Actually doing something..."));
             sleep(0, 75 * MILLIS_TO_NANOS);
             LOG4CPLUS_INFO_FMT(logger,
                 LOG4CPLUS_TEXT (
@@ -104,20 +104,20 @@ main()
         for(i=0; i<NUM_THREADS; ++i) {
             threads[i]->start();
         }
-        LOG4CPLUS_DEBUG(logger, "All Threads started...");
+        LOG4CPLUS_DEBUG(logger, "", "All Threads started...");
 
         for(i=0; i<NUM_THREADS; ++i) {
             while(threads[i]->isRunning()) {
                 sleep(0, 200 * MILLIS_TO_NANOS);
             }
         }
-        LOG4CPLUS_INFO(logger, "Exiting main()...");
+        LOG4CPLUS_INFO(logger, "", "Exiting main()...");
     }
     catch(std::exception &e) {
-        LOG4CPLUS_FATAL(Logger::getRoot(), "main()- Exception occured: " << e.what());
+        LOG4CPLUS_FATAL(Logger::getRoot(), "", "main()- Exception occured: " << e.what());
     }
     catch(...) {
-        LOG4CPLUS_FATAL(Logger::getRoot(), "main()- Exception occured");
+        LOG4CPLUS_FATAL(Logger::getRoot(), "", "main()- Exception occured");
     }
 
     log4cplus::Logger::shutdown();
@@ -129,23 +129,23 @@ void
 TestThread::run()
 {
     try {
-        LOG4CPLUS_WARN(logger, name + LOG4CPLUS_TEXT(" TestThread.run()- Starting..."));
+        LOG4CPLUS_WARN(logger, "", name + LOG4CPLUS_TEXT(" TestThread.run()- Starting..."));
         NDC& ndc = getNDC();
         NDCContextCreator _first_ndc(name);
-        LOG4CPLUS_DEBUG(logger, "Entering Run()...");
+        LOG4CPLUS_DEBUG(logger, "", "Entering Run()...");
         for(int i=0; i<NUM_LOOPS; ++i) {
             NDCContextCreator _ndc(LOG4CPLUS_TEXT("loop"));
             slow->doSomething();
         }
-        LOG4CPLUS_DEBUG(logger, "Exiting run()...");
+        LOG4CPLUS_DEBUG(logger, "", "Exiting run()...");
 
         ndc.remove();
     }
     catch(std::exception const & e) {
-        LOG4CPLUS_FATAL(logger, "TestThread.run()- Exception occurred: " << e.what());
+        LOG4CPLUS_FATAL(logger, "", "TestThread.run()- Exception occurred: " << e.what());
     }
     catch(...) {
-        LOG4CPLUS_FATAL(logger, "TestThread.run()- Exception occurred!!");
+        LOG4CPLUS_FATAL(logger, "", "TestThread.run()- Exception occurred!!");
     }
-    LOG4CPLUS_WARN(logger, name << " TestThread.run()- Finished");
+    LOG4CPLUS_WARN(logger, "", name << " TestThread.run()- Finished");
 } // end "run"

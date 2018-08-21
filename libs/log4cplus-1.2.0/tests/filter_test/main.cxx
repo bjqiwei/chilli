@@ -16,11 +16,11 @@ void
 printDebug()
 {
     LOG4CPLUS_TRACE_METHOD(logger, LOG4CPLUS_TEXT("::printDebug()"));
-    LOG4CPLUS_DEBUG(logger, "This is a DEBUG message");
-    LOG4CPLUS_INFO(logger, "This is a INFO message");
-    LOG4CPLUS_WARN(logger, "This is a WARN message");
-    LOG4CPLUS_ERROR(logger, "This is a ERROR message");
-    LOG4CPLUS_FATAL(logger, "This is a FATAL message");
+    LOG4CPLUS_DEBUG(logger, "", "This is a DEBUG message");
+    LOG4CPLUS_INFO(logger, "", "This is a INFO message");
+    LOG4CPLUS_WARN(logger, "", "This is a WARN message");
+    LOG4CPLUS_ERROR(logger, "", "This is a ERROR message");
+    LOG4CPLUS_FATAL(logger, "", "This is a FATAL message");
 }
 
 
@@ -34,12 +34,12 @@ main()
     try {
         PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("log4cplus.properties"));
 
-        LOG4CPLUS_WARN(root, "Testing....");
+        LOG4CPLUS_WARN(root, "", "Testing....");
         printDebug();
     }
     catch(...) {
         tcout << "Exception..." << endl;
-        LOG4CPLUS_FATAL(root, "Exception occured...");
+        LOG4CPLUS_FATAL(root, "", "Exception occured...");
     }
 
     tcout << "Exiting main()..." << endl;

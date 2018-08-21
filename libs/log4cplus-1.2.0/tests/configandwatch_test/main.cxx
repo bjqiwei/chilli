@@ -20,10 +20,10 @@ void
 printMsgs(Logger& logger)
 {
     LOG4CPLUS_TRACE_METHOD(logger, LOG4CPLUS_TEXT("printMsgs()"));
-    LOG4CPLUS_DEBUG(logger, "printMsgs()");
-    LOG4CPLUS_INFO(logger, "printMsgs()");
-    LOG4CPLUS_WARN(logger, "printMsgs()");
-    LOG4CPLUS_ERROR(logger, "printMsgs()");
+    LOG4CPLUS_DEBUG(logger, "", "printMsgs()");
+    LOG4CPLUS_INFO(logger, "", "printMsgs()");
+    LOG4CPLUS_WARN(logger, "", "printMsgs()");
+    LOG4CPLUS_ERROR(logger, "", "printMsgs()");
 }
 
 
@@ -40,7 +40,7 @@ main()
         ConfigureAndWatchThread configureThread(
             LOG4CPLUS_TEXT("log4cplus.properties"), 5 * 1000);
 
-        LOG4CPLUS_WARN(root, "Testing....");
+        LOG4CPLUS_WARN(root,"",  "Testing....");
 
         for(int i=0; i<4; ++i) {
             printMsgs(log_1);
@@ -51,7 +51,7 @@ main()
     }
     catch(...) {
         tcout << LOG4CPLUS_TEXT("Exception...") << endl;
-        LOG4CPLUS_FATAL(root, "Exception occured...");
+        LOG4CPLUS_FATAL(root,"",  "Exception occured...");
     }
 
     tcout << LOG4CPLUS_TEXT("Exiting main()...") << endl;

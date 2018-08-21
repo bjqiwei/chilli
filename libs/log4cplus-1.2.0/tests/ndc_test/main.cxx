@@ -29,23 +29,23 @@ main()
         Logger logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));
         log4cplus::tcout << "Logger: " << logger.getName() << endl;
         getNDC().push(LOG4CPLUS_TEXT("tsmith"));
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("This is a short test..."));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("This is a short test..."));
 
         getNDC().push(LOG4CPLUS_TEXT("password"));
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("This should have my password now"));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("This should have my password now"));
 
         getNDC().pop();
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("This should NOT have my password now"));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("This should NOT have my password now"));
 
         getNDC().pop_void ();
         cout << "Just returned from pop..." << endl;
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("There should be no NDC..."));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("There should be no NDC..."));
 
         getNDC().push(LOG4CPLUS_TEXT("tsmith"));
         getNDC().push(LOG4CPLUS_TEXT("password"));
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("This should have my password now"));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("This should have my password now"));
         getNDC().remove();
-        LOG4CPLUS_DEBUG(logger, LOG4CPLUS_TEXT("There should be no NDC..."));
+        LOG4CPLUS_DEBUG(logger, "", LOG4CPLUS_TEXT("There should be no NDC..."));
     }
     catch(...) {
         cout << "Exception..." << endl;

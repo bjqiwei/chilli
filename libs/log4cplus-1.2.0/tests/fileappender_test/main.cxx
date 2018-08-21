@@ -31,7 +31,7 @@ main()
 
     for(int i=0; i<LOOP_COUNT; ++i) {
         NDCContextCreator _context(LOG4CPLUS_TEXT("loop"));
-        LOG4CPLUS_DEBUG(subTest, "Entering loop #" << i);
+        LOG4CPLUS_DEBUG(subTest, "", "Entering loop #" << i);
     }
 
     {

@@ -32,17 +32,17 @@ main()
     try {
         Logger logger = Logger::getInstance(LOG4CPLUS_TEXT("testlogger"));
 
-        LOG4CPLUS_WARN(Logger::getRoot (), "Starting test loop....");
+        LOG4CPLUS_WARN(Logger::getRoot (), "", "Starting test loop....");
         Time start = Time::gettimeofday();
         tstring msg(LOG4CPLUS_TEXT("This is a WARNING..."));
         int i = 0;
         for(i=0; i<LOOP_COUNT; ++i) {
-            LOG4CPLUS_WARN(logger, msg);
+            LOG4CPLUS_WARN(logger, "", msg);
         }
         Time end = Time::gettimeofday();
         Time diff = end - start;
-        LOG4CPLUS_WARN(LOG4CPLUS_TEXT("root"), "Logging " << LOOP_COUNT << " took: " << diff << endl);
-        LOG4CPLUS_WARN(root, "Logging average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(LOG4CPLUS_TEXT("root"), "", "Logging " << LOOP_COUNT << " took: " << diff << endl);
+        LOG4CPLUS_WARN(root, "", "Logging average: " << (diff/LOOP_COUNT) << endl);
 
         start = Time::gettimeofday();
         for(i=0; i<LOOP_COUNT; ++i) {
@@ -52,7 +52,7 @@ main()
         }
         end = Time::gettimeofday();
         diff = end - start;
-        LOG4CPLUS_WARN(root, "tostringstream average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(root, "", "tostringstream average: " << (diff/LOOP_COUNT) << endl);
 
         start = Time::gettimeofday();
         for(i=0; i<LOOP_COUNT; ++i) {
@@ -62,8 +62,8 @@ main()
         end = Time::gettimeofday();
         diff = end - start;
 
-        LOG4CPLUS_WARN(root, "Creating log " << LOOP_COUNT << " objects took: " << diff);
-        LOG4CPLUS_WARN(root, "Creating log object average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(root, "", "Creating log " << LOOP_COUNT << " objects took: " << diff);
+        LOG4CPLUS_WARN(root, "", "Creating log object average: " << (diff/LOOP_COUNT) << endl);
 
         start = Time::gettimeofday();
         for(i=0; i<LOOP_COUNT; ++i) {
@@ -74,8 +74,8 @@ main()
         }
         end = Time::gettimeofday();
         diff = end - start;
-        LOG4CPLUS_WARN(root, "Creating FULL log " << LOOP_COUNT << " objects took: " << diff);
-        LOG4CPLUS_WARN(root, "Creating FULL log object average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(root, "", "Creating FULL log " << LOOP_COUNT << " objects took: " << diff);
+        LOG4CPLUS_WARN(root, "", "Creating FULL log object average: " << (diff/LOOP_COUNT) << endl);
         
         start = Time::gettimeofday();
         for(i=0; i<LOOP_COUNT; ++i) {
@@ -85,8 +85,8 @@ main()
         }
         end = Time::gettimeofday();
         diff = end - start;
-        LOG4CPLUS_WARN(root, "getNDC() " << LOOP_COUNT << " calls took: " << diff);
-        LOG4CPLUS_WARN(root, "getNDC() average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(root, "", "getNDC() " << LOOP_COUNT << " calls took: " << diff);
+        LOG4CPLUS_WARN(root, "", "getNDC() average: " << (diff/LOOP_COUNT) << endl);
         
         start = Time::gettimeofday();
         for(i=0; i<LOOP_COUNT; ++i) {
@@ -96,12 +96,12 @@ main()
         }
         end = Time::gettimeofday();
         diff = end - start;
-        LOG4CPLUS_WARN(root, "getThread() " << LOOP_COUNT << " calls took: " << diff);
-        LOG4CPLUS_WARN(root, "getThread() average: " << (diff/LOOP_COUNT) << endl);
+        LOG4CPLUS_WARN(root, "", "getThread() " << LOOP_COUNT << " calls took: " << diff);
+        LOG4CPLUS_WARN(root, "", "getThread() average: " << (diff/LOOP_COUNT) << endl);
     }
     catch(...) {
         tcout << LOG4CPLUS_TEXT("Exception...") << endl;
-        LOG4CPLUS_FATAL(root, "Exception occured...");
+        LOG4CPLUS_FATAL(root, "", "Exception occured...");
     }
 
     tcout << LOG4CPLUS_TEXT("Exiting main()...") << endl;

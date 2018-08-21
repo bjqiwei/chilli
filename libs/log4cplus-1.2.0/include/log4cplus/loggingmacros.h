@@ -252,6 +252,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
             log4cplus::tchar const * _logEvent                          \
                 = _snpbuf.print (__VA_ARGS__);                          \
             log4cplus::detail::macro_forced_log (_l,                    \
+                "",                                                     \
                 log4cplus::logLevel, _logEvent,                         \
                 __FILE__, __LINE__, LOG4CPLUS_MACRO_FUNCTION ());       \
         }                                                               \
@@ -270,6 +271,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
             log4cplus::tchar const * _logEvent                          \
                 = _snpbuf.print (logArgs);                              \
             log4cplus::detail::macro_forced_log (_l,                    \
+                "",                                                     \
                 log4cplus::logLevel, _logEvent,                         \
                 __FILE__, __LINE__, LOG4CPLUS_MACRO_FUNCTION ());       \
         }                                                               \
@@ -470,11 +472,12 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
 //! If the condition given in second parameter evaluates false, this
 //! macro logs it using FATAL log level, including the condition's
 //! source text.
-#define LOG4CPLUS_ASSERT(logger, condition)                             \
+#define LOG4CPLUS_ASSERT(logger, appendName, condition)                             \
     LOG4CPLUS_SUPPRESS_DOWHILE_WARNING()                                \
     do {                                                                \
         if (LOG4CPLUS_UNLIKELY(! (condition)))                          \
             LOG4CPLUS_FATAL_STR ((logger),                              \
+                appendName,                                             \
                 LOG4CPLUS_TEXT ("failed condition: ")                   \
                 LOG4CPLUS_TEXT (LOG4CPLUS_ASSERT_STRINGIFY (condition))); \
     } while (0)                                                         \
