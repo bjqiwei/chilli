@@ -366,14 +366,7 @@ bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & log)
 		param["display"].asString();
 
 	if (param["sessionID"].isString())
-		param["sessionID"].asString();
-
-	if (called.length() < 5) {
-		called = "sofia/internal/" + called + "%192.168.2.232";
-	}
-	else {
-		called = "sofia/external/" + called + "@192.168.2.220";
-	}
+		sessionId = param["sessionID"].asString();
 
 	esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_execute:bridge " << called << ", status:" << status);
@@ -457,7 +450,8 @@ void FreeSwitchModule::ConnectFS()
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
-
+		
+		m_Handle.async_execute = true;
 		if (!m_Handle.connected){
 			LOG4CPLUS_ERROR(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port << " error,"
 				<< m_Handle.errnum << " " << m_Handle.err);
@@ -563,16 +557,13 @@ void FreeSwitchModule::ConnectFS()
 							evt.event["param"].removeMember("UniqueID");
 
 							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
-								if (dir == "inbound")
+								if (dir == "inbound" && !caller.empty())
 									m_Session_DeviceId[sessionId] = caller.substr(0,caller.find("%"));
-								else if (dir == "outbound")
+								else if (dir == "outbound" && !called.empty())
 									m_Session_DeviceId[sessionId] = called.substr(0,called.find("%"));
 								
 							}
 							
-							evt.event["id"] = m_Session_DeviceId[sessionId];
-							evt.event["event"] = eventName;
-							evt.event["param"]["sessionID"] = sessionId;
 
 							//Channel _ Create：通道创建事件
 							//Channel _ Progress：通道振铃事件
@@ -580,13 +571,25 @@ void FreeSwitchModule::ConnectFS()
 							//Channel _ Bridge：通道桥接事件
 							//Channel _ Hangup：通道挂断事件
 
-							this->PushEvent(evt);
 
-							if (eventName == "CHANNEL_DESTROY")
-								m_Session_DeviceId.erase(evt.event["sessionID"].asString());
-							
-							if (eventName == "BACKGROUND_JOB")
+
+							if (m_Session_DeviceId.find(sessionId) != m_Session_DeviceId.end()){
+								evt.event["id"] = m_Session_DeviceId[sessionId];
+								evt.event["event"] = eventName;
+								evt.event["param"]["sessionID"] = sessionId;
+								this->PushEvent(evt);
+							}
+							else {
+								LOG4CPLUS_ERROR(log, "." + this->getId(), "Channel is already destroy:" << m_Handle.last_event->body);
+							}
+
+							if (eventName == "BACKGROUND_JOB") {
 								m_Job_Session.erase(evt.event["JobUUID"].asString());
+									
+							}
+							else if(eventName == "CHANNEL_DESTROY") {
+								m_Session_DeviceId.erase(sessionId);
+							}
 
 						}
 						else {
@@ -629,7 +632,8 @@ void FreeSwitchModule::run()
 					}
 
 					if (peId.empty()){
-						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
+						Json::FastWriter writer;
+						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
 						continue;
 					}
 

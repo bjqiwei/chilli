@@ -20,22 +20,38 @@
 	<script src="./conf/DateFormat.js"/>
 	<script>
 		FSCause = {};
-		FSCause["USER_NOT_REGISTERED"] = 1066;
-		FSCause["USER_BUSY"] = 1017;
-		FSCause["CALL_REJECTED"] = 1021;
 		FSCause["FILE NOT FOUND"] = 1401,
 		FSCause["NORMAL_CLEARING"] = 0;
 		FSCause["FILE PLAYED"]=0;
-		FSCause["RECOVERY_ON_TIMER_EXPIRE"]=1102;
 		FSCause["ORIGINATOR_CANCEL"]=1487;
 		FSCause["PLAYBACK ERROR"] = 1402;
 		FSCause["NORMAL_TEMPORARY_FAILURE"] = 1503;
+		
+		FSCause["NONE"] = 0;
+		FSCause["UNALLOCATED_NUMBER"]=1;
+		FSCause["NO_ROUTE_TRANSIT_NET"]=2;
+		FSCause["NO_ROUTE_DESTINATION"]=3;
+		FSCause["CHANNEL_UNACCEPTABLE"]=6;
+		FSCause["USER_BUSY"] = 1017;
+		FSCause["CALL_REJECTED"] = 1021;
+		FSCause["USER_NOT_REGISTERED"] = 1066;
 		FSCause["DESTINATION_OUT_OF_ORDER"] = 1027;
+		FSCause["INCOMPATIBLE_DESTINATION"] = 1088;
+		FSCause["RECOVERY_ON_TIMER_EXPIRE"]=1102;
 	</script>
 </scriptmodel>
 	<state id="Null">
 		<event event="CHANNEL_CREATE">
 			<transition target="Initiated"/>
+		</event>
+		
+		<event event="CHANNEL_DESTROY">
+			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
+				<cause type="script">cause=FSCause["USER_NOT_REGISTERED"];</cause>
+				<deviceID type="script">_device.deviceID</deviceID>
+				<sessionID type="script">_event.param.sessionID</sessionID>
+			</send>
+			<transition target="Destroy"/>
 		</event>
 		
 		<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate' &amp;&amp; _event.param._body.indexOf('-ERR')!=-1">
@@ -167,6 +183,8 @@
 						<sessionID type="script">_event.param.sessionID</sessionID>
 					</send>
 				</onentry>
+				<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate'">
+				</event>
 		</state>
 		</state>
 	</state>
