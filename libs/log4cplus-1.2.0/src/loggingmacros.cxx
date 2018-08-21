@@ -76,22 +76,24 @@ get_macro_body_snprintf_buf ()
 
 void
 macro_forced_log (log4cplus::Logger const & logger,
+    log4cplus::tstring const & appendName,
     log4cplus::LogLevel log_level, log4cplus::tchar const * msg,
     char const * filename, int line, char const * func)
 {
-    macro_forced_log (logger, log_level,
+    macro_forced_log (logger, appendName, log_level,
         internal::get_ptd ()->macros_str = msg, filename, line, func);
 }
 
 
 void
 macro_forced_log (log4cplus::Logger const & logger,
+    log4cplus::tstring const & appendName,
     log4cplus::LogLevel log_level, log4cplus::tstring const & msg,
     char const * filename, int line, char const * func)
 {
     log4cplus::spi::InternalLoggingEvent & ev
         = internal::get_ptd ()->forced_log_ev;
-    ev.setLoggingEvent (logger.getName() + logger.getAppendName(), log_level, msg, filename, line,
+    ev.setLoggingEvent (logger.getName () + appendName , log_level, msg, filename, line,
         func);
     logger.forcedLog (ev);
 }

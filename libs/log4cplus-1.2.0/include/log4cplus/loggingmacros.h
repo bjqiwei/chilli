@@ -131,9 +131,11 @@ LOG4CPLUS_EXPORT void clear_tostringstream (tostringstream &);
 LOG4CPLUS_EXPORT log4cplus::tostringstream & get_macro_body_oss ();
 LOG4CPLUS_EXPORT log4cplus::helpers::snprintf_buf & get_macro_body_snprintf_buf ();
 LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
+    log4cplus::tstring const &,
     log4cplus::LogLevel, log4cplus::tstring const &, char const *, int,
     char const *);
 LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
+    log4cplus::tstring const &,
     log4cplus::LogLevel, log4cplus::tchar const *, char const *, int,
     char const *);
 
@@ -205,7 +207,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
 #endif
 
 
-#define LOG4CPLUS_MACRO_BODY(logger, logEvent, logLevel)                \
+#define LOG4CPLUS_MACRO_BODY(logger, appendName, logEvent, logLevel)                \
     LOG4CPLUS_SUPPRESS_DOWHILE_WARNING()                                \
     do {                                                                \
         log4cplus::Logger const & _l                                    \
@@ -215,6 +217,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
             LOG4CPLUS_MACRO_INSTANTIATE_OSTRINGSTREAM (_log4cplus_buf); \
             _log4cplus_buf << logEvent;                                 \
             log4cplus::detail::macro_forced_log (_l,                    \
+                appendName,                                             \
                 log4cplus::logLevel, _log4cplus_buf.str(),              \
                 __FILE__, __LINE__, LOG4CPLUS_MACRO_FUNCTION ());       \
         }                                                               \
@@ -222,7 +225,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
     LOG4CPLUS_RESTORE_DOWHILE_WARNING()
 
 
-#define LOG4CPLUS_MACRO_STR_BODY(logger, logEvent, logLevel)            \
+#define LOG4CPLUS_MACRO_STR_BODY(logger, appendName, logEvent, logLevel)            \
     LOG4CPLUS_SUPPRESS_DOWHILE_WARNING()                                \
     do {                                                                \
         log4cplus::Logger const & _l                                    \
@@ -230,6 +233,7 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
         if (LOG4CPLUS_MACRO_LOGLEVEL_PRED (                             \
                 _l.isEnabledFor (log4cplus::logLevel), logLevel)) {     \
             log4cplus::detail::macro_forced_log (_l,                    \
+                appendName,                                             \
                 log4cplus::logLevel, logEvent,                          \
                 __FILE__, __LINE__, LOG4CPLUS_MACRO_FUNCTION ());       \
         }                                                               \
@@ -285,10 +289,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
 #define LOG4CPLUS_TRACE_METHOD(logger, logEvent)                        \
     log4cplus::TraceLogger _log4cplus_trace_logger(logger, logEvent,    \
         __FILE__, __LINE__, LOG4CPLUS_MACRO_FUNCTION ());
-#define LOG4CPLUS_TRACE(logger, logEvent)                               \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, TRACE_LOG_LEVEL)
-#define LOG4CPLUS_TRACE_STR(logger, logEvent)                           \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, TRACE_LOG_LEVEL)
+#define LOG4CPLUS_TRACE(logger, appendName, logEvent)                               \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, TRACE_LOG_LEVEL)
+#define LOG4CPLUS_TRACE_STR(logger, appendName, logEvent)                           \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, TRACE_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_TRACE_FMT(logger, ...)                                \
@@ -316,10 +320,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
  * <code>logEvent</code> will be streamed into an <code>ostream</code>.
  */
 #if !defined(LOG4CPLUS_DISABLE_DEBUG)
-#define LOG4CPLUS_DEBUG(logger, logEvent)                               \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, DEBUG_LOG_LEVEL)
-#define LOG4CPLUS_DEBUG_STR(logger, logEvent)                           \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, DEBUG_LOG_LEVEL)
+#define LOG4CPLUS_DEBUG(logger, appendName, logEvent)                               \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, DEBUG_LOG_LEVEL)
+#define LOG4CPLUS_DEBUG_STR(logger, appendName, logEvent)                           \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, DEBUG_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_DEBUG_FMT(logger, ...)                                \
@@ -346,10 +350,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
  * <code>logEvent</code> will be streamed into an <code>ostream</code>.
  */
 #if !defined(LOG4CPLUS_DISABLE_INFO)
-#define LOG4CPLUS_INFO(logger, logEvent)                                \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, INFO_LOG_LEVEL)
-#define LOG4CPLUS_INFO_STR(logger, logEvent)                            \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, INFO_LOG_LEVEL)
+#define LOG4CPLUS_INFO(logger, appendName, logEvent)                                \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, INFO_LOG_LEVEL)
+#define LOG4CPLUS_INFO_STR(logger, appendName, logEvent)                            \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, INFO_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_INFO_FMT(logger, ...)                                 \
@@ -376,10 +380,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
  * <code>logEvent</code> will be streamed into an <code>ostream</code>.
  */
 #if !defined(LOG4CPLUS_DISABLE_WARN)
-#define LOG4CPLUS_WARN(logger, logEvent)                                \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, WARN_LOG_LEVEL)
-#define LOG4CPLUS_WARN_STR(logger, logEvent)                            \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, WARN_LOG_LEVEL)
+#define LOG4CPLUS_WARN(logger, appendName, logEvent)                                \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, WARN_LOG_LEVEL)
+#define LOG4CPLUS_WARN_STR(logger, appendName, logEvent)                            \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, WARN_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_WARN_FMT(logger, ...)                                 \
@@ -406,10 +410,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
  * <code>logEvent</code> will be streamed into an <code>ostream</code>.
  */
 #if !defined(LOG4CPLUS_DISABLE_ERROR)
-#define LOG4CPLUS_ERROR(logger, logEvent)                               \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, ERROR_LOG_LEVEL)
-#define LOG4CPLUS_ERROR_STR(logger, logEvent)                           \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, ERROR_LOG_LEVEL)
+#define LOG4CPLUS_ERROR(logger, appendName, logEvent)                               \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, ERROR_LOG_LEVEL)
+#define LOG4CPLUS_ERROR_STR(logger, appendName,logEvent)                           \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, ERROR_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_ERROR_FMT(logger, ...)                                \
@@ -436,10 +440,10 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
  * <code>logEvent</code> will be streamed into an <code>ostream</code>.
  */
 #if !defined(LOG4CPLUS_DISABLE_FATAL)
-#define LOG4CPLUS_FATAL(logger, logEvent)                               \
-    LOG4CPLUS_MACRO_BODY (logger, logEvent, FATAL_LOG_LEVEL)
-#define LOG4CPLUS_FATAL_STR(logger, logEvent)                           \
-    LOG4CPLUS_MACRO_STR_BODY (logger, logEvent, FATAL_LOG_LEVEL)
+#define LOG4CPLUS_FATAL(logger, appendName, logEvent)                               \
+    LOG4CPLUS_MACRO_BODY (logger, appendName, logEvent, FATAL_LOG_LEVEL)
+#define LOG4CPLUS_FATAL_STR(logger, appendName, logEvent)                           \
+    LOG4CPLUS_MACRO_STR_BODY (logger, appendName, logEvent, FATAL_LOG_LEVEL)
 
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
 #define LOG4CPLUS_FATAL_FMT(logger, ...)                                \
