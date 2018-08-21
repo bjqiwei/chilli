@@ -11,7 +11,6 @@ namespace Avaya {
 	{
 		std::string logName = "AvayaVDN";
 		log = log4cplus::Logger::getInstance(logName);
-		log.setAppendName("." + this->getId());
 	}
 
 	AvayaVDN::~AvayaVDN() {
@@ -34,7 +33,7 @@ namespace Avaya {
 
 			if (callid == 0)
 			{
-				LOG4CPLUS_WARN(log, " callid is invalid," << jsonEvent.toStyledString());
+				LOG4CPLUS_WARN(log, "." + this->getId(), " callid is invalid," << jsonEvent.toStyledString());
 				return false;
 
 			}

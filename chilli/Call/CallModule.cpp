@@ -13,14 +13,13 @@ namespace Call{
 CallModule::CallModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.CallModule");
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log, " Constuction a Call module.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a Call module.");
 }
 
 
 CallModule::~CallModule(void)
 {
-	LOG4CPLUS_DEBUG(log, " Destruction a ACD module.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Destruction a ACD module.");
 }
 
 
@@ -30,7 +29,7 @@ bool CallModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if(config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS) 
 	{ 
-		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	
@@ -55,13 +54,13 @@ void CallModule::processSend(Json::Value & jsonData, const void * param, bool & 
 
 void CallModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 	Json::Value jsonData;
 	Json::CharReaderBuilder b;
 	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 	std::string jsonerr;
 	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
 		return;
 	}
 
@@ -72,7 +71,7 @@ void CallModule::fireSend(const std::string & strContent, const void * param)
 void CallModule::run()
 {
 
-	LOG4CPLUS_INFO(log, " Starting...");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
 	try
 	{
 		while (m_bRunning)
@@ -102,7 +101,7 @@ void CallModule::run()
 						newConnectionID = jsonEvent["param"]["connectionID"].asString();
 
 					if (sessionid.empty()){
-						LOG4CPLUS_WARN(log, "sessionID is null");
+						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionID is null");
 						continue;
 					}
 					if (m_Calls.find(sessionid) == m_Calls.end()) {
@@ -147,17 +146,17 @@ void CallModule::run()
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, " " << e.what());
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
 			}
 		}
 
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, " " << e.what());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, " Stoped.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
 	log4cplus::threadCleanup();
 }
 

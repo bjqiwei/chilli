@@ -13,7 +13,6 @@ namespace Avaya {
 	{
 		std::string logName = "AvayaDevice";
 		log = log4cplus::Logger::getInstance(logName);
-		log.setAppendName("." + this->getId());
 	}
 
 	AvayaDevice::~AvayaDevice() {
@@ -21,14 +20,14 @@ namespace Avaya {
 
 	void AvayaDevice::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 		Json::Value jsonData;
 		Json::CharReaderBuilder b;
 		std::shared_ptr<Json::CharReader> reader(b.newCharReader());
 
 		std::string err;
 		if (!reader->parse(strContent.c_str(), strContent.c_str()+ strContent.length(), &jsonData, &err)) {
-			LOG4CPLUS_ERROR(log, strContent << " not json data." << err);
+			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << err);
 			return;
 		}
 

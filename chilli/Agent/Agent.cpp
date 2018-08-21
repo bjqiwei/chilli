@@ -13,12 +13,11 @@ Agent::Agent(model::ProcessModule * model, const std::string &ext, const std::st
 {
 	std::string logName= "Agent";
 	log = log4cplus::Logger::getInstance(logName);
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log," new a Agent object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " new a Agent object.");
 }
 
 Agent::~Agent(){
-	LOG4CPLUS_DEBUG(log, " destruction a Agent object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a Agent object.");
 }
 
 void Agent::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
@@ -28,14 +27,14 @@ void Agent::processSend(Json::Value & jsonData, const void * param, bool & bHand
 
 void Agent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 	Json::Value jsonData;
 	Json::CharReaderBuilder b;
 	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 	std::string jsonerr;
 
 	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, this->getId() << " " << " not json data." << jsonerr);
+		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " " << " not json data." << jsonerr);
 		return;
 	}
 	bool bHandled = false;
@@ -44,7 +43,7 @@ void Agent::fireSend(const std::string & strContent,const void * param)
 
 void Agent::Start()
 {
-	LOG4CPLUS_INFO(log, " Start.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Start.");
 	for (auto & it : m_StateMachines) {
 		it.second->start(false);
 	}
@@ -55,7 +54,7 @@ void Agent::Stop()
 	for (auto & it : m_StateMachines) {
 		it.second->stop();
 	}
-	LOG4CPLUS_INFO(log, " Stop.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
 }
 
 bool Agent::IsClosed()
@@ -94,7 +93,7 @@ void Agent::mainEventLoop()
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_DEBUG(log, " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event.event.toStyledString());
 
 			if (m_StateMachines.begin() == m_StateMachines.end()) {
 				StateMachine sm(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
@@ -125,7 +124,7 @@ void Agent::mainEventLoop()
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
 	}
 }
 

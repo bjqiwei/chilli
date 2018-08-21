@@ -12,18 +12,17 @@ namespace Call {
 	{
 		std::string logName = "Call";
 		log = log4cplus::Logger::getInstance(logName);
-		log.setAppendName("." + this->getId());
-		LOG4CPLUS_DEBUG(log, " new a call object.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " new a call object.");
 	}
 
 	Call::~Call() {
 		m_StateMachines.clear();
-		LOG4CPLUS_DEBUG(log, " destruction a call object.");
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a call object.");
 	}
 
 	void Call::Start()
 	{
-		LOG4CPLUS_INFO(log, " Start.");
+		LOG4CPLUS_INFO(log, "." + this->getId(), " Start.");
 		for (auto & it : m_StateMachines) {
 			it.second->start(false);
 		}
@@ -34,7 +33,7 @@ namespace Call {
 		for (auto & it : m_StateMachines) {
 			it.second->stop();
 		}
-		LOG4CPLUS_INFO(log, " Stop.");
+		LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
 	}
 
 	bool Call::IsClosed()
@@ -75,7 +74,7 @@ namespace Call {
 				}
 				
 				Json::FastWriter writer;
-				LOG4CPLUS_DEBUG(log, " Recived a event," << writer.write(Event.event));
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << writer.write(Event.event));
 
 				if (m_StateMachines.empty()) {
 					
@@ -108,7 +107,7 @@ namespace Call {
 		}
 		catch (std::exception & e)
 		{
-			LOG4CPLUS_ERROR(log, e.what());
+			LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
 		}
 
 	}
@@ -129,7 +128,7 @@ namespace Call {
 				pe->PushEvent(chilli::model::EventType_t(newEvent));
 			}
 			else {
-				LOG4CPLUS_WARN(log, "not find device:" << newEvent["id"].asString());
+				LOG4CPLUS_WARN(log, "." + this->getId(), "not find device:" << newEvent["id"].asString());
 			}
 			bHandled = true;
 		}
@@ -138,7 +137,7 @@ namespace Call {
 
 	void Call::fireSend(const std::string &strContent, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 		Json::Value jsonData;
 		Json::CharReaderBuilder b;
 		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
@@ -149,7 +148,7 @@ namespace Call {
 			this->processSend(jsonData, param, bHandled);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
 		}
 	}
 

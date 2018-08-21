@@ -12,26 +12,25 @@ ShExtension::ShExtension(model::ProcessModule * model, const std::string &ext, c
 	:Device(model, ext, smFileName)
 {
 	this->log = log4cplus::Logger::getInstance("chilli.ShDeivce");
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log, " new a extension object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " new a extension object.");
 }
 
 
 
 ShExtension::~ShExtension(void)
 {
-	LOG4CPLUS_DEBUG(log, " destruction a extension object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a extension object.");
 }
 
 bool ShExtension::setType(const std::string & strType)
 {
 	/*if (this->nType != ShDevModule::getDeviceTypeByName(strType))
 	{
-		LOG4CPLUS_ERROR(log,"the type set not match the device type:"<<strType << ",set UnEnable.");
+		LOG4CPLUS_ERROR(log,"." + this->getId(), "the type set not match the device type:"<<strType << ",set UnEnable.");
 		this->m_bEnable = false;
 		return false;
 	}*/
-	LOG4CPLUS_DEBUG(log, " set type="<<strType);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " set type="<<strType);
 	return true;
 }
 void ShExtension::setType(int _type)
@@ -48,7 +47,7 @@ int ShExtension::getChannelID()
 
 void ShExtension::fireSend(const std::string &strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, " recive a Send event from stateMachine:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " recive a Send event from stateMachine:" << strContent);
 }
 
 }

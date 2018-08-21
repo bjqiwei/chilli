@@ -19,7 +19,7 @@ namespace chilli {
 		TSAPIModule::TSAPIModule(const std::string & id):ProcessModule(id), m_ulInvokeID(1)
 		{
 			log = log4cplus::Logger::getInstance("chilli.TSAPIModule");
-			LOG4CPLUS_DEBUG(log, " Constuction a module.");
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a module.");
 		}
 
 		// Destructor of TSAPIModule
@@ -30,7 +30,7 @@ namespace chilli {
 				Stop();
 			}
 
-			LOG4CPLUS_DEBUG(log, " Destruction a module.");
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Destruction a module.");
 		}
 
 		int TSAPIModule::Start()
@@ -46,7 +46,7 @@ namespace chilli {
 				m_threadtsapi = std::thread(&TSAPIModule::runtsapi, this);
 			}
 			else {
-				LOG4CPLUS_WARN(log, " already running for this module.");
+				LOG4CPLUS_WARN(log, "." + this->getId(), " already running for this module.");
 			}
 			return 0;
 		}
@@ -76,7 +76,7 @@ namespace chilli {
 			tinyxml2::XMLDocument config;
 			if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 			{
-				LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 				return false;
 			}
 
@@ -89,7 +89,7 @@ namespace chilli {
 					m_ServiceID = LinkElement->GetText() ? LinkElement->GetText() : "";
 				}
 				else {
-					LOG4CPLUS_ERROR(log, " configure file not find TLink element in the TSAPI element.");
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " configure file not find TLink element in the TSAPI element.");
 					return false;
 				}
 
@@ -98,7 +98,7 @@ namespace chilli {
 					m_UserID = UserIDElement->GetText() ? UserIDElement->GetText() : "";
 				}
 				else {
-					LOG4CPLUS_ERROR(log, " configure file not find UserID element in the TSAPI element.");
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " configure file not find UserID element in the TSAPI element.");
 					return false;
 				}
 				XMLElement* PasswordElement = tsapi->FirstChildElement("Password");
@@ -106,7 +106,7 @@ namespace chilli {
 					m_Password = PasswordElement->GetText() ? PasswordElement->GetText() : "";
 				}
 				else {
-					LOG4CPLUS_ERROR(log, " configure file not find Password element in the TSAPI element.");
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " configure file not find Password element in the TSAPI element.");
 					return false;
 				}
 
@@ -158,7 +158,7 @@ namespace chilli {
 						ext->setVar("_agent.name", agent_name);
 					}
 					else {
-						LOG4CPLUS_ERROR(log, " alredy had agent:" << num);
+						LOG4CPLUS_ERROR(log, "." + this->getId(), " alredy had agent:" << num);
 					}
 				}
 			}
@@ -193,7 +193,7 @@ namespace chilli {
 						ext->setVar("_stationNo", stationno);
 					}
 					else {
-						LOG4CPLUS_ERROR(log, " alredy had extension:" << num);
+						LOG4CPLUS_ERROR(log, "." + this->getId(), " alredy had extension:" << num);
 					}
 				}
 			}
@@ -220,7 +220,7 @@ namespace chilli {
 					ext->setVar("_stationNo", stationno);
 				}
 				else{
-					LOG4CPLUS_ERROR(log, " alredy had extension:" << num);
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " alredy had extension:" << num);
 				}
 			}
 
@@ -250,7 +250,7 @@ namespace chilli {
 						ext->setVar("_stationNo", stationno);
 					}
 					else {
-						LOG4CPLUS_ERROR(log, " alredy had extension:" << num);
+						LOG4CPLUS_ERROR(log, "." + this->getId(), " alredy had extension:" << num);
 					}
 				}
 
@@ -262,8 +262,8 @@ namespace chilli {
 
 		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
 		{
-			LOG4CPLUS_DEBUG(log, strContent);
-			LOG4CPLUS_WARN(log, " fireSend not implement.");
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), strContent);
+			LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
 		}
 
 		bool TSAPIModule::OpenStream(const char * serverID, const char * loginID, const char * password)
@@ -304,7 +304,7 @@ namespace chilli {
 
 
 			if (nRetCode < 0) {
-				LOG4CPLUS_ERROR(log, " acsOpenStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " acsOpenStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
 				bResult = false;
 			}
 			else {
@@ -332,7 +332,7 @@ namespace chilli {
 			//RetCode_t nRetCode = acsAbortStream(m_lAcsHandle, NULL);
 
 			if (nRetCode < 0) {
-				LOG4CPLUS_ERROR(log, " acsCloseStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " acsCloseStream:" << AvayaAPI::acsReturnCodeString(nRetCode));
 			}
 			else {
 				bReturnValue = true;
@@ -401,7 +401,7 @@ namespace chilli {
 						NULL);
 				}
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AgentLogin";
@@ -411,7 +411,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AgentLogin:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogin:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 				}
@@ -447,7 +447,7 @@ namespace chilli {
 					(AgentPassword_t *)password,
 					NULL);
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AgentLogout";
@@ -457,7 +457,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AgentLogout:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogout:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogout";
 				}
@@ -476,7 +476,7 @@ namespace chilli {
 					(DeviceID_t *)deviceId,
 					NULL);
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaQueryAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaQueryAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AgentGetState";
@@ -486,7 +486,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AgentGetState:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentGetState:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentGetState";
 				}
@@ -515,7 +515,7 @@ namespace chilli {
 					(PrivateData_t *)&g_stPrivateData);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AgentSetFree";
@@ -525,7 +525,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AgentSetFree:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetFree:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] =pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetFree";
 				}
@@ -554,7 +554,7 @@ namespace chilli {
 					(PrivateData_t *)&g_stPrivateData);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaSetAgentState:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AgentSetBusy";
@@ -564,7 +564,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AgentSetBusy:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetBusy:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetBusy";
 				}
@@ -592,7 +592,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaClearConnection:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaClearConnection:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "ClearConnection";
@@ -602,7 +602,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " ClearConnection:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearConnection:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ClearConnection";
 				}
@@ -630,7 +630,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaClearCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaClearCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "ClearCall";
@@ -640,7 +640,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " ClearCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ClearCall";
 				}
@@ -668,7 +668,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaAnswerCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaAnswerCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "AnswerCall";
@@ -678,7 +678,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " AnswerCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AnswerCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AnswerCall";
 				}
@@ -704,7 +704,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaMakeCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaMakeCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "MakeCall";
@@ -714,7 +714,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " MakeCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MakeCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MakeCall";
 				}
@@ -743,7 +743,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaHoldCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaHoldCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "HoldCall";
@@ -753,7 +753,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " HoldCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " HoldCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "HoldCall";
 				}
@@ -781,7 +781,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaRetrieveCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaRetrieveCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "RetrieveCall";
@@ -791,7 +791,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " RetrieveCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " RetrieveCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "RetrieveCall";
 				}
@@ -823,7 +823,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaConsultationCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaConsultationCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "ConsultationCall";
@@ -833,7 +833,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " ConsultationCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConsultationCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ConsultationCall";
 				}
@@ -874,7 +874,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaReconnectCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaReconnectCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "ReconnectCall";
@@ -884,7 +884,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " ReconnectCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ReconnectCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ReconnectCall";
 				}
@@ -925,7 +925,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaTransferCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaTransferCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "TransferCall";
@@ -935,7 +935,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " TransferCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " TransferCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "TransferCall";
 				}
@@ -976,7 +976,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaConferenceCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaConferenceCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "ConferenceCall";
@@ -986,7 +986,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " ConferenceCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConferenceCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ConferenceCall";
 				}
@@ -1014,7 +1014,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaMonitorDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaMonitorDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "MonitorDevice";
@@ -1024,7 +1024,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " MonitorDevice:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorDevice:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorDevice";
 				}
@@ -1045,7 +1045,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaMonitorStop:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaMonitorStop:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "MonitorStop";
@@ -1055,7 +1055,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " MonitorStop:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorStop:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorStop";
 				}
@@ -1083,7 +1083,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaMonitorCallsViaDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaMonitorCallsViaDevice:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "MonitorCallsViaDevice";
@@ -1093,7 +1093,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " MonitorCallsViaDevice:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCallsViaDevice:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
 				}
@@ -1128,7 +1128,7 @@ namespace chilli {
 					NULL);
 
 				if (nRetCode != ACSPOSITIVE_ACK) {
-					LOG4CPLUS_ERROR(log, " cstaMonitorCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " cstaMonitorCall:" << AvayaAPI::acsReturnCodeString(nRetCode));
 					Json::Value event;
 					event["extension"] = pe->getId();
 					event["event"] = "MonitorCall";
@@ -1138,7 +1138,7 @@ namespace chilli {
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, " MonitorCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCall:" << jsonEvent["param"].toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCall";
 				}
@@ -1154,12 +1154,12 @@ namespace chilli {
 					it.second = true;
 
 					m_callid2ACDExtenion[it.first] = callid;
-					LOG4CPLUS_DEBUG(log, " exist call size:" << m_callid2ACDExtenion.size());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " exist call size:" << m_callid2ACDExtenion.size());
 					
 					return it.first;
 				}
 			}
-			LOG4CPLUS_ERROR(log, " overload max acd size:" << m_ACDExts.size());
+			LOG4CPLUS_ERROR(log, "." + this->getId(), " overload max acd size:" << m_ACDExts.size());
 			return std::string();
 		}
 
@@ -1178,7 +1178,7 @@ namespace chilli {
 		{
 			m_callid2ACDExtenion.erase(ext);
 			m_ACDExts[ext] = false;
-			LOG4CPLUS_DEBUG(log, " exist call size:" << m_callid2ACDExtenion.size());
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " exist call size:" << m_callid2ACDExtenion.size());
 		}
 
 		void TSAPIModule::runtsapi()
@@ -1186,10 +1186,10 @@ namespace chilli {
 			CSTAEvent_t cstaEvent; // CSTA event buffer required for reteriving the Event Structure
 			unsigned short usEventBufSize; // CSTA event buffer size
 
-			LOG4CPLUS_INFO(log, " Starting...");
+			LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
 
 			while (m_bRunning) {
-				LOG4CPLUS_DEBUG(log, " ServiceID:" << m_ServiceID << ",UserID:" << m_UserID << ",Password:" << m_Password);
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), " ServiceID:" << m_ServiceID << ",UserID:" << m_UserID << ",Password:" << m_Password);
 				bool connected = OpenStream(m_ServiceID.c_str(), m_UserID.c_str(), m_Password.c_str());
 				
 				if (connected == false) {
@@ -1218,7 +1218,7 @@ namespace chilli {
 					}
 
 					if (nRetCode < 0) {
-						LOG4CPLUS_ERROR(log, " acsGetEventBlock:" << AvayaAPI::acsReturnCodeString(nRetCode));
+						LOG4CPLUS_ERROR(log, "." + this->getId(), " acsGetEventBlock:" << AvayaAPI::acsReturnCodeString(nRetCode));
 						std::this_thread::sleep_for(std::chrono::seconds(5));
 						break;
 					}
@@ -1232,14 +1232,14 @@ namespace chilli {
 						case ACS_OPEN_STREAM_CONF: {
 							ServerID_t svrId;
 							if (AvayaAPI::acsGetServerID(m_lAcsHandle, &svrId) == ACSPOSITIVE_ACK)
-								LOG4CPLUS_INFO(log, " Open ServerID:" << svrId);
+								LOG4CPLUS_INFO(log, "." + this->getId(), " Open ServerID:" << svrId);
 
-							LOG4CPLUS_INFO(log, " ACS_OPEN_STREAM_CONF.");
-							LOG4CPLUS_INFO(log, " API Version:" << cstaEvent.event.acsConfirmation.u.acsopen.apiVer);
-							LOG4CPLUS_INFO(log, " Lib Version:" << cstaEvent.event.acsConfirmation.u.acsopen.libVer);
-							LOG4CPLUS_INFO(log, " Tsrv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.tsrvVer);
-							LOG4CPLUS_INFO(log, " Drv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.drvrVer);
-							LOG4CPLUS_INFO(log, " vendor:" << m_stPrivateData.vendor);
+							LOG4CPLUS_INFO(log, "." + this->getId(), " ACS_OPEN_STREAM_CONF.");
+							LOG4CPLUS_INFO(log, "." + this->getId(), " API Version:" << cstaEvent.event.acsConfirmation.u.acsopen.apiVer);
+							LOG4CPLUS_INFO(log, "." + this->getId(), " Lib Version:" << cstaEvent.event.acsConfirmation.u.acsopen.libVer);
+							LOG4CPLUS_INFO(log, "." + this->getId(), " Tsrv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.tsrvVer);
+							LOG4CPLUS_INFO(log, "." + this->getId(), " Drv Version:" << cstaEvent.event.acsConfirmation.u.acsopen.drvrVer);
+							LOG4CPLUS_INFO(log, "." + this->getId(), " vendor:" << m_stPrivateData.vendor);
 
 							AvayaAPI::cstaGetAPICaps(m_lAcsHandle, ++m_ulInvokeID);
 							AvayaAPI::cstaQueryCallMonitor(m_lAcsHandle, ++m_ulInvokeID);
@@ -1306,16 +1306,16 @@ namespace chilli {
 						}
 												   break;
 						case ACS_CLOSE_STREAM_CONF: {
-							LOG4CPLUS_INFO(log," ACS_CLOSE_STREAM_CONF.");
+							LOG4CPLUS_INFO(log, "." + this->getId(), " ACS_CLOSE_STREAM_CONF.");
 							goto end;
 						}
 													break;
 						case ACS_UNIVERSAL_FAILURE_CONF: {
-							LOG4CPLUS_WARN(log, " ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
+							LOG4CPLUS_WARN(log, "." + this->getId(),  " ACS_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::acsErrorString(cstaEvent.event.acsConfirmation.u.failureEvent.error));
 						}
 														 break;
 						default: {
-							LOG4CPLUS_WARN(log, " Unknown ACSCONFIRMATION eventType:" << cstaEvent.eventHeader.eventType);
+							LOG4CPLUS_WARN(log, "." + this->getId(),  " Unknown ACSCONFIRMATION eventType:" << cstaEvent.eventHeader.eventType);
 						}
 								 break;
 						}
@@ -1324,12 +1324,12 @@ namespace chilli {
 					case ACSUNSOLICITED: {
 						switch (cstaEvent.eventHeader.eventType) {
 						case ACS_UNIVERSAL_FAILURE: {
-							LOG4CPLUS_INFO(log, " ACS_UNIVERSAL_FAILURE:" << AvayaAPI::acsErrorString(cstaEvent.event.acsUnsolicited.u.failureEvent.error));
+							LOG4CPLUS_INFO(log, "." + this->getId(),  " ACS_UNIVERSAL_FAILURE:" << AvayaAPI::acsErrorString(cstaEvent.event.acsUnsolicited.u.failureEvent.error));
 							connected = false;
 						}
 													break;
 						default: {
-							LOG4CPLUS_WARN(log, " Unknown ACSUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
+							LOG4CPLUS_WARN(log, "." + this->getId(),  " Unknown ACSUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
 								 break;
 						}
@@ -1340,42 +1340,42 @@ namespace chilli {
 						switch (cstaEvent.eventHeader.eventType)
 						{
 						case CSTA_GETAPI_CAPS_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_GETAPI_CAPS_CONF.");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_GETAPI_CAPS_CONF.");
 							CSTAGetAPICapsConfEvent_t apiCaps = cstaEvent.event.cstaConfirmation.u.getAPICaps;
 							for (uint32_t i = 0; i < sizeof(apiCaps) / sizeof(apiCaps.alternateCall); i++)
 							{
-								LOG4CPLUS_DEBUG(log, " " << AvayaAPI::cstaAPICapsString(i) << ":"<< ((short *)&apiCaps)[i]);
+								LOG4CPLUS_DEBUG(log, "." + this->getId(),  " " << AvayaAPI::cstaAPICapsString(i) << ":"<< ((short *)&apiCaps)[i]);
 							}
 						}
 													break;
 						case CSTA_QUERY_CALL_MONITOR_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_QUERY_CALL_MONITOR_CONF:" << (int)cstaEvent.event.cstaConfirmation.u.queryCallMonitor.callMonitor);
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_QUERY_CALL_MONITOR_CONF:" << (int)cstaEvent.event.cstaConfirmation.u.queryCallMonitor.callMonitor);
 						}
 														   break;
 						case CSTA_GET_DEVICE_LIST_CONF: {
-							LOG4CPLUS_DEBUG(log, " driverSdbLevel:" << cstaEvent.event.cstaConfirmation.u.getDeviceList.driverSdbLevel);
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " driverSdbLevel:" << cstaEvent.event.cstaConfirmation.u.getDeviceList.driverSdbLevel);
 							short count = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.count;
 							DeviceID_t * devices = cstaEvent.event.cstaConfirmation.u.getDeviceList.devList.device;
 							for (int i = 0; i < count; i++) {
-								LOG4CPLUS_DEBUG(log, " " << devices[i]);
+								LOG4CPLUS_DEBUG(log, "." + this->getId(),  " " << devices[i]);
 							}
 
 						}
 														break;
 						case CSTA_ALTERNATE_CALL_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_ALTERNATE_CALL_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_ALTERNATE_CALL_CONF");
 						}
 													   break;
 						case CSTA_ANSWER_CALL_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_ANSWER_CALL_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_ANSWER_CALL_CONF");
 						}
 													break;
 						case CSTA_CALL_COMPLETION_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_CALL_COMPLETION_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_CALL_COMPLETION_CONF");
 						}
 														break;
 						case CSTA_CLEAR_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_CLEAR_CALL_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_CLEAR_CALL_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1389,11 +1389,11 @@ namespace chilli {
 						}
 												   break;
 						case CSTA_CLEAR_CONNECTION_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_CLEAR_CONNECTION_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_CLEAR_CONNECTION_CONF");
 						}
 														 break;
 						case CSTA_CONFERENCE_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_CONFERENCE_CALL_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_CONFERENCE_CALL_CONF:");
 							CSTAConferenceCallConfEvent_t conferenceCall = cstaEvent.event.cstaConfirmation.u.conferenceCall;
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
@@ -1414,7 +1414,7 @@ namespace chilli {
 						}
 														break;
 						case CSTA_CONSULTATION_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_CONSULTATION_CALL_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_CONSULTATION_CALL_CONF:");
 							CSTAConsultationCallConfEvent_t consultationCall = cstaEvent.event.cstaConfirmation.u.consultationCall;
 							ConnectionID_t newCall = consultationCall.newCall;
 
@@ -1431,15 +1431,15 @@ namespace chilli {
 						}
 														  break;
 						case CSTA_DEFLECT_CALL_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_DEFLECT_CALL_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_DEFLECT_CALL_CONF");
 						}
 													 break;
 						case CSTA_GROUP_PICKUP_CALL_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_GROUP_PICKUP_CALL_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_GROUP_PICKUP_CALL_CONF");
 						}
 														  break;
 						case CSTA_HOLD_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_HOLD_CALL_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_HOLD_CALL_CONF");
 							
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
@@ -1453,7 +1453,7 @@ namespace chilli {
 						}
 												  break;
 						case CSTA_MAKE_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_MAKE_CALL_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_MAKE_CALL_CONF:");
 							CSTAMakeCallConfEvent_t makeCall = cstaEvent.event.cstaConfirmation.u.makeCall;
 							ConnectionID_t newCall = makeCall.newCall;
 
@@ -1471,18 +1471,18 @@ namespace chilli {
 						}
 												  break;
 						case CSTA_MAKE_PREDICTIVE_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_MAKE_PREDICTIVE_CALL_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_MAKE_PREDICTIVE_CALL_CONF:");
 							ConnectionID_t newCall = cstaEvent.event.cstaConfirmation.u.makePredictiveCall.newCall;
-							LOG4CPLUS_DEBUG(log, " newCall:" << newCall.callID
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " newCall:" << newCall.callID
 								<< "," << newCall.deviceID << "," << newCall.devIDType);
 						}
 															 break;
 						case CSTA_PICKUP_CALL_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_PICKUP_CALL_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_PICKUP_CALL_CONF");
 						}
 													break;
 						case CSTA_RECONNECT_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_RECONNECT_CALL_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_RECONNECT_CALL_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1495,7 +1495,7 @@ namespace chilli {
 						}
 													   break;
 						case CSTA_RETRIEVE_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_RETRIEVE_CALL_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_RETRIEVE_CALL_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1508,7 +1508,7 @@ namespace chilli {
 						}
 													  break;
 						case CSTA_TRANSFER_CALL_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_TRANSFER_CALL_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_TRANSFER_CALL_CONF");
 
 							CSTATransferCallConfEvent_t transferCall = cstaEvent.event.cstaConfirmation.u.transferCall;
 							Json::Value event;
@@ -1530,19 +1530,19 @@ namespace chilli {
 						}
 													  break;
 						case CSTA_SET_MWI_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_SET_MWI_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_SET_MWI_CONF");
 						}
 												break;
 						case CSTA_SET_DND_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_SET_DND_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_SET_DND_CONF");
 						}
 												break;
 						case CSTA_SET_FWD_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_SET_FWD_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " CSTA_SET_FWD_CONF");
 						}
 												break;
 						case CSTA_SET_AGENT_STATE_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_SET_AGENT_STATE_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_SET_AGENT_STATE_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1554,30 +1554,30 @@ namespace chilli {
 						}
 														break;
 						case CSTA_QUERY_MWI_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUERY_MWI_CONF:");
-							LOG4CPLUS_DEBUG(log, " messages:" << (bool)cstaEvent.event.cstaConfirmation.u.queryMwi.messages);
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_QUERY_MWI_CONF:");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " messages:" << (bool)cstaEvent.event.cstaConfirmation.u.queryMwi.messages);
 						}
 												  break;
 						case CSTA_QUERY_DND_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUERY_DND_CONF");
-							LOG4CPLUS_DEBUG(log, " doNotDisturb:" << (bool)cstaEvent.event.cstaConfirmation.u.queryDnd.doNotDisturb);
+							LOG4CPLUS_TRACE(log, "." + this->getId(),  " CSTA_QUERY_DND_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(),  " doNotDisturb:" << (bool)cstaEvent.event.cstaConfirmation.u.queryDnd.doNotDisturb);
 						}
 												  break;
 						case CSTA_QUERY_FWD_CONF: {
-							LOG4CPLUS_DEBUG(log, " CSTA_QUERY_FWD_CONF");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(), " CSTA_QUERY_FWD_CONF");
 							CSTAQueryFwdConfEvent_t queryFwd = cstaEvent.event.cstaConfirmation.u.queryFwd;
 							ListForwardParameters_t forward = queryFwd.forward;
 							for (int i = 0; i < forward.count; i++) {
-								LOG4CPLUS_DEBUG(log, " fwd[" << i << "]:" << forward.param[i].forwardingType
+								LOG4CPLUS_DEBUG(log, "." + this->getId(), " fwd[" << i << "]:" << forward.param[i].forwardingType
 									<< "," << forward.param[i].forwardingOn
 									<< "," << forward.param[i].forwardDN);
 							}
 						}
 												  break;
 						case CSTA_QUERY_AGENT_STATE_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUERY_AGENT_STATE_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_QUERY_AGENT_STATE_CONF:");
 							AgentState_t agentState = cstaEvent.event.cstaConfirmation.u.queryAgentState.agentState;
-							LOG4CPLUS_DEBUG(log, " agentState:" << AvayaAPI::cstaAgentStateString(agentState));
+							LOG4CPLUS_DEBUG(log, "." + this->getId(), " agentState:" << AvayaAPI::cstaAgentStateString(agentState));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1590,19 +1590,19 @@ namespace chilli {
 						}
 														  break;
 						case CSTA_QUERY_LAST_NUMBER_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUERY_LAST_NUMBER_CONF:");
-							LOG4CPLUS_DEBUG(log, " lastNumber:" << cstaEvent.event.cstaConfirmation.u.queryLastNumber.lastNumber);
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_QUERY_LAST_NUMBER_CONF:");
+							LOG4CPLUS_DEBUG(log, "." + this->getId(), " lastNumber:" << cstaEvent.event.cstaConfirmation.u.queryLastNumber.lastNumber);
 						}
 														  break;
 						case CSTA_QUERY_DEVICE_INFO_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUERY_DEVICE_INFO_CONF:");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_QUERY_DEVICE_INFO_CONF:");
 							CSTAQueryDeviceInfoConfEvent_t queryDeviceInfo = cstaEvent.event.cstaConfirmation.u.queryDeviceInfo;
-							LOG4CPLUS_DEBUG(log, " queryDeviceInfo,device:" << queryDeviceInfo.device << ",deviceClass:" << queryDeviceInfo.deviceClass << ",deviceType:" << queryDeviceInfo.deviceType);
+							LOG4CPLUS_DEBUG(log, "." + this->getId(), " queryDeviceInfo,device:" << queryDeviceInfo.device << ",deviceClass:" << queryDeviceInfo.deviceClass << ",deviceType:" << queryDeviceInfo.deviceType);
 						}
 														  break;
 						case CSTA_UNIVERSAL_FAILURE_CONF: {
 							CSTAUniversalFailure_t error = cstaEvent.event.cstaConfirmation.u.universalFailure.error;
-							LOG4CPLUS_WARN(log, " CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
+							LOG4CPLUS_WARN(log, "." + this->getId(), " CSTA_UNIVERSAL_FAILURE_CONF:" << AvayaAPI::cstaErrorString(error));
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1614,7 +1614,7 @@ namespace chilli {
 						}
 														  break;
 						case CSTA_MONITOR_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_MONITOR_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_MONITOR_CONF");
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaConfirmation.u.monitorStart.monitorCrossRefID;
 
 							this->m_monitorID2Extension[monitorId] = this->m_InvokeID2Extension[invokeId];
@@ -1631,7 +1631,7 @@ namespace chilli {
 						}
 								  break;
 						case CSTA_MONITOR_STOP_CONF: {
-							LOG4CPLUS_TRACE(log, " CSTA_MONITOR_STOP_CONF");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_MONITOR_STOP_CONF");
 							Json::Value event;
 							event["extension"] = this->m_InvokeID2Extension[invokeId];
 							std::string eventName = this->m_InvokeID2Event[invokeId];
@@ -1642,7 +1642,7 @@ namespace chilli {
 						}
 													 break;
 						default: {
-							LOG4CPLUS_WARN(log, " Unknown CSTACONFIRMATION eventType:" << cstaEvent.eventHeader.eventType);
+							LOG4CPLUS_WARN(log, "." + this->getId(), " Unknown CSTACONFIRMATION eventType:" << cstaEvent.eventHeader.eventType);
 						}
 								 break;
 						}
@@ -1655,7 +1655,7 @@ namespace chilli {
 						case CSTA_MONITOR_ENDED: {
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAEventCause_t cause = cstaEvent.event.cstaUnsolicited.u.monitorEnded.cause;
-							LOG4CPLUS_TRACE(log, " CSTA_MONITOR_ENDED" );
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_MONITOR_ENDED" );
 							Json::Value event;
 							event["extension"] = this->m_monitorID2Extension[monitorId];
 							event["monitorId"] = monitorId;
@@ -1670,7 +1670,7 @@ namespace chilli {
 						}
 												 break;
 						case CSTA_CALL_CLEARED: {
-							LOG4CPLUS_TRACE(log, " CSTA_CALL_CLEARED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_CALL_CLEARED");
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTACallClearedEvent_t	callCleared = cstaEvent.event.cstaUnsolicited.u.callCleared;
 
@@ -1691,7 +1691,7 @@ namespace chilli {
 						}
 												break;
 						case CSTA_CONNECTION_CLEARED: {
-							LOG4CPLUS_TRACE(log, " CSTA_CONNECTION_CLEARED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_CONNECTION_CLEARED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAConnectionClearedEvent_t	connectionCleared = cstaEvent.event.cstaUnsolicited.u.connectionCleared;
@@ -1714,7 +1714,7 @@ namespace chilli {
 						}
 													  break;
 						case CSTA_DELIVERED: {
-							LOG4CPLUS_TRACE(log, " CSTA_DELIVERED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_DELIVERED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTADeliveredEvent_t delivered = cstaEvent.event.cstaUnsolicited.u.delivered;
@@ -1753,7 +1753,7 @@ namespace chilli {
 						}
 													  break;
 						case CSTA_ESTABLISHED: {
-							LOG4CPLUS_TRACE(log, " CSTA_ESTABLISHED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_ESTABLISHED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							const char *called = cstaEvent.event.cstaUnsolicited.u.established.calledDevice.deviceID;
@@ -1785,7 +1785,7 @@ namespace chilli {
 						}
 											   break;
 						case CSTA_SERVICE_INITIATED: {
-							LOG4CPLUS_TRACE(log, " CSTA_SERVICE_INITIATED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_SERVICE_INITIATED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAServiceInitiatedEvent_t serviceInitiated = cstaEvent.event.cstaUnsolicited.u.serviceInitiated;
@@ -1805,7 +1805,7 @@ namespace chilli {
 						}
 													 break;
 						case CSTA_ORIGINATED: {
-							LOG4CPLUS_TRACE(log, " CSTA_ORIGINATED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_ORIGINATED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAOriginatedEvent_t originated = cstaEvent.event.cstaUnsolicited.u.originated;
@@ -1829,7 +1829,7 @@ namespace chilli {
 						}
 											  break;
 						case CSTA_HELD: {
-							LOG4CPLUS_TRACE(log, " CSTA_HELD");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_HELD");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAHeldEvent_t held = cstaEvent.event.cstaUnsolicited.u.held;
@@ -1851,7 +1851,7 @@ namespace chilli {
 						}
 										break;
 						case CSTA_RETRIEVED: {
-							LOG4CPLUS_TRACE(log, " CSTA_RETRIEVED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_RETRIEVED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTARetrievedEvent_t retrieved = cstaEvent.event.cstaUnsolicited.u.retrieved;
@@ -1873,7 +1873,7 @@ namespace chilli {
 						}
 											 break;
 						case CSTA_QUEUED: {
-							LOG4CPLUS_TRACE(log, " CSTA_QUEUED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_QUEUED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAQueuedEvent_t queued = cstaEvent.event.cstaUnsolicited.u.queued;
@@ -1902,7 +1902,7 @@ namespace chilli {
 						}
 										  break;
 						case CSTA_FAILED: {
-							LOG4CPLUS_TRACE(log, " CSTA_FAILED");
+							LOG4CPLUS_TRACE(log, "." + this->getId(), " CSTA_FAILED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAFailedEvent_t failed = cstaEvent.event.cstaUnsolicited.u.failed;
@@ -1928,7 +1928,7 @@ namespace chilli {
 						}
 										  break;
 						case CSTA_TRANSFERRED: {
-							LOG4CPLUS_TRACE(log," CSTA_TRANSFERRED");
+							LOG4CPLUS_TRACE(log, "." + this->getId()," CSTA_TRANSFERRED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTATransferredEvent_t transferred = cstaEvent.event.cstaUnsolicited.u.transferred;
@@ -1959,7 +1959,7 @@ namespace chilli {
 											   break;
 						case CSTA_CONFERENCED: {
 							
-							LOG4CPLUS_TRACE(log," CSTA_CONFERENCED");
+							LOG4CPLUS_TRACE(log, "." + this->getId()," CSTA_CONFERENCED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTAConferencedEvent_t conferenced = cstaEvent.event.cstaUnsolicited.u.conferenced;
@@ -1992,7 +1992,7 @@ namespace chilli {
 						}
 											   break;
 						case CSTA_DIVERTED:{
-							LOG4CPLUS_TRACE(log," CSTA_DIVERTED");
+							LOG4CPLUS_TRACE(log, "." + this->getId()," CSTA_DIVERTED");
 
 							CSTAMonitorCrossRefID_t monitorId = cstaEvent.event.cstaUnsolicited.monitorCrossRefId;
 							CSTADivertedEvent_t	diverted = cstaEvent.event.cstaUnsolicited.u.diverted;
@@ -2020,21 +2020,21 @@ namespace chilli {
 						}
 										   break;
 						default: {
-							LOG4CPLUS_WARN(log, " Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
+							LOG4CPLUS_WARN(log, "." + this->getId(), " Unknown CSTAUNSOLICITED eventType:" << cstaEvent.eventHeader.eventType);
 						}
 								 break;
 						}
 					}// end of CSTAUNSOLICITED Events
 										  break;
 					default: {
-						LOG4CPLUS_WARN(log, " Unknown eventClass:" << cstaEvent.eventHeader.eventClass);
+						LOG4CPLUS_WARN(log, "." + this->getId(), " Unknown eventClass:" << cstaEvent.eventHeader.eventClass);
 					}
 							 break;
 					}// end of outer switch
 				}
 			}
 		end:
-			LOG4CPLUS_INFO(log, " Stoped.");
+			LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
 			log4cplus::threadCleanup();
 		}
 	}

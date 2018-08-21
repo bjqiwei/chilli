@@ -10,7 +10,6 @@ namespace Avaya{
 AvayaAgent::AvayaAgent(TSAPIModule * model, const std::string &ext, const std::string &smFileName)
 	:m_model(model), Agent(model, ext, smFileName)
 {
-	log.setAppendName("." + this->getId());
 }
 
 AvayaAgent::~AvayaAgent(){
@@ -19,14 +18,14 @@ AvayaAgent::~AvayaAgent(){
 
 void AvayaAgent::fireSend(const std::string & strContent,const void * param)
 {
-	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 	Json::Value jsonEvent;
 	Json::CharReaderBuilder b;
 	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 	std::string jsonerr;
 
 	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonEvent, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, this->getId() << " " << " not json data." << jsonerr);
+		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " " << " not json data." << jsonerr);
 		return;
 	}
 

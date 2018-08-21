@@ -17,8 +17,7 @@ namespace FreeSwitch{
 FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.FSModule");
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log, "Constuction a FreeSwitch module.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Constuction a FreeSwitch module.");
 }
 
 
@@ -28,12 +27,12 @@ FreeSwitchModule::~FreeSwitchModule(void)
 		Stop();
 	}
 
-	LOG4CPLUS_DEBUG(log, "Destruction a FreeSwitch module.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Destruction a FreeSwitch module.");
 }
 
 int FreeSwitchModule::Stop(void)
 {
-	LOG4CPLUS_DEBUG(log, "Stop...  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Stop...  FreeSwitch module");
 	if (m_bRunning)
 	{
 		ProcessModule::Stop();
@@ -63,7 +62,7 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 	tinyxml2::XMLDocument config;
 	if (config.Parse(configContext.c_str()) != XMLError::XML_SUCCESS)
 	{
-		LOG4CPLUS_ERROR(log, " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), " load config error:" << config.ErrorName() << ":" << config.GetErrorStr1());
 		return false;
 	}
 	tinyxml2::XMLElement * eConfig = config.FirstChildElement();
@@ -97,14 +96,14 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 
 void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
 {
-	LOG4CPLUS_TRACE(log, " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
 	Json::Value jsonData;
 	Json::CharReaderBuilder b;
 	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
 	std::string jsonerr;
 
 	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, strContent << " not json data." << jsonerr);
+		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
 		return;
 	}
 
@@ -185,19 +184,19 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 		/*
 		auto pe = this->getPerformElement(agentid);
 		if (pe != nullptr) {
-			LOG4CPLUS_DEBUG(log, agentid << " state:" << pe->getStateId());
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), agentid << " state:" << pe->getStateId());
 			if (pe->getStateId() == "Ready") {
 				findAgent = agentid;
 				goto _findAgent;
 			}
 		}
 		
-		LOG4CPLUS_DEBUG(log, " All device:" << this->GetExtensions().size());
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " All device:" << this->GetExtensions().size());
 
 		if (lastAgent == ""){
 			for (auto it : this->GetExtensions())
 			{
-				LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
 				if (it.second->getStateId() == "Ready") {
 					findAgent = it.first;
 					break;
@@ -217,7 +216,7 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 
 				if (bfindLastAgent == true)
 				{
-					LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
 					if (it.second->getStateId() == "Ready") {
 						findAgent = it.first;
 						break;
@@ -229,7 +228,7 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 			{
 				for (auto it : this->GetExtensions())
 				{
-					LOG4CPLUS_DEBUG(log, it.first << " state:" << it.second->getStateId());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
 					if (it.second->getStateId() == "Ready"){
 						findAgent = it.first;
 						break;
@@ -240,14 +239,14 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 		
 	_findAgent:
 		lastAgent = findAgent;
-		LOG4CPLUS_DEBUG(log, " find agent:" << findAgent);
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " find agent:" << findAgent);
 		if (!findAgent.empty()){
 			Json::Value ext = this->getExtension(findAgent)->getVar("_agent.Device");
 			if (ext.isString())
 			{
 				std::string cmd = "bgapi uuid_transfer " + uuid +" " + ext.asString() + " XML default";
 				esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-				LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
 			}
 		}
 
@@ -284,7 +283,7 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
 
 	return true;
 
@@ -313,7 +312,7 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
 	return true;
 
 }
@@ -329,7 +328,7 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 
 	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
 
 	return true;
 }
@@ -350,7 +349,7 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 
 	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
 	return true;
 }
 
@@ -377,7 +376,7 @@ bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & log)
 	}
 
 	esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_execute:bridge " << called << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_execute:bridge " << called << ", status:" << status);
 
 	return true;
 }
@@ -394,7 +393,7 @@ bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & log)
 		filename = param["filename"].asString();
 
 	esl_status_t status = esl_execute(&m_Handle, "playback", filename.c_str(), sessionId.c_str());
-	LOG4CPLUS_DEBUG(log, " esl_execute:playback " << filename << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_execute:playback " << filename << ", status:" << status);
 	return true;
 }
 
@@ -424,22 +423,22 @@ void esl_logger(const char *file, const char *func, int line, int level, const c
 	ret = esl_vasprintf(&data, fmt, ap);
 	if (ret != -1) {
 		if (level == ESL_LOG_LEVEL_DEBUG){
-			LOG4CPLUS_DEBUG(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_DEBUG(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		else if (level == ESL_LOG_LEVEL_INFO){
-			LOG4CPLUS_INFO(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_INFO(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		else if (level == ESL_LOG_LEVEL_NOTICE) {
-			LOG4CPLUS_INFO(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_INFO(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		else if (level == ESL_LOG_LEVEL_WARNING) {
-			LOG4CPLUS_WARN(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_WARN(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		else if (level == ESL_LOG_LEVEL_ERROR) {
-			LOG4CPLUS_ERROR(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_ERROR(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		else if (level == ESL_LOG_LEVEL_CRIT) {
-			LOG4CPLUS_FATAL(log, fp << ":" << line << " " << func << "() " << data);
+			LOG4CPLUS_FATAL(log, "", fp << ":" << line << " " << func << "() " << data);
 		}
 		free(data);
 	}
@@ -449,29 +448,29 @@ void esl_logger(const char *file, const char *func, int line, int level, const c
 
 void FreeSwitchModule::ConnectFS()
 {
-	LOG4CPLUS_DEBUG(log, " Run  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Run  FreeSwitch module");
 
 	//esl_handle_t handle = { { 0 } };
 
 	while (m_bRunning)
 	{
-		LOG4CPLUS_DEBUG(log, " connect freeswitch " << m_Host << ":" << m_Port);
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
 
 		if (!m_Handle.connected){
-			LOG4CPLUS_ERROR(log, " connect freeswitch " << m_Host << ":" << m_Port << " error,"
+			LOG4CPLUS_ERROR(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port << " error,"
 				<< m_Handle.errnum << " " << m_Handle.err);
 			if (m_bRunning)
 				std::this_thread::sleep_for(std::chrono::seconds(5));
 			continue;
 		}
 
-		LOG4CPLUS_INFO(log, " Connected to FreeSWITCH");
+		LOG4CPLUS_INFO(log, "." + this->getId(), " Connected to FreeSWITCH");
 
 		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
 		esl_send(&m_Handle, "nixevent json CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
-		LOG4CPLUS_DEBUG(log, " " << m_Handle.last_sr_reply);
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_sr_reply);
 
 		while (m_bRunning){
 			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, true, NULL);
@@ -591,7 +590,7 @@ void FreeSwitchModule::ConnectFS()
 
 						}
 						else {
-							LOG4CPLUS_DEBUG(log, " " << m_Handle.last_event->body);
+							LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_event->body);
 						}
 					}
 					
@@ -600,19 +599,19 @@ void FreeSwitchModule::ConnectFS()
 			else if (status == ESL_BREAK)
 				continue;
 			else{
-				LOG4CPLUS_ERROR(log, " " << m_Handle.err);
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " " << m_Handle.err);
 				break;
 			}
 		}
 
 		esl_disconnect(&m_Handle);
 	}
-	LOG4CPLUS_DEBUG(log, " Stoped  FreeSwitch module");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Stoped  FreeSwitch module");
 	log4cplus::threadCleanup();
 }
 void FreeSwitchModule::run()
 {
-	LOG4CPLUS_INFO(log, " Starting...");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
 	try
 	{
 
@@ -630,7 +629,7 @@ void FreeSwitchModule::run()
 					}
 
 					if (peId.empty()){
-						LOG4CPLUS_WARN(log, " not find device:" << peId);
+						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
 						continue;
 					}
 
@@ -662,23 +661,23 @@ void FreeSwitchModule::run()
 						
 					}
 					else {
-						LOG4CPLUS_WARN(log, " not find device:" << peId);
+						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
 					}
 				}
 			}
 			catch (std::exception & e)
 			{
-				LOG4CPLUS_ERROR(log, e.what());
+				LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
 			}
 		}
 
 	}
 	catch (std::exception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
 	}
 
-	LOG4CPLUS_INFO(log, " Stoped.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
 	log4cplus::threadCleanup();
 }
 }
