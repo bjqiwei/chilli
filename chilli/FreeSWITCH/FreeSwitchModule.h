@@ -26,9 +26,12 @@ namespace FreeSwitch{
 		bool Divert(Json::Value &param, log4cplus::Logger & log);
 		bool PlayFile(Json::Value & param, log4cplus::Logger & log);
 
+
 		std::string dialStringFindNumber(const std::string & dialString);
 	private:
 		std::thread m_Thread;
+		std::thread m_executeThread[100];
+		helper::CEventBuffer<model::EventType_t> m_eventQueue[100];
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;
@@ -39,6 +42,7 @@ namespace FreeSwitch{
 		std::map<std::string, std::string>m_Job_Session;
 		std::map<std::string, std::string>m_device_StateMachine;
 		virtual void run() override;
+		void execute(uint32_t eventQueue);
 		friend class FreeSwitchDevice;
 	};
 

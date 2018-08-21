@@ -9,6 +9,7 @@
 #include "../stringHelper.h"
 #include "../uuid.h"
 #include <regex>
+#include <apr_hash.h>
 
 
 namespace chilli{
@@ -39,6 +40,11 @@ int FreeSwitchModule::Stop(void)
 		ProcessModule::Stop();
 		m_bRunning = false;
 
+		for (auto & it:m_executeThread) {
+			if (it.joinable())
+				it.join();
+		}
+
 		if (m_Thread.joinable()) {
 			m_Thread.join();
 		}
@@ -53,6 +59,9 @@ int FreeSwitchModule::Start()
 		ProcessModule::Start();
 		m_bRunning = true;
 		m_Thread = std::thread(&FreeSwitchModule::ConnectFS, this);
+		for (uint32_t i = 0; i < 100;i++) {
+			m_executeThread[i]=std::thread(&FreeSwitchModule::execute, this, i);
+		}
 	}
 	return 0;
 }
@@ -658,47 +667,22 @@ void FreeSwitchModule::run()
 				if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
 				{
 					const Json::Value & jsonEvent = Event.event;
-					std::string peId;
-					if (jsonEvent["id"].isString()) {
-						peId = jsonEvent["id"].asString();
+					std::string sessionId;
+					if (jsonEvent["param"]["sessionID"].isString()) {
+						sessionId = jsonEvent["param"]["sessionID"].asString();
 					}
 
-					if (peId.empty()){
+					if (sessionId.empty()){
 						Json::FastWriter writer;
 						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
 						continue;
 					}
 
+					apr_ssize_t klen = sessionId.length();
+					uint32_t hash = apr_hashfunc_default(sessionId.c_str(),  &klen);
+					hash %= 100;
+					m_eventQueue[hash].Put(Event);
 
-					if (this->getPerformElement(peId) == nullptr) {
-
-						for (auto & it : this->m_device_StateMachine) {
-							std::regex regPattern(it.first);
-							if (std::regex_match(peId, regPattern)) {
-								model::PerformElementPtr peptr(new FreeSwitchDevice(this, peId, it.second));
-								if (peptr != nullptr && this->addPerformElement(peId, peptr)) {
-									peptr->setVar("_device.deviceID", peId);
-								}
-
-								break;
-							}
-						}
-
-					}
-
-					auto extptr = getPerformElement(peId);
-
-					if (extptr != nullptr) {
-						extptr->pushEvent(Event);
-						extptr->mainEventLoop();
-
-						if (extptr->IsClosed())
-							this->removePerfromElement(peId);
-						
-					}
-					else {
-						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
-					}
 				}
 			}
 			catch (std::exception & e)
@@ -714,6 +698,69 @@ void FreeSwitchModule::run()
 	}
 
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
+	log4cplus::threadCleanup();
+}
+void FreeSwitchModule::execute(uint32_t eventQueue)
+{
+	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue <<"  Starting...");
+	while (m_bRunning)
+	{
+		try
+		{
+			model::EventType_t Event;
+			if (m_eventQueue[eventQueue].Get(Event, 1000) && !Event.event.isNull())
+			{
+				const Json::Value & jsonEvent = Event.event;
+				std::string peId;
+				if (jsonEvent["id"].isString()) {
+					peId = jsonEvent["id"].asString();
+				}
+
+				if (peId.empty()) {
+					Json::FastWriter writer;
+					LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
+					continue;
+				}
+
+
+				if (this->getPerformElement(peId) == nullptr) {
+
+					for (auto & it : this->m_device_StateMachine) {
+						std::regex regPattern(it.first);
+						if (std::regex_match(peId, regPattern)) {
+							model::PerformElementPtr peptr(new FreeSwitchDevice(this, peId, it.second));
+							if (peptr != nullptr && this->addPerformElement(peId, peptr)) {
+								peptr->setVar("_device.deviceID", peId);
+							}
+
+							break;
+						}
+					}
+
+				}
+
+				auto extptr = getPerformElement(peId);
+
+				if (extptr != nullptr) {
+					extptr->pushEvent(Event);
+					extptr->mainEventLoop();
+
+					if (extptr->IsClosed())
+						this->removePerfromElement(peId);
+
+				}
+				else {
+					LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
+				}
+			}
+		}
+		catch (std::exception & e)
+		{
+			LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
+		}
+	}
+
+	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Stoped.");
 	log4cplus::threadCleanup();
 }
 }
