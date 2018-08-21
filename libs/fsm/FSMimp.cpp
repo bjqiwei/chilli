@@ -36,7 +36,6 @@ fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::stri
 	:m_xmlType(xtype), m_xmlDocPtr(nullptr), xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
 {
 	log = log4cplus::Logger::getInstance(logId.empty() ? "fsm.StateMachine" : logId);
-	log.setAppendName("." + m_strSessionID);
 
 	if (m_xmlType == File)
 	{
@@ -56,7 +55,7 @@ fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::stri
 		g_TimerServer->Start();
 	}
 
-	LOG4CPLUS_DEBUG(log, ",creat a fsm object." << this);
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",creat a fsm object." << this);
 
 	g_StateMachines.insert(std::make_pair(this, this));
 
@@ -79,7 +78,7 @@ fsm::StateMachineimp::~StateMachineimp()
 		g_TimerServer = nullptr;
 
 	}
-	LOG4CPLUS_DEBUG(log, ",destruction a smscxml object." << this);
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destruction a smscxml object." << this);
  }
 
 bool fsm::StateMachineimp::Init(void)
@@ -91,10 +90,10 @@ bool fsm::StateMachineimp::Init(void)
 		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
 		 {
 			 m_rootNode = rootNode;
-			 //LOG4CPLUS_TRACE(log, ",set rootNode=" << m_rootNode);
+			 //LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",set rootNode=" << m_rootNode);
 
 			 m_strName =  getXmlNodeAttributesValue(m_rootNode,"name");
-			 LOG4CPLUS_TRACE(log, ",set name=" << m_strName);
+			 LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",set name=" << m_strName);
 
 			  /* Create xpath evaluation context */
 			  if (xpathCtx._xPathCtxPtr == NULL)
@@ -103,7 +102,7 @@ bool fsm::StateMachineimp::Init(void)
 			  }
 
 			  if (xpathCtx._xPathCtxPtr == NULL) {
-				  LOG4CPLUS_ERROR(log, ": unable to create new XPath context");
+				  LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": unable to create new XPath context");
 				  throw std::logic_error("Error: unable to create new XPath context");
 			  }
 			// normalize(_rootNode);
@@ -117,20 +116,20 @@ bool fsm::StateMachineimp::Init(void)
 			 string strFinalState = getXmlNodeAttributesValue(m_rootNode, "final");
 			 m_finalState = getState(strFinalState);
 
-			 LOG4CPLUS_TRACE(log, ", set initState=" << getXmlNodeAttributesValue(m_initState, "id"));
+			 LOG4CPLUS_TRACE(log, "." + m_strSessionID, ", set initState=" << getXmlNodeAttributesValue(m_initState, "id"));
 			 
 		 }
 		 else
 		 {
 
-			 LOG4CPLUS_ERROR(log, " ,Cannot find root fsm element." );
+			 LOG4CPLUS_ERROR(log, "." + m_strSessionID, " ,Cannot find root fsm element." );
 			 //throw std::logic_error( "Cannot find FSM element.");
 			 return false;
 		 }
 	}
 	else {
 
-		LOG4CPLUS_ERROR(log, " ,Interpreter has no DOM at all!");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, " ,Interpreter has no DOM at all!");
 		//throw std::logic_error("Interpreter has no DOM at all!");
 		return false;
 	}
@@ -141,7 +140,7 @@ bool fsm::StateMachineimp::Init(void)
 void fsm::StateMachineimp::normalize(const xmlNodePtr &smscxml)
 {
 	//检查文件内容，初始化状态机
-	LOG4CPLUS_WARN(log, ",normalize fuction is not implement.");
+	LOG4CPLUS_WARN(log, "." + m_strSessionID, ",normalize fuction is not implement.");
 	return ;
 }
 
@@ -222,7 +221,7 @@ bool fsm::StateMachineimp::parse()
 {
 
 	if (NULL != m_xmlDocPtr._xDocPtr) {
-		LOG4CPLUS_WARN(log, ",xmldocument is not empty , there not Parse file:" << this->m_strStateFile);
+		LOG4CPLUS_WARN(log, "." + m_strSessionID, ",xmldocument is not empty , there not Parse file:" << this->m_strStateFile);
 		return true;
 	}
 
@@ -231,22 +230,22 @@ bool fsm::StateMachineimp::parse()
 		//_docPtr = xmlCtxtReadFile(_ctxt, _strStateFile.c_str(), NULL, XML_PARSE_NOERROR);
 		if (m_xmlType == File)
 		{
-			LOG4CPLUS_DEBUG(log, ", Parse xml file:" << m_strStateFile);
+			LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", Parse xml file:" << m_strStateFile);
 			m_xmlDocPtr = xmlParseFile(m_strStateFile.c_str());
 		}else
 		{
-			LOG4CPLUS_DEBUG(log, ", Parse xml Content:" << m_strStateContent);
+			LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", Parse xml Content:" << m_strStateContent);
 			m_xmlDocPtr = xmlParseMemory(m_strStateContent.c_str(), m_strStateContent.length());
 		}
 	}
 	catch(std::exception &e){ 
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 		return false;
 	}
 
 	if (NULL == m_xmlDocPtr._xDocPtr) 
 	{  
-		LOG4CPLUS_ERROR(log, ",Document not parsed successfully."); 
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, ",Document not parsed successfully.");
 		//throw std::logic_error( "Document not parsed successfully."); 
 		return false;
 	} 
@@ -302,13 +301,13 @@ bool fsm::StateMachineimp::processEvent(const xmlNodePtr &eventNode)const
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
-			LOG4CPLUS_ERROR(log, actionNode->name << " process not implement.");
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, actionNode->name << " process not implement.");
 		}
 	}
 	
 	if (!doneSomething)
 	{
-		LOG4CPLUS_WARN(log, getCurrentStateID() << " state occur event " << helper::xml::getXmlNodeAttributesValue(eventNode, "event") << " done nothing,line:" << eventNode->line);
+		LOG4CPLUS_WARN(log, "." + m_strSessionID, getCurrentStateID() << " state occur event " << helper::xml::getXmlNodeAttributesValue(eventNode, "event") << " done nothing,line:" << eventNode->line);
 	}
 	return doneSomething;
 }
@@ -327,17 +326,17 @@ bool fsm::StateMachineimp::processTransition(const xmlNodePtr &actionNode)const
 	}
 	else
 	{
-		LOG4CPLUS_ERROR(log, m_strStateFile<<" file,not find the target:" << transition.getTarget() << " state, line:" << actionNode->line);
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, m_strStateFile<<" file,not find the target:" << transition.getTarget() << " state, line:" << actionNode->line);
 	}
 
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return true;
 }
@@ -362,16 +361,16 @@ bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 	}
 	else {
 
-		LOG4CPLUS_ERROR(log, " not find the send target:" << send.getTarget());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, " not find the send target:" << send.getTarget());
 	}
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return true;
 }
@@ -394,7 +393,7 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
-	LOG4CPLUS_DEBUG(log, ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
 	Json::Value vars;
 	vars["sessionId"] = this->m_strSessionID;
 	vars["timerId"] = timer.getId();
@@ -405,11 +404,11 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return true;
 }
@@ -430,11 +429,11 @@ bool fsm::StateMachineimp::processLog(const xmlNodePtr &Node)const
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return true;
 }
@@ -454,11 +453,11 @@ bool fsm::StateMachineimp::processScript(const xmlNodePtr &node) const
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return false;
 }
@@ -474,7 +473,7 @@ bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 		TriggerEvent _raiseEvent;
 		_raiseEvent.setEventName(raise.getEvent());
 		_raiseEvent.setParam(this);
-		LOG4CPLUS_TRACE(log, ", Raise a event:" << _raiseEvent.ToString());
+		LOG4CPLUS_TRACE(log, "." + m_strSessionID, ", Raise a event:" << _raiseEvent.ToString());
 		const_cast<StateMachineimp*>(this)->m_internalQueue.push(_raiseEvent);
 		return true;
 	}
@@ -482,11 +481,11 @@ bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 
 	return false;
@@ -507,11 +506,11 @@ bool fsm::StateMachineimp::processSleep(const xmlNodePtr &node)const
 	}
 	catch (fsm::env::jsexception & e)
 	{
-		LOG4CPLUS_ERROR(log, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
 	catch (std::exception &e)
 	{
-		LOG4CPLUS_ERROR(log, e.what());
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 	}
 	return false;
 }
@@ -554,7 +553,7 @@ void fsm::StateMachineimp::enterStates(const xmlNodePtr &stateNode) const
 	if(isState(stateNode))
 	{
 		const_cast<StateMachineimp*>(this)->m_currentStateNode = stateNode;
-		LOG4CPLUS_DEBUG(log, ", enter state:" << getCurrentStateID());
+		LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", enter state:" << getCurrentStateID());
 		getRootContext()->setVar("_state._id", getCurrentStateID());
 		for (xmlNodePtr  entryNode = stateNode->children; entryNode != NULL; entryNode = entryNode->next)
 		{
@@ -566,7 +565,7 @@ void fsm::StateMachineimp::enterStates(const xmlNodePtr &stateNode) const
 	}
 	else
 	{
-		LOG4CPLUS_ERROR(log, ", Will enter the node is not a status node.");
+		LOG4CPLUS_ERROR(log, "." + m_strSessionID, ", Will enter the node is not a status node.");
 
 	}
 }
@@ -611,7 +610,7 @@ bool fsm::StateMachineimp::processExit(const xmlNodePtr &exitNode) const
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
-			LOG4CPLUS_ERROR(log, actionNode->name <<"  process not implement." );
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, actionNode->name <<"  process not implement." );
 		}
 	}
 	return true ;
@@ -661,7 +660,7 @@ bool fsm::StateMachineimp::processEntry(const xmlNodePtr &node)const
 		}
 		else if(actionNode->type == XML_ELEMENT_NODE)
 		{
-			LOG4CPLUS_ERROR(log, ", in the onentry element [" << actionNode->name << "] process not implement,line:" << actionNode->line );
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ", in the onentry element [" << actionNode->name << "] process not implement,line:" << actionNode->line );
 		}
 	}
 	return true;
@@ -678,7 +677,7 @@ xmlNodePtr fsm::StateMachineimp::getState(const string& stateId) const
 		/* Evaluate xpath expression */
 		xpathObj = xmlXPathEvalExpression(BAD_CAST(strExpression.c_str()), xpathCtx._xPathCtxPtr);
 		if(xpathObj._xPathObjPtr == NULL) {
-			LOG4CPLUS_ERROR(log, ",Error: unable to evaluate xpath expression:" << strExpression);
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ",Error: unable to evaluate xpath expression:" << strExpression);
 			throw std::logic_error(string("Error: unable to evaluate xpath expression: " +strExpression).c_str());
 		}
 		
@@ -698,7 +697,7 @@ bool fsm::StateMachineimp::addSendImplement(SendInterface * evtDsp)
 	if (m_mapSendObject.count(evtDsp->getTarget())) 
 		return false;
 	m_mapSendObject[evtDsp->getTarget()] = evtDsp;
-	LOG4CPLUS_TRACE(log, "addSendImplement:" << evtDsp->getTarget());
+	LOG4CPLUS_TRACE(log, "." + m_strSessionID, "addSendImplement:" << evtDsp->getTarget());
 	return true;
 }
 const std::string & fsm::StateMachineimp::getName() const {
@@ -783,7 +782,7 @@ bool fsm::StateMachineimp::start(bool block)
 			}
 		}
 		m_Running = true;
-		LOG4CPLUS_DEBUG(log, ", start");
+		LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", start");
 		enterStates(this->m_initState);
 		return true;
 	}
@@ -795,7 +794,7 @@ bool fsm::StateMachineimp::start(bool block)
 
 void fsm::StateMachineimp::stop()
 {
-	LOG4CPLUS_DEBUG(log, ", stop");
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", stop");
 	m_Running = false;
 	TriggerEvent trigEvent;
 	pushEvent(trigEvent);
@@ -807,7 +806,7 @@ void fsm::StateMachineimp::stop()
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
 {
 	m_strSessionID = strSessionid;
-	LOG4CPLUS_DEBUG(log, ", set this stateMachine sessionid=" << m_strSessionID);
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", set this stateMachine sessionid=" << m_strSessionID);
 }
 
 void fsm::StateMachineimp::mainEventLoop()
@@ -833,7 +832,7 @@ void fsm::StateMachineimp::mainEventLoop()
 			//内部事件队列循环
 			if (m_Running && !m_internalQueue.empty())
 			{
-				LOG4CPLUS_TRACE(log, ", Internal Event Queue size:" << m_internalQueue.size());
+				LOG4CPLUS_TRACE(log, "." + m_strSessionID, ", Internal Event Queue size:" << m_internalQueue.size());
 				std::queue<TriggerEvent> excQueue;
 				// 拷贝现在内部事件队列中的事件到执行队列中
 				excQueue.swap(m_internalQueue);
@@ -848,7 +847,7 @@ void fsm::StateMachineimp::mainEventLoop()
 		}
 		catch (std::exception & e)
 		{
-			LOG4CPLUS_ERROR(log, e.what());
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what());
 		}
 
 	} while (m_Running && m_Block);
@@ -866,7 +865,7 @@ bool fsm::StateMachineimp::isInFinalState()
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 {
 	using namespace helper::xml;
-	LOG4CPLUS_TRACE(log, ",processEvent:" << event.getEventName());
+	LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",processEvent:" << event.getEventName());
 	if (getRootContext()){
 		getRootContext()->deleteVar("_event");
 		m_currentEvt = event;
@@ -887,7 +886,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 	//scInstance->getRootContext()->set("_event.data",strEventData);
 	while (filterState != NULL && filterState != m_rootNode && foundEvent == false) 
 	{
-		LOG4CPLUS_TRACE(log, ",matching event stateid=" << getXmlNodeAttributesValue(filterState, "id"));
+		LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",matching event stateid=" << getXmlNodeAttributesValue(filterState, "id"));
 		for (xmlNodePtr eventNode = filterState->children; eventNode !=NULL;
 			eventNode = eventNode->next)
 		{
@@ -913,7 +912,7 @@ bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)
 
 	if (!foundEvent)
 	{
-		LOG4CPLUS_WARN(log, ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
+		LOG4CPLUS_WARN(log, "." + m_strSessionID, ",stateid=" << getXmlNodeAttributesValue(m_currentStateNode,"id") << " not match the event:"  << m_currentEvt.ToString());
 	}
 	return foundEvent;
 }

@@ -359,13 +359,13 @@ public:
 	{
 		if (doc._xDocPtr == NULL)
 		{
-			//LOG4CPLUS_ERROR(log,  ": Convert a string to xml error was encountered,string=" << str);
+			//LOG4CPLUS_ERROR(log, "." + m_strSessionID,  ": Convert a string to xml error was encountered,string=" << str);
 			return;
 		}
 		_root = xmlDocGetRootElement(doc._xDocPtr);
 
 		if (_root == NULL){
-			//LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << str);
+			//LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": Convert a string to xml error was encountered,string=" << str);
 		}
 	}
 	CXmlParseHelper(const char * xmlCh):doc(xmlParseMemory(xmlCh,::strlen(xmlCh))),_root(NULL){
@@ -379,7 +379,7 @@ public:
 		_root = xmlDocGetRootElement(doc._xDocPtr);
 
 		if (_root == NULL){
-			//LOG4CPLUS_ERROR(log, ": Convert a string to xml error was encountered,string=" << xmlCh);
+			//LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": Convert a string to xml error was encountered,string=" << xmlCh);
 		}
 
 	}

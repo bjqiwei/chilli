@@ -10,7 +10,6 @@ namespace model
 	Datamodel::Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Datamodel");
-		log.setAppendName("." + m_strSession);
 	}
 
 
@@ -29,7 +28,7 @@ namespace model
 		}
 		if (!bFindData)
 		{
-			LOG4CPLUS_WARN(log, ",not find data element in this datamodel.");
+			LOG4CPLUS_WARN(log, "." + m_strSession, ",not find data element in this datamodel.");
 		}
 		//LOG4CPLUS_TRACE(log,",execute end.");
 	}

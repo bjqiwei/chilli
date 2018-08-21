@@ -28,14 +28,14 @@ namespace env
 		std::unique_lock<std::mutex> lck(g_InitMtx);
 		if (g_JSEvaluatorReferce.fetch_add(1) == 0) {
 			if (!JS_Init()) {
-				LOG4CPLUS_ERROR(log, ",JS_Init error.");
+				LOG4CPLUS_ERROR(log, "", ",JS_Init error.");
 				throw std::logic_error("JS_Init error.");
 			}
 		}
 
 		this->m_jsrt = JS_NewRuntime(gMaxHeapSize);
 		if ( m_jsrt == NULL ){
-			LOG4CPLUS_ERROR(log, "new evaluator runtime error.");
+			LOG4CPLUS_ERROR(log, "", "new evaluator runtime error.");
 			throw std::logic_error("JS_NewRuntime error.");
 		}
 
@@ -43,18 +43,18 @@ namespace env
 
 		JS_SetNativeStackQuota(m_jsrt, gMaxStackSize);
 
-		LOG4CPLUS_TRACE(log,"construct a JSEvaluator object.");
+		LOG4CPLUS_TRACE(log, "", "construct a JSEvaluator object.");
 
 	}
 	JSEvaluator::~JSEvaluator(){
 		
 		std::unique_lock<std::mutex> lck(g_InitMtx);
 		if (!m_contexts.empty())
-			LOG4CPLUS_WARN(log, "has " << m_contexts.size() << " context when evaluator delete.");
+			LOG4CPLUS_WARN(log, "", "has " << m_contexts.size() << " context when evaluator delete.");
 
 		while(!m_contexts.empty())
 		{
-			LOG4CPLUS_DEBUG(log,"contexts size " << m_contexts.size());
+			LOG4CPLUS_DEBUG(log, "", "contexts size " << m_contexts.size());
 			delete m_contexts.front();
 			m_contexts.pop_front();
 		}
@@ -66,7 +66,7 @@ namespace env
 			JS_ShutDown();
 		}
 
-		LOG4CPLUS_TRACE(log, "deconstruct a JSEvaluator object.");
+		LOG4CPLUS_TRACE(log, "", "deconstruct a JSEvaluator object.");
 	}
 
 
@@ -76,7 +76,7 @@ namespace env
 		std::lock_guard<std::mutex>lck(m_mtx);
 		Context * cx = new env::JsContext(this->m_jsrt, sessionid, this, parent);
 		m_contexts.push_back(cx);
-		LOG4CPLUS_TRACE(log, "push context:" << cx << " contexts size " << m_contexts.size());
+		LOG4CPLUS_TRACE(log, "", "push context:" << cx << " contexts size " << m_contexts.size());
 		return cx;
 
 	}
@@ -85,7 +85,7 @@ namespace env
 		std::lock_guard<std::mutex>lck(m_mtx);
 		m_contexts.remove(cx);
 		delete cx;
-		LOG4CPLUS_TRACE(log, "remove context:" << cx << " contexts size " << m_contexts.size());
+		LOG4CPLUS_TRACE(log, "", "remove context:" << cx << " contexts size " << m_contexts.size());
 	}
 
 	bool JSEvaluator::hasContext()

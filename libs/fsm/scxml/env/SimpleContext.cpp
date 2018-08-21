@@ -11,11 +11,11 @@ namespace env
 	SimpleContext::SimpleContext(Context * const parent):Context(nullptr,parent)
 	{
 		InitializeInstanceFields();
-		LOG4CPLUS_TRACE(log,"construct a SimpleContext object.");
+		LOG4CPLUS_TRACE(log,"", "construct a SimpleContext object.");
 	}
 
 	SimpleContext::~SimpleContext(){
-		LOG4CPLUS_TRACE(log,"deconstruct a SimpleContext object.");
+		LOG4CPLUS_TRACE(log, "", "deconstruct a SimpleContext object.");
 	}
 
 	void SimpleContext::setVar(const std::string & name, const Json::Value & value )

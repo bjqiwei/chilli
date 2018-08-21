@@ -19,11 +19,10 @@ namespace env
 		:Context(eval, _parent), m_strSessionID(sessionid), m_jsrt(rt)
 	{
 		log =  log4cplus::Logger::getInstance("fsm.JsContext");
-		log.setAppendName("." + m_strSessionID);
-		LOG4CPLUS_TRACE(log, ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
+		LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",new a fsm.env.JsContext object:" << this << " parent:" << parent);
 		
 		InitializeInstanceFields();
-		//LOG4CPLUS_DEBUG(log, ",new a fsm.env.JsContext object finish.");
+		//LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",new a fsm.env.JsContext object finish.");
 	}
 
 	void JsContext::setVar(const std::string & name, const Json::Value & value)
@@ -50,19 +49,19 @@ namespace env
 
 					JS::RootedObject _object(m_jsctx, JS_NewObject(m_jsctx, nullptr));
 					if (!_object) {
-						LOG4CPLUS_ERROR(log, "JS_NewObject " << objName);
+						LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_NewObject " << objName);
 						return;
 					}
 
 					if (!JS_DefineProperty(m_jsctx, obj, objName.c_str(), _object, JSPROP_ENUMERATE)) {
-						LOG4CPLUS_ERROR(log, "JS_DefineProperty " << objName);
+						LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_DefineProperty " << objName);
 						return;
 					}
 					obj = _object;
 				}
 			}
 			else {
-				LOG4CPLUS_ERROR(log, "JS_GetProperty " << objName);
+				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_GetProperty " << objName);
 				return;
 			}
 		}
@@ -70,10 +69,10 @@ namespace env
 
 		//std::string out = value.toStyledString();
 		//helper::string::trim(out);
-		//LOG4CPLUS_TRACE(log, ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
+		//LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",set "<< (va==fsm::globalObject? "global.":"_event.") << name << "=" << out);
 
 		if (!JS_DefineProperty(m_jsctx, obj, _name.c_str(), val, JSPROP_READONLY | JSPROP_ENUMERATE)) {
-			LOG4CPLUS_WARN(log, ",define "<< " property " << name << " failed.");
+			LOG4CPLUS_WARN(log, "." + m_strSessionID, ",define "<< " property " << name << " failed.");
 		}
 
 	}
@@ -103,10 +102,10 @@ namespace env
 		JS::RootedObject obj (this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
-		//LOG4CPLUS_TRACE(log, ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
+		//LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
 
 		if(!JS_DeleteProperty(m_jsctx, obj, name.c_str())){
-			LOG4CPLUS_ERROR(log, ", delete Var " << name << " failed.");
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ", delete Var " << name << " failed.");
 		}
 	
 	}
@@ -114,7 +113,7 @@ namespace env
 
 	Context *JsContext::getParent()
 	{
-		LOG4CPLUS_TRACE(log, ",getParent:" << parent);
+		LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",getParent:" << parent);
 		return parent;
 	}
 
@@ -209,7 +208,7 @@ namespace env
 		
 		m_jsctx = JS_NewContext(m_jsrt, gStackChunkSize);
 		if (m_jsctx == NULL){
-			LOG4CPLUS_ERROR(log, ",JS_NewContext error.");
+			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ",JS_NewContext error.");
 			throw std::logic_error("JS_NewContext error.");
 		}
 
@@ -258,14 +257,14 @@ namespace env
 
 	JsContext::~JsContext()
 	{
-		//LOG4CPLUS_DEBUG(log, ",Destroy SpiderMonkey Context." );
+		//LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",Destroy SpiderMonkey Context." );
 		if (m_global)
 			delete m_global;
 
 		if (m_jsctx) 
 			JS_DestroyContext(m_jsctx);
 
-		LOG4CPLUS_TRACE(log, ",destructioned a fsm.env.JsContext object:" << this );
+		LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",destructioned a fsm.env.JsContext object:" << this );
 	}
 
 	JS::Value JsContext::JsonValueToJsval(const Json::Value &value)const
@@ -295,7 +294,7 @@ namespace env
 			JS::RootedObject  obj(this->m_jsctx, JS_NewObject(m_jsctx, nullptr));
 		
 			if (!obj) {
-				LOG4CPLUS_ERROR(log, "JS_NewObject " << value.toStyledString());
+				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_NewObject " << value.toStyledString());
 				return val;
 			}
 
@@ -305,7 +304,7 @@ namespace env
 			
 				if(!JS_DefineProperty(this->m_jsctx, obj, it.c_str(), val2, JSPROP_ENUMERATE))
 				{
-					LOG4CPLUS_WARN(log, ",define " << " property " << it << " failed.");
+					LOG4CPLUS_WARN(log, "." + m_strSessionID, ",define " << " property " << it << " failed.");
 				}
 			}
 
@@ -315,7 +314,7 @@ namespace env
 		{
 			JS::RootedObject _array(m_jsctx, JS_NewArrayObject(m_jsctx, value.size()));
 			if (!_array) {
-				LOG4CPLUS_ERROR(log, "JS_NewArrayObject " << value.toStyledString());
+				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_NewArrayObject " << value.toStyledString());
 				return val;
 			}
 			for (uint32_t i = 0; i < value.size(); i++)
@@ -367,7 +366,7 @@ namespace env
 
 
 			if (!JS_Enumerate(this->m_jsctx, obj, &props)) {
-				LOG4CPLUS_ERROR(log, "JS_Enumerate error");
+				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_Enumerate error");
 				return result;
 			}
 

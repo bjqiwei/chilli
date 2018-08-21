@@ -10,7 +10,6 @@ Scriptmodel::Scriptmodel(xmlNodePtr xnode,const std::string &session, const std:
 	Action(xnode, session, filename)
 {
 	log = log4cplus::Logger::getInstance("fsm.model.Scriptmodel");
-	log.setAppendName("." + m_strSession);
 }
 
 void Scriptmodel::execute(fsm::Context * ctx){
@@ -28,7 +27,7 @@ void Scriptmodel::execute(fsm::Context * ctx){
 	}
 	if (!bFindData)
 	{
-		LOG4CPLUS_WARN(log, ",not find data element in this Scriptmodel.");
+		LOG4CPLUS_WARN(log, "." + m_strSession, ",not find data element in this Scriptmodel.");
 	}
 	//LOG4CPLUS_TRACE(log,",execute end.");
 }

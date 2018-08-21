@@ -10,7 +10,6 @@ namespace model
 		m_strSession(session),m_strFilename(filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.State");
-		log.setAppendName("." + m_strSession);
 		InitializeInstanceFields();
 		m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
 		m_strName = helper::xml::getXmlNodeAttributesValue(node,"name");

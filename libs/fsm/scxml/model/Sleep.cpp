@@ -10,7 +10,6 @@ namespace model{
 		:Action(xNode, session, filename)
 	{
 		log = log4cplus::Logger::getInstance("fsm.model.Sleep");
-		log.setAppendName("." + m_strSession);
 		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");
 	}
 	Sleep::~Sleep(){
@@ -24,7 +23,7 @@ namespace model{
 
 	void Sleep::execute(fsm::Context * ctx)
 	{
-		LOG4CPLUS_DEBUG(log, ",sleep " << getInterval() << "ms");
+		LOG4CPLUS_DEBUG(log, "." + m_strSession, ",sleep " << getInterval() << "ms");
 		std::this_thread::sleep_for(std::chrono::milliseconds(getInterval()));
 	}
 
