@@ -70,7 +70,7 @@ int main(int argc, _TCHAR* argv[])
 void SendImp::fireSend(const std::string& strContent, const void * param)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("sendimp");
-	LOG4CPLUS_DEBUG(log, strContent);
+	LOG4CPLUS_DEBUG(log,"", strContent);
 }
 //#else
 //int main(int argc, _TCHAR* argv[]){
