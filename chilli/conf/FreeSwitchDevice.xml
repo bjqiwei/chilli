@@ -38,6 +38,7 @@
 		FSCause["DESTINATION_OUT_OF_ORDER"] = 1027;
 		FSCause["INCOMPATIBLE_DESTINATION"] = 1088;
 		FSCause["RECOVERY_ON_TIMER_EXPIRE"]=1102;
+		FSCause["MEDIA_TIMEOUT"] = 1604;
 	</script>
 </scriptmodel>
 	<state id="Null">

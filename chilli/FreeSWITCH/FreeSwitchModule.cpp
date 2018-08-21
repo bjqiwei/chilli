@@ -14,6 +14,7 @@
 namespace chilli{
 namespace FreeSwitch{
 
+static std::string esl_execute_data(const char *app, const char *arg, const char *uuid, bool eventlock, bool async);
 FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
 {
 	log = log4cplus::Logger::getInstance("chilli.FSModule");
@@ -283,7 +284,7 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 
 	return true;
 
@@ -312,7 +313,7 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 	return true;
 
 }
@@ -328,7 +329,7 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 
 	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 
 	return true;
 }
@@ -349,11 +350,11 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 
 	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + uuid, " esl_send:" << cmd << ", status:" << status);
 	return true;
 }
 
-bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & llog)
 {
 	std::string called = "";
 	std::string sessionId = "";
@@ -368,13 +369,14 @@ bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & log)
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
 
-	esl_status_t status = esl_execute(&m_Handle, "bridge", called.c_str(), sessionId.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_execute:bridge " << called << ", status:" << status);
+	std::string cmd = esl_execute_data("bridge", called.c_str(), sessionId.c_str(), false, false);
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 
 	return true;
 }
 
-bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & llog)
 {
 	std::string sessionId;
 	std::string filename;
@@ -385,9 +387,40 @@ bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & log)
 	if (param["filename"].isString())
 		filename = param["filename"].asString();
 
-	esl_status_t status = esl_execute(&m_Handle, "playback", filename.c_str(), sessionId.c_str());
-	LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_execute:playback " << filename << ", status:" << status);
+	std::string cmd = esl_execute_data("playback", filename.c_str(), sessionId.c_str(), false, false);
+	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 	return true;
+}
+
+std::string esl_execute_data(const char * app, const char * arg, const char * uuid, bool eventlock, bool async)
+{
+
+	char cmd_buf[128] = "sendmsg";
+	char app_buf[512] = "";
+	char arg_buf[4096] = "";
+	const char *el_buf = "event-lock: true\n";
+	const char *bl_buf = "async: true\n";
+	char send_buf[5120] = "";
+
+
+	if (uuid) {
+		snprintf(cmd_buf, sizeof(cmd_buf), "sendmsg %s", uuid);
+	}
+
+	if (app) {
+		snprintf(app_buf, sizeof(app_buf), "execute-app-name: %s\n", app);
+	}
+
+	if (arg) {
+		snprintf(arg_buf, sizeof(arg_buf), "execute-app-arg: %s\n", arg);
+	}
+
+	snprintf(send_buf, sizeof(send_buf), "%s\ncall-command: execute\n%s%s%s%s\n",
+		cmd_buf, app_buf, arg_buf, eventlock ? el_buf : "", async ? bl_buf : "");
+	
+	return send_buf;
+
 }
 
 std::string FreeSwitchModule::dialStringFindNumber(const std::string & dialString)
@@ -451,7 +484,6 @@ void FreeSwitchModule::ConnectFS()
 
 		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
 		
-		m_Handle.async_execute = true;
 		if (!m_Handle.connected){
 			LOG4CPLUS_ERROR(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port << " error,"
 				<< m_Handle.errnum << " " << m_Handle.err);
