@@ -38,7 +38,7 @@ namespace WebSocket {
 			}
 			break;
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
-			LOG4CPLUS_WARN(This->log, "LWS_CALLBACK_CLIENT_CONNECTION_ERROR");
+			LOG4CPLUS_WARN(This->log, "", "LWS_CALLBACK_CLIENT_CONNECTION_ERROR");
 			std::string errorCode;
 			if (in) {
 				errorCode.assign((char *)in, len);
@@ -55,10 +55,10 @@ namespace WebSocket {
 		}
 												   break;
 		case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH");
 			break;
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_ESTABLISHED");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLIENT_ESTABLISHED");
 			if (wsclient) {
 				wsclient->m_state = OPEN;
 				wsclient->OnOpen();
@@ -66,16 +66,16 @@ namespace WebSocket {
 			}
 			break;
 		case LWS_CALLBACK_CLOSED:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED");
 			goto lwsclose;
 			break;
 		case LWS_CALLBACK_CLOSED_CLIENT_HTTP:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED_CLIENT_HTTP");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED_CLIENT_HTTP");
 			goto lwsclose;
 			break;
 		case LWS_CALLBACK_CLOSED_HTTP:
 		{
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLOSED_HTTP");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED_HTTP");
 lwsclose:
 			std::string errorCode;
 			if (in) {
@@ -100,10 +100,10 @@ lwsclose:
 		}
 								   break;
 		case LWS_CALLBACK_RECEIVE_PONG:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_RECEIVE_PONG");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_RECEIVE_PONG");
 			break;
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_RECEIVE");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLIENT_RECEIVE");
 			std::string message;
 			if (in) {
 				message.assign((char *)in, len);
@@ -113,14 +113,14 @@ lwsclose:
 		}
 										  break;
 		case LWS_CALLBACK_CLIENT_RECEIVE_PONG:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_CLIENT_RECEIVE_PONG");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLIENT_RECEIVE_PONG");
 			break;
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
-			//LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_CLIENT_WRITEABLE");
+			//LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_CLIENT_WRITEABLE");
 			goto ws_write;
 			break;
 		case LWS_CALLBACK_SERVER_WRITEABLE: {
-			//LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_SERVER_WRITEABLE");
+			//LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_SERVER_WRITEABLE");
 		ws_write:
 			if ( wsclient && wsclient->m_state != CLOSING) {
 				wsclient->OnSend();
@@ -129,7 +129,7 @@ lwsclose:
 					if (bufLen > 0)
 					{
 						std::string sdata = std::string(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).end());
-						LOG4CPLUS_TRACE(wsclient->log, "Send:" << sdata);
+						LOG4CPLUS_TRACE(wsclient->log, "", "Send:" << sdata);
 
 						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 						if (len > 0){
@@ -150,84 +150,84 @@ lwsclose:
 				}
 			}
 			else {
-				LOG4CPLUS_DEBUG(This->log, "Close a connection ");
+				LOG4CPLUS_DEBUG(This->log, "", "Close a connection ");
 				return -1;
 			}
 		}
 											break;
 		case LWS_CALLBACK_HTTP: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_HTTP");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_HTTP");
 		}
 								break;
 		case LWS_CALLBACK_HTTP_BODY: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_HTTP_BODY");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_HTTP_BODY");
 		}
 									 break;
 		case LWS_CALLBACK_HTTP_BODY_COMPLETION: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_HTTP_BODY_COMPLETION");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_HTTP_BODY_COMPLETION");
 		}
 												break;
 		case LWS_CALLBACK_HTTP_FILE_COMPLETION: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_HTTP_FILE_COMPLETION");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_HTTP_FILE_COMPLETION");
 		}
 												break;
 		case LWS_CALLBACK_HTTP_WRITEABLE: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_HTTP_WRITEABLE");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_HTTP_WRITEABLE");
 		}
 										  break;
 		case LWS_CALLBACK_FILTER_NETWORK_CONNECTION: {
-			//LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_FILTER_NETWORK_CONNECTION");
+			//LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_FILTER_NETWORK_CONNECTION");
 		}
 													 break;
 		case LWS_CALLBACK_FILTER_HTTP_CONNECTION: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_FILTER_HTTP_CONNECTION");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_FILTER_HTTP_CONNECTION");
 		}
 												  break;
 		case LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED: {
-			//LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED");
+			//LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED");
 		}
 														  break;
 		case LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION: {
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION");
 		}
 													  break;
 		case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS");
 		}
 																  break;
 		case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS");
 		}
 																  break;
 		case LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION");
 		}
 																	break;
 		case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER");
 			break;
 		case LWS_CALLBACK_CONFIRM_EXTENSION_OKAY: {
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_CONFIRM_EXTENSION_OKAY");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_CONFIRM_EXTENSION_OKAY");
 		}
 												  break;
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED");
 			break;
 		case LWS_CALLBACK_PROTOCOL_INIT:
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_INIT");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_PROTOCOL_INIT");
 			break;
 		case LWS_CALLBACK_PROTOCOL_DESTROY: {
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_PROTOCOL_DESTROY");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_PROTOCOL_DESTROY");
 		}
 											break;
 		case LWS_CALLBACK_WSI_CREATE: {
-			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_CREATE");
+			//LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_WSI_CREATE");
 			if(lws_wsi_user(wsi) == nullptr)
 				WSConnection * wsclient = This->OnAccept(wsi);
 		}
 									  break;
 		case LWS_CALLBACK_WSI_DESTROY: {
-			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_WSI_DESTROY");
+			//LOG4CPLUS_DEBUG(This->log,  "","LWS_CALLBACK_WSI_DESTROY");
 			if (wsclient){
 				if (typeid(*wsclient) == typeid(WSConnection))
 					delete wsclient;
@@ -236,38 +236,38 @@ lwsclose:
 		}
 									   break;
 		case LWS_CALLBACK_GET_THREAD_ID: {
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_GET_THREAD_ID");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_GET_THREAD_ID");
 		}
 										 break;
 		case LWS_CALLBACK_ADD_POLL_FD:
-			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_ADD_POLL_FD");
+			//LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_ADD_POLL_FD");
 			break;
 		case LWS_CALLBACK_DEL_POLL_FD:
-			//LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_DEL_POLL_FD");
+			//LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_DEL_POLL_FD");
 			break;
 		case LWS_CALLBACK_CHANGE_MODE_POLL_FD:
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_CHANGE_MODE_POLL_FD");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_CHANGE_MODE_POLL_FD");
 			break;
 		case LWS_CALLBACK_LOCK_POLL:
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_LOCK_POLL");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_LOCK_POLL");
 			break;
 		case LWS_CALLBACK_UNLOCK_POLL:
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_UNLOCK_POLL");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_UNLOCK_POLL");
 			break;
 		case LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY:
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY");
 			break;
 		case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_WS_PEER_INITIATED_CLOSE");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_WS_PEER_INITIATED_CLOSE");
 			break;
 		case LWS_CALLBACK_WS_EXT_DEFAULTS:
-			LOG4CPLUS_TRACE(This->log, "LWS_CALLBACK_WS_EXT_DEFAULTS");
+			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_WS_EXT_DEFAULTS");
 			break;
 		case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
-			//LOG4CPLUS_DEBUG(log, "LWS_CALLBACK_HTTP_DROP_PROTOCOL");
+			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_HTTP_DROP_PROTOCOL");
 			break;
 		case LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION:
-			LOG4CPLUS_DEBUG(This->log, "LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION");
+			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_OPENSSL_PERFORM_SERVER_CERT_VERIFICATION");
 			{
 				/* Verify the client certificate */
 				X509_STORE_CTX_set_error((X509_STORE_CTX*)user, X509_V_OK);
@@ -281,7 +281,7 @@ lwsclose:
 			}
 			break;
 		default:
-			LOG4CPLUS_DEBUG(This->log, "Unknown:" << reason);
+			LOG4CPLUS_DEBUG(This->log, "", "Unknown:" << reason);
 			break;
 		}
 
@@ -332,17 +332,17 @@ lwsclose:
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("wslog");
 		std::string msg(line,strlen(line)-1);
 		if (level == LLL_ERR)
-			LOG4CPLUS_ERROR(log, msg);
+			LOG4CPLUS_ERROR(log,"", msg);
 		else if (level == LLL_WARN)
-			LOG4CPLUS_WARN(log, msg);
+			LOG4CPLUS_WARN(log,"", msg);
 		else if (level == LLL_NOTICE)
-			LOG4CPLUS_INFO(log, msg);
+			LOG4CPLUS_INFO(log,"", msg);
 		else if (level == LLL_INFO)
-			LOG4CPLUS_INFO(log, msg);
+			LOG4CPLUS_INFO(log,"", msg);
 		else if (level == LLL_DEBUG)
-			LOG4CPLUS_DEBUG(log, msg);
+			LOG4CPLUS_DEBUG(log,"", msg);
 		else 
-			LOG4CPLUS_TRACE(log, msg);
+			LOG4CPLUS_TRACE(log,"", msg);
 	}
 
 	bool WebSocketServer::InitInstance()
@@ -386,7 +386,7 @@ lwsclose:
 
 		m_Context = lws_create_context(&m_Info);
 		if (m_Context == NULL) {
-			LOG4CPLUS_ERROR(log, "Creating libwebsocket context failed");
+			LOG4CPLUS_ERROR(log,"", "Creating libwebsocket context failed");
 			result = false;
 		}
 		
@@ -435,14 +435,14 @@ lwsclose:
 	{
 		this->log = log4cplus::Logger::getInstance("wsclient");
 
-		//LOG4CPLUS_DEBUG(log, m_SessionId << "wsi:" << wsi);
+		//LOG4CPLUS_DEBUG(log, "", m_SessionId << "wsi:" << wsi);
 		m_Context = lws_get_context(wsi);
-		//LOG4CPLUS_DEBUG(log, m_SessionId << "context:" << m_Context);
+		//LOG4CPLUS_DEBUG(log, "", m_SessionId << "context:" << m_Context);
 
 		WSClientSet.insert(std::make_pair(wsi, this));
 		memset(&con_info, 0, sizeof(con_info));
 
-		//LOG4CPLUS_TRACE(log, m_SessionId << "construction");
+		//LOG4CPLUS_TRACE(log,  "", m_SessionId << "construction");
 
 	}
 
@@ -468,7 +468,7 @@ lwsclose:
 		strncpy(m_urlbuff, m_url.c_str(), sizeof(m_urlbuff));
 
 		if (lws_parse_uri(m_urlbuff, &prot, &con_info.address, &con_info.port, &con_info.path)) {
-			LOG4CPLUS_ERROR(log, " parse uri error.");
+			LOG4CPLUS_ERROR(log, "", " parse uri error.");
 			return;
 		}
 
@@ -490,7 +490,7 @@ lwsclose:
 		con_info.userdata = this;
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		wsi = lws_client_connect_via_info(&con_info);
-		LOG4CPLUS_TRACE(log, "wsi:" << wsi);
+		LOG4CPLUS_TRACE(log, "", "wsi:" << wsi);
 
 		WSClientSet.insert(std::make_pair(wsi, this));
 
@@ -526,7 +526,7 @@ lwsclose:
 			lws_cancel_service(m_Context);
 		}
 		else {
-			LOG4CPLUS_ERROR(log, " closed");
+			LOG4CPLUS_ERROR(log, ""," closed");
 		}
 
 		return 0;
@@ -535,33 +535,33 @@ lwsclose:
 
 	void WSConnection::OnOpen()
 	{
-		LOG4CPLUS_DEBUG(log, "OnOpen");
+		LOG4CPLUS_DEBUG(log, "", "OnOpen");
 	}
 
 	void WSConnection::OnSend()
 	{
-		LOG4CPLUS_TRACE(log, "OnSend");
+		LOG4CPLUS_TRACE(log, "", "OnSend");
 	}
 
 	void WSConnection::OnClose(const std::string & ErrorCode)
 	{
-		LOG4CPLUS_DEBUG(log, "OnClose:" << ErrorCode);
+		LOG4CPLUS_DEBUG(log, "", "OnClose:" << ErrorCode);
 	}
 
 	void WSConnection::OnError(const std::string & errorCode)
 	{
-		LOG4CPLUS_DEBUG(log, "OnError:" << errorCode);
+		LOG4CPLUS_DEBUG(log, "", "OnError:" << errorCode);
 	}
 
 	void WSConnection::OnMessage(const std::string & message)
 	{
-		LOG4CPLUS_DEBUG(log, "OnMessage:" << message);
+		LOG4CPLUS_DEBUG(log, "", "OnMessage:" << message);
 	}
 
 	void WSConnection::SetWSUrl(const std::string & url)
 	{
 		this->m_url = url;
-		LOG4CPLUS_DEBUG(log, "WS:" << this->m_url);
+		LOG4CPLUS_DEBUG(log, "", "WS:" << this->m_url);
 	}
 
 	const std::string & WSConnection::GetWSUrl()

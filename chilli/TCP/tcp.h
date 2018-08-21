@@ -34,6 +34,8 @@ public:
 
 	void setLogger(log4cplus::Logger log);
 	log4cplus::Logger getLogger();
+	void setId(const std::string & id);
+	std::string getId();
 
 	void ListenTCP(uint32_t port);
 	void Stop();
@@ -41,5 +43,6 @@ public:
 private:
 	struct event_base * m_Base = nullptr;
 	log4cplus::Logger loger;
+	std::string m_Id;
 };
 }

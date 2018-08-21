@@ -19,21 +19,20 @@ static std::string GetSsmLastErrMsg()
 ShDevModule::ShDevModule(const std::string & id):ProcessModule(id)
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
-	log.setAppendName("." + this->getId());
-	LOG4CPLUS_DEBUG(log,"new a ShDevModule object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "new a ShDevModule object.");
 	InitLib();
 }
 
 
 ShDevModule::~ShDevModule(void)
 {
-	LOG4CPLUS_DEBUG(log,"destruction a ShDevModule object.");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "destruction a ShDevModule object.");
 	UnInitLib();
 }
 
 void ShDevModule::fireSend(const std::string &strContent, const void * param)
 {
-	LOG4CPLUS_WARN(log, "fireSend not implement.");
+	LOG4CPLUS_WARN(log, "." + this->getId(), "fireSend not implement.");
 }
 
 bool ShDevModule::Init()
@@ -42,13 +41,13 @@ bool ShDevModule::Init()
 	//load configuration file and initialize system
 	if (SsmStartCti("conf/ShConfig.ini", "conf/ShIndex.ini") == -1)
 	{
-		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), GetSsmLastErrMsg());
 		return false;
 	}
 
 
 	int nTotCh = SsmGetMaxCh();
-	LOG4CPLUS_INFO(log, "MaxCh:" << nTotCh);
+	LOG4CPLUS_INFO(log, "." + this->getId(), "MaxCh:" << nTotCh);
 	for (int i = 0; i < nTotCh; i++)
 	{
 		//chilli::ShDev::ShExtensionPtr extPtr = new ShExtension();
@@ -74,7 +73,7 @@ int ShDevModule::Start()
 
 	if (SsmSetEvent(0xffff, -1, true, &EventMode) != 0)
 	{
-		LOG4CPLUS_ERROR(log, "set CallBack fuction failed. " << GetSsmLastErrMsg());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), "set CallBack fuction failed. " << GetSsmLastErrMsg());
 	}
 
 
@@ -85,11 +84,11 @@ int ShDevModule::Start()
 
 int ShDevModule::Stop()
 {
-	LOG4CPLUS_DEBUG(log,"Close a Sanhuid device");
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Close a Sanhuid device");
 	ProcessModule::Stop();
 	if(SsmCloseCti() == -1)									 
 	{
-		LOG4CPLUS_ERROR(log, GetSsmLastErrMsg());
+		LOG4CPLUS_ERROR(log, "." + this->getId(), GetSsmLastErrMsg());
 	}
 	return 0;
 }
@@ -196,7 +195,7 @@ std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const s
 	
 	Json::FastWriter writer;
 	std::string strEvent = writer.write(jsonEvent);
-	LOG4CPLUS_TRACE(log,"ch=" << pEvent->nReference << ",Recive a event,event=" << strEvent);
+	LOG4CPLUS_TRACE(log, "", "ch=" << pEvent->nReference << ",Recive a event,event=" << strEvent);
 	return strEvent;
 }
 
@@ -320,7 +319,7 @@ const char * ShDevModule::GetString_EventType( int nEvent )
 	case E_RCV_IPA_DONGLE_REMOVED			:return "E_RCV_IPA_DONGLE_REMOVED";//			= 0x007c, 	// IPA series: removal of USB-key detected	
 	default:		{
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("ShDevModule.GetString_EventType");
-		LOG4CPLUS_ERROR(log,"UNKNOWN the event:" << nEvent);
+		LOG4CPLUS_ERROR(log, "." + this->getId(), "UNKNOWN the event:" << nEvent);
 		return "UNKNOWN";
 		}
 	}
@@ -466,7 +465,7 @@ const char * ShDevModule::GetString_State( int nState )
 	case S_IPR_COMMUNICATING				:return "S_IPR_COMMUNICATING";//		= 171,	// IPR channel: the channel is in the communicating state
 	default:		{
 		static log4cplus::Logger log = log4cplus::Logger::getInstance("ShDevModule.GetString_State");
-		LOG4CPLUS_ERROR(log,"UNKNOWN the state:" << nState);
+		LOG4CPLUS_ERROR(log, "", "UNKNOWN the state:" << nState);
 		return "UNKNOWN";
 		}
 	}
@@ -556,7 +555,7 @@ const char *ShDevModule::GetString_PengdingReason(int nReason)
 		case IP_REDIRECT_FAIL					:return "IP_REDIRECT_FAIL";//	= 77    // Redirect failed
 		default:	{
 			static log4cplus::Logger log = log4cplus::Logger::getInstance("ShDevModule.GetString_State");
-			LOG4CPLUS_ERROR(log,"UNKNOWN the state:" << nReason);
+			LOG4CPLUS_ERROR(log, "", "UNKNOWN the state:" << nReason);
 			return "UNKNOWN";
 		}
 	}

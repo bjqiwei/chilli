@@ -29,7 +29,7 @@ namespace TCP {
 		sockaddr_in * sa_in = (sockaddr_in *)sa;
 		char ip[64];
 		evutil_inet_ntop(AF_INET, sa_in, ip, sizeof(ip));
-		LOG4CPLUS_DEBUG(This->getLogger(), " accept client:" << client << ":" << ip << ":" << ntohs(sa_in->sin_port));
+		LOG4CPLUS_DEBUG(This->getLogger(), "." + This->getId(), " accept client:" << client << ":" << ip << ":" << ntohs(sa_in->sin_port));
 		client->OnOpen();
 	}
 
@@ -56,7 +56,7 @@ namespace TCP {
 		struct evbuffer *output = bufferevent_get_output(bev);
 		if (evbuffer_get_length(output) == 0) {
 			This->OnSend();
-			//LOG4CPLUS_DEBUG(This->log, "write data end.");
+			//LOG4CPLUS_DEBUG(This->log, "." + This->getId(), "write data end.");
 		}
 
 	}
@@ -165,13 +165,23 @@ namespace TCP {
 		return this->loger;
 	}
 
+	void TCPServer::setId(const std::string & id)
+	{
+		m_Id = id;
+	}
+
+	std::string TCPServer::getId()
+	{
+		return m_Id;
+	}
+
 
 	void TCPServer::ListenTCP(uint32_t port)
 	{
 		struct sockaddr_in sin;
 		struct evconnlistener *listener;
 
-		LOG4CPLUS_INFO(loger, " listen TCP Starting...");
+		LOG4CPLUS_INFO(loger, "."+ this->getId(), " listen TCP Starting...");
 #ifdef WIN32
 		evthread_use_windows_threads();
 		WSADATA wsa_data;
@@ -186,10 +196,10 @@ namespace TCP {
 		}
 
 		m_Base = event_base_new();
-		LOG4CPLUS_INFO(loger, ",libevent current method:" << event_base_get_method(m_Base));
+		LOG4CPLUS_INFO(loger, "." + this->getId(), ",libevent current method:" << event_base_get_method(m_Base));
 
 		if (!m_Base) {
-			LOG4CPLUS_ERROR(loger, " Could not initialize libevent!");
+			LOG4CPLUS_ERROR(loger, "." + this->getId(), " Could not initialize libevent!");
 			goto done;
 		}
 
@@ -204,11 +214,11 @@ namespace TCP {
 			sizeof(sin));
 
 		if (!listener) {
-			LOG4CPLUS_ERROR(loger, " Could not create a listener!");
+			LOG4CPLUS_ERROR(loger, "." + this->getId(), " Could not create a listener!");
 			goto done;
 		}
 
-		LOG4CPLUS_INFO(loger, ",start listen tcp port:" << port);
+		LOG4CPLUS_INFO(loger, "." + this->getId(), ",start listen tcp port:" << port);
 
 		event_base_dispatch(m_Base);
 
@@ -226,7 +236,7 @@ namespace TCP {
 #ifdef WIN32
 		WSACleanup();
 #endif
-		LOG4CPLUS_INFO(loger, " listen TCP Stoped.");
+		LOG4CPLUS_INFO(loger, "." + this->getId(), " listen TCP Stoped.");
 		log4cplus::threadCleanup();
 		
 	}
