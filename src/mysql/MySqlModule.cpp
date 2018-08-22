@@ -115,6 +115,12 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 
 			for (int i = 1; i <= numcols; ++i) {
 				switch (res_meta->getColumnType(i)) {
+				case sql::DataType::INTEGER:
+					record[res_meta->getColumnLabel(i).c_str()] = resultset->getUInt64(i); break;
+				case sql::DataType::BIGINT:
+					record[res_meta->getColumnLabel(i).c_str()] = resultset->getUInt64(i); break;
+				case sql::DataType::SMALLINT:
+					record[res_meta->getColumnLabel(i).c_str()] = resultset->getUInt(i); break;
 				default:
 					record[res_meta->getColumnLabel(i).c_str()] = resultset->getString(i).c_str();
 				}
