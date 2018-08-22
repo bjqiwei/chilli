@@ -1,0 +1,16 @@
+1、修改open files 限制,centos 7是修改/etc/systemd/system.conf或者/etc/systemd/system.conf.d/*.conf
+添加
+DefaultLimitCORE=infinity
+DefaultLimitNOFILE=65535
+DefaultLimitNPROC=65535
+
+2、修改switch.conf.xml 修改max-sessions 和 sessions-per-second
+3、修改modules.conf.xml 启用mod_shout yum install libshout-devel lame-devel libmpg123-devel
+4、sip账号使用数据库，安装lua yum install freeswitch-lua*, 修改lua.conf.xml文件
+5、上传gen_dir_user_xml.lua 到/usr/shared/freeswitch/script/
+6、安装FreeSwitch ODBC  yum install unixODBC-devel mysql-connector-odbc
+7、修改拨号计划
+8、禁用IPV6
+9、修改event_socket.conf.xml
+10、修改internal.xml 和external 的 ext-rtp-ip ext-sip-ip
+11、修改switch.conf.xml中的端口范围。
