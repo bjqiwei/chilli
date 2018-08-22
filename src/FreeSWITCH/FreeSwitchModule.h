@@ -28,7 +28,7 @@ namespace FreeSwitch{
 
 
 		std::string dialStringFindNumber(const std::string & dialString);
-		std::string toDialString(const std::string & sipId);
+		std::string toDialString(const std::string & sipId, const std::string & uuid, const std::string & caller);
 	private:
 		std::thread m_Thread;
 		std::thread m_executeThread[100];

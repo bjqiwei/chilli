@@ -303,13 +303,13 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 {
 	std::string called = "";
 	std::string sessionId = "";
-	std::string display = "";
+	std::string caller = "";
 
 	if (param["called"].isString())
 		called = param["called"].asString();
 
-	if (param["display"].isString())
-		display = param["display"].asString();
+	if (param["caller"].isString())
+		caller = param["caller"].asString();
 
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
@@ -317,11 +317,11 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	
 	m_Session_DeviceId[sessionId] = dialStringFindNumber(called);
 
-	called = toDialString(called);
+	called = toDialString(called, sessionId, caller);
 	std::string jobid = helper::uuid();
 	m_Job_Session[jobid] = sessionId;
 
-	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + called + " &park()\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi originate "+ called + " &park()\nJob-UUID:" + jobid;
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
@@ -443,18 +443,31 @@ std::string FreeSwitchModule::dialStringFindNumber(const std::string & dialStrin
 	return number;
 }
 
-std::string FreeSwitchModule::toDialString(const std::string & sipId)
+std::string FreeSwitchModule::toDialString(const std::string & sipId, const std::string & uuid, const std::string & caller)
 {
+	std::string called = "user/" + sipId;
+	std::string _caller = caller;
 	for (uint32_t i = 0; i < this->routeConfig.size(); i++) {
 		std::string pattern = this->routeConfig[i]["regex_pattern"].asString();
 		std::regex regPattern(pattern);
 		if (std::regex_match(sipId, regPattern)) {
 			std::string ip = this->routeConfig[i]["ip"].asString();
 			uint32_t port = this->routeConfig[i]["port"].asUInt();
-			return "sofia/external/" + sipId + "@" + ip + ":" + std::to_string(port);
+			if(_caller.empty())
+				_caller = this->routeConfig[i]["defaultcaller"].asString();
+
+			called = "sofia/external/" + sipId + "@" + ip + ":" + std::to_string(port);
+			break;
 		}
 	}
-	return "user/" + sipId;
+
+	std::string dialstring = "{origination_uuid=" + uuid;
+	if (!_caller.empty())
+		dialstring.append(",origination_caller_id_number=" + _caller);
+	dialstring.append("}");
+	dialstring.append(called);
+
+	return dialstring;
 }
 
 void esl_logger(const char *file, const char *func, int line, int level, const char *fmt, ...)
