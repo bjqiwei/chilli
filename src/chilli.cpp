@@ -155,7 +155,7 @@ static bool options_load(server_options_t *options, int argc, const char * const
 			options->cmd_line = false;
 			break;
 		case 'v':
-			printf("%s", appversion);
+			printf("%s\n", appversion);
 			return FALSE;
 		case 'h':
 			usage();
