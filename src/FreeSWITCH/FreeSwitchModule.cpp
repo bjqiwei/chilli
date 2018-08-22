@@ -10,6 +10,7 @@
 #include "../uuid.h"
 #include <regex>
 #include <apr_hash.h>
+#include "../mysql/MySqlModule.h"
 
 
 namespace chilli{
@@ -316,6 +317,7 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	
 	m_Session_DeviceId[sessionId] = dialStringFindNumber(called);
 
+	called = toDialString(called);
 	std::string jobid = helper::uuid();
 	m_Job_Session[jobid] = sessionId;
 
@@ -439,6 +441,20 @@ std::string FreeSwitchModule::dialStringFindNumber(const std::string & dialStrin
 	number = number.substr(0, number.find("@"));
 	number = number.substr(min(number.find_last_of("/") + 1, number.length()));
 	return number;
+}
+
+std::string FreeSwitchModule::toDialString(const std::string & sipId)
+{
+	for (uint32_t i = 0; i < this->routeConfig.size(); i++) {
+		std::string pattern = this->routeConfig[i]["regex_pattern"].asString();
+		std::regex regPattern(pattern);
+		if (std::regex_match(sipId, regPattern)) {
+			std::string ip = this->routeConfig[i]["ip"].asString();
+			uint32_t port = this->routeConfig[i]["port"].asUInt();
+			return "sofia/external/" + sipId + "@" + ip + ":" + std::to_string(port);
+		}
+	}
+	return "user/" + sipId;
 }
 
 void esl_logger(const char *file, const char *func, int line, int level, const char *fmt, ...)
@@ -658,6 +674,22 @@ void FreeSwitchModule::run()
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
 	try
 	{
+		DataBase::MySqlModule * mysqlmodule;
+		for (auto & m : model::ProcessModule::g_Modules)
+		{
+			if (m->getId().find("mysql") != std::string::npos)
+			{
+				mysqlmodule = dynamic_cast<DataBase::MySqlModule*>(m.get());
+			}
+		}
+
+		if (mysqlmodule){
+			routeConfig = mysqlmodule->executeQuery("SELECT * from sip_route left join sip_gateway on sip_route.gateway_id = sip_gateway.id;");
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " get route config from database:" << routeConfig.toStyledString());
+		}
+		else {
+			LOG4CPLUS_ERROR(log, "." + this->getId(), "not find mysql module");
+		}
 
 		while (m_bRunning)
 		{

@@ -28,16 +28,7 @@
 		<event event="MakeConnection">
 			<script>called = _event.param.called;</script>
 			<send target="freeswitch001" type="cmd" dest="this" event="MakeConnection">
-				<called type="script">
-				var called_; 
-				if(_event.param.called.length &lt; 5){
-					called_ = 'sofia/internal/' + _event.param.called + '%192.168.2.232';
-				}
-				else{
-					called_ = 'sofia/external/' + _event.param.called + '@192.168.2.231:5080'
-				}
-				called_;
-				</called>
+				<called type="script">_event.param.called</called>
 				<display type="script">_event.param.called</display>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>

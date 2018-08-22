@@ -28,6 +28,7 @@ namespace FreeSwitch{
 
 
 		std::string dialStringFindNumber(const std::string & dialString);
+		std::string toDialString(const std::string & sipId);
 	private:
 		std::thread m_Thread;
 		std::thread m_executeThread[100];
@@ -43,6 +44,7 @@ namespace FreeSwitch{
 		std::map<std::string, std::string>m_device_StateMachine;
 		virtual void run() override;
 		void execute(uint32_t eventQueue);
+		Json::Value routeConfig;
 		friend class FreeSwitchDevice;
 	};
 
