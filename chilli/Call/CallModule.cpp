@@ -5,6 +5,7 @@
 #include <json/config.h>
 #include <json/json.h>
 #include "../uuid.h"
+#include <apr_hash.h>
 
 
 namespace chilli{
@@ -20,6 +21,33 @@ CallModule::CallModule(const std::string & id):ProcessModule(id)
 CallModule::~CallModule(void)
 {
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Destruction a ACD module.");
+}
+
+int CallModule::Start()
+{
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Start...  CallModule");
+	if (!m_bRunning) {
+		ProcessModule::Start();
+		for (uint32_t i = 0; i < 100; i++) {
+			m_executeThread[i] = std::thread(&CallModule::execute, this, i);
+		}
+	}
+	return 0;
+}
+
+int CallModule::Stop()
+{
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Stop...  CallModule");
+	if (m_bRunning)
+	{
+		ProcessModule::Stop();
+
+		for (auto & it : m_executeThread) {
+			if (it.joinable())
+				it.join();
+		}
+	}
+	return 0;
 }
 
 
@@ -129,17 +157,101 @@ void CallModule::run()
 
 					newCallId = m_Calls[sessionid];
 
+					jsonEvent["id"] = newCallId;
+
+					apr_ssize_t klen = newCallId.length();
+					uint32_t hash = apr_hashfunc_default(newCallId.c_str(), &klen);
+					hash %= 100;
+					m_eventQueue[hash].Put(chilli::model::EventType_t(jsonEvent));
+				}
+			}
+			catch (std::exception & e)
+			{
+				LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
+			}
+		}
+
+	}
+	catch (std::exception & e)
+	{
+		LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
+	}
+
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
+	log4cplus::threadCleanup();
+}
+
+void CallModule::execute(uint32_t eventQueue)
+{
+	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Starting...");
+	try
+	{
+		while (m_bRunning)
+		{
+			try
+			{
+				model::EventType_t evt;
+				if (m_eventQueue[eventQueue].Get(evt, 1000) && !evt.event.isNull())
+				{
+					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
+
+					Json::Value  & jsonEvent = evt.event;
+					if (jsonEvent["type"] == "request") {
+						jsonEvent["event"] = jsonEvent["request"];
+					}
+
+					std::string sessionid;
+					if (jsonEvent["param"].isMember("sessionID"))
+						sessionid = jsonEvent["param"]["sessionID"].asString();
+
+					std::string newCallId;
+					if (jsonEvent["param"].isMember("callID"))
+						newCallId = jsonEvent["param"]["callID"].asString();
+
+					std::string newConnectionID;
+					if (jsonEvent["param"].isMember("connectionID"))
+						newConnectionID = jsonEvent["param"]["connectionID"].asString();
+
+					if (sessionid.empty()) {
+						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionID is null");
+						continue;
+					}
+					if (m_Calls.find(sessionid) == m_Calls.end()) {
+
+						std::string otherSessionId;
+						if (jsonEvent["param"].isMember("otherSessionID") && jsonEvent["param"]["otherSessionID"].isString())
+							otherSessionId = jsonEvent["param"]["otherSessionID"].asString();
+
+						if (m_Calls.find(otherSessionId) != m_Calls.end()) {
+							m_Calls[sessionid] = m_Calls[otherSessionId];
+						}
+						else {
+							if (newCallId.empty())
+								newCallId = helper::uuid();
+							if (newConnectionID.empty())
+								newConnectionID = helper::uuid();
+
+							model::PerformElementPtr call(new Call(this, newCallId, m_SMFileName));
+							call->setVar("_callid", newCallId);
+							call->setVar("_connectionid", newConnectionID);
+							this->addPerformElement(newCallId, call);
+							m_Calls[sessionid] = newCallId;
+						}
+					}
+
+					newCallId = m_Calls[sessionid];
+
 					const auto & call = this->getPerformElement(newCallId);
 
 					jsonEvent["id"] = newCallId;
-						
-						
+
+
 					call->pushEvent(chilli::model::EventType_t(jsonEvent));
 					call->mainEventLoop();
 
 					if (call->IsClosed())
 						this->removePerfromElement(call->getId());
-					
+
 					if (jsonEvent["event"].isString() && jsonEvent["event"].asString() == "Null")
 						m_Calls.erase(sessionid);
 				}
@@ -156,7 +268,7 @@ void CallModule::run()
 		LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Stoped.");
 	log4cplus::threadCleanup();
 }
 
