@@ -53,7 +53,7 @@ CXXFLAGS = $(CFLAGS) -std=c++11
 LDFLAGS= -L./. -L/usr/local/lib -L/usr/local/apr/lib/ -static-libstdc++ -static-libgcc -Wall -g -O1 
 LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.a ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -lxml2 -levent_extra -levent_core -levent_pthreads -llog4cplus -lmozjs-45 -lmozglue\
 	$(MOZJSDIR)mfbt/Compression.o $(MOZJSDIR)mfbt/Decimal.o $(MOZJSDIR)mfbt/Unified_cpp_mfbt0.o
-LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -lm -ldl -lrt -lz -lm -ldl  -lrt
+LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -lm -ldl -lrt -lz -lm -ldl  -lrt -Wl,-rpath=./lib
 
 OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(ACD_OBJ_DIR)ACDModule.o $(ACD_OBJ_DIR)ACDDevice.o\
