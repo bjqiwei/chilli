@@ -1,0 +1,36 @@
+1、修改linux 默认ssh端口，vi /etc/ssh/sshd_config       service sshd restart
+
+2、安装依赖库 yum install -y http://files.freeswitch.org/freeswitch-release-1-6.noarch.rpm epel-release
+yum install -y git alsa-lib-devel autoconf automake bison broadvoice-devel bzip2 curl-devel db-devel e2fsprogs-devel flite-devel g722_1-devel gcc-c++ gdbm-devel gnutls-devel ilbc2-devel ldns-devel libcodec2-devel libcurl-devel libedit-devel libidn-devel libjpeg-devel libmemcached-devel libogg-devel libsilk-devel libsndfile-devel libtheora-devel libtiff-devel libtool libuuid-devel libvorbis-devel libxml2-devel lua-devel lzo-devel mongo-c-driver-devel ncurses-devel net-snmp-devel openssl-devel opus-devel pcre-devel perl perl-ExtUtils-Embed pkgconfig portaudio-devel postgresql-devel python26-devel python-devel soundtouch-devel speex-devel sqlite-devel unbound-devel unixODBC-devel wget which yasm zlib-devel
+
+3、下载源代码 git clone -b v1.6 https://freeswitch.org/stash/scm/fs/freeswitch.git freeswitch
+
+4、编译
+./bootstrap.sh -j
+./configure
+make
+
+5、安装
+make install
+make cd-sounds-install
+make cd-moh-install
+
+6、删除 ipv6 配置 mv internal-ipv6.xml internal-ipv6.xml.del
+mv external-ipv6.xml external-ipv6.xml.del
+
+7、修改 vars.xml 默认密码为4321!@#$
+
+8、修改SIP 端口 internal_sip_port=16171 internal_tls_port=16172 external_sip_port=16191 external_tls_port=16192
+
+9、修改event_socket.conf.xml 默认配置端口和密码
+
+10、
+修改 internal.xml external.xml
+net穿透 autonat:*.*.*.*
+
+11、 添加fs_cli 配置文件 .fs_cli_conf 
+[server1]
+host     => 127.0.0.1
+port     => 8021
+password => secret_password
+debug    => 7
