@@ -276,4 +276,4 @@ uninstall:
 	rm -rf /etc/init.d/siad
 
 tar:
-	tar -zcvf ./chilli.$(APPVERSION).tar.gz ../Sia/ReadMe.txt ../Sia/restart.sh ../Sia/*.sh ../Sia/siaserver ../Sia/conf/log4cplus.properties ../Sia/conf/sia.cfg ../Sia/sys_scripts/dkjson.lua ../Sia/sys_scripts/init.lua ../Sia/sys_scripts/makecall.lua ../Sia/sys_scripts/preswitchboard.lua ../Sia/sys_scripts/satisfaction.lua
+	tar -zcvf ./chilli.$(APPVERSION).tar.gz ./chilli ./conf/* ./lib/*

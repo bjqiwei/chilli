@@ -684,7 +684,7 @@ void FreeSwitchModule::run()
 		}
 
 		if (mysqlmodule){
-			routeConfig = mysqlmodule->executeQuery("SELECT * from sip_route left join sip_gateway on sip_route.gateway_id = sip_gateway.id;");
+			routeConfig = mysqlmodule->executeQuery("SELECT * from sip_route left join sip_gateway on sip_route.gateway_id = sip_gateway.id where sip_gateway.ip <> \"\" order by level ASC ;");
 			LOG4CPLUS_DEBUG(log, "." + this->getId(), " get route config from database:" << routeConfig.toStyledString());
 		}
 		else {
