@@ -155,6 +155,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6001;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="esl_json.c" />
+    <ClCompile Include="esl_oop.cpp" />
     <ClCompile Include="esl_threadmutex.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">28125;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">28125;%(DisableSpecificWarnings)</DisableSpecificWarnings>
