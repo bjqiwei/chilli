@@ -8,7 +8,6 @@
 #include "mozilla/Atomics.h"
 #include "mozilla/DebugOnly.h"
 #include "mozilla/GuardObjects.h"
-#include "mozilla/mozalloc.h"
 #include "mozilla/PodOperations.h"
 
 #ifdef XP_WIN
