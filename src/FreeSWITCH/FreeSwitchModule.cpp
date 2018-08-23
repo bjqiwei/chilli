@@ -17,7 +17,7 @@ namespace chilli{
 namespace FreeSwitch{
 
 static std::string esl_execute_data(const char *app, const char *arg, const char *uuid, bool eventlock, bool async);
-FreeSwitchModule::FreeSwitchModule(const std::string & id):ProcessModule(id)
+FreeSwitchModule::FreeSwitchModule(const std::string & id, uint32_t threadSize) :ProcessModule(id), m_executeThread(threadSize)
 {
 	log = log4cplus::Logger::getInstance("chilli.FSModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Constuction a FreeSwitch module.");
@@ -42,8 +42,8 @@ int FreeSwitchModule::Stop(void)
 		m_bRunning = false;
 
 		for (auto & it:m_executeThread) {
-			if (it.joinable())
-				it.join();
+			if (it.th.joinable())
+				it.th.join();
 		}
 
 		if (m_Thread.joinable()) {
@@ -60,8 +60,8 @@ int FreeSwitchModule::Start()
 		ProcessModule::Start();
 		m_bRunning = true;
 		m_Thread = std::thread(&FreeSwitchModule::ConnectFS, this);
-		for (uint32_t i = 0; i < 100;i++) {
-			m_executeThread[i]=std::thread(&FreeSwitchModule::execute, this, i);
+		for (auto & it : m_executeThread) {
+			it.th=std::thread(&FreeSwitchModule::execute, this, &it.eventQueue);
 		}
 	}
 	return 0;
@@ -286,10 +286,10 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	if (param["sessionID"].isString())
 		sessionId = param["sessionID"].asString();
 
-	m_Session_DeviceId[sessionId] = dialStringFindNumber(caller);
+	setSessionDevice(sessionId, dialStringFindNumber(caller));
 
 	std::string jobid = helper::uuid();
-	m_Job_Session[jobid] = sessionId;
+	setJobSession(jobid, sessionId);
 
 	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
 
@@ -315,11 +315,11 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 		sessionId = param["sessionID"].asString();
 
 	
-	m_Session_DeviceId[sessionId] = dialStringFindNumber(called);
+	setSessionDevice(sessionId, dialStringFindNumber(called));
 
 	called = toDialString(called, sessionId, caller);
 	std::string jobid = helper::uuid();
-	m_Job_Session[jobid] = sessionId;
+	setJobSession(jobid, sessionId);
 
 	std::string cmd = "bgapi originate "+ called + " &park()\nJob-UUID:" + jobid;
 
@@ -336,7 +336,7 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 		sessionId = param["sessionID"].asString();
 
 	std::string jobid = helper::uuid();
-	m_Job_Session[jobid] = sessionId;
+	setJobSession(jobid, sessionId);
 
 	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
@@ -347,21 +347,21 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 
 bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 {
-	std::string uuid = "";
+	std::string sessionId = "";
 	std::string filename = "";
 
 	if (param["ConnectionID"].isString())
-		uuid = param["ConnectionID"].asString();
+		sessionId = param["ConnectionID"].asString();
 
 	if (param["filename"].isString())
 		filename = param["filename"].asString();
 
 	std::string jobid = helper::uuid();
-	m_Job_Session[jobid] = uuid;
+	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi uuid_record " + uuid + " start " + filename + "\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid;
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + uuid, " esl_send:" << cmd << ", status:" << status);
+	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 	return true;
 }
 
@@ -620,17 +620,20 @@ void FreeSwitchModule::ConnectFS()
 
 
 							if (eventName == "BACKGROUND_JOB"){
-								evt.event["param"]["UniqueID"] = m_Job_Session[evt.event["param"]["JobUUID"].asString()];
+								std::string sessionId;
+								getJobSession(evt.event["param"]["JobUUID"].asString(), sessionId);
+								evt.event["param"]["UniqueID"] = sessionId;
 							}
 
 							std::string sessionId = evt.event["param"]["UniqueID"].asString();
 							evt.event["param"].removeMember("UniqueID");
 
-							if (m_Session_DeviceId.find(sessionId) == m_Session_DeviceId.end()){
+							std::string device;
+							if (getSessionDevice(sessionId, device) == false){
 								if (dir == "inbound" && !caller.empty())
-									m_Session_DeviceId[sessionId] = caller.substr(0,caller.find("%"));
+									setSessionDevice(sessionId, caller.substr(0, caller.find("%")));
 								else if (dir == "outbound" && !called.empty())
-									m_Session_DeviceId[sessionId] = called.substr(0,called.find("%"));
+									setSessionDevice(sessionId, called.substr(0, called.find("%")));
 								
 							}
 							
@@ -642,9 +645,9 @@ void FreeSwitchModule::ConnectFS()
 							//Channel _ Hangup：通道挂断事件
 
 
-
-							if (m_Session_DeviceId.find(sessionId) != m_Session_DeviceId.end()){
-								evt.event["id"] = m_Session_DeviceId[sessionId];
+							
+							if (getSessionDevice(sessionId,device)) {
+								evt.event["id"] = device;
 								evt.event["event"] = eventName;
 								evt.event["param"]["sessionID"] = sessionId;
 								this->PushEvent(evt);
@@ -654,11 +657,11 @@ void FreeSwitchModule::ConnectFS()
 							}
 
 							if (eventName == "BACKGROUND_JOB") {
-								m_Job_Session.erase(evt.event["JobUUID"].asString());
+								removeJobSession(evt.event["JobUUID"].asString());
 									
 							}
 							else if(eventName == "CHANNEL_DESTROY") {
-								m_Session_DeviceId.erase(sessionId);
+								removeSessionDevice(sessionId);
 							}
 
 						}
@@ -682,6 +685,52 @@ void FreeSwitchModule::ConnectFS()
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Stoped  FreeSwitch module");
 	log4cplus::threadCleanup();
 }
+void FreeSwitchModule::setSessionDevice(const TsessionID & sessionId, const std::string & device)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	m_Session_DeviceId[sessionId] = device;
+}
+
+bool FreeSwitchModule::getSessionDevice(const TsessionID & sessionId, std::string & device)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	const auto & it = m_Session_DeviceId.find(sessionId);
+	if (it != m_Session_DeviceId.end()){
+		device = it->second;
+		return true;
+	}
+	return false;
+}
+
+void FreeSwitchModule::removeSessionDevice(const TsessionID & sessionId)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	m_Session_DeviceId.erase(sessionId);
+}
+
+void FreeSwitchModule::setJobSession(const TJobID & job, const TsessionID & sessionId)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	m_Job_Session[job] = sessionId;
+}
+
+bool FreeSwitchModule::getJobSession(const TJobID & job, TsessionID & sessionId)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	const auto & it = m_Job_Session.find(job);
+	if (it != m_Job_Session.end()) {
+		sessionId = it->second;
+		return true;
+	}
+	return false;
+}
+
+void FreeSwitchModule::removeJobSession(const TJobID & job)
+{
+	std::unique_lock<std::mutex> lck(m_sessionMtx);
+	m_Job_Session.erase(job);
+}
+
 void FreeSwitchModule::run()
 {
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
@@ -725,8 +774,10 @@ void FreeSwitchModule::run()
 
 					apr_ssize_t klen = sessionId.length();
 					uint32_t hash = apr_hashfunc_default(sessionId.c_str(),  &klen);
-					hash %= 100;
-					m_eventQueue[hash].Put(Event);
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), sessionId << " hash:" << hash);
+					hash %= m_executeThread.size();
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), sessionId << " hash:" << hash);
+					m_executeThread[hash].eventQueue.Put(Event);
 
 				}
 			}
@@ -745,15 +796,15 @@ void FreeSwitchModule::run()
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
 	log4cplus::threadCleanup();
 }
-void FreeSwitchModule::execute(uint32_t eventQueue)
+void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 {
-	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue <<"  Starting...");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Starting...");
 	while (m_bRunning)
 	{
 		try
 		{
 			model::EventType_t Event;
-			if (m_eventQueue[eventQueue].Get(Event, 1000) && !Event.event.isNull())
+			if (eventQueue->Get(Event, 1000) && !Event.event.isNull())
 			{
 				const Json::Value & jsonEvent = Event.event;
 				std::string peId;
@@ -805,7 +856,7 @@ void FreeSwitchModule::execute(uint32_t eventQueue)
 		}
 	}
 
-	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Stoped.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
 	log4cplus::threadCleanup();
 }
 }

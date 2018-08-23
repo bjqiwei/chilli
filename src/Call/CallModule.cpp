@@ -11,7 +11,7 @@
 namespace chilli{
 namespace Call{
 
-CallModule::CallModule(const std::string & id):ProcessModule(id)
+CallModule::CallModule(const std::string & id, uint32_t threadSize) :ProcessModule(id), m_executeThread(threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.CallModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a Call module.");
@@ -28,8 +28,8 @@ int CallModule::Start()
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Start...  CallModule");
 	if (!m_bRunning) {
 		ProcessModule::Start();
-		for (uint32_t i = 0; i < 100; i++) {
-			m_executeThread[i] = std::thread(&CallModule::execute, this, i);
+		for (auto & it : m_executeThread) {
+			it.th = std::thread(&CallModule::execute, this, &it.eventQueue);
 		}
 	}
 	return 0;
@@ -43,8 +43,8 @@ int CallModule::Stop()
 		ProcessModule::Stop();
 
 		for (auto & it : m_executeThread) {
-			if (it.joinable())
-				it.join();
+			if (it.th.joinable())
+				it.th.join();
 		}
 	}
 	return 0;
@@ -132,14 +132,16 @@ void CallModule::run()
 						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionID is null");
 						continue;
 					}
-					if (m_Calls.find(sessionid) == m_Calls.end()) {
+
+					if (findCallBySession(sessionid, newCallId) == false) {
 
 						std::string otherSessionId;
 						if (jsonEvent["param"].isMember("otherSessionID") && jsonEvent["param"]["otherSessionID"].isString())
 							otherSessionId = jsonEvent["param"]["otherSessionID"].asString();
 
-						if (m_Calls.find(otherSessionId) != m_Calls.end()) {
-							m_Calls[sessionid] = m_Calls[otherSessionId];
+						std::string otherCallId;
+						if (findCallBySession(otherSessionId, otherCallId)) {
+							setCallSession(sessionid, otherCallId);
 						}
 						else {
 							if (newCallId.empty())
@@ -151,18 +153,18 @@ void CallModule::run()
 							call->setVar("_callid", newCallId);
 							call->setVar("_connectionid", newConnectionID);
 							this->addPerformElement(newCallId, call);
-							m_Calls[sessionid] = newCallId;
+							setCallSession(sessionid, newCallId);
 						}
 					}
 
-					newCallId = m_Calls[sessionid];
+					findCallBySession(sessionid, newCallId);
 
 					jsonEvent["id"] = newCallId;
 
 					apr_ssize_t klen = newCallId.length();
 					uint32_t hash = apr_hashfunc_default(newCallId.c_str(), &klen);
-					hash %= 100;
-					m_eventQueue[hash].Put(chilli::model::EventType_t(jsonEvent));
+					hash %= m_executeThread.size();
+					m_executeThread[hash].eventQueue.Put(chilli::model::EventType_t(jsonEvent));
 				}
 			}
 			catch (std::exception & e)
@@ -181,9 +183,9 @@ void CallModule::run()
 	log4cplus::threadCleanup();
 }
 
-void CallModule::execute(uint32_t eventQueue)
+void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 {
-	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Starting...");
+	LOG4CPLUS_INFO(log, "." + this->getId(),  " Process thread Starting...");
 	try
 	{
 		while (m_bRunning)
@@ -191,7 +193,7 @@ void CallModule::execute(uint32_t eventQueue)
 			try
 			{
 				model::EventType_t evt;
-				if (m_eventQueue[eventQueue].Get(evt, 1000) && !evt.event.isNull())
+				if (eventQueue->Get(evt, 1000) && !evt.event.isNull())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 
@@ -216,14 +218,15 @@ void CallModule::execute(uint32_t eventQueue)
 						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionID is null");
 						continue;
 					}
-					if (m_Calls.find(sessionid) == m_Calls.end()) {
+					if (findCallBySession(sessionid,newCallId) == false) {
 
 						std::string otherSessionId;
 						if (jsonEvent["param"].isMember("otherSessionID") && jsonEvent["param"]["otherSessionID"].isString())
 							otherSessionId = jsonEvent["param"]["otherSessionID"].asString();
 
-						if (m_Calls.find(otherSessionId) != m_Calls.end()) {
-							m_Calls[sessionid] = m_Calls[otherSessionId];
+						std::string otherCallId;
+						if (findCallBySession(otherSessionId,otherCallId)) {
+							setCallSession(sessionid, otherCallId);
 						}
 						else {
 							if (newCallId.empty())
@@ -235,11 +238,11 @@ void CallModule::execute(uint32_t eventQueue)
 							call->setVar("_callid", newCallId);
 							call->setVar("_connectionid", newConnectionID);
 							this->addPerformElement(newCallId, call);
-							m_Calls[sessionid] = newCallId;
+							setCallSession(sessionid, newCallId);
 						}
 					}
 
-					newCallId = m_Calls[sessionid];
+					findCallBySession(sessionid, newCallId);
 
 					const auto & call = this->getPerformElement(newCallId);
 
@@ -253,7 +256,7 @@ void CallModule::execute(uint32_t eventQueue)
 						this->removePerfromElement(call->getId());
 
 					if (jsonEvent["event"].isString() && jsonEvent["event"].asString() == "Null")
-						m_Calls.erase(sessionid);
+						removeCallSession(sessionid);
 				}
 			}
 			catch (std::exception & e)
@@ -268,8 +271,31 @@ void CallModule::execute(uint32_t eventQueue)
 		LOG4CPLUS_ERROR(log, "." + this->getId(), " " << e.what());
 	}
 
-	LOG4CPLUS_INFO(log, "." + this->getId(), eventQueue << " Stoped.");
+	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
 	log4cplus::threadCleanup();
+}
+
+void CallModule::setCallSession(const TSessionID & sessionid, const TCallID & callid)
+{
+	std::unique_lock<std::mutex> lck(m_callMtx);
+	m_Calls[sessionid] = callid;
+}
+
+bool CallModule::findCallBySession(const TSessionID & sessionid, TCallID & callid)
+{
+	std::unique_lock<std::mutex> lck(m_callMtx);
+	const auto & it = m_Calls.find(sessionid);
+	if (it != m_Calls.end()){
+		callid = it->second;
+		return true;
+	}
+	return false;
+}
+
+void CallModule::removeCallSession(const TSessionID & sessionid)
+{
+	std::unique_lock<std::mutex> lck(m_callMtx);
+	m_Calls.erase(sessionid);
 }
 
 }

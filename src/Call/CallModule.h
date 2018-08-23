@@ -9,7 +9,7 @@ namespace Call{
 class CallModule :public model::ProcessModule
 {
 public:
-	explicit CallModule(const std::string & id);
+	explicit CallModule(const std::string & id, uint32_t threadSize = 10);
 	virtual ~CallModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;
@@ -21,13 +21,23 @@ private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 	virtual void run() override;
-	std::thread m_executeThread[100];
-	helper::CEventBuffer<model::EventType_t> m_eventQueue[100];
-	void execute(uint32_t eventQueue);
+	typedef struct
+	{
+		std::thread th;
+		helper::CEventBuffer<model::EventType_t> eventQueue;
+	}TexecuteThread;
+
+	std::vector<TexecuteThread> m_executeThread;
+
+	void execute(helper::CEventBuffer<model::EventType_t> * eventQueue);
 	std::string m_SMFileName;
-	typedef std::string sessionID;
-	typedef std::string CallID;
-	std::map<sessionID, CallID>m_Calls;
+	typedef std::string TSessionID;
+	typedef std::string TCallID;
+	std::mutex m_callMtx;
+	std::map<TSessionID, TCallID>m_Calls;
+	void setCallSession(const TSessionID & sessionid, const TCallID & callid);
+	bool findCallBySession(const TSessionID & sessionid, TCallID & callid);
+	void removeCallSession(const TSessionID & sessionid);
 };
 }
 }

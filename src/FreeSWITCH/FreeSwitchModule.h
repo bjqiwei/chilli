@@ -10,7 +10,7 @@ namespace FreeSwitch{
 	class FreeSwitchModule :public model::ProcessModule
 	{
 	public:
-		explicit FreeSwitchModule(const std::string & id);
+		explicit FreeSwitchModule(const std::string & id, uint32_t threadSize = 8);
 		virtual ~FreeSwitchModule(void);
 		virtual int Start() override;
 		virtual int Stop() override;
@@ -31,19 +31,37 @@ namespace FreeSwitch{
 		std::string toDialString(const std::string & sipId, const std::string & uuid, const std::string & caller);
 	private:
 		std::thread m_Thread;
-		std::thread m_executeThread[100];
-		helper::CEventBuffer<model::EventType_t> m_eventQueue[100];
+
+		typedef struct  
+		{
+			std::thread th;
+			helper::CEventBuffer<model::EventType_t> eventQueue;
+		}TexecuteThread;
+
+		std::vector<TexecuteThread> m_executeThread;
+
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;
 		std::string m_Password;
 		esl_handle_t m_Handle = { { 0 } };
 		void ConnectFS();
+		typedef std::string TsessionID;
+		std::mutex m_sessionMtx;
 		std::map<std::string, std::string>m_Session_DeviceId;
+		void setSessionDevice(const TsessionID & sessionId, const std::string & device);
+		bool getSessionDevice(const TsessionID & sessionId, std::string & device);
+		void removeSessionDevice(const TsessionID &sessionId);
+
+		typedef std::string TJobID;
 		std::map<std::string, std::string>m_Job_Session;
+		void setJobSession(const TJobID & job, const TsessionID & sessionId);
+		bool getJobSession(const TJobID & job, TsessionID & sessionId);
+		void removeJobSession(const TJobID & job);
+
 		std::map<std::string, std::string>m_device_StateMachine;
 		virtual void run() override;
-		void execute(uint32_t eventQueue);
+		void execute(helper::CEventBuffer<model::EventType_t> * eventQueue);
 		Json::Value routeConfig;
 		friend class FreeSwitchDevice;
 	};
