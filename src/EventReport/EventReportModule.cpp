@@ -233,6 +233,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 		else if (requestid == "MakeConnection")
 		{
 			std::string called;
+			std::string caller;
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
@@ -240,6 +241,9 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 			if (request["param"]["initiatingDevice"].isString())
 				called = request["param"]["initiatingDevice"].asString();
+
+			if (request["param"]["caller"].isString())
+				caller = request["param"]["caller"].asString();
 
 			request["param"].removeMember("initiatingDevice");
 
@@ -263,6 +267,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			request["param"]["callID"] = response["param"]["initiatedCall"]["callID"];
 			request["param"]["sessionID"] = response["param"]["initiatedCall"]["sessionID"];
 			request["param"]["called"] = called;
+			request["param"]["caller"] = caller;
 			model::EventType_t evt(request);
 			this->PushEvent(evt);
 		}
