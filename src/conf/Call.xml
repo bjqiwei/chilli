@@ -29,7 +29,7 @@
 			<script>called = _event.param.called;</script>
 			<send target="freeswitch001" type="cmd" dest="this" event="MakeConnection">
 				<called type="script">_event.param.called</called>
-				<display type="script">_event.param.called</display>
+				<caller type="script">_event.param.caller</caller>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
 			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;</script>

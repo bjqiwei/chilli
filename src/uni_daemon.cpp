@@ -37,7 +37,6 @@ bool uni_daemon_run(bool detach)
 		apr_proc_detach(APR_PROC_DETACH_DAEMONIZE);
 	}
 
-	apr_signal(SIGTERM, sigterm_handler);
 	apr_signal(SIGINT, sigterm_handler);
 #ifdef SIGTSTP
 	apr_signal(SIGTSTP, sigterm_handler);

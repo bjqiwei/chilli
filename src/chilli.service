@@ -1,0 +1,14 @@
+[Unit]
+Description=The chilli Server
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+#EnvironmentFile=/etc/sysconfig/httpd
+ExecStart=/home/qiwei/chilli/src/chilli -d $OPTIONS
+ExecStop=/bin/kill ${MAINPID}
+KillSignal=SIGCONT
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

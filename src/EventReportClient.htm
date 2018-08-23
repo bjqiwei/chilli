@@ -70,6 +70,7 @@
 			request.request = "MakeConnection";
 			request.param = new Object();
 			request.param.initiatingDevice = document.getElementById("called2").value;
+			request.param.caller = "10086";
 			doSend(JSON.stringify(request));
 		}
 		
