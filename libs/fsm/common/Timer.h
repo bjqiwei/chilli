@@ -1,5 +1,4 @@
-#ifndef _COMMON_TIMER_HEADER_
-#define _COMMON_TIMER_HEADER_
+#pragma once
 #include <queue>
 #include <sys/timeb.h>
 #include <mutex>
@@ -114,22 +113,21 @@ namespace helper{
 						Timer * timer = this->m_timer.top();
 
 						millisec = timer->getInterval();
-						//LOG4CPLUS_DEBUG(log,"timer event . interval=" << millisec );
 						if (millisec > 0) {
-							break;
-						}
-
-						if (m_rvtimer.find(timer->getTimerId()) == m_rvtimer.end()) {
-							if (timer->getFunction() != nullptr)
-								timer->getFunction()->OnTimer(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+							break; //最近的定时器到期时间
 						}
 						else
-							m_rvtimer.erase(timer->getTimerId());
+							millisec = INFINITE; //假设已经不存在定制器，永远等待。
 
 						this->m_timer.pop();
+						if (m_rvtimer.erase(timer->getTimerId()) == 0){
+							lck.unlock();
+							if (timer->getFunction() != nullptr)
+								timer->getFunction()->OnTimer(timer->getTimerId(), timer->getAttr(), timer->getUserData());
+							lck.lock();
+						}
 						delete timer;
 
-						millisec = INFINITE;
 					}
 				}
 				else {
@@ -162,4 +160,3 @@ namespace helper{
 	};
 
 }//end namespace helper
-#endif//end timer header
