@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+  <ACD id="acd001">
+    <Device DeviceID="0001" StateMachine="./conf/ACD.xml"></Device>
+  </ACD>
+  <Call id="call001" StateMachine="./conf/Call.xml"/>
+  <Agents id="agent001">
+    <Agent ExtensionNumber="6001" StateMachine="./conf/Agent.xml" password="1234" Extension="1000"></Agent>
+  </Agents>
+  <IVR id="ivr001">
+    <Extension ExtensionNumber="5001" StateMachine="./conf/IVR.xml"></Extension>
+  </IVR>
+  <EventReport id="eventreport" TCPPort="9985" WSPort="9986"/>
+  <Conferences>
+      <Conf ChannelID="0" Type="BASE" Enable="0"></Conf>
+      <Conf ChannelID="1" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="2" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="3" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="4" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="5" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="6" Type="BASE" Enable="1"></Conf>
+      <Conf ChannelID="7" Type="BASE" Enable="1"></Conf>
+   </Conferences>
+   <!--
+   <Groups id="group001">
+      <Group ExtensionNumber ="5000" StateMachine="./conf/Group.xml">
+        <Extension>0100</Extension>
+        <Extension>0101</Extension>
+        <Extension>0102</Extension>
+        <Extension>0103</Extension>
+        <Extension>0104</Extension>
+        <Extension>0105</Extension>
+        <Extension>0106</Extension>
+        <Extension>0107</Extension>
+        <Extension>0108</Extension>
+        <Extension>0109</Extension>
+    </Group>
+   </Groups>
+   -->
+  <FreeSwitch id = "freeswitch001" host="192.168.2.232" port ="8021" password="ClueCon">
+    <Devices>
+      <Device DeviceID="1000" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
+      <Device DeviceID=".*" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
+    </Devices>
+  </FreeSwitch>
+  <!--
+  <Avaya id = "tsapi001">
+		<TSAPI>
+			<TLink>AVAYA#CM#CSTA#AES</TLink>
+			<UserID>ctiadaptor</UserID>
+			<Password>Dadmin@01</Password>
+		</TSAPI>
+		<Agents>
+			<Agent ExtensionNumber="9999" StateMachine="./conf/AvayaAgent.xml" password="96e79218965eb72c92a549dd5a330112" Extension="8005" avayaAgentId="6030" avayaPassword="1234" avayaExtension="8005"></Agent>
+		</Agents>
+		<Extensions>
+			<Extension ExtensionNumber="8005" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8005"></Extension>
+			<Extension ExtensionNumber="8006" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8006"></Extension>
+			<Extension ExtensionNumber="8007" StateMachine="./conf/AvayaDevice.xml" avayaExtension="8007"></Extension>
+		</Extensions>
+    <VDN ExtensionNumber="5099" avayaExtension="5099"/>
+    <ACD>
+      <Extension ExtensionNumber="0100" StateMachine="./conf/AvayaACD.xml"></Extension>
+    </ACD>
+	</Avaya>
+  -->
+  <!--MySql id="mysql" Host="127.0.0.1:3306" UserID="root" Password="deduct" DataBase="CTI"/-->
+</Config>
