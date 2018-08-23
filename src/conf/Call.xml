@@ -43,10 +43,11 @@
 		</event>
 		
 		<event event="Failed">
+			<script>sessionlist[_event.param.sessionID]= sessionlist[_event.param.sessionID] || {}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
 			<send target="eventreport" type="event" event="Failed">
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
 				<failingDevice type="script">_event.param.deviceID</failingDevice>
-				<calledDevice type="script">sessionlist[_event.param.sessionID].called</calledDevice>
+				<calledDevice type="script">sessionlist[_event.param.sessionID].called || _event.param.deviceID</calledDevice>
 				<cause type="script">parseInt(_event.param.cause)</cause>
 			</send>
 			
@@ -68,8 +69,8 @@
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
-					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
-					<called type="script">sessionlist[_event.param.sessionID].called</called>
+					<caller type="script">sessionlist[_event.param.sessionID].caller || _event.param.deviceID</caller>
+					<called type="script">sessionlist[_event.param.sessionID].called || _event.param.deviceID</called>
 					<createdTime type="script">_event.param.createdTime</createdTime>
 					<ringTime type="script">_event.param.ringTime</ringTime>
 					<answeredTime type="script">_event.param.answeredTime</answeredTime>
