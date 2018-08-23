@@ -1,6 +1,6 @@
 MODULE_APP =chilli
-APPVERSION=1.0.6.0
-INSTALL_PATH=/usr/local/chilli/
+APPVERSION=1.0.6.1
+INSTALL_PATH=/usr/local/$(MODULE_APP)/
 
 #CFLAGS='-D_EVENT_DISABLE_DEBUG_MODE -g -O1' ./configure --disable-shared
 MOZJSDIR = ../libs/mozjs-45.0.2/js/src/
@@ -261,7 +261,7 @@ clean:
 
 install:
 	mkdir $(INSTALL_PATH)
-	cp ./chilli $(INSTALL_PATH)
+	cp ./$(MODULE_APP) $(INSTALL_PATH)
 	chmod g+x ./restart.sh
 	cp ./restart.sh $(INSTALL_PATH)
 	cp ./conf/* $(INSTALL_PATH)/conf
@@ -269,11 +269,16 @@ install:
 	#cp -f ./siad /etc/init.d/
 
 uninstall:
-	rm -f $(INSTALL_PATH)chilli
+	rm -f $(INSTALL_PATH)$(MODULE_APP)
 	rm -rf $(INSTALL_PATH)conf
 	rm -f $(INSTALL_PATH)restart.sh
 	rm -rf $(INSTALL_PATH) 
 	rm -rf /etc/init.d/siad
 
 tar:
-	tar -zcvf ./chilli.$(APPVERSION).tar.gz ./chilli ./conf/* ./lib/*
+	@if test -e ./conf/chilli.xml; \
+	then \
+		mv -f ./conf/chilli.xml ./conf/$(MODULE_APP).xml; \
+	fi
+
+	tar -zcvf ./$(MODULE_APP).$(APPVERSION).tar.gz ./$(MODULE_APP) ./conf/* ./lib/*
