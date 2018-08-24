@@ -72,3 +72,17 @@ bool fsm::StateMachine::setVar(const std::string &name, const Json::Value & valu
 	return imp->setVar(name, value);
 }
 
+void fsm::initialize()
+{
+	return StateMachineimp::initialize();
+}
+
+void fsm::threadCleanup()
+{
+	return StateMachineimp::threadCleanup();
+}
+
+void fsm::unInitialize()
+{
+	return StateMachineimp::unInitialize();
+}

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 //#ifdef SCXML 
 #include "sendimp.h"
-#include <fsm.h>
+#include <FSM.h>
 //#endif // SCXML
 //#include "io/SCXMLParser.h"
 #include <string>
@@ -27,11 +27,14 @@ class ontimer :public OnTimerInterface {
 
 int main(int argc, _TCHAR* argv[])
 {
+	log4cplus::initialize();
+	fsm::initialize();
+
 	try{
- 		log4cplus::initialize();
  		log4cplus::helpers::LogLog::getLogLog()->setInternalDebugging(true);
  		log4cplus::PropertyConfigurator::doConfigure(".\\log4cplus.properties");
 		
+
 		//char szFilePath[_MAX_PATH-1];
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
@@ -45,6 +48,7 @@ int main(int argc, _TCHAR* argv[])
 			mysmscxml.start();
 			mysmscxml.mainEventLoop();
 			std::cout << mysmscxml.isInFinalState() << endl;
+			fsm::threadCleanup();
 		});
 
 		
@@ -55,13 +59,16 @@ int main(int argc, _TCHAR* argv[])
 			mysmscxml.pushEvent(evt);
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
 		}
+
 		mysmscxml.stop();
 		th.join();
+
 	}
 	catch(exception & e)
 	{
 		std::cout<<e.what()<<endl;
 	}
+	fsm::unInitialize();
 	getchar();
 
 	return 0;

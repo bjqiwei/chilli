@@ -23,7 +23,7 @@ namespace fsm
 		virtual ~Evaluator(){};
 		virtual Context * newContext(const std::string &sessionid, Context * const parent) = 0;
 		virtual void deleteContext(Context * const cx) = 0;
-		virtual unsigned int getContextCount(){ return m_contexts.size();};
+		virtual size_t getContextCount(){ return m_contexts.size();};
 		virtual bool hasContext() = 0;
 	protected:
 		std::list<Context * > m_contexts;

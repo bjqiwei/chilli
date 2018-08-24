@@ -26,10 +26,12 @@ enum xmlType{
 namespace fsm {
 	//static std::atomic_ulong g_StateMachineReferce = 0;
 	//static Evaluator * g_Evaluator = nullptr;
-	static std::map<StateMachineimp*, StateMachineimp*>g_StateMachines;
-	static std::mutex g_StateMtx;
 	static tls_key_type g_tls_storage_key = 0;
-	static helper::TimerServer * g_TimerServer = nullptr;
+	typedef struct {
+		std::shared_ptr<Evaluator> evaluator = nullptr;
+		std::shared_ptr<helper::TimerServer>  timerServer = nullptr;
+	}per_thread_data;
+	
 }
 
 fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerInterface * func)
@@ -44,40 +46,11 @@ fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::stri
 	else{
 		m_strStateContent = xml;
 	}
-
-	std::unique_lock<std::mutex> lck(g_StateMtx);
-	if (g_tls_storage_key == 0){
-		g_tls_storage_key = tls_init(nullptr);
-	}
-
-	if (g_StateMachines.empty()){
-		g_TimerServer = new helper::TimerServer();
-		g_TimerServer->Start();
-	}
-
 	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",creat a fsm object." << this);
-
-	g_StateMachines.insert(std::make_pair(this, this));
-
 }
 
 fsm::StateMachineimp::~StateMachineimp()
  { 
-	 //if (_ctxt) xmlClearParserCtxt(_ctxt);
-	 //_ctxt = NULL;
-	std::unique_lock<std::mutex> lck(g_StateMtx);
-	g_StateMachines.erase(this);
-
-	if (g_StateMachines.empty()) {
-
-		tls_cleanup(g_tls_storage_key);
-		g_tls_storage_key = 0;
-
-		g_TimerServer->Stop();
-		delete g_TimerServer;
-		g_TimerServer = nullptr;
-
-	}
 	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destruction a smscxml object." << this);
  }
 
@@ -378,19 +351,19 @@ bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 
 bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 {
-	try{
+	try {
 
 	if (!Node) return false;
-	model::Timer timer(Node,m_strSessionID,m_strStateFile);
+	model::Timer timer(Node, m_strSessionID, m_strStateFile);
 
 	if (timer.isEnabledCondition(this->getRootContext()))
 	{
 		timer.execute(this->getRootContext());
 	}
-	else{
+	else {
 		return false;
 	}
-	
+
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
 	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",set a timer,id=" << timer.getId() << ", interval=" << timer.getInterval());
@@ -398,9 +371,10 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 	vars["sessionId"] = this->m_strSessionID;
 	vars["timerId"] = timer.getId();
 	vars["interval"] = timer.getInterval();
-	
-	g_TimerServer->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc , const_cast<StateMachineimp *>(this));
 
+	if (this->getTimerServer())
+		this->getTimerServer()->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc, const_cast<StateMachineimp *>(this));
+	
 	}
 	catch (fsm::env::jsexception & e)
 	{
@@ -525,6 +499,29 @@ const xmlNodePtr fsm::StateMachineimp::getParentState(const xmlNodePtr &currentS
 	}while (curState != NULL && curState != m_rootNode);
 
 	return NULL;
+}
+
+helper::TimerServer * fsm::StateMachineimp::getTimerServer() const
+{
+	if (m_TimerServer == nullptr) {
+
+		per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
+
+		if (pdata == nullptr) {
+			pdata = new per_thread_data();
+			tls_set_value(g_tls_storage_key, pdata);
+		}
+
+		pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
+		if (pdata->timerServer == nullptr) {
+			pdata->timerServer.reset(new helper::TimerServer());
+			pdata->timerServer->Start();
+		}
+
+		const_cast<StateMachineimp*>(this)->m_TimerServer = pdata->timerServer.get();
+	}
+
+	return m_TimerServer;
 }
 
 //void fsm::StateMachineimp::setName(const string &strName)
@@ -711,31 +708,32 @@ const std::string & fsm::StateMachineimp::getSessionId()const {
 
 fsm::Context  *  fsm::StateMachineimp::getRootContext() const{
 	if (m_Context == nullptr) {
-		Evaluator * evaluator = reinterpret_cast<Evaluator *>(tls_get_value(g_tls_storage_key));
+		per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
 
-		if (evaluator == nullptr) {
-			evaluator = new fsm::env::JSEvaluator();
-			tls_set_value(g_tls_storage_key, evaluator);
+		if (pdata == nullptr) {
+			pdata = new per_thread_data();
+			tls_set_value(g_tls_storage_key, pdata);
 		}
 
-		const_cast<StateMachineimp*>(this)->m_Context = evaluator->newContext(m_strSessionID, nullptr);
+		pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
+		if (pdata->evaluator == nullptr) {
+			pdata->evaluator.reset(new fsm::env::JSEvaluator());
+		}
+
+		const_cast<StateMachineimp*>(this)->m_Context = pdata->evaluator->newContext(m_strSessionID, nullptr);
 	}
+	
 	return m_Context;
 }
 
 void fsm::StateMachineimp::deleteContext(Context * ctx)
 {
-	Evaluator * evaluator = reinterpret_cast<Evaluator *>(tls_get_value(g_tls_storage_key));
+	per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
 
-	if (evaluator != nullptr) {
+	if (pdata != nullptr && pdata->evaluator != nullptr) {
 
-		evaluator->deleteContext(m_Context);
+		pdata->evaluator->deleteContext(m_Context);
 		m_Context = nullptr;
-
-		if (!evaluator->hasContext()) {
-			delete evaluator;
-			tls_set_value(g_tls_storage_key, nullptr);
-		}
 	}
 }
 
@@ -860,6 +858,35 @@ void fsm::StateMachineimp::mainEventLoop()
 bool fsm::StateMachineimp::isInFinalState()
 {
 	return m_currentStateNode == m_finalState;
+}
+
+void fsm::StateMachineimp::initialize()
+{
+	g_tls_storage_key = tls_init(nullptr);
+}
+
+void fsm::StateMachineimp::threadCleanup()
+{
+	per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
+	if (pdata != nullptr)
+	{
+		if (pdata->evaluator){
+			if (pdata->evaluator->hasContext())
+				LOG4CPLUS_ERROR(log4cplus::Logger::getRoot(), "", "has context when evaluator delete.");
+		}
+		if (pdata->timerServer){
+			pdata->timerServer->Stop();
+		}
+
+		delete pdata;
+		tls_set_value(g_tls_storage_key, nullptr);
+	}
+}
+
+void fsm::StateMachineimp::unInitialize()
+{
+	tls_cleanup(g_tls_storage_key);
+	g_tls_storage_key = 0;
 }
 
 bool fsm::StateMachineimp::processEvent(const TriggerEvent &event)

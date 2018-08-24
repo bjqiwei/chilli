@@ -21,6 +21,11 @@ namespace fsm{
 		File,
 		Memory,
 	};
+
+	FSM_EXPORT void initialize();
+	FSM_EXPORT void threadCleanup();
+	FSM_EXPORT void unInitialize();
+
 	class FSM_EXPORT StateMachine {
 	public:
 		StateMachine(const std::string & logId, const std::string &sessionid, const string &xml, OnTimerInterface * func, xmlType xtype = xmlType::File);

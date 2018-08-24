@@ -1,5 +1,4 @@
-#ifndef _INTERPRETERIMP_HEADER_
-#define _INTERPRETERIMP_HEADER_
+#pragma once
 #include "common/xmlHelper.h"
 #include "common/CEventBuffer.h"
 #include "common/Timer.h"
@@ -50,6 +49,10 @@ namespace fsm{
 		void pushEvent(const TriggerEvent & Evt);
 		void mainEventLoop();
 		bool isInFinalState();
+public:
+		static void initialize();
+		static void threadCleanup();
+		static void unInitialize();
 	private:
 		std::string m_strStateFile;
 		std::string m_strStateContent;
@@ -62,6 +65,7 @@ namespace fsm{
 		xmlNodePtr m_currentStateNode = nullptr;
 		xmlNodePtr m_rootNode = nullptr;
 		Context *  m_Context = nullptr;
+		helper::TimerServer * m_TimerServer = nullptr;
 		std::string m_strSessionID;
 		std::string m_strName;
 		helper::OnTimerInterface * m_TimeOutFunc = nullptr;
@@ -118,6 +122,9 @@ namespace fsm{
 		xmlNodePtr getState(const string& stateId) const;
 		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
 
+		helper::TimerServer * getTimerServer() const;
+
+
 	public:
 		/****************************************************  
 		@describle   应用XML Schema模板文件验证案例文档 
@@ -136,4 +143,3 @@ namespace fsm{
 		}
 	};
 }
-#endif
