@@ -761,22 +761,20 @@ void FreeSwitchModule::run()
 				if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
 				{
 					const Json::Value & jsonEvent = Event.event;
-					std::string sessionId;
-					if (jsonEvent["param"]["sessionID"].isString()) {
-						sessionId = jsonEvent["param"]["sessionID"].asString();
+					std::string peId;
+					if (jsonEvent["id"].isString()) {
+						peId = jsonEvent["id"].asString();
 					}
 
-					if (sessionId.empty()){
+					if (peId.empty()) {
 						Json::FastWriter writer;
 						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
 						continue;
 					}
 
-					apr_ssize_t klen = sessionId.length();
-					uint32_t hash = apr_hashfunc_default(sessionId.c_str(),  &klen);
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), sessionId << " hash:" << hash);
+					apr_ssize_t klen = peId.length();
+					uint32_t hash = apr_hashfunc_default(peId.c_str(),  &klen);
 					hash %= m_executeThread.size();
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), sessionId << " hash:" << hash);
 					m_executeThread[hash].eventQueue.Put(Event);
 
 				}
@@ -826,6 +824,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 						if (std::regex_match(peId, regPattern)) {
 							model::PerformElementPtr peptr(new FreeSwitchDevice(this, peId, it.second));
 							if (peptr != nullptr && this->addPerformElement(peId, peptr)) {
+								LOG4CPLUS_INFO(log, "." + this->getId(), "current session size:" << getPerformElementCount());
 								peptr->setVar("_device.deviceID", peId);
 							}
 
@@ -841,8 +840,11 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 					extptr->pushEvent(Event);
 					extptr->mainEventLoop();
 
-					if (extptr->IsClosed())
+					if (extptr->IsClosed()) {
 						this->removePerfromElement(peId);
+						LOG4CPLUS_INFO(log, "." + this->getId(), "current session size:" << getPerformElementCount());
+					}
+
 
 				}
 				else {
