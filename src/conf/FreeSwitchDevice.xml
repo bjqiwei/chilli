@@ -91,7 +91,7 @@
 			<transition target="Hangup"/>
 		</event>
 		<event event="ShutDown">
-			<script>_event.param.HangupCause = "MANAGER_REQUEST"; </script>
+			<script>_event.param = _event.param || {}; _event.param.HangupCause = "MANAGER_REQUEST"; </script>
 			<transition target="Destroy"/>
 		</event>
 		<state id="Initiated">

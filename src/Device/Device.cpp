@@ -41,14 +41,6 @@ namespace chilli {
 
 		bool Device::pushEvent(const model::EventType_t &evt)
 		{
-			if (evt.event["event"].asString() == "ShutDown"){
-				model::EventType_t shutdown = evt;
-				for (const auto & it: m_Sessions ){
-					shutdown.event["param"]["sessionID"] = it.first;
-					m_EvtBuffer.Put(shutdown);
-				}
-				return true;
-			}
 			return m_EvtBuffer.Put(evt);
 		}
 
@@ -62,7 +54,7 @@ namespace chilli {
 					const Json::Value & jsonEvent = Event.event;
 
 					std::string eventName;
-					std::string sessionId = m_Id;
+					std::string sessionId;
 					std::string type;
 
 					if (jsonEvent["type"].isString())
@@ -76,11 +68,6 @@ namespace chilli {
 						sessionId = jsonEvent["param"]["sessionID"].asString();
 					}
 
-					if (sessionId.empty()){
-						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionid is null");
-						return;
-					}
-
 					fsm::TriggerEvent evt(eventName, type);
 
 					for (auto & it : jsonEvent.getMemberNames()) {
@@ -88,7 +75,7 @@ namespace chilli {
 					}
 
 
-					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
+					if (!sessionId.empty() && m_Sessions.find(sessionId) == m_Sessions.end()) {
 						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
 						m_Sessions[sessionId] = session;
 
@@ -109,13 +96,27 @@ namespace chilli {
 					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << writer.write(Event.event));
 
 					const auto & it = m_Sessions.find(sessionId);
-					it->second->pushEvent(evt);
-					it->second->mainEventLoop();
+					if (it != m_Sessions.end()) {
 
-					if (it->second->isInFinalState()) {
-						it->second->stop();
-						m_Sessions.erase(it);
+						it->second->pushEvent(evt);
+						it->second->mainEventLoop();
+						if (it->second->isInFinalState()) {
+							it->second->stop();
+							m_Sessions.erase(it);
+						}
 					}
+					else {
+						for (const auto & it : m_Sessions)
+						{
+							it.second->pushEvent(evt);
+							it.second->mainEventLoop();
+							if (it.second->isInFinalState()) {
+								it.second->stop();
+								m_Sessions.erase(it.first);
+							}
+						}
+					}
+
 				}
 			}
 			catch (std::exception & e)
