@@ -1,6 +1,6 @@
-MODULE_APP =chilli
+APP =chilli
 APPVERSION=1.0.6.1
-INSTALL_PATH=/usr/local/$(MODULE_APP)/
+INSTALL_PATH=/usr/local/$(APP)/
 
 #CFLAGS='-D_EVENT_DISABLE_DEBUG_MODE -g -O1' ./configure --disable-shared
 MOZJSDIR = ../libs/mozjs-45.0.2/js/src/
@@ -73,8 +73,8 @@ OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
 	  $(websocket_OBJ_DIR)websocket.o
 	  
 
-MODULE_APP:chkobjdir $(OBJ)
-	$(LINK) -v -g -o $(MODULE_APP)  $(OBJ) $(LDFLAGS)  
+APP:chkobjdir $(OBJ)
+	$(LINK) -v -g -o $(APP)  $(OBJ) $(LDFLAGS)  
 
 $(OBJ_DIR)chilli.o:$(SRC)chilli.cpp
 	$(COMPILE) $(CXXFLAGS) $(SRC)chilli.cpp $(INCLUDE) -o $(OBJ_DIR)chilli.o
@@ -256,12 +256,12 @@ chkobjdir:
 	fi
 	
 clean:
-	rm -rdf $(MODULE_APP)
+	rm -rdf $(APP)
 	rm -rf $(OBJ_DIR)*
 
 install:
 	mkdir $(INSTALL_PATH)
-	cp ./$(MODULE_APP) $(INSTALL_PATH)
+	cp ./$(APP) $(INSTALL_PATH)
 	chmod g+x ./restart.sh
 	cp ./restart.sh $(INSTALL_PATH)
 	cp ./conf/* $(INSTALL_PATH)/conf
@@ -269,16 +269,17 @@ install:
 	#cp -f ./siad /etc/init.d/
 
 uninstall:
-	rm -f $(INSTALL_PATH)$(MODULE_APP)
+	rm -f $(INSTALL_PATH)$(APP)
 	rm -rf $(INSTALL_PATH)conf
 	rm -f $(INSTALL_PATH)restart.sh
 	rm -rf $(INSTALL_PATH) 
 	rm -rf /etc/init.d/siad
 
 tar:
-	@if test -e ./conf/chilli.xml; \
+	@if [ "chilli" != "$(APP)" ]; \
 	then \
-		mv -f ./conf/chilli.xml ./conf/$(MODULE_APP).xml; \
+		cp -f "./conf/chilli.xml" "./conf/$(APP).xml"; \
 	fi
-
-	tar -zcvf ./$(MODULE_APP).$(APPVERSION).tar.gz ./$(MODULE_APP) ./conf/* ./lib/*
+	
+	sed -i '12s/^.*$//log4cplus.appender.D.File=.\/log\/$(APP)/' ./conf/log4cplus.properties;
+	tar -zcvf ./$(APP).$(APPVERSION).tar.gz ./$(APP) ./conf/* ./lib/*
