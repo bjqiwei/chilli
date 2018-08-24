@@ -60,7 +60,7 @@
 		FSCause["USER_NOT_REGISTERED"] = 1066;
 		FSCause["INCOMPATIBLE_DESTINATION"] = 1088;
 		FSCause["RECOVERY_ON_TIMER_EXPIRE"] = 1102;
-		FSCause["MANAGER_REQUEST" = 1503;
+		FSCause["MANAGER_REQUEST"] = 1503;
 		FSCause["MEDIA_TIMEOUT"] = 1604;
 	</script>
 </scriptmodel>
@@ -90,7 +90,10 @@
 		<event event="CHANNEL_HANGUP">
 			<transition target="Hangup"/>
 		</event>
-		
+		<event event="ShutDown">
+			<script>_event.param.HangupCause = "MANAGER_REQUEST"; </script>
+			<transition target="Destroy"/>
+		</event>
 		<state id="Initiated">
 			<onentry>
 				<script>sessionID = _event.param.sessionID; caller = _event.param.CallerOrigCallerIDNumber; called =_event.param.CallerDestinationNumber; CallDirection = _event.param.CallDirection;</script>
@@ -105,6 +108,10 @@
 	
 			</onentry>
 			
+			<event event="CHANNEL_ORIGINATE">
+				<transition target="Originated"/>
+			</event>
+		
 			<event event="CHANNEL_HANGUP">
 				<transition target="Hangup"/>
 			</event>
@@ -209,7 +216,12 @@
 				</onentry>
 				<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate'">
 				</event>
-		</state>
+			</state>
+			
+			<state id="Originated">
+				<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate'">
+				</event>
+			</state>
 		</state>
 	</state>
 	<state id="Destroy">
@@ -222,7 +234,6 @@
 				<ringTime type="script">_event.param.CallerChannelProgressTime</ringTime>
 				<answeredTime type="script">_event.param.CallerChannelAnsweredTime</answeredTime>
 				<hangupTime type="script">_event.param.CallerChannelHangupTime</hangupTime>
-				<cause type="script">cause = FSCause[_event.param.HangupCause]</cause>
 				<hangupDirection type="script">_hangupDirection</hangupDirection>
 				<recordPath type="script">""</recordPath>
 			</send>

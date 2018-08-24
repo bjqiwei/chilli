@@ -9,7 +9,7 @@ namespace Call{
 class CallModule :public model::ProcessModule
 {
 public:
-	explicit CallModule(const std::string & id, uint32_t threadSize = 10);
+	explicit CallModule(const std::string & id, uint32_t threadSize = 16);
 	virtual ~CallModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;

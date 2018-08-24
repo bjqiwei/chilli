@@ -13,6 +13,7 @@
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
 #include "tinyxml2/tinyxml2.h"
+#include "FSM.h"
 
 #include "ACD/ACDModule.h"
 #include "Sh/ShDevModule.h"
@@ -380,6 +381,7 @@ void chilli::App::Start()
 	static log4cplus::ConfigureAndWatchThread logconfig("conf/log4cplus.properties", 10 * 1000);
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log,"",  __FUNCTION__ << " start.");
+	fsm::initialize();
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);
 
@@ -399,6 +401,7 @@ void chilli::App::Stop()
 		it->Stop();
 	}
 	model::ProcessModule::g_Modules.clear();
+	fsm::unInitialize();
 	LOG4CPLUS_TRACE(log, "", __FUNCTION__ << " end.");
 
 }

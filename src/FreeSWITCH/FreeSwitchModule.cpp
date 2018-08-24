@@ -860,6 +860,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
 	log4cplus::threadCleanup();
+	fsm::threadCleanup();
 }
 }
 }

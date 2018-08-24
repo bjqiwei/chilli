@@ -10,7 +10,7 @@ namespace FreeSwitch{
 	class FreeSwitchModule :public model::ProcessModule
 	{
 	public:
-		explicit FreeSwitchModule(const std::string & id, uint32_t threadSize = 8);
+		explicit FreeSwitchModule(const std::string & id, uint32_t threadSize = 16);
 		virtual ~FreeSwitchModule(void);
 		virtual int Start() override;
 		virtual int Stop() override;

@@ -41,6 +41,14 @@ namespace model{
 	{
 		if (m_bRunning) {
 			m_bRunning = false;
+
+			for (const auto & it: m_PerformElements){
+				Json::Value shutdown;
+				shutdown["id"] = it.first;
+				shutdown["event"] = "ShutDown";
+				this->m_RecEvtBuffer.Put(chilli::model::EventType_t(shutdown));
+			}
+
 			chilli::model::EventType_t stopEvent(Json::nullValue);
 			this->m_RecEvtBuffer.Put(stopEvent);
 
@@ -120,6 +128,7 @@ namespace model{
 
 		LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
 		log4cplus::threadCleanup();
+		fsm::threadCleanup();
 	}
 	
 	void ProcessModule::OnTimer(unsigned long timerId, const std::string & attr, void * userdata)

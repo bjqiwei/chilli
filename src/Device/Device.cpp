@@ -41,6 +41,14 @@ namespace chilli {
 
 		bool Device::pushEvent(const model::EventType_t &evt)
 		{
+			if (evt.event["event"].asString() == "ShutDown"){
+				model::EventType_t shutdown = evt;
+				for (const auto & it: m_Sessions ){
+					shutdown.event["param"]["sessionID"] = it.first;
+					m_EvtBuffer.Put(shutdown);
+				}
+				return true;
+			}
 			return m_EvtBuffer.Put(evt);
 		}
 

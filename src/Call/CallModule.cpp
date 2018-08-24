@@ -118,17 +118,15 @@ void CallModule::run()
 						sessionid = jsonEvent["param"]["sessionID"].asString();
 
 					std::string newCallId;
-					if(jsonEvent["param"].isMember("callID"))
+					if (jsonEvent.isMember("id"))
+						newCallId = jsonEvent["id"].asString();
+					else if(jsonEvent["param"].isMember("callID"))
 						newCallId = jsonEvent["param"]["callID"].asString();
 
 					std::string newConnectionID;
 					if(jsonEvent["param"].isMember("connectionID"))
 						newConnectionID = jsonEvent["param"]["connectionID"].asString();
 
-					if (sessionid.empty()){
-						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionID is null");
-						continue;
-					}
 
 					if (findCallBySession(sessionid, newCallId) == false) {
 
@@ -244,10 +242,14 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
 	log4cplus::threadCleanup();
+	fsm::threadCleanup();
 }
 
 void CallModule::setCallSession(const TSessionID & sessionid, const TCallID & callid)
 {
+	if (sessionid.empty())
+		return;
+
 	std::unique_lock<std::mutex> lck(m_callMtx);
 	m_Calls[sessionid] = callid;
 }
