@@ -72,9 +72,6 @@ namespace Call {
 				for (auto & it : jsonEvent.getMemberNames()) {
 					evt.addVars(it, jsonEvent[it]);
 				}
-				
-				Json::FastWriter writer;
-				LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << writer.write(Event.event));
 
 				if (m_StateMachines.empty()) {
 					
@@ -93,6 +90,9 @@ namespace Call {
 					call->addSendImplement(this);
 					call->start(false);
 				}
+
+				Json::FastWriter writer;
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << writer.write(Event.event));
 
 				const auto & it = m_StateMachines.begin();
 				it->second->pushEvent(evt);

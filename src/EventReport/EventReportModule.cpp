@@ -34,6 +34,7 @@ int EventReportModule::Stop(void)
 {
 
 	if (m_bRunning){
+		m_Connections.clear();
 		ProcessModule::Stop();
 		m_bRunning = false;
 		TCPServer::Stop();

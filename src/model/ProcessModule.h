@@ -29,6 +29,7 @@ public:
 	virtual PerformElementPtr removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElementByGlobal(const std::string & peId) final;
+	virtual uint32_t getPerformElementCount();
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
 	virtual const log4cplus::Logger & getLogger()final;
 	virtual const std::string getId()final;

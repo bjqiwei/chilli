@@ -213,5 +213,11 @@ namespace model{
 		return nullptr;
 	}
 
+	uint32_t ProcessModule::getPerformElementCount()
+	{
+		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
+		return this->m_PerformElements.size();
+	}
+
 }
 }

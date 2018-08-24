@@ -79,8 +79,6 @@ namespace chilli {
 						evt.addVars(it, jsonEvent[it]);
 					}
 
-					Json::FastWriter writer;
-					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << writer.write(Event.event));
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
 						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
@@ -98,6 +96,9 @@ namespace chilli {
 						session->addSendImplement(this);
 						session->start(false);
 					}
+
+					Json::FastWriter writer;
+					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << writer.write(Event.event));
 
 					const auto & it = m_Sessions.find(sessionId);
 					it->second->pushEvent(evt);
