@@ -32,6 +32,7 @@ namespace env
 				throw std::logic_error("JS_Init error.");
 			}
 		}
+		lck.unlock();
 
 		this->m_jsrt = JS_NewRuntime(gMaxHeapSize);
 		if ( m_jsrt == NULL ){
@@ -48,24 +49,17 @@ namespace env
 	}
 	JSEvaluator::~JSEvaluator(){
 		
-		std::unique_lock<std::mutex> lck(g_InitMtx);
 		if (!m_contexts.empty())
 			LOG4CPLUS_WARN(log, "", "has " << m_contexts.size() << " context when evaluator delete.");
-
-		while(!m_contexts.empty())
-		{
-			LOG4CPLUS_DEBUG(log, "", "contexts size " << m_contexts.size());
-			delete m_contexts.front();
-			m_contexts.pop_front();
-		}
 
 		if (m_jsrt)
 			JS_DestroyRuntime(m_jsrt);
 
+		g_InitMtx.lock();
 		if (g_JSEvaluatorReferce.fetch_sub(1) == 1) {
 			JS_ShutDown();
 		}
-
+		g_InitMtx.unlock();
 		LOG4CPLUS_TRACE(log, "", "deconstruct a JSEvaluator object.");
 	}
 
