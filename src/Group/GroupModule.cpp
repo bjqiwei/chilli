@@ -10,7 +10,7 @@ namespace chilli {
 namespace Group {
 
 	// Constructor of the GroupModule 
-	GroupModule::GroupModule(const std::string & id) :ProcessModule(id)
+	GroupModule::GroupModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 	{
 		log = log4cplus::Logger::getInstance("chilli.GroupModule");
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a  module.");
@@ -84,6 +84,14 @@ namespace Group {
 		}
 
 		return true;
+	}
+
+	void GroupModule::run()
+	{
+	}
+
+	void GroupModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+	{
 	}
 
 	void GroupModule::fireSend(const std::string & strContent, const void * param)

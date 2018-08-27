@@ -17,7 +17,7 @@ namespace chilli{
 namespace FreeSwitch{
 
 static std::string esl_execute_data(const char *app, const char *arg, const char *uuid, bool eventlock, bool async);
-FreeSwitchModule::FreeSwitchModule(const std::string & id, uint32_t threadSize) :ProcessModule(id), m_executeThread(threadSize)
+FreeSwitchModule::FreeSwitchModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 {
 	log = log4cplus::Logger::getInstance("chilli.FSModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), "Constuction a FreeSwitch module.");
@@ -41,11 +41,6 @@ int FreeSwitchModule::Stop(void)
 		ProcessModule::Stop();
 		m_bRunning = false;
 
-		for (auto & it:m_executeThread) {
-			if (it.th.joinable())
-				it.th.join();
-		}
-
 		if (m_Thread.joinable()) {
 			m_Thread.join();
 		}
@@ -60,9 +55,6 @@ int FreeSwitchModule::Start()
 		ProcessModule::Start();
 		m_bRunning = true;
 		m_Thread = std::thread(&FreeSwitchModule::ConnectFS, this);
-		for (auto & it : m_executeThread) {
-			it.th=std::thread(&FreeSwitchModule::execute, this, &it.eventQueue);
-		}
 	}
 	return 0;
 }

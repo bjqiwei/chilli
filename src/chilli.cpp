@@ -302,7 +302,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			modelid = modelid ? modelid : "";
 
 			if (nodeName == FREESWITCHNODE) {
-				model::ProcessModulePtr freeswitch(new chilli::FreeSwitch::FreeSwitchModule(modelid));
+				model::ProcessModulePtr freeswitch(new chilli::FreeSwitch::FreeSwitchModule(modelid, 32));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				freeswitch->LoadConfig(printer.CStr());
@@ -353,7 +353,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			}
 			else if (nodeName == CALL)
 			{
-				model::ProcessModulePtr eventreport(new chilli::Call::CallModule(modelid));
+				model::ProcessModulePtr eventreport(new chilli::Call::CallModule(modelid, 32));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				eventreport->LoadConfig(printer.CStr());

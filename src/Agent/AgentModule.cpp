@@ -19,7 +19,7 @@
 namespace chilli{
 namespace Agent {
 
-AgentModule::AgentModule(const std::string & id) :ProcessModule(id)
+AgentModule::AgentModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 {
 	log = log4cplus::Logger::getInstance("chilli.AgentModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a Agent module.");
@@ -72,6 +72,14 @@ bool AgentModule::LoadConfig(const std::string & configContext)
 	}
 
 	return true;
+}
+
+void AgentModule::run()
+{
+}
+
+void AgentModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+{
 }
 
 

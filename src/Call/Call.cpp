@@ -31,7 +31,14 @@ namespace Call {
 	void Call::Stop()
 	{
 		for (auto & it : m_StateMachines) {
-			it.second->stop();
+			for (auto & it : m_StateMachines) {
+				Json::Value shutdown;
+				shutdown["id"] = this->m_Id;
+				shutdown["event"] = "ShutDown";
+				shutdown["param"]["callID"] = it.first;
+				this->PushEvent(chilli::model::EventType_t(shutdown));
+
+			}
 		}
 		LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
 	}

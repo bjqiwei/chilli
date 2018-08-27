@@ -9,7 +9,7 @@
 namespace chilli{
 namespace IVR{
 
-IVRModule::IVRModule(const std::string & id):ProcessModule(id)
+IVRModule::IVRModule(const std::string & id, uint32_t threadSize):ProcessModule(id, threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.IVRModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a IVR module.");
@@ -50,6 +50,14 @@ bool IVRModule::LoadConfig(const std::string & configContext)
 		}
 	}
 	return true;
+}
+
+void IVRModule::run()
+{
+}
+
+void IVRModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+{
 }
 
 

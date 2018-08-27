@@ -31,15 +31,6 @@ namespace FreeSwitch{
 		std::string toDialString(const std::string & sipId, const std::string & uuid, const std::string & caller);
 	private:
 		std::thread m_Thread;
-
-		typedef struct  
-		{
-			std::thread th;
-			helper::CEventBuffer<model::EventType_t> eventQueue;
-		}TexecuteThread;
-
-		std::vector<TexecuteThread> m_executeThread;
-
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;
@@ -61,7 +52,7 @@ namespace FreeSwitch{
 
 		std::map<std::string, std::string>m_device_StateMachine;
 		virtual void run() override;
-		void execute(helper::CEventBuffer<model::EventType_t> * eventQueue);
+		virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 		Json::Value routeConfig;
 		friend class FreeSwitchDevice;
 	};

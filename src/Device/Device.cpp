@@ -29,7 +29,12 @@ namespace chilli {
 		void Device::Stop()
 		{
 			for (auto & it : m_Sessions) {
-				it.second->stop();
+				Json::Value shutdown;
+				shutdown["id"] = this->m_Id;
+				shutdown["event"] = "ShutDown";
+				shutdown["param"]["sessionID"] = it.first;
+				this->PushEvent(chilli::model::EventType_t(shutdown));
+
 			}
 			LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
 		}
@@ -56,6 +61,7 @@ namespace chilli {
 					std::string eventName;
 					std::string sessionId;
 					std::string type;
+					Json::FastWriter writer;
 
 					if (jsonEvent["type"].isString())
 						type = jsonEvent["type"].asString();
@@ -68,14 +74,18 @@ namespace chilli {
 						sessionId = jsonEvent["param"]["sessionID"].asString();
 					}
 
+					if (sessionId.empty()) {
+						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionid is null:" << writer.write(jsonEvent));
+						return;
+					}
+
 					fsm::TriggerEvent evt(eventName, type);
 
 					for (auto & it : jsonEvent.getMemberNames()) {
 						evt.addVars(it, jsonEvent[it]);
 					}
 
-
-					if (!sessionId.empty() && m_Sessions.find(sessionId) == m_Sessions.end()) {
+					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
 						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
 						m_Sessions[sessionId] = session;
 
@@ -92,7 +102,6 @@ namespace chilli {
 						session->start(false);
 					}
 
-					Json::FastWriter writer;
 					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << writer.write(Event.event));
 
 					const auto & it = m_Sessions.find(sessionId);
@@ -106,15 +115,7 @@ namespace chilli {
 						}
 					}
 					else {
-						for (const auto & it : m_Sessions)
-						{
-							it.second->pushEvent(evt);
-							it.second->mainEventLoop();
-							if (it.second->isInFinalState()) {
-								it.second->stop();
-								m_Sessions.erase(it.first);
-							}
-						}
+						LOG4CPLUS_ERROR(log, "." + this->getId() + "." + sessionId, "no find session :" << writer.write(Event.event));
 					}
 
 				}

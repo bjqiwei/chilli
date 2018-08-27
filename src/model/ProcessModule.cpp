@@ -8,8 +8,8 @@ namespace model{
 	std::recursive_mutex ProcessModule::g_PEMtx;
 	model::PerformElementMap ProcessModule::g_PerformElements;
 
-	ProcessModule::ProcessModule(const std::string & modelId) :SendInterface(modelId),
-		m_bRunning(false), m_Id(modelId)
+	ProcessModule::ProcessModule(const std::string & modelId, uint32_t threadSize) :SendInterface(modelId),
+		m_bRunning(false), m_executeThread(threadSize), m_Id(modelId)
 	{
 	}
 
@@ -30,6 +30,9 @@ namespace model{
 		if (!m_bRunning) {
 			m_bRunning = true;
 			m_thread = std::thread(&ProcessModule::_run, this);
+			for (auto & it : m_executeThread) {
+				it.th = std::thread(&ProcessModule::_execute, this, &it.eventQueue);
+			}
 		}
 		else {
 			LOG4CPLUS_WARN(log, "." + this->getId(), " already running for this module.");
@@ -40,20 +43,22 @@ namespace model{
 	int ProcessModule::Stop()
 	{
 		if (m_bRunning) {
-			m_bRunning = false;
 
-			for (const auto & it: m_PerformElements){
-				Json::Value shutdown;
-				shutdown["id"] = it.first;
-				shutdown["event"] = "ShutDown";
-				this->m_RecEvtBuffer.Put(chilli::model::EventType_t(shutdown));
+			for (auto & it : m_PerformElements) {
+				it.second->Stop();
 			}
 
+			m_bRunning = false;
 			chilli::model::EventType_t stopEvent(Json::nullValue);
 			this->m_RecEvtBuffer.Put(stopEvent);
 
 			if (m_thread.joinable()) {
 				m_thread.join();
+			}
+
+			for (auto & it : m_executeThread) {
+				if (it.th.joinable())
+					it.th.join();
 			}
 		}
 		return 0;
@@ -78,57 +83,9 @@ namespace model{
 		return this->run();
 	}
 
-	void ProcessModule::run()
+	void ProcessModule::_execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 	{
-		LOG4CPLUS_INFO(log, "." + this->getId(), " Starting...");
-		try
-		{
-			for (auto & it : m_PerformElements) {
-				it.second->Start();
-			}
-
-			while (m_bRunning)
-			{
-				try
-				{
-					model::EventType_t Event;
-					if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
-					{
-						const Json::Value & jsonEvent = Event.event;
-						std::string peId;
-						if (jsonEvent["id"].isString()) {
-							peId = jsonEvent["id"].asString();
-						}
-
-						auto extptr = getPerformElement(peId);
-
-						if (extptr != nullptr) {
-							extptr->pushEvent(Event);
-							extptr->mainEventLoop();
-						}
-						else {
-							LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
-						}
-					}
-				}
-				catch (std::exception & e)
-				{
-					LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
-				}
-			}
-
-			for (auto & it : m_PerformElements) {
-				it.second->Stop();
-			}
-		}
-		catch (std::exception & e)
-		{
-			LOG4CPLUS_ERROR(log, "." + this->getId(), e.what());
-		}
-
-		LOG4CPLUS_INFO(log, "." + this->getId(), " Stoped.");
-		log4cplus::threadCleanup();
-		fsm::threadCleanup();
+		return this->execute(eventQueue);
 	}
 	
 	void ProcessModule::OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
@@ -222,7 +179,7 @@ namespace model{
 		return nullptr;
 	}
 
-	uint32_t ProcessModule::getPerformElementCount()
+	uint64_t ProcessModule::getPerformElementCount()
 	{
 		std::unique_lock<std::recursive_mutex> lck(g_PEMtx);
 		return this->m_PerformElements.size();

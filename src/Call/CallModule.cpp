@@ -11,7 +11,7 @@
 namespace chilli{
 namespace Call{
 
-CallModule::CallModule(const std::string & id, uint32_t threadSize) :ProcessModule(id), m_executeThread(threadSize)
+CallModule::CallModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.CallModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a Call module.");
@@ -28,9 +28,6 @@ int CallModule::Start()
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Start...  CallModule");
 	if (!m_bRunning) {
 		ProcessModule::Start();
-		for (auto & it : m_executeThread) {
-			it.th = std::thread(&CallModule::execute, this, &it.eventQueue);
-		}
 	}
 	return 0;
 }
@@ -41,11 +38,6 @@ int CallModule::Stop()
 	if (m_bRunning)
 	{
 		ProcessModule::Stop();
-
-		for (auto & it : m_executeThread) {
-			if (it.th.joinable())
-				it.th.join();
-		}
 	}
 	return 0;
 }
@@ -112,6 +104,7 @@ void CallModule::run()
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 
 					Json::Value  & jsonEvent = evt.event;
+					Json::FastWriter writer;
 
 					std::string sessionid; 
 					if (jsonEvent["param"].isMember("sessionID"))

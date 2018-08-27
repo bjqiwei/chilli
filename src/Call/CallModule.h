@@ -21,15 +21,7 @@ private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 	virtual void run() override;
-	typedef struct
-	{
-		std::thread th;
-		helper::CEventBuffer<model::EventType_t> eventQueue;
-	}TexecuteThread;
-
-	std::vector<TexecuteThread> m_executeThread;
-
-	void execute(helper::CEventBuffer<model::EventType_t> * eventQueue);
+	virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 	std::string m_SMFileName;
 	typedef std::string TSessionID;
 	typedef std::string TCallID;

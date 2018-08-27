@@ -9,7 +9,7 @@
 namespace chilli{
 namespace ACD{
 
-ACDModule::ACDModule(const std::string & id):ProcessModule(id)
+ACDModule::ACDModule(const std::string & id, uint32_t threadSize):ProcessModule(id, threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.ACDModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a ACD module.");
@@ -51,6 +51,14 @@ bool ACDModule::LoadConfig(const std::string & configContext)
 	}
 	
 	return true;
+}
+
+void ACDModule::run()
+{
+}
+
+void ACDModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+{
 }
 
 

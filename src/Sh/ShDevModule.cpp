@@ -16,7 +16,7 @@ static std::string GetSsmLastErrMsg()
 	return Err;
 }
 
-ShDevModule::ShDevModule(const std::string & id):ProcessModule(id)
+ShDevModule::ShDevModule(const std::string & id, uint32_t threadSize):ProcessModule(id, threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.ShDevModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), "new a ShDevModule object.");

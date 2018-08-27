@@ -31,7 +31,7 @@ typedef std::shared_ptr<EPConnection> EPConnectionPtr;
 class EventReportModule :public model::ProcessModule, public TCP::TCPServer
 {
 public:
-	explicit EventReportModule(const std::string & id);
+	explicit EventReportModule(const std::string & id, uint32_t threadSize = 16);
 	virtual ~EventReportModule(void);
 	virtual int Start() override;
 	virtual int Stop() override;
@@ -46,6 +46,7 @@ private:
 	//inherit from SendInterface
 	virtual void fireSend(const std::string &strContent, const void * param) override;
 	virtual void run() override;
+	virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 private:
 	std::vector<std::thread> m_Threads;
 

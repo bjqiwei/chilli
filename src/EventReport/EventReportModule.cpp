@@ -14,7 +14,7 @@ static const char* appversion = STRVERSION(APPVERSION);
 namespace chilli{
 namespace EventReport{
 
-EventReportModule::EventReportModule(const std::string & id) :ProcessModule(id)
+EventReportModule::EventReportModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 {
 	log = log4cplus::Logger::getInstance("chilli.ERModule");
 	LOG4CPLUS_DEBUG(log, "." + ProcessModule::getId(), " Constuction a EventReport module.");
@@ -479,6 +479,10 @@ void EventReportModule::run()
 
 	LOG4CPLUS_INFO(log, "." + ProcessModule::getId(), " Stoped.");
 	log4cplus::threadCleanup();
+}
+
+void EventReportModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+{
 }
 
 class TCPConnection :public EPConnection, public TCP::TCPConnection{

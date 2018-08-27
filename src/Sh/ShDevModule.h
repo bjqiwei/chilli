@@ -21,7 +21,7 @@ class ShDevModule :
 	public chilli::model::ProcessModule
 {
 public:
-	explicit ShDevModule(const std::string & id);
+	explicit ShDevModule(const std::string & id, uint32_t threadSize = 16);
 	virtual ~ShDevModule(void);
 
 	virtual int Start() override;

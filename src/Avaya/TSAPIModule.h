@@ -13,13 +13,14 @@ namespace chilli {
 		{
 
 		public:
-			explicit TSAPIModule(const std::string & id);
+			explicit TSAPIModule(const std::string & id, uint32_t threadSize = 16);
 			~TSAPIModule();
 
 			virtual int Start() override;
 			virtual int Stop() override;
 			virtual bool LoadConfig(const std::string & configContext) override;
-
+			virtual void run() override;
+			virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 		protected:
 			//inherit from SendInterface
 			virtual void fireSend(const std::string &strContent, const void * param) override;

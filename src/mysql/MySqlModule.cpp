@@ -18,7 +18,7 @@ namespace chilli{
 namespace DataBase{
 
 
-MySqlModule::MySqlModule(const std::string & id) :ProcessModule(id)
+MySqlModule::MySqlModule(const std::string & id, uint32_t threadSize) :ProcessModule(id, threadSize)
 {
 	log =log4cplus::Logger::getInstance("chilli.MySqlModule");
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Constuction a module.");
@@ -79,6 +79,15 @@ bool MySqlModule::LoadConfig(const std::string & configContext)
 	m_Password = password ? password : std::string();
 	m_DataBase = db ? db : std::string();
 	return true;
+}
+
+void MySqlModule::run()
+{
+
+}
+
+void MySqlModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
+{
 }
 
 Json::Value MySqlModule::executeQuery(const std::string & sql)
