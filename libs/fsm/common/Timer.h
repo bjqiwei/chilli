@@ -1,12 +1,13 @@
 #pragma once
 #include <queue>
-#include <sys/timeb.h>
+#include <chrono>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
 #include <atomic>
 #include <map>
 #include "TimerInterface.h"
+#include <iostream>
 
 #ifndef INFINITE
 #define  INFINITE  (0xFFFFFFFF)
@@ -25,26 +26,26 @@ namespace helper{
 			//生成一个定时器对象，时间间隔，定时器id，
 			Timer(unsigned long timerId, unsigned long interval, const std::string & attr, OnTimerInterface * fun, void * userdata) :
 				m_nTimerId(timerId), m_attr(attr), m_interval(interval), m_TimeOutFuc(fun), m_userdata(userdata)
-			  {
-				  ftime(&m_startTime);
-			  }
-			  virtual ~Timer(){};
+			{
+				m_startTime = std::chrono::steady_clock::now();
+			}
+			virtual ~Timer(){};
 
-			  time_t getInterval() const{
-				  struct timeb currTime;
-				  ftime(&currTime);
-				  time_t  i = m_interval - ((currTime.time-m_startTime.time)*1000 + currTime.millitm-m_startTime.millitm);
-				  return i > 0?i:0;
-			  };
+			int64_t getInterval() const {
+				std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+				int64_t  i = m_interval - std::chrono::duration_cast<std::chrono::milliseconds>(now - m_startTime).count();
+				//std::cout << m_nTimerId << ":" << (i > 0 ? i : 0) << std::endl;
+				return i > 0 ? i : 0;
+			}
 			unsigned long getTimerId(){return m_nTimerId;};
 			const std::string & getAttr(){ return m_attr;};
 			void * getUserData() { return m_userdata; };
 			OnTimerInterface * getFunction() { return m_TimeOutFuc; };
 		private:
-			const unsigned long m_nTimerId;
+			const uint64_t m_nTimerId;
 			const std::string m_attr;
-			const unsigned long m_interval;
-			struct timeb m_startTime;
+			const int64_t m_interval;
+			std::chrono::steady_clock::time_point m_startTime;
 			OnTimerInterface * m_TimeOutFuc = nullptr;
 			void * m_userdata;
 			Timer & operator=( const Timer & ) = delete;
@@ -53,7 +54,7 @@ namespace helper{
 		public:
 			bool operator() (const Timer * const A, const Timer * const B)
 			{
-				return (A->getInterval()  > B->getInterval());
+				return (A->getInterval() > B->getInterval());
 			}
 
 		};
