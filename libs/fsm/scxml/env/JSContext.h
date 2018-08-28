@@ -1,12 +1,5 @@
 #pragma once
-#ifndef _FSM_ENV_JSCONTEXT_HEADER_
-#define _FSM_ENV_JSCONTEXT_HEADER_
 #include "../Context.h"
-#include "mozilla/ArrayUtils.h"
-#include "mozilla/Atomics.h"
-#include "mozilla/DebugOnly.h"
-#include "mozilla/GuardObjects.h"
-#include "mozilla/PodOperations.h"
 
 #ifdef XP_WIN
 # include <direct.h>
@@ -95,5 +88,3 @@ namespace env
 
 }
 }
-
-#endif // end head 

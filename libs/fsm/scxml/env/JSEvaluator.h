@@ -1,14 +1,6 @@
 #pragma once
-#ifndef _FSM_ENV_JSEVALUATOR_HEADER_
-#define _FSM_ENV_JSEVALUATOR_HEADER_
 #include "../Evaluator.h"
 #include <log4cplus/logger.h>
-#include <mutex>
-#include "mozilla/ArrayUtils.h"
-#include "mozilla/Atomics.h"
-#include "mozilla/DebugOnly.h"
-#include "mozilla/GuardObjects.h"
-#include "mozilla/PodOperations.h"
 
 #ifdef XP_WIN
 # include <direct.h>
@@ -58,22 +50,7 @@ namespace fsm
 {
 namespace env
 {
-		
-
-	class jsexception : public std::runtime_error {
-	public:
-		jsexception(const char * what, const char * file, uint32_t line, uint32_t column) :std::runtime_error(what),m_file(file?file:""),m_line(line),m_column(column)
-		{
-
-		}
-		~jsexception()
-		{
-
-		}
-		std::string m_file;
-		uint32_t m_line;
-		uint32_t m_column;
-	};
+	
 	/// <summary>
 	/// Evaluator implementation enabling use of JS expressions 
 	/// 
@@ -84,20 +61,19 @@ namespace env
 	private:
 			::JSRuntime *m_jsrt = nullptr;
 			log4cplus::Logger log;
-			std::mutex m_mtx;
 	public:
 
 		JSEvaluator(); 
 		virtual ~JSEvaluator();
 
 		virtual Context * newContext(const std::string &sessionid, Context *const parent) override;
-
-		virtual void deleteContext(Context * const cx) override;
-
+		virtual void releaseContext(Context * const cx) override;
+		virtual void deleteContext(size_t count) override;
+		virtual size_t getContextCount() override;
 		virtual bool hasContext() override;
-
+	protected:
+		std::list<Context * > m_contexts;
+		std::list<Context *> m_removedContexts;
 	};
 }
 }
-
-#endif //end head file

@@ -24,6 +24,7 @@ namespace fsm{
 
 	FSM_EXPORT void initialize();
 	FSM_EXPORT void threadCleanup();
+	FSM_EXPORT void threadIdle();
 	FSM_EXPORT void unInitialize();
 
 	class FSM_EXPORT StateMachine {

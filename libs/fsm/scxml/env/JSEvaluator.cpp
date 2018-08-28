@@ -1,6 +1,7 @@
 #include "JSEvaluator.h"
 #include "JSContext.h"
 #include <log4cplus/loggingmacros.h>
+#include <mutex>
 
 
 namespace fsm
@@ -67,24 +68,42 @@ namespace env
 	Context * JSEvaluator::newContext(const std::string &sessionid, Context *const parent)
 	{
 		//LOG4CPLUS_DEBUG(log, sessionid << " new a JsContext,parent="<< parent);
-		std::lock_guard<std::mutex>lck(m_mtx);
-		Context * cx = new env::JsContext(this->m_jsrt, sessionid, this, parent);
+		Context * cx = nullptr;
+		if (!m_removedContexts.empty()){
+			cx = m_removedContexts.front();
+			m_removedContexts.pop_front();
+		}
+		else {
+			cx = new env::JsContext(this->m_jsrt, sessionid, this, parent);
+		}
 		m_contexts.push_back(cx);
-		LOG4CPLUS_TRACE(log, "", "push context:" << cx << " contexts size " << m_contexts.size());
 		return cx;
 
 	}
-	void JSEvaluator::deleteContext(Context * const cx)
+
+	void JSEvaluator::releaseContext(Context * const cx)
 	{
-		std::lock_guard<std::mutex>lck(m_mtx);
 		m_contexts.remove(cx);
-		delete cx;
-		LOG4CPLUS_TRACE(log, "", "remove context:" << cx << " contexts size " << m_contexts.size());
+		m_removedContexts.push_back(cx);
+	}
+
+	void JSEvaluator::deleteContext(size_t count)
+	{
+		while (!m_removedContexts.empty() && count--)
+		{
+			Context * const cx = m_removedContexts.front();
+			m_removedContexts.pop_front();
+			delete cx;
+		}
+	}
+
+	size_t JSEvaluator::getContextCount()
+	{
+		return m_contexts.size();
 	}
 
 	bool JSEvaluator::hasContext()
 	{
-		std::lock_guard<std::mutex>lck(m_mtx);
 		return !m_contexts.empty();
 	}
 

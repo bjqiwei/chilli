@@ -82,6 +82,11 @@ void fsm::threadCleanup()
 	return StateMachineimp::threadCleanup();
 }
 
+FSM_EXPORT void fsm::threadIdle()
+{
+	return StateMachineimp::threadIdle();
+}
+
 void fsm::unInitialize()
 {
 	return StateMachineimp::unInitialize();

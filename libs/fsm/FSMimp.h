@@ -52,6 +52,7 @@ namespace fsm{
 public:
 		static void initialize();
 		static void threadCleanup();
+		static void threadIdle();
 		static void unInitialize();
 	private:
 		std::string m_strStateFile;
@@ -118,7 +119,7 @@ public:
 		void exitStates() const;
 
 		Context * getRootContext() const; 
-		void deleteContext(Context * ctx);
+		void releaseContext(Context * ctx);
 		xmlNodePtr getState(const string& stateId) const;
 		const ::xmlNodePtr getParentState(const xmlNodePtr &currentState)const;
 

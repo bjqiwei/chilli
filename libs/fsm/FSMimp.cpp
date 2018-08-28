@@ -303,7 +303,7 @@ bool fsm::StateMachineimp::processTransition(const xmlNodePtr &actionNode)const
 	}
 
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -337,7 +337,7 @@ bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, " not find the send target:" << send.getTarget());
 	}
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -376,7 +376,7 @@ bool fsm::StateMachineimp::processTimer(const xmlNodePtr &Node)const
 		this->getTimerServer()->SetTimer(timer.getInterval(), vars.toStyledString(), m_TimeOutFunc, const_cast<StateMachineimp *>(this));
 	
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -401,7 +401,7 @@ bool fsm::StateMachineimp::processLog(const xmlNodePtr &Node)const
 	}
 
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -425,7 +425,7 @@ bool fsm::StateMachineimp::processScript(const xmlNodePtr &node) const
 	}
 
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -453,7 +453,7 @@ bool fsm::StateMachineimp::processRaise(const xmlNodePtr &node)const
 	}
 
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -478,7 +478,7 @@ bool fsm::StateMachineimp::processSleep(const xmlNodePtr &node)const
 	}
 
 	}
-	catch (fsm::env::jsexception & e)
+	catch (fsm::jsexception & e)
 	{
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, e.what() << "(" << e.m_file << ":" << e.m_line << ":" << e.m_column << ")");
 	}
@@ -726,13 +726,13 @@ fsm::Context  *  fsm::StateMachineimp::getRootContext() const{
 	return m_Context;
 }
 
-void fsm::StateMachineimp::deleteContext(Context * ctx)
+void fsm::StateMachineimp::releaseContext(Context * ctx)
 {
 	per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
 
 	if (pdata != nullptr && pdata->evaluator != nullptr) {
 
-		pdata->evaluator->deleteContext(m_Context);
+		pdata->evaluator->releaseContext(m_Context);
 		m_Context = nullptr;
 	}
 }
@@ -794,11 +794,13 @@ void fsm::StateMachineimp::stop()
 {
 	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ", stop");
 	m_Running = false;
-	TriggerEvent trigEvent;
-	pushEvent(trigEvent);
+	if (m_Block){
+		TriggerEvent trigEvent;
+		pushEvent(trigEvent);
+	}
 
 	if (!m_Block) {
-		this->deleteContext(m_Context);
+		this->releaseContext(m_Context);
 	}
 }
 void fsm::StateMachineimp::setSessionID(const std::string &strSessionid)
@@ -822,9 +824,8 @@ void fsm::StateMachineimp::mainEventLoop()
 					this->getRootContext()->setVar(it.first, it.second); 
 				}
 				m_globalVars.clear();
-				if (!trigEvent.getEventName().empty()) {
-					processEvent(trigEvent);
-				}
+				processEvent(trigEvent);
+
 			}
 
 			//内部事件队列循环
@@ -851,7 +852,7 @@ void fsm::StateMachineimp::mainEventLoop()
 	} while (m_Running && m_Block);
 
 	if (m_Block){
-		this->deleteContext(m_Context);
+		this->releaseContext(m_Context);
 	}
 }
 
@@ -880,6 +881,17 @@ void fsm::StateMachineimp::threadCleanup()
 
 		delete pdata;
 		tls_set_value(g_tls_storage_key, nullptr);
+	}
+}
+
+void fsm::StateMachineimp::threadIdle()
+{
+	per_thread_data * pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
+	if (pdata != nullptr)
+	{
+		if (pdata->evaluator) {
+			pdata->evaluator->deleteContext(1);
+		}
 	}
 }
 

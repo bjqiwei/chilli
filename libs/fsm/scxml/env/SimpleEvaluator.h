@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _SCXML_ENV_SIMPLEEVALUATOR_HEADER_
-#define _SCXML_ENV_SIMPLEEVALUATOR_HEADER_
 #include "../Evaluator.h"
 
 
@@ -20,10 +18,14 @@ namespace env
 
 	
 		virtual Context * newContext(const std::string &sessionid, Context *const parent) override;
-		virtual void deleteContext(Context * const cx) override;
+		virtual void releaseContext(Context * const cx) override;
+		virtual void deleteContext(size_t count) override;
+		virtual size_t getContextCount() override;
 		virtual bool hasContext() override;
 
+	protected:
+		std::list<Context * > m_contexts;
+		std::list<Context *> m_removedContexts;
 	};
 }
 }
-#endif //end Simple evaluator head
