@@ -20,7 +20,8 @@ class ontimer :public OnTimerInterface {
 
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata)
 	{
-		std::cout << attr << endl;
+		static log4cplus::Logger log = log4cplus::Logger::getInstance("timer");
+		LOG4CPLUS_DEBUG(log, "", attr);
 	}
 }my_timer;
 
