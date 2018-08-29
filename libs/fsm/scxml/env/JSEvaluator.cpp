@@ -33,9 +33,9 @@ namespace env
 				throw std::logic_error("JS_Init error.");
 			}
 		}
-		lck.unlock();
-
 		this->m_jsrt = JS_NewRuntime(gMaxHeapSize);
+
+		lck.unlock();
 		if ( m_jsrt == NULL ){
 			LOG4CPLUS_ERROR(log, "", "new evaluator runtime error.");
 			throw std::logic_error("JS_NewRuntime error.");
