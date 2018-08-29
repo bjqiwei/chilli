@@ -45,7 +45,7 @@ namespace env
 
 		JS_SetNativeStackQuota(m_jsrt, gMaxStackSize);
 
-		LOG4CPLUS_TRACE(log, "", "construct a JSEvaluator object.");
+		LOG4CPLUS_DEBUG(log, "", "construct a JSEvaluator object.");
 
 	}
 	JSEvaluator::~JSEvaluator(){
@@ -61,7 +61,7 @@ namespace env
 			JS_ShutDown();
 		}
 		g_InitMtx.unlock();
-		LOG4CPLUS_TRACE(log, "", "deconstruct a JSEvaluator object.");
+		LOG4CPLUS_DEBUG(log, "", "deconstruct a JSEvaluator object.");
 	}
 
 

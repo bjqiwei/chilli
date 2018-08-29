@@ -46,12 +46,12 @@ fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::stri
 	else{
 		m_strStateContent = xml;
 	}
-	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",creat a fsm object." << this);
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",creat a scxml object." << this);
 }
 
 fsm::StateMachineimp::~StateMachineimp()
  { 
-	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destruction a smscxml object." << this);
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destruction a scxml object." << this);
  }
 
 bool fsm::StateMachineimp::Init(void)
