@@ -483,6 +483,9 @@ void EventReportModule::run()
 
 void EventReportModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 {
+	fsm::threadIdle();
+	fsm::threadCleanup();
+	log4cplus::threadCleanup();
 }
 
 class TCPConnection :public EPConnection, public TCP::TCPConnection{

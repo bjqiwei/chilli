@@ -220,6 +220,9 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 					if (jsonEvent["event"].isString() && jsonEvent["event"].asString() == "Null")
 						removeCallSession(sessionid);
 				}
+				else {
+					fsm::threadIdle();
+				}
 			}
 			catch (std::exception & e)
 			{
@@ -234,8 +237,8 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 	}
 
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
-	log4cplus::threadCleanup();
 	fsm::threadCleanup();
+	log4cplus::threadCleanup();
 }
 
 void CallModule::setCallSession(const TSessionID & sessionid, const TCallID & callid)

@@ -59,6 +59,9 @@ void ACDModule::run()
 
 void ACDModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 {
+	fsm::threadIdle();
+	fsm::threadCleanup();
+	log4cplus::threadCleanup();
 }
 
 

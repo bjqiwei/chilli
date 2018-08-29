@@ -88,6 +88,9 @@ void MySqlModule::run()
 
 void MySqlModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 {
+	fsm::threadIdle();
+	fsm::threadCleanup();
+	log4cplus::threadCleanup();
 }
 
 Json::Value MySqlModule::executeQuery(const std::string & sql)

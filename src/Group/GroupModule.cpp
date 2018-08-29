@@ -92,6 +92,9 @@ namespace Group {
 
 	void GroupModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 	{
+		fsm::threadIdle();
+		fsm::threadCleanup();
+		log4cplus::threadCleanup();
 	}
 
 	void GroupModule::fireSend(const std::string & strContent, const void * param)

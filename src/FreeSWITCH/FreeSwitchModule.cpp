@@ -843,6 +843,9 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 					LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
 				}
 			}
+			else {
+				fsm::threadIdle();
+			}
 		}
 		catch (std::exception & e)
 		{
@@ -851,8 +854,8 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 	}
 
 	LOG4CPLUS_INFO(log, "." + this->getId(), " Process thread Stoped.");
-	log4cplus::threadCleanup();
 	fsm::threadCleanup();
+	log4cplus::threadCleanup();
 }
 }
 }
