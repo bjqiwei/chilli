@@ -102,6 +102,7 @@ void CallModule::run()
 				if (m_RecEvtBuffer.Get(evt) && !evt.event.isNull())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
 
 					Json::Value  & jsonEvent = evt.event;
 					Json::FastWriter writer;
@@ -179,7 +180,7 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 			try
 			{
 				model::EventType_t evt;
-				if (eventQueue->Get(evt, 1000) && !evt.event.isNull())
+				if (eventQueue->Get(evt, 1000 * 10) && !evt.event.isNull())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 

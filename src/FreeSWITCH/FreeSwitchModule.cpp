@@ -752,6 +752,7 @@ void FreeSwitchModule::run()
 				model::EventType_t Event;
 				if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
 				{
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
 					const Json::Value & jsonEvent = Event.event;
 					std::string peId;
 					if (jsonEvent["id"].isString()) {
@@ -794,7 +795,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 		try
 		{
 			model::EventType_t Event;
-			if (eventQueue->Get(Event, 1000) && !Event.event.isNull())
+			if (eventQueue->Get(Event, 1000 * 10) && !Event.event.isNull())
 			{
 				const Json::Value & jsonEvent = Event.event;
 				std::string peId;
@@ -840,7 +841,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 
 				}
 				else {
-					LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << peId);
+					LOG4CPLUS_ERROR(log, "." + this->getId(), " not find device:" << peId);
 				}
 			}
 			else {
