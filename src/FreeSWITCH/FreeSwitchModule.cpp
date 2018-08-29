@@ -283,7 +283,7 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid + "\n\n";
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
@@ -313,7 +313,7 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi originate "+ called + " &park()\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi originate " + called + " &park()\nJob-UUID:" + jobid + "\n\n";
 
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
@@ -330,7 +330,7 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid + "\n\n";
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 
@@ -351,7 +351,7 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid;
+	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid + "\n\n";
 	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
 	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
 	return true;
@@ -419,7 +419,7 @@ std::string esl_execute_data(const char * app, const char * arg, const char * uu
 		snprintf(arg_buf, sizeof(arg_buf), "execute-app-arg: %s\n", arg);
 	}
 
-	snprintf(send_buf, sizeof(send_buf), "%s\ncall-command: execute\n%s%s%s%s\n",
+	snprintf(send_buf, sizeof(send_buf), "%s\ncall-command: execute\n%s%s%s%s\n\n",
 		cmd_buf, app_buf, arg_buf, eventlock ? el_buf : "", async ? bl_buf : "");
 	
 	return send_buf;
