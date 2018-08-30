@@ -33,7 +33,7 @@ namespace env
 				throw std::logic_error("JS_Init error.");
 			}
 		}
-		this->m_jsrt = JS_NewRuntime(gMaxHeapSize);
+		this->m_jsrt = JS_NewRuntime(gMaxHeapSize); // JS_NewRuntime 不是线程安全的，需要做线程安全处理
 
 		lck.unlock();
 		if ( m_jsrt == NULL ){
