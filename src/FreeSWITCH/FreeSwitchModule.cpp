@@ -795,7 +795,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 		try
 		{
 			model::EventType_t Event;
-			if (eventQueue->Get(Event, 1000 * 10) && !Event.event.isNull())
+			if (eventQueue->Get(Event, 1000 * 5) && !Event.event.isNull())
 			{
 				const Json::Value & jsonEvent = Event.event;
 				std::string peId;
