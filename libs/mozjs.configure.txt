@@ -1,4 +1,4 @@
-./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-system-zlib --without-intl-api --without-nspr --disable-optimize --enable-static-rtl
+./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --without-nspr --enable-release --with-pthreads --disable-gc-trace --enable-static-rtl
 #禁用动态库参数 --disable-shared-js --disable-shared --enable-static
 #debug --enable-debug
 #编译64位库参数 --target=x86_64-pc-mingw32 --host=x86_64-pc-mingw32
