@@ -16,7 +16,7 @@ public:
 	virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 private:
 	//inherit from SendInterface
-	virtual void fireSend(const std::string &strContent, const void * param) override;
+	virtual void fireSend(const fsm::FireDataType &firData, const void * param) override;
 };
 }
 }

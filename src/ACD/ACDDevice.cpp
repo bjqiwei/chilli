@@ -25,27 +25,19 @@ void ACDDevice::mainEventLoop()
 	{
 
 		model::EventType_t Event;
-		if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
-			const Json::Value & jsonEvent = Event.event;
+		if (m_EvtBuffer.Get(Event, 0) && !Event ->jsonEvent.empty()) {
+			const Json::Value & jsonEvent = Event->jsonEvent;
 
-			std::string eventName;
 			std::string connectid;
-			std::string type;
 
-			if (jsonEvent["type"].isString())
-				type = jsonEvent["type"].asString();
 
-			if (jsonEvent["event"].isString()) {
-				eventName = jsonEvent["event"].asString();
-			}
-
-			fsm::TriggerEvent evt(eventName, type);
+			fsm::TriggerEvent evt(Event->eventName, Event->type);
 
 			for (auto & it : jsonEvent.getMemberNames()) {
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event->origData);
 
 			if (m_Sessions.begin() == m_Sessions.end()) {
 				Session connection(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));

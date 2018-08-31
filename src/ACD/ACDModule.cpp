@@ -65,9 +65,9 @@ void ACDModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 }
 
 
-void ACDModule::fireSend(const std::string & strContent, const void * param)
+void ACDModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
+	LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement." << fireData.event);
 }
 
 }

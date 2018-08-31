@@ -6,14 +6,49 @@
 
 namespace chilli {
 namespace model {
-	typedef struct _EventType
+	struct _EventType
 	{
-		_EventType() {};
-		explicit _EventType(const Json::Value & _event) :event(_event) {};
+		explicit _EventType(const std::string &_id, const std::string & _eventName, const std::string & _type, const Json::Value & _event, const std::string & data) 
+			:id(_id), eventName(_eventName), type(_type), jsonEvent(_event), origData(data) {
+		};
+
+		explicit _EventType(const Json::Value & _event, const std::string & data)
+			:jsonEvent(_event), origData(data) {
+			if (jsonEvent["id"].isString())
+				this->id = jsonEvent["id"].asString();
+			
+			if (jsonEvent["event"].isString())
+				this->eventName = jsonEvent["event"].asString();
+			
+			if (jsonEvent["type"].isString())
+				this->type = jsonEvent["type"].asString();
+		};
+
+		explicit _EventType(const Json::Value & _event)
+			:jsonEvent(_event) {
+			if (jsonEvent["id"].isString())
+				this->id = jsonEvent["id"].asString();
+
+			if (jsonEvent["event"].isString())
+				this->eventName = jsonEvent["event"].asString();
+
+			if (jsonEvent["type"].isString())
+				this->type = jsonEvent["type"].asString();
+
+			Json::StreamWriterBuilder builder;
+			this->origData = Json::writeString(builder, this->jsonEvent);
+
+		};
+
 		//explicit _EventType(const Json::Value & _event, uint64_t _connect) :event(_event),connect(_connect) {};
-		Json::Value event;
+		Json::Value jsonEvent;
+		std::string id;
+		std::string eventName;
+		std::string type;
+		std::string origData;
 		//uint64_t connect = 0;
-	}EventType_t;
+	};
+	typedef std::shared_ptr<_EventType> EventType_t;
 
 	typedef struct _SQLEventType
 	{
