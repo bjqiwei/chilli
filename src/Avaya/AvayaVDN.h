@@ -18,7 +18,7 @@ namespace chilli{
 			virtual void mainEventLoop() override;
 
 			//inherit from SendInterface
-			virtual void fireSend(const std::string &strContent, const void * param) override;
+			virtual void fireSend(const fsm::FireDataType &fireData, const void * param) override;
 
 		private:
 			TSAPIModule * m_model;

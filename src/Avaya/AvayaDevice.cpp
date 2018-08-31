@@ -18,29 +18,20 @@ namespace Avaya {
 	AvayaDevice::~AvayaDevice() {
 	}
 
-	void AvayaDevice::fireSend(const std::string &strContent, const void * param)
+	void AvayaDevice::fireSend(const fsm::FireDataType &fireData, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-		Json::Value jsonData;
-		Json::CharReaderBuilder b;
-		std::shared_ptr<Json::CharReader> reader(b.newCharReader());
-
-		std::string err;
-		if (!reader->parse(strContent.c_str(), strContent.c_str()+ strContent.length(), &jsonData, &err)) {
-			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << err);
-			return;
-		}
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 
 		bool bHandled = false;
-		this->processSend(jsonData, param, bHandled);
+		this->processSend(fireData, param, bHandled);
 		
 	}
 
-	void AvayaDevice::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+	void AvayaDevice::processSend(const fsm::FireDataType &fireData, const void * param, bool & bHandled)
 	{
-		m_model->processSend(jsonData, param, bHandled, this);
+		m_model->processSend(fireData, param, bHandled, this);
 		if (!bHandled) {
-			Device::processSend(jsonData, param, bHandled);
+			Device::processSend(fireData, param, bHandled);
 		}
 	}
 

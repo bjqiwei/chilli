@@ -23,13 +23,13 @@ namespace chilli {
 			virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 		protected:
 			//inherit from SendInterface
-			virtual void fireSend(const std::string &strContent, const void * param) override;
+			virtual void fireSend(const fsm::FireDataType &fireData, const void * param) override;
 
 			// This function is used to Open a communication Channel(in the form of ACS Stream) for the application to send csta request
 			bool OpenStream(const char * serviceId, const char * userId, const char * password);		// for opening an ACS Stream
 
 			bool CloseStream();
-			void processSend(Json::Value &jsonData, const void * param, bool & bHandled, model::PerformElement * pe);
+			void processSend(const fsm::FireDataType &fireData, const void * param, bool & bHandled, model::PerformElement * pe);
 			
 			ACSHandle_t m_lAcsHandle = 0;	// Handle for ACS Stream
 			ATTPrivateData_t m_stPrivateData;	// Private Data for using extended features of TSAPI service

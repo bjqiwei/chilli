@@ -24,7 +24,7 @@ namespace Avaya {
 	bool AvayaVDN::pushEvent(const model::EventType_t &evt)
 	{
 		//return m_EventBuffer.Put(evt);
-		const Json::Value & jsonEvent = evt.event;
+		const Json::Value & jsonEvent = evt->jsonEvent;
 		if (jsonEvent["event"].isString()) {
 
 			uint32_t callid = 0;
@@ -33,7 +33,7 @@ namespace Avaya {
 
 			if (callid == 0)
 			{
-				LOG4CPLUS_WARN(log, "." + this->getId(), " callid is invalid," << jsonEvent.toStyledString());
+				LOG4CPLUS_WARN(log, "." + this->getId(), " callid is invalid," << evt->origData);
 				return false;
 
 			}
@@ -46,12 +46,12 @@ namespace Avaya {
 
 			if (!ext.empty())
 			{
-				chilli::model::EventType_t newEvent(jsonEvent);
-				newEvent.event["extension"] = ext;
-				newEvent.event["stationNo"] = m_stationNo;
-				newEvent.event["companyid"] = m_companyid;
+				evt->jsonEvent["id"] = ext;
+				evt->id = ext;
+				evt->jsonEvent["stationNo"] = m_stationNo;
+				evt->jsonEvent["companyid"] = m_companyid;
 
-				this->m_model->PushEvent(newEvent);
+				this->m_model->PushEvent(evt);
 			}
 		}
 		return 0;
@@ -61,7 +61,7 @@ namespace Avaya {
 	{
 	}
 
-	void AvayaVDN::fireSend(const std::string &strContent, const void * param)
+	void AvayaVDN::fireSend(const fsm::FireDataType &fireData, const void * param)
 	{
 	}
 

@@ -16,29 +16,20 @@ AvayaAgent::~AvayaAgent(){
 
 }
 
-void AvayaAgent::fireSend(const std::string & strContent,const void * param)
+void AvayaAgent::fireSend(const fsm::FireDataType &fireData,const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-	Json::Value jsonEvent;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-
-	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonEvent, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " " << " not json data." << jsonerr);
-		return;
-	}
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 
 	bool bHandled = false;
-	this->processSend(jsonEvent, param, bHandled);
+	this->processSend(fireData, param, bHandled);
 	
 }
 
-void AvayaAgent::processSend(Json::Value & jsonEvent, const void * param, bool & bHandled)
+void AvayaAgent::processSend(const fsm::FireDataType &fireData, const void * param, bool & bHandled)
 {
-	m_model->processSend(jsonEvent, param, bHandled, this);
+	m_model->processSend(fireData, param, bHandled, this);
 	if (!bHandled) {
-		Agent::processSend(jsonEvent, param, bHandled);
+		Agent::processSend(fireData, param, bHandled);
 	}
 }
 

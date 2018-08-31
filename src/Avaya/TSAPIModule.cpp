@@ -271,9 +271,9 @@ namespace chilli {
 		}
 
 
-		void TSAPIModule::fireSend(const std::string & strContent, const void * param)
+		void TSAPIModule::fireSend(const fsm::FireDataType &fireData, const void * param)
 		{
-			LOG4CPLUS_DEBUG(log, "." + this->getId(), strContent);
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), fireData.event);
 			LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
 		}
 
@@ -351,52 +351,36 @@ namespace chilli {
 			return bReturnValue;
 		}
 
-		void TSAPIModule::processSend(Json::Value & jsonEvent, const void * param, bool & bHandled, model::PerformElement * pe)
+		void TSAPIModule::processSend(const fsm::FireDataType &fireData, const void * param, bool & bHandled, model::PerformElement * pe)
 		{
 			log4cplus::Logger log = pe->getLogger();
 
-			std::string eventName;
-			std::string typeName;
-			std::string dest;
-
-			if (jsonEvent["type"].isString()) {
-				typeName = jsonEvent["type"].asString();
-			}
-
-			if (typeName != "cmd") {
+			if (fireData.type != "cmd") {
 				return;
 			}
 
-			if (jsonEvent["dest"].isString()) {
-				dest = jsonEvent["dest"].asString();
-			}
-
-			if (dest != "this"){
+			if (fireData.dest != "this"){
 				return;
 			}
 
-			if (jsonEvent["event"].isString()) {
-				eventName = jsonEvent["event"].asString();
-			}
-
-			if (eventName == "AgentLogin")
+			if (fireData.event == "AgentLogin")
 			{
 				const char* agentid = nullptr;
 				const char* deviceId = nullptr;
 				const char* password = nullptr;
 				const char* group = nullptr;
 
-				if (jsonEvent["param"]["agentId"].isString())
-					agentid = jsonEvent["param"]["agentId"].asCString();
+				if (fireData.param["agentId"].isString())
+					agentid = fireData.param["agentId"].asCString();
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
-				if (jsonEvent["param"]["group"].isString())
-					group = jsonEvent["param"]["group"].asCString();
+				if (fireData.param["group"].isString())
+					group = fireData.param["group"].asCString();
 
-				if (jsonEvent["param"]["password"].isString())
-					password = jsonEvent["param"]["password"].asCString();
+				if (fireData.param["password"].isString())
+					password = fireData.param["password"].asCString();
 
 				RetCode_t nRetCode = AvayaAPI::attSetAgentState(&g_stPrivateData, wmManualIn);
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -418,34 +402,34 @@ namespace chilli {
 					event["event"] = "AgentLogin";
 					event["AgentLogin"]["cause"] = nRetCode;
 					event["AgentLogin"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogin:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogin:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogin";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "AgentLogout")
+			else if (fireData.event == "AgentLogout")
 			{
 				const char* agentid = nullptr;
 				const char* deviceId = nullptr;
 				const char* password = nullptr;
 				const char* group = "";
 
-				if (jsonEvent["param"]["agentId"].isString())
-					agentid = jsonEvent["param"]["agentId"].asCString();
+				if (fireData.param["agentId"].isString())
+					agentid = fireData.param["agentId"].asCString();
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
-				if (jsonEvent["param"]["group"].isString())
-					group = jsonEvent["param"]["group"].asCString();
+				if (fireData.param["group"].isString())
+					group = fireData.param["group"].asCString();
 
-				if (jsonEvent["param"]["password"].isString())
-					password = jsonEvent["param"]["password"].asCString();
+				if (fireData.param["password"].isString())
+					password = fireData.param["password"].asCString();
 
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -464,22 +448,22 @@ namespace chilli {
 					event["event"] = "AgentLogout";
 					event["AgentLogout"]["cause"] = nRetCode;
 					event["AgentLogout"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogout:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentLogout:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentLogout";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "AgentGetState")
+			else if (fireData.event == "AgentGetState")
 			{
 				const char* deviceId = "";
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
 				RetCode_t nRetCode = AvayaAPI::cstaQueryAgentState(this->m_lAcsHandle,
@@ -493,26 +477,26 @@ namespace chilli {
 					event["event"] = "AgentGetState";
 					event["AgentGetState"]["cause"] = nRetCode;
 					event["AgentGetState"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentGetState:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentGetState:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentGetState";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "AgentSetFree")
+			else if (fireData.event == "AgentSetFree")
 			{
 				const char* agentid = nullptr;
 				const char* deviceId = nullptr;
 
-				if (jsonEvent["param"]["agentId"].isString())
-					agentid = jsonEvent["param"]["agentId"].asCString();
+				if (fireData.param["agentId"].isString())
+					agentid = fireData.param["agentId"].asCString();
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -532,26 +516,26 @@ namespace chilli {
 					event["event"] = "AgentSetFree";
 					event["AgentSetFree"]["cause"] = nRetCode;
 					event["AgentSetFree"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetFree:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetFree:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] =pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetFree";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "AgentSetBusy")
+			else if (fireData.event == "AgentSetBusy")
 			{
 				const char* agentid = nullptr;
 				const char* deviceId = nullptr;
 
-				if (jsonEvent["param"]["agentId"].isString())
-					agentid = jsonEvent["param"]["agentId"].asCString();
+				if (fireData.param["agentId"].isString())
+					agentid = fireData.param["agentId"].asCString();
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -571,21 +555,21 @@ namespace chilli {
 					event["event"] = "AgentSetBusy";
 					event["AgentSetBusy"]["cause"] = nRetCode;
 					event["AgentSetBusy"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetBusy:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AgentSetBusy:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AgentSetBusy";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "ClearConnection")
+			else if (fireData.event == "ClearConnection")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -609,21 +593,21 @@ namespace chilli {
 					event["event"] = "ClearConnection";
 					event["ClearConnection"]["cause"] = nRetCode;
 					event["ClearConnection"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearConnection:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearConnection:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ClearConnection";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "ClearCall")
+			else if (fireData.event == "ClearCall")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -647,21 +631,21 @@ namespace chilli {
 					event["event"] = "ClearCall";
 					event["ClearCall"]["cause"] = nRetCode;
 					event["ClearCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ClearCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ClearCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "AnswerCall")
+			else if (fireData.event == "AnswerCall")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -685,26 +669,26 @@ namespace chilli {
 					event["event"] = "AnswerCall";
 					event["AnswerCall"]["cause"] = nRetCode;
 					event["AnswerCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AnswerCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " AnswerCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "AnswerCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "MakeCall")
+			else if (fireData.event == "MakeCall")
 			{
 				DeviceID_t calling = "";
 				DeviceID_t called = "";
 
-				if (jsonEvent["param"]["calling"].isString())
-					strncpy(calling, jsonEvent["param"]["calling"].asCString(), sizeof(calling));
+				if (fireData.param["calling"].isString())
+					strncpy(calling, fireData.param["calling"].asCString(), sizeof(calling));
 
-				if (jsonEvent["param"]["called"].isString())
-					strncpy(called, jsonEvent["param"]["called"].asCString(), sizeof(called));
+				if (fireData.param["called"].isString())
+					strncpy(called, fireData.param["called"].asCString(), sizeof(called));
 
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -721,21 +705,21 @@ namespace chilli {
 					event["event"] = "MakeCall";
 					event["MakeCall"]["cause"] = nRetCode;
 					event["MakeCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MakeCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MakeCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MakeCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "HoldCall")
+			else if (fireData.event == "HoldCall")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -760,21 +744,21 @@ namespace chilli {
 					event["event"] = "HoldCall";
 					event["HoldCall"]["cause"] = nRetCode;
 					event["HoldCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " HoldCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " HoldCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "HoldCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "RetrieveCall")
+			else if (fireData.event == "RetrieveCall")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -798,22 +782,22 @@ namespace chilli {
 					event["event"] = "RetrieveCall";
 					event["RetrieveCall"]["cause"] = nRetCode;
 					event["RetrieveCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " RetrieveCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " RetrieveCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "RetrieveCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "ConsultationCall")
+			else if (fireData.event == "ConsultationCall")
 			{
 				ConnectionID_t connection;
 				DeviceID_t called = "";
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -823,8 +807,8 @@ namespace chilli {
 				if (jsonConnection["deviceID"].isString())
 					strncpy(connection.deviceID, jsonConnection["deviceID"].asCString(), sizeof(DeviceID_t));
 
-				if (jsonEvent["param"]["called"].isString())
-					strncpy(called, jsonEvent["param"]["called"].asCString(), sizeof(DeviceID_t));
+				if (fireData.param["called"].isString())
+					strncpy(called, fireData.param["called"].asCString(), sizeof(DeviceID_t));
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
 				RetCode_t nRetCode = AvayaAPI::cstaConsultationCall(this->m_lAcsHandle,
@@ -840,23 +824,23 @@ namespace chilli {
 					event["event"] = "ConsultationCall";
 					event["ConsultationCall"]["cause"] = nRetCode;
 					event["ConsultationCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConsultationCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConsultationCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ConsultationCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "ReconnectCall")
+			else if (fireData.event == "ReconnectCall")
 			{
 				ConnectionID_t heldCall;
 				ConnectionID_t activeCall;
 
-				Json::Value jsonheldCall = jsonEvent["param"]["heldCall"];
-				Json::Value jsonactiveCall = jsonEvent["param"]["activeCall"];
+				Json::Value jsonheldCall = fireData.param["heldCall"];
+				Json::Value jsonactiveCall = fireData.param["activeCall"];
 
 				if (jsonheldCall["callID"].isInt())
 					heldCall.callID = jsonheldCall["callID"].asInt();
@@ -891,23 +875,23 @@ namespace chilli {
 					event["event"] = "ReconnectCall";
 					event["ReconnectCall"]["cause"] = nRetCode;
 					event["ReconnectCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ReconnectCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ReconnectCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ReconnectCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "TransferCall")
+			else if (fireData.event == "TransferCall")
 			{
 				ConnectionID_t heldCall;
 				ConnectionID_t activeCall;
 
-				Json::Value jsonheldCall = jsonEvent["param"]["heldCall"];
-				Json::Value jsonactiveCall = jsonEvent["param"]["activeCall"];
+				Json::Value jsonheldCall = fireData.param["heldCall"];
+				Json::Value jsonactiveCall = fireData.param["activeCall"];
 
 				if (jsonheldCall["callID"].isInt())
 					heldCall.callID = jsonheldCall["callID"].asInt();
@@ -942,23 +926,23 @@ namespace chilli {
 					event["event"] = "TransferCall";
 					event["TransferCall"]["cause"] = nRetCode;
 					event["TransferCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " TransferCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " TransferCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "TransferCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "ConferenceCall")
+			else if (fireData.event == "ConferenceCall")
 			{
 				ConnectionID_t heldCall;
 				ConnectionID_t activeCall;
 
-				Json::Value jsonheldCall = jsonEvent["param"]["heldCall"];
-				Json::Value jsonactiveCall = jsonEvent["param"]["activeCall"];
+				Json::Value jsonheldCall = fireData.param["heldCall"];
+				Json::Value jsonactiveCall = fireData.param["activeCall"];
 
 				if (jsonheldCall["callID"].isInt())
 					heldCall.callID = jsonheldCall["callID"].asInt();
@@ -993,22 +977,22 @@ namespace chilli {
 					event["event"] = "ConferenceCall";
 					event["ConferenceCall"]["cause"] = nRetCode;
 					event["ConferenceCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConferenceCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " ConferenceCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "ConferenceCall";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "MonitorDevice")
+			else if (fireData.event == "MonitorDevice")
 			{
 				const char* deviceId = nullptr;
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
 				CSTAMonitorFilter_t noFilter;
 				noFilter.agent = 0;
@@ -1031,22 +1015,22 @@ namespace chilli {
 					event["event"] = "MonitorDevice";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorDevice:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorDevice:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorDevice";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "MonitorStop")
+			else if (fireData.event == "MonitorStop")
 			{
 				CSTAMonitorCrossRefID_t monitorId = 0;
 
-				if (jsonEvent["param"]["monitorId"].isInt())
-					monitorId = jsonEvent["param"]["monitorId"].asInt();
+				if (fireData.param["monitorId"].isInt())
+					monitorId = fireData.param["monitorId"].asInt();
 
 
 				uint32_t uInvodeId = ++(this->m_ulInvokeID);
@@ -1062,22 +1046,22 @@ namespace chilli {
 					event["event"] = "MonitorStop";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorStop:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorStop:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorStop";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "MonitorCallsViaDevice")
+			else if (fireData.event == "MonitorCallsViaDevice")
 			{
 				const char* deviceId = nullptr;
 
-				if (jsonEvent["param"]["deviceId"].isString())
-					deviceId = jsonEvent["param"]["deviceId"].asCString();
+				if (fireData.param["deviceId"].isString())
+					deviceId = fireData.param["deviceId"].asCString();
 
 				CSTAMonitorFilter_t noFilter;
 				noFilter.agent = 0;
@@ -1100,21 +1084,21 @@ namespace chilli {
 					event["event"] = "MonitorCallsViaDevice";
 					event["cause"] = nRetCode;
 					event["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCallsViaDevice:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCallsViaDevice:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCallsViaDevice";
 				}
 				bHandled = true;
 			}
-			else if (eventName == "MonitorCall")
+			else if (fireData.event == "MonitorCall")
 			{
 				ConnectionID_t connection;
 
-				Json::Value jsonConnection = jsonEvent["param"]["connection"];
+				Json::Value jsonConnection = fireData.param["connection"];
 				if (jsonConnection["callID"].isInt())
 					connection.callID = jsonConnection["callID"].asInt();
 
@@ -1145,11 +1129,11 @@ namespace chilli {
 					event["event"] = "MonitorCall";
 					event["MonitorCall"]["cause"] = nRetCode;
 					event["MonitorCall"]["reason"] = AvayaAPI::acsReturnCodeString(nRetCode);
-					model::EventType_t evt(event);
+					model::EventType_t evt(new model::_EventType(event));
 					this->PushEvent(evt);
 				}
 				else {
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCall:" << jsonEvent["param"].toStyledString());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), " MonitorCall:" << fireData.param.toStyledString());
 					this->m_InvokeID2Extension[uInvodeId] = pe->getId();
 					this->m_InvokeID2Event[uInvodeId] = "MonitorCall";
 				}
@@ -1394,7 +1378,7 @@ namespace chilli {
 							event[eventName]["cause"] = 0;
 							event[eventName]["clearCall"] = Json::nullValue;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 
 						}
@@ -1420,7 +1404,7 @@ namespace chilli {
 										conferenceCall.connList.connection[i].party));
 							}
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 														break;
@@ -1437,7 +1421,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
 							event[eventName]["cause"] = 0;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1459,7 +1443,7 @@ namespace chilli {
 							event[eventName]["cause"] = 0;
 							event[eventName]["holdCall"] = Json::nullValue;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 												  break;
@@ -1476,7 +1460,7 @@ namespace chilli {
 							event[eventName]["newCall"] = AvayaAPI::cstaConnectionIDJson(newCall);
 							event[eventName]["cause"] = 0;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						
 						}
@@ -1501,7 +1485,7 @@ namespace chilli {
 							event[eventName]["cause"] = 0;
 							event[eventName]["reconnectCall"] = Json::nullValue;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													   break;
@@ -1514,7 +1498,7 @@ namespace chilli {
 							event[eventName]["cause"] = 0;
 							event[eventName]["retrieveCall"] = Json::nullValue;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1536,7 +1520,7 @@ namespace chilli {
 										transferCall.connList.connection[i].party));
 							}
 						
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1560,7 +1544,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName] = Json::objectValue;
 							event[eventName]["cause"] = 0;
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 														break;
@@ -1596,7 +1580,7 @@ namespace chilli {
 							event[eventName] = Json::objectValue;
 							event[eventName]["agentState"] = AvayaAPI::cstaAgentStateString(agentState);
 							event[eventName]["cause"] = 0;
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1620,7 +1604,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName]["cause"] = error + 1000;
 							event[eventName]["reason"] = AvayaAPI::cstaErrorString(error);
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 														  break;
@@ -1636,7 +1620,7 @@ namespace chilli {
 							event["event"] = eventName;
 							event[eventName]["cause"] = 0;
 							event[eventName]["monitorId"] = monitorId;
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 							
 						}
@@ -1648,7 +1632,7 @@ namespace chilli {
 							std::string eventName = this->m_InvokeID2Event[invokeId];
 							event["event"] = eventName;
 							event[eventName]["cause"] = 0;
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													 break;
@@ -1674,7 +1658,7 @@ namespace chilli {
 							event["monitorEnded"]["cause"] = max((int)cause, 0);
 							event["monitorEnded"]["reason"] = AvayaAPI::cstaEventCauseString(cause);
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 							this->m_monitorID2Extension.erase(monitorId);
 
@@ -1697,7 +1681,7 @@ namespace chilli {
 							
 							m_callid2UUID.erase(callCleared.clearedCall.callID);
 							
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 												break;
@@ -1720,7 +1704,7 @@ namespace chilli {
 							event["callid"] = connectionCleared.droppedConnection.callID;
 
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													  break;
@@ -1758,7 +1742,7 @@ namespace chilli {
 
 							event["uuid"] = m_callid2UUID[connection.callID];
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 
 						}
@@ -1790,7 +1774,7 @@ namespace chilli {
 							event["established"]["answering"] = answering;
 							event["callid"] = connection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 
 						}
@@ -1811,7 +1795,7 @@ namespace chilli {
 							event["serviceInitiated"]["connection"] = AvayaAPI::cstaConnectionIDJson(serviceInitiated.initiatedConnection);
 							event["callid"] = serviceInitiated.initiatedConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 													 break;
@@ -1835,7 +1819,7 @@ namespace chilli {
 							event["originated"]["called"] = called;
 							event["callid"] = originated.originatedConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 											  break;
@@ -1857,7 +1841,7 @@ namespace chilli {
 							event["held"]["holding"] = holding;
 							event["callid"] = held.heldConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 										break;
@@ -1879,7 +1863,7 @@ namespace chilli {
 							event["retrieved"]["retrieving"] = retrieving;
 							event["callid"] = retrieved.retrievedConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 											 break;
@@ -1908,7 +1892,7 @@ namespace chilli {
 							event["queued"]["numberQueued"] = queued.numberQueued;
 							event["callid"] = queued.queuedConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 										  break;
@@ -1934,7 +1918,7 @@ namespace chilli {
 							event["failed"]["called"] = called;
 							event["callid"] = failed.failedConnection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 										  break;
@@ -1964,7 +1948,7 @@ namespace chilli {
 							event["transferred"]["secondary"] = secondary;
 							event["callid"] = transferred.primaryOldCall.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 											   break;
@@ -1998,7 +1982,7 @@ namespace chilli {
 										conferenced.conferenceConnections.connection[i].party));
 							}
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 											   break;
@@ -2026,7 +2010,7 @@ namespace chilli {
 							event["diverted"]["connection"] = AvayaAPI::cstaConnectionIDJson(connection);
 							event["callid"] = connection.callID;
 
-							model::EventType_t evt(event);
+							model::EventType_t evt(new model::_EventType(event));
 							this->PushEvent(evt);
 						}
 										   break;
