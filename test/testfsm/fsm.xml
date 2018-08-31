@@ -65,7 +65,9 @@
 			<onentry>
 				<log level = "info">enter state1 state.</log>
 				<log level = "info" type="script"> new Date();</log>
-				<send target="testsend" type="cmd" idexpr="uuid();" from="1000" destexpr="1000+1" ></send>
+				<send target="testsend" type="cmd" idexpr="uuid();" event ="sendtest" from="1000" destexpr="1000+1" >
+          <date type="script">new Date().toString();</date>
+        </send>
 			</onentry>
 			<event event="init">
 				<script>globalVar=1000;</script>

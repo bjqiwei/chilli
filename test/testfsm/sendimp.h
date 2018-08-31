@@ -5,8 +5,8 @@
 class SendImp :public fsm::SendInterface
 {
 public:
-	SendImp():SendInterface("testsend"){}
+	SendImp():SendInterface("testsend", nullptr){}
 	~SendImp(){}
-	virtual void fireSend(const std::string& strContent, const void * param);
+	virtual void fireSend(const fsm::FireDataType & strContent, const void * param) override;
 
 };

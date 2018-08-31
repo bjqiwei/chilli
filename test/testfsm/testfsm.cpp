@@ -75,10 +75,10 @@ int main(int argc, _TCHAR* argv[])
 	return 0;
 }
 
-void SendImp::fireSend(const std::string& strContent, const void * param)
+void SendImp::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
 	static log4cplus::Logger log = log4cplus::Logger::getInstance("sendimp");
-	LOG4CPLUS_DEBUG(log,"", strContent);
+	LOG4CPLUS_DEBUG(log,"", fireData.id << ":" << fireData.event << ":" << fireData.param.toStyledString());
 }
 //#else
 //int main(int argc, _TCHAR* argv[]){
