@@ -20,25 +20,16 @@ Agent::~Agent(){
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a Agent object.");
 }
 
-void Agent::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+void Agent::processSend(const fsm::FireDataType &fireData, const void * param, bool & bHandled)
 {
 
 }
 
-void Agent::fireSend(const std::string & strContent,const void * param)
+void Agent::fireSend(const fsm::FireDataType &fireData,const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-	Json::Value jsonData;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-
-	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " " << " not json data." << jsonerr);
-		return;
-	}
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 	bool bHandled = false;
-	processSend(jsonData, param, bHandled);
+	processSend(fireData, param, bHandled);
 }
 
 void Agent::Start()
@@ -73,27 +64,18 @@ void Agent::mainEventLoop()
 	{
 
 		model::EventType_t Event;
-		if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
-			const Json::Value & jsonEvent = Event.event;
+		if (m_EvtBuffer.Get(Event, 0) && !Event->eventName.empty()) {
+			const Json::Value & jsonEvent = Event->jsonEvent;
 
-			std::string eventName;
 			std::string connectid;
-			std::string type;
 
-			if (jsonEvent["type"].isString())
-				type = jsonEvent["type"].asString();
-
-			if (jsonEvent["event"].isString()) {
-				eventName = jsonEvent["event"].asString();
-			}
-
-			fsm::TriggerEvent evt(eventName, type);
+			fsm::TriggerEvent evt(Event->eventName, Event->type);
 
 			for (auto & it : jsonEvent.getMemberNames()) {
 				evt.addVars(it, jsonEvent[it]);
 			}
 
-			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event.event.toStyledString());
+			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event->origData);
 
 			if (m_StateMachines.begin() == m_StateMachines.end()) {
 				StateMachine sm(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));

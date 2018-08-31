@@ -86,9 +86,9 @@ void AgentModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 }
 
 
-void AgentModule::fireSend(const std::string & strContent, const void * param)
+void AgentModule::fireSend(const fsm::FireDataType &fireData, const void * param)
 {
-	LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
+	LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement." << fireData.event);
 }
 }
 }
