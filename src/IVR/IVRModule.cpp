@@ -64,7 +64,7 @@ void IVRModule::execute(helper::CEventBuffer<model::EventType_t>* eventQueue)
 }
 
 
-void IVRModule::fireSend(const std::string &strContent, const void * param)
+void IVRModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
 	LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
 }

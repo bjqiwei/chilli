@@ -8,7 +8,7 @@ namespace model{
 	std::recursive_mutex ProcessModule::g_PEMtx;
 	model::PerformElementMap ProcessModule::g_PerformElements;
 
-	ProcessModule::ProcessModule(const std::string & modelId, uint32_t threadSize) :SendInterface(modelId),
+	ProcessModule::ProcessModule(const std::string & modelId, uint32_t threadSize) :SendInterface(modelId, this),
 		m_bRunning(false), m_executeThread(threadSize), m_Id(modelId)
 	{
 	}
@@ -49,7 +49,7 @@ namespace model{
 			}
 
 			m_bRunning = false;
-			chilli::model::EventType_t stopEvent(Json::nullValue);
+			chilli::model::EventType_t stopEvent(new model::_EventType(Json::nullValue));
 			this->m_RecEvtBuffer.Put(stopEvent);
 
 			if (m_thread.joinable()) {
@@ -103,7 +103,7 @@ namespace model{
 				peId = jsonEvent["id"].asString();
 			}
 		}
-		chilli::model::EventType_t evt(jsonEvent);
+		chilli::model::EventType_t evt(new model::_EventType(jsonEvent));
 		m_RecEvtBuffer.Put(evt);
 	}
 

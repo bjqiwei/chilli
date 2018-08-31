@@ -8,8 +8,8 @@ namespace chilli {
 namespace model {
 	struct _EventType
 	{
-		explicit _EventType(const std::string &_id, const std::string & _eventName, const std::string & _type, const Json::Value & _event, const std::string & data) 
-			:id(_id), eventName(_eventName), type(_type), jsonEvent(_event), origData(data) {
+		explicit _EventType(const std::string &_id, const std::string &_sessionId, const std::string & _eventName, const std::string & _type, const Json::Value & _event, const std::string & data) 
+			:id(_id), sessionid(_sessionId), eventName(_eventName), type(_type), jsonEvent(_event), origData(data) {
 		};
 
 		explicit _EventType(const Json::Value & _event, const std::string & data)
@@ -22,6 +22,9 @@ namespace model {
 			
 			if (jsonEvent["type"].isString())
 				this->type = jsonEvent["type"].asString();
+
+			if (jsonEvent["param"]["sessionID"].isString())
+				this->sessionid = jsonEvent["param"]["sessionID"].asString();
 		};
 
 		explicit _EventType(const Json::Value & _event)
@@ -35,6 +38,9 @@ namespace model {
 			if (jsonEvent["type"].isString())
 				this->type = jsonEvent["type"].asString();
 
+			if (jsonEvent["param"]["sessionID"].isString())
+				this->sessionid = jsonEvent["param"]["sessionID"].asString();
+
 			Json::StreamWriterBuilder builder;
 			this->origData = Json::writeString(builder, this->jsonEvent);
 
@@ -43,6 +49,7 @@ namespace model {
 		//explicit _EventType(const Json::Value & _event, uint64_t _connect) :event(_event),connect(_connect) {};
 		Json::Value jsonEvent;
 		std::string id;
+		std::string sessionid;
 		std::string eventName;
 		std::string type;
 		std::string origData;

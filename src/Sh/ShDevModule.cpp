@@ -30,7 +30,7 @@ ShDevModule::~ShDevModule(void)
 	UnInitLib();
 }
 
-void ShDevModule::fireSend(const std::string &strContent, const void * param)
+void ShDevModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
 	LOG4CPLUS_WARN(log, "." + this->getId(), "fireSend not implement.");
 }

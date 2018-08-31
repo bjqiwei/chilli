@@ -97,9 +97,9 @@ namespace Group {
 		log4cplus::threadCleanup();
 	}
 
-	void GroupModule::fireSend(const std::string & strContent, const void * param)
+	void GroupModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 	{
-		LOG4CPLUS_DEBUG(log, "." + this->getId(), strContent);
+		LOG4CPLUS_DEBUG(log, "." + this->getId(), fireData.event);
 		LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend not implement.");
 	}
 }

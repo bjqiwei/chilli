@@ -6,7 +6,7 @@ namespace chilli {
 namespace model {
 
 
-	PerformElement::PerformElement(ProcessModule * model, const std::string &id) :SendInterface("this"),
+	PerformElement::PerformElement(ProcessModule * model, const std::string &id) :SendInterface("this", this),
 		m_model(model), m_Id(id)
 	{
 	}

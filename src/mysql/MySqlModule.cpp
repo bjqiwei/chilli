@@ -159,51 +159,28 @@ Json::Value MySqlModule::executeQuery(const std::string & sql)
 	return result;
 }
 
-void MySqlModule::fireSend(const std::string &strContent, const void * param)
+void MySqlModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-	Json::Value jsonEvent;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonEvent, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, "." + this->getId(), " " << strContent << " not json data." << jsonerr);
-		return;
-	}
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 
-	std::string eventName;
-	std::string typeName;
-	std::string dest;
-	std::string from;
+	const std::string & eventName = fireData.event;
+	const std::string & typeName = fireData.type;
+	const std::string & dest = fireData.dest;
+	const std::string & from = fireData.from;
 
-	if (jsonEvent["type"].isString()) {
-		typeName = jsonEvent["type"].asString();
-	}
 
 	if (typeName != "cmd") {
 		return;
 	}
 
-	if (jsonEvent["dest"].isString()) {
-		dest = jsonEvent["dest"].asString();
-	}
-
-	if (jsonEvent["event"].isString()) {
-		eventName = jsonEvent["event"].asString();
-	}
-
-	if (jsonEvent["from"].isString()) {
-		from = jsonEvent["from"].asString();
-	}
-
 	std::string sql;
 	std::string conctionId;
 
-	if (jsonEvent["param"]["sql"].isString())
-		sql = jsonEvent["param"]["sql"].asString();
+	if (fireData.param["sql"].isString())
+		sql = fireData.param["sql"].asString();
 
-	if (jsonEvent["param"]["ConnectionID"].isString()) {
-		conctionId = jsonEvent["param"]["ConnectionID"].asString();
+	if (fireData.param["ConnectionID"].isString()) {
+		conctionId = fireData.param["ConnectionID"].asString();
 	}
 
 
@@ -364,11 +341,12 @@ void MySqlModule::executeSql()
 					}
 				}
 
-				result["extension"] = Event.m_ExtNumber;
+				result["id"] = Event.m_ExtNumber;
 				result["ConnectionID"] = Event.m_ConnectionID;
 				result["event"] = "SQL";
+				result["type"] = "result";
 
-				chilli::model::EventType_t resultEvent(result);
+				chilli::model::EventType_t resultEvent(new model::_EventType(result));
 				this->PushEvent(resultEvent);
 			}
 		}

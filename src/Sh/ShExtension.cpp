@@ -45,9 +45,9 @@ int ShExtension::getChannelID()
 
 
 
-void ShExtension::fireSend(const std::string &strContent, const void * param)
+void ShExtension::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " recive a Send event from stateMachine:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " recive a Send event from stateMachine:" << fireData.event);
 }
 
 }
