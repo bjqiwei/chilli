@@ -330,7 +330,7 @@ bool fsm::StateMachineimp::processSend(const xmlNodePtr &Node)const
 
 	std::map<std::string , SendInterface *>::const_iterator it = m_mapSendObject.find(send.getTarget());
 	if (it != m_mapSendObject.end()) {
-		it->second->fireSend(send.getContent(),this);
+		it->second->fireSend(send.getFireData(), it->second->getUserData());
 	}
 	else {
 

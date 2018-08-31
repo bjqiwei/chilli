@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _FSM_MODEL_ACTION_HEADER_
-#define _FSM_MODEL_ACTION_HEADER_
 #include "../Context.h"
 #include <libxml/tree.h>
 #include <log4cplus/logger.h>
@@ -52,4 +50,3 @@ namespace model
 	};
 }
 }
-#endif // end action header

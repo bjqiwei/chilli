@@ -1,5 +1,4 @@
-#ifndef FSM_CONFIG_H
-#define FSM_CONFIG_H
+#pragma once
 #include <string>
 #include <map>
 #ifdef FSM_LIB
@@ -15,4 +14,3 @@
 
 //EXPIMP_TEMPLATE template class FSM_EXPORT std::allocator<char>;
 //EXPIMP_TEMPLATE template class FSM_EXPORT std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
-#endif
