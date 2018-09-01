@@ -19,10 +19,10 @@ namespace Call {
 		virtual void mainEventLoop() override;
 
 		//inherit from SendInterface
-		virtual void fireSend(const std::string &strContent, const void * param) override;
+		virtual void fireSend(const fsm::FireDataType & fireData, const void * param) override;
 
 	protected:
-		void processSend(Json::Value &jsonData, const void * param, bool & bHandled);
+		void processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled);
 		std::map<std::string, StateMachine> m_StateMachines;
 		const std::string m_SMFileName;
 		helper::CEventBuffer<model::EventType_t> m_EvtBuffer;

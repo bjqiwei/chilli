@@ -32,8 +32,10 @@ namespace chilli {
 				Json::Value shutdown;
 				shutdown["id"] = this->m_Id;
 				shutdown["event"] = "ShutDown";
+				shutdown["type"] = "cmd";
+				shutdown["param"]["deviceID"] = this->m_Id;
 				shutdown["param"]["sessionID"] = it.first;
-				this->PushEvent(chilli::model::EventType_t(shutdown));
+				this->PushEvent(model::EventType_t(new model::_EventType(shutdown)));
 
 			}
 			LOG4CPLUS_INFO(log, "." + this->getId(), " Stop.");
@@ -55,33 +57,19 @@ namespace chilli {
 			{
 
 				model::EventType_t Event;
-				if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
-					const Json::Value & jsonEvent = Event.event;
+				if (m_EvtBuffer.Get(Event, 0) && !Event->eventName.empty()) {
+					const Json::Value & jsonEvent = Event->jsonEvent;
 
-					std::string eventName;
-					std::string sessionId;
-					std::string type;
-					Json::FastWriter writer;
-
-					if (jsonEvent["type"].isString())
-						type = jsonEvent["type"].asString();
-
-					if (jsonEvent["event"].isString()) {
-						eventName = jsonEvent["event"].asString();
-					}
-
-					if (jsonEvent["param"]["sessionID"].isString()) {
-						sessionId = jsonEvent["param"]["sessionID"].asString();
-					}
+					const std::string & sessionId = Event->sessionid;
 
 					if (sessionId.empty()) {
-						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionid is null:" << writer.write(jsonEvent));
+						LOG4CPLUS_WARN(log, "." + this->getId(), "sessionid is null:" << Event->origData);
 						return;
 					}
 
-					fsm::TriggerEvent evt(eventName, type);
+					fsm::TriggerEvent evt(Event->eventName, Event->type);
 
-					for (auto & it : jsonEvent.getMemberNames()) {
+					for (const auto & it : jsonEvent.getMemberNames()) {
 						evt.addVars(it, jsonEvent[it]);
 					}
 
@@ -102,7 +90,7 @@ namespace chilli {
 						session->start(false);
 					}
 
-					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << writer.write(Event.event));
+					LOG4CPLUS_DEBUG(log, "." + this->getId() + "." + sessionId, " Recived a event," << Event->origData);
 
 					const auto & it = m_Sessions.find(sessionId);
 					if (it != m_Sessions.end()) {
@@ -115,7 +103,7 @@ namespace chilli {
 						}
 					}
 					else {
-						LOG4CPLUS_ERROR(log, "." + this->getId() + "." + sessionId, "no find session :" << writer.write(Event.event));
+						LOG4CPLUS_ERROR(log, "." + this->getId() + "." + sessionId, "no find session :" << Event->origData);
 					}
 
 				}
@@ -126,21 +114,21 @@ namespace chilli {
 			}
 		}
 
-		void Device::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+		void Device::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled)
 		{
 	
-			if (jsonData.isObject() && jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
+			if (!fireData.dest.empty())
 			{
 				Json::Value newEvent;
-				newEvent["from"] = jsonData["from"];
-				newEvent["id"] = jsonData["dest"];
-				newEvent["event"] = jsonData["event"];
-				newEvent["type"] = jsonData["type"];
-				newEvent["param"] = jsonData["param"];
+				newEvent["from"] = fireData.from;
+				newEvent["id"] = fireData.dest;
+				newEvent["event"] = fireData.event;
+				newEvent["type"] = fireData.type;
+				newEvent["param"] = fireData.param;
 			
-				const auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
+				const auto & pe = this->m_model->getPerformElementByGlobal(fireData.dest);
 				if (pe != nullptr) {
-					pe->PushEvent(chilli::model::EventType_t(newEvent));
+					pe->PushEvent(model::EventType_t(new model::_EventType(newEvent)));
 				}
 				else {
 					LOG4CPLUS_WARN(log, "." + this->getId(), "not find device:" << newEvent["id"].asString());
@@ -150,20 +138,11 @@ namespace chilli {
 
 		}
 
-		void Device::fireSend(const std::string &strContent, const void * param)
+		void Device::fireSend(const fsm::FireDataType &fireData, const void * param)
 		{
-			LOG4CPLUS_TRACE(log, "." + this->getId(), "fireSend:" << strContent);
-			Json::Value jsonData;
-			Json::CharReaderBuilder b;
-			std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-			std::string jsonerr;
-
-			if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-				LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
-				return;
-			}
+			LOG4CPLUS_TRACE(log, "." + this->getId(), "fireSend:" << fireData.event);
 			bool bHandled = false;
-			processSend(jsonData, param, bHandled);
+			processSend(fireData, param, bHandled);
 		}
 
 	}

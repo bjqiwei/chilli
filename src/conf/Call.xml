@@ -17,7 +17,7 @@
 		</onentry>
 		<event event="MakeCall">
 			<script>caller = _event.param.caller; called = _event.param.called;</script>
-			<send target="freeswitch001" type="cmd" dest="this" event="MakeCall">
+			<send target="freeswitch001" type="cmd" destexpr="_event.param.caller" event="MakeCall">
 				<caller type="script">_event.param.caller</caller>
 				<called type="script">_event.param.called</called>
 				<display type="script">_event.param.caller</display>
@@ -27,7 +27,7 @@
 		
 		<event event="MakeConnection">
 			<script>called = _event.param.called;</script>
-			<send target="freeswitch001" type="cmd" dest="this" event="MakeConnection">
+			<send target="freeswitch001" type="cmd" destexpr="_event.param.called" event="MakeConnection">
 				<called type="script">_event.param.called</called>
 				<caller type="script">_event.param.caller</caller>
 				<sessionID type="script">_event.param.sessionID</sessionID>

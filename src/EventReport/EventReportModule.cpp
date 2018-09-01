@@ -227,8 +227,11 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 			request["param"]["caller"] = calling;
 			request["param"]["called"] = called;
+			request["id"] = request["param"]["callID"];
+			request["event"] = requestid;
+			request.removeMember("request");
 
-			model::EventType_t evt(request);
+			model::EventType_t evt(new model::_EventType(request));
 			this->PushEvent(evt);
 		}
 		else if (requestid == "MakeConnection")
@@ -269,7 +272,10 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			request["param"]["sessionID"] = response["param"]["initiatedCall"]["sessionID"];
 			request["param"]["called"] = called;
 			request["param"]["caller"] = caller;
-			model::EventType_t evt(request);
+			request["id"] = request["param"]["callID"];
+			request["event"] = requestid;
+			request.removeMember("request");
+			model::EventType_t evt(new model::_EventType(request));
 			this->PushEvent(evt);
 		}
 
@@ -296,7 +302,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["event"] = request["request"];
 						request.removeMember("request");
 						request["id"] = deviceid;
-						model::EventType_t evt(request);
+						model::EventType_t evt(new model::_EventType(request));
 						it->PushEvent(evt);
 						return;
 					}
@@ -334,8 +340,11 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["deviceID"] = request["param"]["callToBeCleared"]["deviceID"];
 
 						request["param"].removeMember("callToBeCleared");
+						request["id"] = request["param"]["callID"];
+						request["event"] = requestid;
+						request.removeMember("request");
 
-						model::EventType_t evt(request);
+						model::EventType_t evt(new model::_EventType(request));
 						it->PushEvent(evt);
 						return;
 					}
@@ -374,7 +383,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["event"] = request["request"];
 						request.removeMember("request");
 						request["id"] = deviceid;
-						model::EventType_t evt(request);
+						model::EventType_t evt(new model::_EventType(request));
 						it->PushEvent(evt);
 						return;
 					}
@@ -408,35 +417,27 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 }
 
 
-void EventReportModule::processSend(const std::string &strContent, const void * param, bool & bHandled)
+void EventReportModule::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled)
 {
 	Json::Value jsonData;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-	if (jsonReader->parse(strContent.c_str(), strContent.c_str()+ strContent.length(), &jsonData, &jsonerr)) {
 
-		jsonData.removeMember("id");
-		jsonData.removeMember("dest");
-		jsonData.removeMember("from");
-		jsonData.removeMember("target");
 
-		for (auto & it:m_Connections){
-			it.second->Send(jsonData);
-		}
-		bHandled = true;
+	jsonData["type"] = fireData.type;
+	jsonData["event"] = fireData.event;
+	jsonData["param"] = fireData.param;
 
+	for (auto & it : m_Connections) {
+		it.second->Send(jsonData);
 	}
-	else {
-		LOG4CPLUS_ERROR(log, "." + ProcessModule::getId(), strContent << " not json data." << jsonerr);
-	}
+	bHandled = true;
+
 }
 
-void EventReportModule::fireSend(const std::string & strContent, const void * param)
+void EventReportModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + ProcessModule::getId(), " fireSend:" << strContent);
+	LOG4CPLUS_TRACE(log, "." + ProcessModule::getId(), " fireSend:" << fireData.event);
 	bool bHandled = false;
-	processSend(strContent, param, bHandled);
+	processSend(fireData, param, bHandled);
 }
 
 void EventReportModule::run()
@@ -459,9 +460,9 @@ void EventReportModule::run()
 			try
 			{
 				model::EventType_t evt;
-				if (m_RecEvtBuffer.Get(evt) && !evt.event.isNull())
+				if (m_RecEvtBuffer.Get(evt) && !evt->eventName.empty())
 				{
-					const Json::Value & jsonEvent = evt.event;
+					const Json::Value & jsonEvent = evt->jsonEvent;
 					callmodule->PushEvent(evt);
 				}
 			}

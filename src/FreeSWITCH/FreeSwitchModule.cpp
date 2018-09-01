@@ -97,74 +97,52 @@ bool FreeSwitchModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-void FreeSwitchModule::fireSend(const std::string & strContent, const void * param)
+void FreeSwitchModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-	Json::Value jsonData;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-
-	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
-		return;
-	}
-
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
+	
 	bool bHandled = false;
-	this->processSend(jsonData, param, bHandled, log);
+	this->processSend(fireData, param, bHandled, log);
 
 }
 
-void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, bool & bHandled, log4cplus::Logger & log)
+void FreeSwitchModule::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled, log4cplus::Logger & log)
 {
 
 
-	std::string eventName;
-	std::string typeName;
-	std::string dest;
+	const std::string & eventName = fireData.event;
+	const std::string & typeName = fireData.type;
+	const std::string & dest = fireData.dest;
+	
+	Json::Value newEvent;
+	newEvent["id"] = dest;
+	newEvent["event"] = fireData.event;
+	newEvent["type"] = fireData.type;
+	newEvent["param"] = fireData.param;
+	model::EventType_t evt(new model::_EventType(newEvent));
+	this->PushEvent(evt);
+	return;
 
-	if (jsonData["type"].isString()) {
-		typeName = jsonData["type"].asString();
-	}
-
-	if (typeName != "cmd") {
-		return;
-	}
-
-	if (jsonData["dest"].isString()) {
-		dest = jsonData["dest"].asString();
-	}
-
-	if (dest != "this") {
-		jsonData["id"] = dest;
-		model::EventType_t evt(jsonData);
-		this->PushEvent(evt);
-		return;
-	}
-
-	if (jsonData["event"].isString()) {
-		eventName = jsonData["event"].asString();
-	}
 
 	if (eventName == "MakeCall")
 	{
-		bHandled = MakeCall(jsonData["param"], log);
+		bHandled = MakeCall(fireData.param, log);
 	}
 	else if (eventName == "MakeConnection")
 	{
-		bHandled = MakeConnection(jsonData["param"], log);
+		bHandled = MakeConnection(fireData.param, log);
 	}
 	else if (eventName == "ClearConnection")
 	{
-		bHandled = ClearConnection(jsonData["param"], log);
+		bHandled = ClearConnection(fireData.param, log);
 	}
 	else if (eventName == "DivertCall")
 	{
-		bHandled = Divert(jsonData["param"], log);
+		bHandled = Divert(fireData.param, log);
 	}
 	else if (eventName == "StartRecord")
 	{
-		bHandled = StartRecord(jsonData["param"], log);
+		bHandled = StartRecord(fireData.param, log);
 	}
 	else if (eventName == "TransferAgent")
 	{
@@ -172,14 +150,14 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 		std::string origcaller = "";
 		std::string agentid = "";
 
-		if (jsonData["param"]["ConnectionID"].isString())
-			uuid = jsonData["param"]["ConnectionID"].asString();
+		if (fireData.param["ConnectionID"].isString())
+			uuid = fireData.param["ConnectionID"].asString();
 
-		if (jsonData["param"]["origcaller"].isString())
-			origcaller = jsonData["param"]["origcaller"].asString();
+		if (fireData.param["origcaller"].isString())
+			origcaller = fireData.param["origcaller"].asString();
 
-		if (jsonData["param"]["agentId"].isString())
-			agentid = jsonData["param"]["agentId"].asString();
+		if (fireData.param["agentId"].isString())
+			agentid = fireData.param["agentId"].asString();
 
 		static std::string lastAgent;
 		std::string findAgent;
@@ -257,7 +235,7 @@ void FreeSwitchModule::processSend(Json::Value & jsonData, const void * param, b
 		*/
 	}
 }
-bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::MakeCall(const Json::Value & param, log4cplus::Logger & log)
 {
 	std::string caller = "";
 	std::string called = "";
@@ -291,7 +269,7 @@ bool FreeSwitchModule::MakeCall(Json::Value & param, log4cplus::Logger & log)
 	return true;
 
 }
-bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::MakeConnection(const Json::Value & param, log4cplus::Logger & log)
 {
 	std::string called = "";
 	std::string sessionId = "";
@@ -320,7 +298,7 @@ bool FreeSwitchModule::MakeConnection(Json::Value & param, log4cplus::Logger & l
 	return true;
 
 }
-bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::ClearConnection(const Json::Value & param, log4cplus::Logger & log)
 {
 	std::string sessionId = "";
 
@@ -337,7 +315,7 @@ bool FreeSwitchModule::ClearConnection(Json::Value & param, log4cplus::Logger & 
 	return true;
 }
 
-bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
+bool FreeSwitchModule::StartRecord(const Json::Value & param, log4cplus::Logger & log)
 {
 	std::string sessionId = "";
 	std::string filename = "";
@@ -357,7 +335,7 @@ bool FreeSwitchModule::StartRecord(Json::Value & param, log4cplus::Logger & log)
 	return true;
 }
 
-bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & llog)
+bool FreeSwitchModule::Divert(const Json::Value & param, log4cplus::Logger & llog)
 {
 	std::string called = "";
 	std::string sessionId = "";
@@ -379,7 +357,7 @@ bool FreeSwitchModule::Divert(Json::Value & param, log4cplus::Logger & llog)
 	return true;
 }
 
-bool FreeSwitchModule::PlayFile(Json::Value & param, log4cplus::Logger & llog)
+bool FreeSwitchModule::PlayFile(const Json::Value & param, log4cplus::Logger & llog)
 {
 	std::string sessionId;
 	std::string filename;
@@ -601,24 +579,24 @@ void FreeSwitchModule::ConnectFS()
 							std::string called = event["Caller-Destination-Number"].asString();
 							std::string dir = event["Call-Direction"].asString();
 
-							model::EventType_t evt;
+							Json::Value newEvt;
 							for (auto & varname : event.getMemberNames()) {
 								std::string newvarname = varname;
 								if (newvarname.find("variable_") == std::string::npos) {
 									helper::string::replaceString(newvarname, "-", "");
-									evt.event["param"][newvarname] = event[varname];
+									newEvt["param"][newvarname] = event[varname];
 								}
 							}
 
 
 							if (eventName == "BACKGROUND_JOB"){
 								std::string sessionId;
-								getJobSession(evt.event["param"]["JobUUID"].asString(), sessionId);
-								evt.event["param"]["UniqueID"] = sessionId;
+								getJobSession(newEvt["param"]["JobUUID"].asString(), sessionId);
+								newEvt["param"]["UniqueID"] = sessionId;
 							}
 
-							std::string sessionId = evt.event["param"]["UniqueID"].asString();
-							evt.event["param"].removeMember("UniqueID");
+							std::string sessionId = newEvt["param"]["UniqueID"].asString();
+							newEvt["param"].removeMember("UniqueID");
 
 							std::string device;
 							if (getSessionDevice(sessionId, device) == false){
@@ -639,17 +617,17 @@ void FreeSwitchModule::ConnectFS()
 
 							
 							if (getSessionDevice(sessionId,device)) {
-								evt.event["id"] = device;
-								evt.event["event"] = eventName;
-								evt.event["param"]["sessionID"] = sessionId;
-								this->PushEvent(evt);
+								newEvt["id"] = device;
+								newEvt["event"] = eventName;
+								newEvt["param"]["sessionID"] = sessionId;
+								this->PushEvent(model::EventType_t(new model::_EventType(newEvt)));
 							}
 							else {
 								LOG4CPLUS_ERROR(log, "." + this->getId(), "Channel is already destroy:" << m_Handle.last_event->body);
 							}
 
 							if (eventName == "BACKGROUND_JOB") {
-								removeJobSession(evt.event["JobUUID"].asString());
+								removeJobSession(newEvt["JobUUID"].asString());
 									
 							}
 							else if(eventName == "CHANNEL_DESTROY") {
@@ -750,18 +728,14 @@ void FreeSwitchModule::run()
 			try
 			{
 				model::EventType_t Event;
-				if (m_RecEvtBuffer.Get(Event) && !Event.event.isNull())
+				if (m_RecEvtBuffer.Get(Event) && !Event->eventName.empty())
 				{
 					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
-					const Json::Value & jsonEvent = Event.event;
-					std::string peId;
-					if (jsonEvent["id"].isString()) {
-						peId = jsonEvent["id"].asString();
-					}
+					const Json::Value & jsonEvent = Event->jsonEvent;
+					std::string peId = Event->id;
 
 					if (peId.empty()) {
-						Json::FastWriter writer;
-						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
+						LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << Event->origData);
 						continue;
 					}
 
@@ -795,20 +769,10 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 		try
 		{
 			model::EventType_t Event;
-			if (eventQueue->Get(Event, 1000 * 5) && !Event.event.isNull())
+			if (eventQueue->Get(Event, 1000 * 1) && !Event->eventName.empty())
 			{
-				const Json::Value & jsonEvent = Event.event;
-				std::string peId;
-				if (jsonEvent["id"].isString()) {
-					peId = jsonEvent["id"].asString();
-				}
-
-				if (peId.empty()) {
-					Json::FastWriter writer;
-					LOG4CPLUS_WARN(log, "." + this->getId(), " not find device:" << writer.write(Event.event));
-					continue;
-				}
-
+				const Json::Value & jsonEvent = Event->jsonEvent;
+				std::string peId = Event->id;
 
 				if (this->getPerformElement(peId) == nullptr) {
 

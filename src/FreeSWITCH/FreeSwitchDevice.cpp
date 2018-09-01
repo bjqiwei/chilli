@@ -18,43 +18,42 @@ namespace FreeSwitch {
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " destruction a device object.");
 	}
 
-	void FreeSwitchDevice::fireSend(const std::string &strContent, const void * param)
+	void FreeSwitchDevice::fireSend(const fsm::FireDataType & fireData, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-		Json::Value jsonData;
-		Json::CharReaderBuilder b;
-		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-		std::string jsonerr;
-
-		if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
-			return;
-		}
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 
 		bool bHandled = false;
-		this->processSend(jsonData, param, bHandled);
+		this->processSend(fireData, param, bHandled);
 		
 	}
 
-	void FreeSwitchDevice::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+	void FreeSwitchDevice::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled)
 	{
-		if (jsonData["event"].asString() == "ClearConnection")
+		if (fireData.event == "MakeConnection")
 		{
-			bHandled = m_model->ClearConnection(jsonData["param"], this->log);
+			bHandled = m_model->MakeConnection(fireData.param, log);
 		}
-		else if (jsonData["event"].asString() == "StartRecord")
+		else if (fireData.event == "MakeCall")
 		{
-			bHandled = m_model->StartRecord(jsonData["param"], this->log);
+			bHandled = m_model->MakeCall(fireData.param, log);
 		}
-		else if (jsonData["event"].asString() == "PlayFile")
+		else if (fireData.event == "ClearConnection")
 		{
-			bHandled = m_model->PlayFile(jsonData["param"], this->log);
+			bHandled = m_model->ClearConnection(fireData.param, this->log);
+		}
+		else if (fireData.event == "StartRecord")
+		{
+			bHandled = m_model->StartRecord(fireData.param, this->log);
+		}
+		else if (fireData.event == "PlayFile")
+		{
+			bHandled = m_model->PlayFile(fireData.param, this->log);
 		}
 		else
-			m_model->processSend(jsonData, param, bHandled, log);
+			m_model->processSend(fireData, param, bHandled, log);
 
 		if (!bHandled) {
-			Device::processSend(jsonData, param, bHandled);
+			Device::processSend(fireData, param, bHandled);
 		}
 	}
 

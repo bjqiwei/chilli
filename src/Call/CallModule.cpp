@@ -59,33 +59,54 @@ bool CallModule::LoadConfig(const std::string & configContext)
 	return true;
 }
 
-void CallModule::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+void CallModule::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled)
 {
 
-	if (jsonData["dest"].isString() && jsonData["dest"].asString() != "this")
+	if (!fireData.dest.empty())
 	{
-		this->PushEvent(chilli::model::EventType_t(jsonData));
+		Json::Value newEvent;
+		newEvent["from"] = fireData.from;
+		newEvent["event"] = fireData.event;
+		newEvent["type"] = fireData.type;
+		newEvent["param"] = fireData.param;
+		std::string callid;
+		if (findCallBySession(fireData.dest, callid)) {
+			newEvent["id"] = callid;
+		}
+		else {
+			if (fireData.param.isMember("otherSessionID") && fireData.param["otherSessionID"].isString()) {
+				std::string otherSessionId = fireData.param["otherSessionID"].asString();
+				if (findCallBySession(otherSessionId, callid)) {
+					newEvent["id"] = callid;
+					setCallSession(fireData.dest, callid);
+				}
+				else {
+					std::string newCallId = helper::uuid();
+					newEvent["param"]["callID"] = newCallId;
+					std::string newConnectionID = helper::uuid();
+					newEvent["param"]["connectionID"] = newConnectionID;
+					setCallSession(fireData.dest, newCallId);
+					newEvent["id"] = newCallId;
+				}
+			}
+		}
+
+		this->PushEvent(model::EventType_t(new model::_EventType(newEvent)));
 		bHandled = true;
+	}
+	else {
+		LOG4CPLUS_WARN(log, "." + this->getId(), " fireSend, dest is null " << fireData.event);
 	}
 
 	
 }
 
 
-void CallModule::fireSend(const std::string & strContent, const void * param)
+void CallModule::fireSend(const fsm::FireDataType & fireData, const void * param)
 {
-	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-	Json::Value jsonData;
-	Json::CharReaderBuilder b;
-	std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-	std::string jsonerr;
-	if (!jsonReader->parse(strContent.c_str(), strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-		LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
-		return;
-	}
-
+	LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
 	bool bHandled = false;
-	processSend(jsonData, param, bHandled);
+	processSend(fireData, param, bHandled);
 }
 
 void CallModule::run()
@@ -99,59 +120,23 @@ void CallModule::run()
 			try
 			{
 				model::EventType_t evt;
-				if (m_RecEvtBuffer.Get(evt) && !evt.event.isNull())
+				if (m_RecEvtBuffer.Get(evt) && !evt->eventName.empty())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
+					Json::Value & jsonEvent = evt->jsonEvent;
 					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
 
-					Json::Value  & jsonEvent = evt.event;
-					Json::FastWriter writer;
-
-					std::string sessionid; 
-					if (jsonEvent["param"].isMember("sessionID"))
-						sessionid = jsonEvent["param"]["sessionID"].asString();
-
-					std::string newCallId;
-					if (jsonEvent.isMember("id"))
-						newCallId = jsonEvent["id"].asString();
-					else if(jsonEvent["param"].isMember("callID"))
-						newCallId = jsonEvent["param"]["callID"].asString();
-
-					std::string newConnectionID;
-					if(jsonEvent["param"].isMember("connectionID"))
-						newConnectionID = jsonEvent["param"]["connectionID"].asString();
-
-
-					if (findCallBySession(sessionid, newCallId) == false) {
-
-						std::string otherSessionId;
-						if (jsonEvent["param"].isMember("otherSessionID") && jsonEvent["param"]["otherSessionID"].isString())
-							otherSessionId = jsonEvent["param"]["otherSessionID"].asString();
-
-						std::string otherCallId;
-						if (findCallBySession(otherSessionId, otherCallId)) {
-							setCallSession(sessionid, otherCallId);
-						}
-						else {
-							if (newCallId.empty()) {
-								newCallId = helper::uuid();
-								jsonEvent["param"]["callID"] = newCallId;
-							}
-							if (newConnectionID.empty()) {
-								newConnectionID = helper::uuid();
-								jsonEvent["param"]["connectionID"] = newConnectionID;
-							}
-
-							setCallSession(sessionid, newCallId);
-						}
+					const std::string & sessionid = evt->sessionid;
+					
+					std::string callid;
+					if (!this->findCallBySession(sessionid, callid)) {
+						this->setCallSession(sessionid, evt->id);
 					}
-
-					jsonEvent["id"] = newCallId;
-
-					apr_ssize_t klen = newCallId.length();
-					uint32_t hash = apr_hashfunc_default(newCallId.c_str(), &klen);
+					
+					apr_ssize_t klen = evt->id.length();
+					uint32_t hash = apr_hashfunc_default(evt->id.c_str(), &klen);
 					hash %= m_executeThread.size();
-					m_executeThread[hash].eventQueue.Put(chilli::model::EventType_t(jsonEvent));
+					m_executeThread[hash].eventQueue.Put(evt);
 				}
 			}
 			catch (std::exception & e)
@@ -180,37 +165,29 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 			try
 			{
 				model::EventType_t evt;
-				if (eventQueue->Get(evt, 1000 * 5) && !evt.event.isNull())
+				if (eventQueue->Get(evt, 1000 * 1) && !evt->eventName.empty())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 
-					Json::Value  & jsonEvent = evt.event;
-					if (jsonEvent["type"] == "request") {
-						jsonEvent["event"] = jsonEvent["request"];
-					}
+					Json::Value  & jsonEvent = evt->jsonEvent;
+					std::string & callId = evt->id;
 
-					std::string sessionid;
-					if (jsonEvent["param"].isMember("sessionID"))
-						sessionid = jsonEvent["param"]["sessionID"].asString();
-
-					std::string callId = jsonEvent["id"].asString();
-
-					std::string newConnectionID;
-					if (jsonEvent["param"].isMember("connectionID"))
-						newConnectionID = jsonEvent["param"]["connectionID"].asString();
-
-
-					if (this->getPerformElement(callId) == nullptr){
+					model::PerformElementPtr call;
+					if ((call = this->getPerformElement(callId)) == nullptr){
 						model::PerformElementPtr newCall(new Call(this, callId, m_SMFileName));
+						std::string newConnectionID;
+						if (jsonEvent["param"].isMember("connectionID"))
+							newConnectionID = jsonEvent["param"]["connectionID"].asString();
+
 						newCall->setVar("_callid", callId);
 						newCall->setVar("_connectionid", newConnectionID);
 						this->addPerformElement(callId, newCall);
 						LOG4CPLUS_INFO(log, "." + this->getId(), "current call size:" << getPerformElementCount());
+						call = newCall;
 					}
 				
-					const auto & call = this->getPerformElement(callId);
 
-					call->pushEvent(chilli::model::EventType_t(jsonEvent));
+					call->pushEvent(evt);
 					call->mainEventLoop();
 
 					if (call->IsClosed()) {
@@ -218,8 +195,9 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 						LOG4CPLUS_INFO(log, "." + this->getId(), "current call size:" << getPerformElementCount());
 					}
 
-					if (jsonEvent["event"].isString() && jsonEvent["event"].asString() == "Null")
-						removeCallSession(sessionid);
+					if (evt->eventName == "Null") {
+						removeCallSession(evt->sessionid);
+					}
 				}
 				else {
 					fsm::threadIdle();
@@ -248,14 +226,14 @@ void CallModule::setCallSession(const TSessionID & sessionid, const TCallID & ca
 		return;
 
 	std::unique_lock<std::mutex> lck(m_callMtx);
-	m_Calls[sessionid] = callid;
+	m_SessionCalls[sessionid] = callid;
 }
 
 bool CallModule::findCallBySession(const TSessionID & sessionid, TCallID & callid)
 {
 	std::unique_lock<std::mutex> lck(m_callMtx);
-	const auto & it = m_Calls.find(sessionid);
-	if (it != m_Calls.end()){
+	const auto & it = m_SessionCalls.find(sessionid);
+	if (it != m_SessionCalls.end()){
 		callid = it->second;
 		return true;
 	}
@@ -265,7 +243,7 @@ bool CallModule::findCallBySession(const TSessionID & sessionid, TCallID & calli
 void CallModule::removeCallSession(const TSessionID & sessionid)
 {
 	std::unique_lock<std::mutex> lck(m_callMtx);
-	m_Calls.erase(sessionid);
+	m_SessionCalls.erase(sessionid);
 }
 
 }

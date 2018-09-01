@@ -36,7 +36,7 @@ namespace Call {
 				shutdown["id"] = this->m_Id;
 				shutdown["event"] = "ShutDown";
 				shutdown["param"]["callID"] = it.first;
-				this->PushEvent(chilli::model::EventType_t(shutdown));
+				this->PushEvent(model::EventType_t(new model::_EventType(shutdown)));
 
 			}
 		}
@@ -59,22 +59,14 @@ namespace Call {
 		{
 			model::PerformElementPtr call;
 			model::EventType_t Event;
-			if (m_EvtBuffer.Get(Event, 0) && !Event.event.isNull()) {
+			if (m_EvtBuffer.Get(Event, 0) && !Event->eventName.empty()) {
 
-				const Json::Value & jsonEvent = Event.event;
+				const Json::Value & jsonEvent = Event->jsonEvent;
 
-				std::string eventName;
 				std::string connectid;
-				std::string type;
 
-				if (jsonEvent["event"].isString()) {
-					eventName = jsonEvent["event"].asString();
-				}
-				if (jsonEvent["type"].isString()){
-					type = jsonEvent["type"].asString();
-				}
 
-				fsm::TriggerEvent evt(eventName, type);
+				fsm::TriggerEvent evt(Event->eventName, Event->type);
 
 				for (auto & it : jsonEvent.getMemberNames()) {
 					evt.addVars(it, jsonEvent[it]);
@@ -98,8 +90,7 @@ namespace Call {
 					call->start(false);
 				}
 
-				Json::FastWriter writer;
-				LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << writer.write(Event.event));
+				LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event->origData);
 
 				const auto & it = m_StateMachines.begin();
 				it->second->pushEvent(evt);
@@ -119,44 +110,33 @@ namespace Call {
 
 	}
 
-	void Call::processSend(Json::Value & jsonData, const void * param, bool & bHandled)
+	void Call::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled)
 	{
-
-		if (jsonData.isObject() && jsonData["dest"].isString() && !jsonData["dest"].asString().empty())
-		{
-			Json::Value newEvent;
-			newEvent["from"] = jsonData["from"];
-			newEvent["id"] = jsonData["dest"];
-			newEvent["event"] = jsonData["event"];
-			newEvent["type"] = jsonData["type"];
-			newEvent["param"] = jsonData["param"];
-			const auto & pe = this->m_model->getPerformElementByGlobal(newEvent["id"].asString());
-			if (pe != nullptr){
-				pe->PushEvent(chilli::model::EventType_t(newEvent));
-			}
-			else {
-				LOG4CPLUS_WARN(log, "." + this->getId(), "not find device:" << newEvent["id"].asString());
-			}
-			bHandled = true;
+		/*
+		Json::Value newEvent;
+		newEvent["from"] = fireData.from;
+		newEvent["id"] = fireData.dest;
+		newEvent["event"] = fireData.event;
+		newEvent["type"] = fireData.type;
+		newEvent["param"] = fireData.param;
+		const auto & pe = this->m_model->getPerformElementByGlobal(fireData.dest);
+		if (pe != nullptr) {
+			pe->PushEvent(model::EventType_t(new model::_EventType(newEvent)));
 		}
+		else {
+			LOG4CPLUS_WARN(log, "." + this->getId(), "not find device:" << fireData.dest);
+		}
+		*/
+		LOG4CPLUS_WARN(log, "." + this->getId(), "processSend not implement.");
+		bHandled = true;
 
 	}
 
-	void Call::fireSend(const std::string &strContent, const void * param)
+	void Call::fireSend(const fsm::FireDataType & fireData, const void * param)
 	{
-		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << strContent);
-		Json::Value jsonData;
-		Json::CharReaderBuilder b;
-		std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-		std::string jsonerr;
-
-		if (jsonReader->parse(strContent.c_str(),strContent.c_str()+strContent.length(), &jsonData, &jsonerr)) {
-			bool bHandled = false;
-			this->processSend(jsonData, param, bHandled);
-		}
-		else {
-			LOG4CPLUS_ERROR(log, "." + this->getId(), strContent << " not json data." << jsonerr);
-		}
+		LOG4CPLUS_TRACE(log, "." + this->getId(), " fireSend:" << fireData.event);
+		bool bHandled = false;
+		this->processSend(fireData, param, bHandled);
 	}
 
 }

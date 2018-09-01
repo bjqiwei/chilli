@@ -42,9 +42,9 @@ public:
 	void ConnOnError(uint64_t id, const std::string & errorCode);
 	void ConnOnMessage(EPConnection * conn, uint64_t id, const std::string & message, log4cplus::Logger & log, const std::string & logId);
 private:
-	void processSend(const std::string &strContent, const void * param, bool & bHandled);
+	void processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled);
 	//inherit from SendInterface
-	virtual void fireSend(const std::string &strContent, const void * param) override;
+	virtual void fireSend(const fsm::FireDataType & fireData, const void * param) override;
 	virtual void run() override;
 	virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) override;
 private:

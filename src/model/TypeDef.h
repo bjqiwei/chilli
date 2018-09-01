@@ -42,6 +42,7 @@ namespace model {
 				this->sessionid = jsonEvent["param"]["sessionID"].asString();
 
 			Json::StreamWriterBuilder builder;
+			builder.settings_["indentation"] = "";
 			this->origData = Json::writeString(builder, this->jsonEvent);
 
 		};

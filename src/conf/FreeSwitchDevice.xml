@@ -65,6 +65,15 @@
 	</script>
 </scriptmodel>
 	<state id="Null">
+		<event event="MakeConnection">
+			<script>called = _event.param.called;</script>
+			<send target="this" type="cmd" event="MakeConnection">
+				<called type="script">_event.param.called</called>
+				<caller type="script">_event.param.caller</caller>
+				<sessionID type="script">_event.param.sessionID</sessionID>
+			</send>
+		</event>
+		
 		<event event="CHANNEL_CREATE">
 			<transition target="Initiated"/>
 		</event>
@@ -96,7 +105,7 @@
 		</event>
 		<state id="Initiated">
 			<onentry>
-				<script>sessionID = _event.param.sessionID; caller = _event.param.CallerOrigCallerIDNumber; called =_event.param.CallerDestinationNumber; CallDirection = _event.param.CallDirection;</script>
+				<script>sessionID = _event.param.sessionID; caller = caller || _event.param.CallerOrigCallerIDNumber; called = called || _event.param.CallerDestinationNumber; CallDirection = _event.param.CallDirection;</script>
 				<send target="call001" type="event" destexpr="sessionID" event="Initiated">
 					<sessionID type="script">sessionID</sessionID>
 					<deviceID type="script">_device.deviceID</deviceID>

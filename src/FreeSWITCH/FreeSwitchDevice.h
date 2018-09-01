@@ -13,10 +13,10 @@ namespace FreeSwitch {
 		virtual ~FreeSwitchDevice();
 
 		//inherit from SendInterface
-		virtual void fireSend(const std::string &strContent, const void * param) override;
+		virtual void fireSend(const fsm::FireDataType & fireData, const void * param) override;
 
 	protected:
-		void processSend(Json::Value &jsonData, const void * param, bool & bHandled);
+		void processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled);
 	private:
 		FreeSwitchModule * m_model;
 

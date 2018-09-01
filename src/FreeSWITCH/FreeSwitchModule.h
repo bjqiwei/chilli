@@ -17,14 +17,14 @@ namespace FreeSwitch{
 		virtual bool LoadConfig(const std::string & config) override;
 	protected:
 		//inherit from SendInterface
-		virtual void fireSend(const std::string &strContent, const void * param) override;
-		void processSend(Json::Value &jsonData, const void * param, bool & bHandled, log4cplus::Logger & log);
-		bool MakeCall(Json::Value & param, log4cplus::Logger & log);
-		bool MakeConnection(Json::Value & param, log4cplus::Logger & log);
-		bool ClearConnection(Json::Value & param, log4cplus::Logger & log);
-		bool StartRecord(Json::Value & param, log4cplus::Logger & log);
-		bool Divert(Json::Value &param, log4cplus::Logger & log);
-		bool PlayFile(Json::Value & param, log4cplus::Logger & log);
+		virtual void fireSend(const fsm::FireDataType & fireData, const void * param) override;
+		void processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled, log4cplus::Logger & log);
+		bool MakeCall(const Json::Value & param, log4cplus::Logger & log);
+		bool MakeConnection(const Json::Value & param, log4cplus::Logger & log);
+		bool ClearConnection(const Json::Value & param, log4cplus::Logger & log);
+		bool StartRecord(const Json::Value & param, log4cplus::Logger & log);
+		bool Divert(const Json::Value &param, log4cplus::Logger & log);
+		bool PlayFile(const Json::Value & param, log4cplus::Logger & log);
 
 
 		std::string dialStringFindNumber(const std::string & dialString);
