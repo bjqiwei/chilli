@@ -239,14 +239,14 @@ namespace env
 		if (!JS_InitCTypesClass(m_jsctx, global))
 			throw std::logic_error("JS_InitCTypesClass error.");
 #endif
-		if (!JS_InitReflectParse(m_jsctx, *m_global))
-			throw std::logic_error("JS_InitReflectParse error.");
+		//if (!JS_InitReflectParse(m_jsctx, *m_global))
+			//throw std::logic_error("JS_InitReflectParse error.");
 
-		if (!JS_DefineDebuggerObject(m_jsctx, *m_global))
-			throw std::logic_error("JS_DefineDebuggerObject error.");
+		//if (!JS_DefineDebuggerObject(m_jsctx, *m_global))
+			//throw std::logic_error("JS_DefineDebuggerObject error.");
 
-		if (!JS::RegisterPerfMeasurement(m_jsctx, *m_global))
-			throw std::logic_error("RegisterPerfMeasurement error.");
+		//if (!JS::RegisterPerfMeasurement(m_jsctx, *m_global))
+			//throw std::logic_error("RegisterPerfMeasurement error.");
 
 		bool succeeded;
 		if (!JS_SetImmutablePrototype(m_jsctx, *m_global, &succeeded))
