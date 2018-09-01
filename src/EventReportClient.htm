@@ -64,14 +64,23 @@
 		
 		function MakeConnection()
 		{
+			setInterval(MakeConnection2, 1);
+		}
+		
+		function MakeConnection2()
+		{
 			var request = new Object();
+			var i=10;
+			while(i--){
 			request.invokeID = invokeid++;
 			request.type = "request";
 			request.request = "MakeConnection";
 			request.param = new Object();
-			request.param.initiatingDevice = document.getElementById("called2").value;
+			request.param.initiatingDevice = (new Date().getTime()).toString();//document.getElementById("called2").value;
 			request.param.caller = "10086";
 			doSend(JSON.stringify(request));
+			}
+			
 		}
 		
 		function PlayFile()

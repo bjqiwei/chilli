@@ -1,8 +1,7 @@
-#ifndef WEBSOCKET_CLASS
-#define WEBSOCKET_CLASS
-
+#pragma once
 #include <log4cplus/logger.h>
 #include <libwebsockets.h>
+#include "../CEventBuffer.h"
 
 namespace WebSocket {
 	class WSConnection;
@@ -71,8 +70,7 @@ namespace WebSocket {
 		struct lws_client_connect_info con_info;
 		struct lws *wsi;
 		std::string m_url;
-		std::vector<std::vector<unsigned char>> m_sendBuf;
+		helper::CEventBuffer<std::vector<unsigned char>> m_sendBuf;
 	};
 }
 
-#endif//end header file

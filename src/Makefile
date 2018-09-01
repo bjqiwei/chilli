@@ -1,5 +1,5 @@
 APP =chilli
-APPVERSION=1.0.6.4
+APPVERSION=1.0.6.5
 INSTALL_PATH=/usr/local/$(APP)/
 
 #CFLAGS='-D_EVENT_DISABLE_DEBUG_MODE -g -O1' ./configure --disable-shared

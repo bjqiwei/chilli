@@ -125,24 +125,23 @@ lwsclose:
 			if ( wsclient && wsclient->m_state != CLOSING) {
 				wsclient->OnSend();
 				if (wsclient->m_sendBuf.size() > 0) {
-					int bufLen = wsclient->m_sendBuf.at(0).size() - LWS_PRE;
+					std::vector<unsigned char> buffer;
+					wsclient->m_sendBuf.Get(buffer, 0);
+					int bufLen = buffer.size() - LWS_PRE;
 					if (bufLen > 0)
 					{
-						std::string sdata = std::string(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).end());
+						std::string sdata = std::string(buffer.begin() + LWS_PRE, buffer.end());
 						LOG4CPLUS_TRACE(wsclient->log, "", "Send:" << sdata);
 
-						int len = lws_write(wsi, wsclient->m_sendBuf.at(0).data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
+						int len = lws_write(wsi, buffer.data() + LWS_PRE, bufLen, LWS_WRITE_TEXT);
 						if (len > 0){
-							wsclient->m_sendBuf.at(0).erase(wsclient->m_sendBuf.at(0).begin() + LWS_PRE, wsclient->m_sendBuf.at(0).begin() + LWS_PRE + len);
+							buffer.erase(buffer.begin() + LWS_PRE, buffer.begin() + LWS_PRE + len);
 						}
 						else {
 							return -1;
 						}
 					}
 
-					if (wsclient->m_sendBuf.at(0).size() - LWS_PRE <= 0) {
-						wsclient->m_sendBuf.erase(wsclient->m_sendBuf.begin());
-					}
 				}
 
 				if (wsclient->m_sendBuf.size() > 0) {
@@ -519,7 +518,7 @@ lwsclose:
 		//std::lock_guard<std::recursive_mutex>lck(wsClientSetMtx);
 		std::vector<unsigned char> data(LWS_PRE);
 		data.insert(data.end(), lpBuf, lpBuf + nBufLen);
-		m_sendBuf.push_back(data);
+		m_sendBuf.Put(data);
 
 		if (WSClientSet.find(this->wsi) != WSClientSet.end() && this->wsi && this->m_state == OPEN) {
 			lws_callback_on_writable(this->wsi);

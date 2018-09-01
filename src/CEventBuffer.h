@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CEVENTBUFFER_HEADER_
-#define _CEVENTBUFFER_HEADER_
 #include <list>
 #include <mutex>
 #include <condition_variable>
@@ -56,4 +54,3 @@ private:
 	const unsigned long MAXBUFFER;
 };// end CEventBuffer class
 }//end namespace helper
-#endif // end header file
