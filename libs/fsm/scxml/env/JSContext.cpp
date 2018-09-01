@@ -13,7 +13,7 @@ namespace fsm
 namespace env
 {
 
-	static const size_t gStackChunkSize = 8192;
+	static const size_t gStackChunkSize = 4096;
 
 	JsContext::JsContext(::JSRuntime * rt, const std::string &sessionid, Evaluator * eval,Context * _parent)
 		:Context(eval, _parent), m_strSessionID(sessionid), m_jsrt(rt)
