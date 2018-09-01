@@ -153,8 +153,11 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			response["status"] = 0;
 			response["param"]["version"] = appversion;
 
-			EPConnectionPtr connptr(conn);
-			m_Connections[id] = connptr;
+			if (m_Connections.find(id) == m_Connections.end()) {
+				EPConnectionPtr connptr(conn);
+				m_Connections[id] = connptr;
+			}
+		
 			const auto & c = m_Connections.find(id);
 			if (c != m_Connections.end())
 				c->second->Send(response);

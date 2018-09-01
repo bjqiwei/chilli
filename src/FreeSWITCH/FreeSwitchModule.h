@@ -30,13 +30,27 @@ namespace FreeSwitch{
 		std::string dialStringFindNumber(const std::string & dialString);
 		std::string toDialString(const std::string & sipId, const std::string & uuid, const std::string & caller);
 	private:
-		std::thread m_Thread;
+		std::thread m_FSReceiveThread;
+		std::thread m_FSSendThread;
 		std::string m_Host;
 		int m_Port = 0;
 		std::string m_User;
 		std::string m_Password;
 		esl_handle_t m_Handle = { { 0 } };
-		void ConnectFS();
+		void receiveFS();
+		void sendToFS();
+		typedef struct _FSSendData
+		{
+			_FSSendData(const std::string & _sessionid, const std::string & _data) :sessionId(_sessionid), data(_data)
+			{
+			}
+			std::string sessionId;
+			std::string data;
+
+
+		}FSSendDataType;
+
+		helper::CEventBuffer<std::shared_ptr<FSSendDataType>> m_FSSendBuffer;
 		typedef std::string TsessionID;
 		std::mutex m_sessionMtx;
 		std::map<std::string, std::string>m_Session_DeviceId;

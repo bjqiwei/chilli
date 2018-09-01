@@ -28,7 +28,8 @@ private:
 	std::mutex m_callMtx;
 	std::map<TSessionID, TCallID>m_SessionCalls;
 	void setCallSession(const TSessionID & sessionid, const TCallID & callid);
-	bool findCallBySession(const TSessionID & sessionid, TCallID & callid);
+	bool getCallBySession(const TSessionID & sessionid, TCallID & callid);
+	bool hasCallBySession(const TSessionID & sessionid);
 	void removeCallSession(const TSessionID & sessionid);
 };
 }

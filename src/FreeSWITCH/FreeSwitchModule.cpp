@@ -41,8 +41,13 @@ int FreeSwitchModule::Stop(void)
 		ProcessModule::Stop();
 		m_bRunning = false;
 
-		if (m_Thread.joinable()) {
-			m_Thread.join();
+		if (m_FSReceiveThread.joinable()) {
+			m_FSReceiveThread.join();
+		}
+
+		if (m_FSSendThread.joinable())
+		{
+			m_FSSendThread.join();
 		}
 	}
 	return 0;
@@ -54,7 +59,8 @@ int FreeSwitchModule::Start()
 	if(!m_bRunning){
 		ProcessModule::Start();
 		m_bRunning = true;
-		m_Thread = std::thread(&FreeSwitchModule::ConnectFS, this);
+		m_FSReceiveThread = std::thread(&FreeSwitchModule::receiveFS, this);
+		m_FSSendThread = std::thread(&FreeSwitchModule::sendToFS, this);
 	}
 	return 0;
 }
@@ -261,10 +267,8 @@ bool FreeSwitchModule::MakeCall(const Json::Value & param, log4cplus::Logger & l
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid + "\n\n";
-
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	std::string cmd = "bgapi originate {origination_uuid=" + sessionId + "}" + caller + " &bridge({origination_caller_id_number=" + display + "}" + called + ")" + "\nJob-UUID:" + jobid;
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId,cmd));	
 
 	return true;
 
@@ -291,10 +295,9 @@ bool FreeSwitchModule::MakeConnection(const Json::Value & param, log4cplus::Logg
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi originate " + called + " &park()\nJob-UUID:" + jobid + "\n\n";
+	std::string cmd = "bgapi originate " + called + " &park()\nJob-UUID:" + jobid;
 
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 	return true;
 
 }
@@ -308,9 +311,8 @@ bool FreeSwitchModule::ClearConnection(const Json::Value & param, log4cplus::Log
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid + "\n\n";
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	std::string cmd = "bgapi uuid_kill " + sessionId + "\nJob-UUID:" + jobid;
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 
 	return true;
 }
@@ -329,9 +331,8 @@ bool FreeSwitchModule::StartRecord(const Json::Value & param, log4cplus::Logger 
 	std::string jobid = helper::uuid();
 	setJobSession(jobid, sessionId);
 
-	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid + "\n\n";
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid;
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 	return true;
 }
 
@@ -351,8 +352,7 @@ bool FreeSwitchModule::Divert(const Json::Value & param, log4cplus::Logger & llo
 		sessionId = param["sessionID"].asString();
 
 	std::string cmd = esl_execute_data("bridge", called.c_str(), sessionId.c_str(), false, false);
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 
 	return true;
 }
@@ -369,8 +369,7 @@ bool FreeSwitchModule::PlayFile(const Json::Value & param, log4cplus::Logger & l
 		filename = param["filename"].asString();
 
 	std::string cmd = esl_execute_data("playback", filename.c_str(), sessionId.c_str(), false, false);
-	esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-	LOG4CPLUS_DEBUG(log, "." + sessionId, " esl_send:" << cmd << ", status:" << status);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 	return true;
 }
 
@@ -397,7 +396,7 @@ std::string esl_execute_data(const char * app, const char * arg, const char * uu
 		snprintf(arg_buf, sizeof(arg_buf), "execute-app-arg: %s\n", arg);
 	}
 
-	snprintf(send_buf, sizeof(send_buf), "%s\ncall-command: execute\n%s%s%s%s\n\n",
+	snprintf(send_buf, sizeof(send_buf), "%s\ncall-command: execute\n%s%s%s%s\n",
 		cmd_buf, app_buf, arg_buf, eventlock ? el_buf : "", async ? bl_buf : "");
 	
 	return send_buf;
@@ -480,7 +479,7 @@ void esl_logger(const char *file, const char *func, int line, int level, const c
 	va_end(ap);
 }
 
-void FreeSwitchModule::ConnectFS()
+void FreeSwitchModule::receiveFS()
 {
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Run  FreeSwitch module");
 
@@ -503,7 +502,8 @@ void FreeSwitchModule::ConnectFS()
 		LOG4CPLUS_INFO(log, "." + this->getId(), " Connected to FreeSWITCH");
 
 		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
-		esl_send(&m_Handle, "nixevent json PLAYBACK_START PLAYBACK_START CHANNEL_UNPARK CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt");
+		std::string cmd = "nixevent json PLAYBACK_START PLAYBACK_START CHANNEL_UNPARK CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt";
+		m_FSSendBuffer.Put(std::make_shared<FSSendDataType>("", cmd));
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_sr_reply);
 
 		while (m_bRunning){
@@ -653,6 +653,31 @@ void FreeSwitchModule::ConnectFS()
 		esl_disconnect(&m_Handle);
 	}
 	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Stoped  FreeSwitch module");
+	log4cplus::threadCleanup();
+}
+void FreeSwitchModule::sendToFS()
+{
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Run  FreeSwitch send thread");
+
+	//esl_handle_t handle = { { 0 } };
+
+	while (m_bRunning)
+	{
+		std::shared_ptr<FSSendDataType> sendData;
+		if (m_FSSendBuffer.Get(sendData,1000) && sendData)
+		{
+			if (m_Handle.connected){
+				esl_status_t status = esl_send(&m_Handle, sendData->data.c_str());
+				LOG4CPLUS_DEBUG(log, "." + sendData->sessionId, " esl_send:" << sendData->data << ", status:" << status);
+			}
+			else {
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				m_FSSendBuffer.Put(sendData);
+			}
+		}
+	
+	}
+	LOG4CPLUS_DEBUG(log, "." + this->getId(), " Stoped  FreeSwitch send thread");
 	log4cplus::threadCleanup();
 }
 void FreeSwitchModule::setSessionDevice(const TsessionID & sessionId, const std::string & device)

@@ -70,13 +70,13 @@ void CallModule::processSend(const fsm::FireDataType & fireData, const void * pa
 		newEvent["type"] = fireData.type;
 		newEvent["param"] = fireData.param;
 		std::string callid;
-		if (findCallBySession(fireData.dest, callid)) {
+		if (getCallBySession(fireData.dest, callid)) {
 			newEvent["id"] = callid;
 		}
 		else {
 			if (fireData.param.isMember("otherSessionID") && fireData.param["otherSessionID"].isString()) {
 				std::string otherSessionId = fireData.param["otherSessionID"].asString();
-				if (findCallBySession(otherSessionId, callid)) {
+				if (getCallBySession(otherSessionId, callid)) {
 					newEvent["id"] = callid;
 					setCallSession(fireData.dest, callid);
 				}
@@ -129,7 +129,7 @@ void CallModule::run()
 					const std::string & sessionid = evt->sessionid;
 					
 					std::string callid;
-					if (!this->findCallBySession(sessionid, callid)) {
+					if (!this->hasCallBySession(sessionid)) {
 						this->setCallSession(sessionid, evt->id);
 					}
 					
@@ -229,12 +229,21 @@ void CallModule::setCallSession(const TSessionID & sessionid, const TCallID & ca
 	m_SessionCalls[sessionid] = callid;
 }
 
-bool CallModule::findCallBySession(const TSessionID & sessionid, TCallID & callid)
+bool CallModule::getCallBySession(const TSessionID & sessionid, TCallID & callid)
 {
 	std::unique_lock<std::mutex> lck(m_callMtx);
 	const auto & it = m_SessionCalls.find(sessionid);
 	if (it != m_SessionCalls.end()){
 		callid = it->second;
+		return true;
+	}
+	return false;
+}
+
+bool CallModule::hasCallBySession(const TSessionID & sessionid)
+{
+	std::unique_lock<std::mutex> lck(m_callMtx);
+	if (m_SessionCalls.find(sessionid) != m_SessionCalls.end()) {
 		return true;
 	}
 	return false;
