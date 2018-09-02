@@ -755,7 +755,8 @@ void FreeSwitchModule::run()
 				model::EventType_t Event;
 				if (m_RecEvtBuffer.Get(Event) && !Event->eventName.empty())
 				{
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
+					static uint64_t sum = 0;
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size() << ":" << ++sum);
 					const Json::Value & jsonEvent = Event->jsonEvent;
 					std::string peId = Event->id;
 

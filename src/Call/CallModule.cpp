@@ -123,18 +123,19 @@ void CallModule::run()
 				if (m_RecEvtBuffer.Get(evt) && !evt->eventName.empty())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
+					static uint64_t sum  = 0;
 					Json::Value & jsonEvent = evt->jsonEvent;
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size());
+					LOG4CPLUS_DEBUG(log, "." + this->getId(), "event buffer size:" << m_RecEvtBuffer.size() << ":" << ++sum);
 
-					const std::string & sessionid = evt->sessionid;
-					
-					std::string callid;
+					std::string sessionid = evt->sessionid;
+					std::string callid = evt->id;
+
 					if (!this->hasCallBySession(sessionid)) {
-						this->setCallSession(sessionid, evt->id);
+						this->setCallSession(sessionid, callid);
 					}
 					
-					apr_ssize_t klen = evt->id.length();
-					uint32_t hash = apr_hashfunc_default(evt->id.c_str(), &klen);
+					apr_ssize_t klen = callid.length();
+					uint32_t hash = apr_hashfunc_default(callid.c_str(), &klen);
 					hash %= m_executeThread.size();
 					m_executeThread[hash].eventQueue.Put(evt);
 				}
