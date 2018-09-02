@@ -1,5 +1,5 @@
 #pragma once
-#include <list>
+#include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <stdexcept>
@@ -24,12 +24,12 @@ public:
 			std::runtime_error ex("CEventBuffer size Exceed max buffer.");
 			throw  std::exception(ex);
 		}
-		this->m_dataBuffer.push_back(data);
+		this->m_dataBuffer.push(data);
 		this->m_cv.notify_one();
 		return true;
 	}
 
-	bool Get(T& data, long long dwMilliseconeds = INT32_MAX)
+	bool Get(T& data, uint64_t dwMilliseconeds = INT32_MAX)
 	{
 		std::unique_lock<std::mutex> lck(m_mtx);
 		
@@ -37,18 +37,35 @@ public:
 		
 		if (result){
 			data = m_dataBuffer.front();
-			m_dataBuffer.pop_front();
+			m_dataBuffer.pop();
 		}
 		
 		return result;
 	}
-	unsigned long size()
+
+	bool Get(std::queue<T> & data, uint64_t dwMilliseconeds = INT32_MAX)
+	{
+		std::unique_lock<std::mutex> lck(m_mtx);
+
+		bool result = this->m_cv.wait_for(lck, std::chrono::milliseconds(dwMilliseconeds), [&]()->bool { return !this->m_dataBuffer.empty(); });
+
+		if (result) {
+			while (!m_dataBuffer.empty()) {
+				data.push(m_dataBuffer.front());
+				m_dataBuffer.pop();
+			}
+		}
+
+		return result;
+	}
+
+	size_t size()
 	{
 		std::unique_lock<std::mutex> lck(m_mtx);
 		return m_dataBuffer.size();
 	}
 private:
-	std::list<T> m_dataBuffer; 
+	std::queue<T> m_dataBuffer; 
 	std::mutex m_mtx;
 	std::condition_variable m_cv;
 	const unsigned long MAXBUFFER;
