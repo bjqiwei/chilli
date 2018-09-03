@@ -1,5 +1,5 @@
-./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --without-nspr --enable-release --with-pthreads --disable-gc-trace --enable-static-rtl
-#禁用动态库参数 --disable-shared-js --disable-shared --enable-static
+./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --without-nspr --enable-release --with-pthreads --disable-gc-trace --enable-static-rtl --enable-static
+#禁用动态库参数 --disable-shared-js --disable-shared
 #debug --enable-debug
 #编译64位库参数 --target=x86_64-pc-mingw32 --host=x86_64-pc-mingw32
 #修改topdir/config/config.mk RTL_FLAGS=-MT

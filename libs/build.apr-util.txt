@@ -1,0 +1,1 @@
+./configure --with-apr=../apr-1.5.2 && make && make install

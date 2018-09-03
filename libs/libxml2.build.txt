@@ -1,1 +1,2 @@
 在Windows 系统下，修改xmlversion.h头文件，禁用LIBXML_LZMA_ENABLED LIBXML_FTP_ENABLED LIBXML_HTTP_ENABLED LIBXML_HTML_ENABLED 宏
+Linux ./configure --enable-static && make && make install
