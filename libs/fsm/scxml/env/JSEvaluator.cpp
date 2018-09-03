@@ -10,7 +10,7 @@ namespace env
 {
 	static std::atomic_ulong g_JSEvaluatorReferce(0);
 
-	static const size_t gMaxHeapSize = 512 * 1024 * 1024;
+	static const size_t gMaxHeapSize = 1024 * 1024 * 1024;
 
 #if defined(DEBUG)
 	static const size_t gMaxStackSize = 2 * 128 * sizeof(size_t) * 1024;
