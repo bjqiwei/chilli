@@ -16,7 +16,7 @@
 			<script>sessionlist = {};</script>
 		</onentry>
 		<event event="MakeCall">
-			<script>caller = _event.param.caller; called = _event.param.called;</script>
+			<script>caller = _event.param.caller; called = _event.param.called; sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ; sessionlist[_event.param.sessionID].caller = _event.param.caller ;</script>
 			<send target="freeswitch001" type="cmd" destexpr="_event.param.caller" event="MakeCall">
 				<caller type="script">_event.param.caller</caller>
 				<called type="script">_event.param.called</called>
@@ -32,7 +32,7 @@
 				<caller type="script">_event.param.caller</caller>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
-			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;</script>
+			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;  sessionlist[_event.param.sessionID].caller = _event.param.caller ;</script>
 			<transition target="Originated"/>
 		</event>
 		
@@ -69,8 +69,8 @@
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
-					<caller type="script">sessionlist[_event.param.sessionID].caller || _event.param.deviceID</caller>
-					<called type="script">sessionlist[_event.param.sessionID].called || _event.param.deviceID</called>
+					<caller type="script">sessionlist[_event.param.sessionID].caller</caller>
+					<called type="script">sessionlist[_event.param.sessionID].called</called>
 					<createdTime type="script">_event.param.createdTime</createdTime>
 					<ringTime type="script">_event.param.ringTime</ringTime>
 					<answeredTime type="script">_event.param.answeredTime</answeredTime>
