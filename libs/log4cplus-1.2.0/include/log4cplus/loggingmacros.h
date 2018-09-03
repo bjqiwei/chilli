@@ -306,12 +306,12 @@ LOG4CPLUS_EXPORT void macro_forced_log (log4cplus::Logger const &,
 
 #else
 #define LOG4CPLUS_TRACE_METHOD(logger, logEvent) LOG4CPLUS_DOWHILE_NOTHING()
-#define LOG4CPLUS_TRACE(logger, logEvent) LOG4CPLUS_DOWHILE_NOTHING()
-#define LOG4CPLUS_TRACE_STR(logger, logEvent) LOG4CPLUS_DOWHILE_NOTHING()
+#define LOG4CPLUS_TRACE(logger, appendName, logEvent) LOG4CPLUS_DOWHILE_NOTHING()
+#define LOG4CPLUS_TRACE_STR(logger, appendName, logEvent) LOG4CPLUS_DOWHILE_NOTHING()
 #if defined (LOG4CPLUS_HAVE_C99_VARIADIC_MACROS)
-#define LOG4CPLUS_TRACE_FMT(logger, logFmt, ...) LOG4CPLUS_DOWHILE_NOTHING()
+#define LOG4CPLUS_TRACE_FMT(logger, appendName, logFmt, ...) LOG4CPLUS_DOWHILE_NOTHING()
 #elif defined (LOG4CPLUS_HAVE_GNU_VARIADIC_MACROS)
-#define LOG4CPLUS_TRACE_FMT(logger, logFmt, logArgs...) LOG4CPLUS_DOWHILE_NOTHING()
+#define LOG4CPLUS_TRACE_FMT(logger,appendName, logFmt, logArgs...) LOG4CPLUS_DOWHILE_NOTHING()
 #endif
 
 #endif
