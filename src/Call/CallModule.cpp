@@ -166,7 +166,7 @@ void CallModule::execute(helper::CEventBuffer<model::EventType_t> * eventQueue)
 			try
 			{
 				model::EventType_t evt;
-				if (eventQueue->Get(evt, 1000 * 5) && !evt->eventName.empty())
+				if (eventQueue->Get(evt, 1000 * 2) && !evt->eventName.empty())
 				{
 					//LOG4CPLUS_DEBUG(log, evt.event.toStyledString());
 
