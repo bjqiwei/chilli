@@ -99,12 +99,12 @@ namespace env
 
 	size_t JSEvaluator::getContextCount()
 	{
-		return m_contexts.size();
+		return m_contexts.size() + m_removedContexts.size();
 	}
 
 	bool JSEvaluator::hasContext()
 	{
-		return !m_contexts.empty();
+		return getContextCount() > 0;
 	}
 
 

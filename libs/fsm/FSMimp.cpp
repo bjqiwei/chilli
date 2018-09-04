@@ -512,7 +512,6 @@ helper::TimerServer * fsm::StateMachineimp::getTimerServer() const
 			tls_set_value(g_tls_storage_key, pdata);
 		}
 
-		pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
 		if (pdata->timerServer == nullptr) {
 			pdata->timerServer.reset(new helper::TimerServer());
 			pdata->timerServer->Start();
@@ -715,7 +714,6 @@ fsm::Context  *  fsm::StateMachineimp::getRootContext() const{
 			tls_set_value(g_tls_storage_key, pdata);
 		}
 
-		pdata = reinterpret_cast<per_thread_data *>(tls_get_value(g_tls_storage_key));
 		if (pdata->evaluator == nullptr) {
 			pdata->evaluator.reset(new fsm::env::JSEvaluator());
 		}
@@ -891,6 +889,11 @@ void fsm::StateMachineimp::threadIdle()
 	{
 		if (pdata->evaluator) {
 			pdata->evaluator->deleteContext(1);
+
+			if (!pdata->evaluator->hasContext())
+			{
+				pdata->evaluator = nullptr;
+			}
 		}
 	}
 }
