@@ -487,6 +487,7 @@ void FreeSwitchModule::receiveFS()
 
 	while (m_bRunning)
 	{
+		esl_global_set_default_logger(5);
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " connect freeswitch " << m_Host << ":" << m_Port);
 
 		esl_status_t status = esl_connect_timeout(&m_Handle, m_Host.c_str(), m_Port, m_User.c_str(), m_Password.c_str(),5*1000);
@@ -507,140 +508,114 @@ void FreeSwitchModule::receiveFS()
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_sr_reply);
 
 		while (m_bRunning){
-			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, true, NULL);
-			if (status == ESL_SUCCESS){
-				if (m_Handle.last_event && m_Handle.last_event->body) {
-					Json::Value event;
-					Json::CharReaderBuilder b;
-					std::shared_ptr<Json::CharReader> jsonReader(b.newCharReader());
-					std::string jsonerr;
+			esl_status_t status = esl_recv_event_timed(&m_Handle, 1000, false, NULL);
+			if (status == ESL_SUCCESS) {
 
-					if (jsonReader->parse(m_Handle.last_event->body, m_Handle.last_event->body + std::strlen(m_Handle.last_event->body), &event, &jsonerr) && event.isObject()) {
-
-						std::string eventName;
-						if (event["Event-Name"].isString()) {
-							eventName = event["Event-Name"].asString();
-							event.removeMember("Event-Name");
-						}
-
-						if (eventName == "CHANNEL_CREATE" 
-							|| eventName == "CHANNEL_PROGRESS"
-							|| eventName == "CHANNEL_ANSWER"
-							|| eventName == "CHANNEL_BRIDGE"
-							|| eventName == "CHANNEL_UNBRIDGE"
-							|| eventName == "CHANNEL_HANGUP"
-							|| eventName == "CHANNEL_DESTROY"
-							|| eventName == "CHANNEL_OUTGOING"
-							|| eventName == "CHANNEL_ORIGINATE"
-							|| eventName == "CHANNEL_EXECUTE"
-							|| eventName == "CHANNEL_EXECUTE_COMPLETE"
-							|| eventName == "CHANNEL_PROGRESS_MEDIA"
-							|| eventName == "BACKGROUND_JOB")
-						{
-							event.removeMember("Core-UUID");
-							event.removeMember("FreeSWITCH-Hostname");
-							event.removeMember("FreeSWITCH-Switchname");
-							event.removeMember("FreeSWITCH-IPv4");
-							event.removeMember("FreeSWITCH-IPv6");
-							event.removeMember("Event-Calling-File");
-							event.removeMember("Event-Calling-Function");
-							event.removeMember("Event-Calling-Line-Number");
-							event.removeMember("Event-Sequence");
-							event.removeMember("Caller-Dialplan");
-							event.removeMember("Caller-Caller-ID-Name");
-							event.removeMember("Caller-Channel-Name");
-							event.removeMember("Caller-Context");
-							event.removeMember("Caller-Orig-Caller-ID-Name");
-							event.removeMember("Caller-Network-Addr");
-							event.removeMember("Caller-Privacy-Hide-Name");
-							event.removeMember("Caller-Privacy-Hide-Number");
-							event.removeMember("Caller-Profile-Created-Time");
-							event.removeMember("Caller-Profile-Index");
-							event.removeMember("Caller-Screen-Bit");
-							event.removeMember("Caller-Source");
-							event.removeMember("Channel-HIT-Dialplan");
-							event.removeMember("Channel-Name");
-							event.removeMember("Channel-Presence-ID");
-							event.removeMember("Event-Date-GMT");
-							event.removeMember("Event-Date-Timestamp");
-							event.removeMember("Caller-Unique-ID");
-							event.removeMember("Caller-Direction");
-							event.removeMember("CallerLogical-Direction");
-							event.removeMember("Channel-Call-UUID");
-							event.removeMember("Channel-Name");
-							event.removeMember("Channel-Call-State");
-							event.removeMember("Presence-Call-Direction");
-							event.removeMember("Channel-State-Number");
-
-							if (eventName == "CHANNEL_EXECUTE_COMPLETE")
-								eventName = event["Application"].asString();
-
-							std::string caller = event["Caller-ANI"].asString();
-							std::string called = event["Caller-Destination-Number"].asString();
-							std::string dir = event["Call-Direction"].asString();
-
-							Json::Value newEvt;
-							for (auto & varname : event.getMemberNames()) {
-								std::string newvarname = varname;
-								if (newvarname.find("variable_") == std::string::npos) {
-									helper::string::replaceString(newvarname, "-", "");
-									newEvt["param"][newvarname] = event[varname];
-								}
-							}
-
-
-							if (eventName == "BACKGROUND_JOB"){
-								std::string sessionId;
-								getJobSession(newEvt["param"]["JobUUID"].asString(), sessionId);
-								newEvt["param"]["UniqueID"] = sessionId;
-							}
-
-							std::string sessionId = newEvt["param"]["UniqueID"].asString();
-							newEvt["param"].removeMember("UniqueID");
-
-							std::string device;
-							if (getSessionDevice(sessionId, device) == false){
-								if (dir == "inbound" && !caller.empty())
-									setSessionDevice(sessionId, caller.substr(0, caller.find("%")));
-								else if (dir == "outbound" && !called.empty())
-									setSessionDevice(sessionId, called.substr(0, called.find("%")));
-								
-							}
-							
-
-							//Channel _ Create：通道创建事件
-							//Channel _ Progress：通道振铃事件
-							//Channel _ Answer：通道应答事件
-							//Channel _ Bridge：通道桥接事件
-							//Channel _ Hangup：通道挂断事件
-
-
-							
-							if (getSessionDevice(sessionId,device)) {
-								newEvt["id"] = device;
-								newEvt["event"] = eventName;
-								newEvt["param"]["sessionID"] = sessionId;
-								this->PushEvent(model::EventType_t(new model::_EventType(newEvt)));
-							}
-							else {
-								LOG4CPLUS_ERROR(log, "." + this->getId(), "Channel is already destroy:" << m_Handle.last_event->body);
-							}
-
-							if (eventName == "BACKGROUND_JOB") {
-								removeJobSession(newEvt["JobUUID"].asString());
-									
-							}
-							else if(eventName == "CHANNEL_DESTROY") {
-								removeSessionDevice(sessionId);
-							}
-
-						}
-						else {
-							LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_event->body);
-						}
-					}
-					
+				if (m_Handle.last_ievent == nullptr) {
+					continue;
 				}
+
+				if (!(m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_CREATE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_PROGRESS
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_ANSWER
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_BRIDGE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_UNBRIDGE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_HANGUP
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_DESTROY
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_OUTGOING
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_ORIGINATE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_PROGRESS_MEDIA
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB))
+				{
+					continue;
+				}
+
+				std::string eventName;
+
+				Json::Value newEvt;
+
+				for (esl_event_header_t * header = m_Handle.last_ievent->headers; header != nullptr; header = header->next)
+				{
+					std::string newvarname = header->name;
+					if (newvarname == "Core-UUID" || newvarname == "FreeSWITCH-Hostname" || newvarname == "FreeSWITCH-Switchname" || newvarname == "FreeSWITCH-IPv4" || newvarname == "FreeSWITCH-IPv6"
+						|| newvarname == "Event-Calling-File" || newvarname == "Event-Calling-Function" || newvarname == "Event-Calling-Line-Number" || newvarname == "Event-Sequence" || newvarname == "Caller-Dialplan"
+						|| newvarname == "Caller-Caller-ID-Name" || newvarname == "Caller-Channel-Name" || newvarname == "Caller-Context" || newvarname == "Caller-Orig-Caller-ID-Name" || newvarname == "Caller-Network-Addr"
+						|| newvarname == "Caller-Privacy-Hide-Name" || newvarname == "Caller-Privacy-Hide-Number" || newvarname == "Caller-Profile-Created-Time" || newvarname == "Caller-Profile-Index" || newvarname == "Caller-Screen-Bit"
+						|| newvarname == "Caller-Source" || newvarname == "Channel-HIT-Dialplan" || newvarname == "Channel-Name" || newvarname == "Channel-Presence-ID" || newvarname == "Event-Date-GMT" || newvarname == "Event-Date-Timestamp"
+						|| newvarname == "Caller-Unique-ID" || newvarname == "Caller-Direction" || newvarname == "CallerLogical-Direction" || newvarname == "Channel-Call-UUID" || newvarname == "Channel-Name" || newvarname == "Channel-Call-State"
+						|| newvarname == "Presence-Call-Direction" || newvarname == "Channel-State-Number"
+						)
+
+						continue;
+
+					if (newvarname.find("variable_") == std::string::npos) {
+						helper::string::replaceString(newvarname, "-", "");
+						newEvt["param"][newvarname] = header->value;
+					}
+
+				}
+
+				if (m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE)
+					eventName = newEvt["param"]["Application"].asString();
+				else
+					eventName = newEvt["param"]["EventName"].asString();
+
+				if (m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB) {
+					std::string sessionId;
+					getJobSession(newEvt["param"]["JobUUID"].asString(), sessionId);
+					newEvt["param"]["UniqueID"] = sessionId;
+				}
+
+				if (m_Handle.last_ievent->body) {
+					newEvt["param"]["body"] = m_Handle.last_ievent->body;
+				}
+
+				std::string caller = newEvt["param"]["CallerANI"].asString();
+				std::string called = newEvt["param"]["CallerDestinationNumber"].asString();
+				std::string dir = newEvt["param"]["CallDirection"].asString();
+
+				std::string sessionId = newEvt["param"]["UniqueID"].asString();
+				newEvt["param"].removeMember("UniqueID");
+
+				std::string device;
+				if (getSessionDevice(sessionId, device) == false) {
+					if (dir == "inbound" && !caller.empty())
+						setSessionDevice(sessionId, caller.substr(0, caller.find("%")));
+					else if (dir == "outbound" && !called.empty())
+						setSessionDevice(sessionId, called.substr(0, called.find("%")));
+
+				}
+
+
+				//Channel _ Create：通道创建事件
+				//Channel _ Progress：通道振铃事件
+				//Channel _ Answer：通道应答事件
+				//Channel _ Bridge：通道桥接事件
+				//Channel _ Hangup：通道挂断事件
+
+
+
+				if (getSessionDevice(sessionId, device)) {
+					newEvt["id"] = device;
+					newEvt["event"] = eventName;
+					newEvt["param"]["sessionID"] = sessionId;
+					newEvt["type"] = "fsevent";
+					this->PushEvent(model::EventType_t(new model::_EventType(newEvt)));
+				}
+				else {
+					LOG4CPLUS_WARN(log, "." + this->getId(), "Channel is already destroy:" << m_Handle.last_event->body);
+				}
+
+				if (eventName == "BACKGROUND_JOB") {
+					removeJobSession(newEvt["JobUUID"].asString());
+
+				}
+				else if (eventName == "CHANNEL_DESTROY") {
+					removeSessionDevice(sessionId);
+				}
+
 			}
 			else if (status == ESL_BREAK)
 				continue;

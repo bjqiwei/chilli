@@ -87,9 +87,9 @@
 			<transition target="Destroy"/>
 		</event>
 		
-		<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate' &amp;&amp; _event.param._body.indexOf('-ERR')!=-1">
+		<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate' &amp;&amp; _event.param.body.indexOf('-ERR')!=-1">
 			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
-				<cause type="script">cause=FSCause[_event.param._body.substr(5,_event.param._body.length-6)];</cause>
+				<cause type="script">cause=FSCause[_event.param.body.substr(5,_event.param.body.length-6)];</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
 				<sessionID type="script">_event.param.sessionID</sessionID>
 			</send>
