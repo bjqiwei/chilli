@@ -19,6 +19,7 @@
 	<input type="button" value="呼单路" onclick="MakeConnection();" /><font>被叫</font><input type="text" id="called2" value="5000" /><p/>
 	<input type="button" value="放音" onclick="PlayFile();" /><font>语音文件</font><input type="text" id="filename" value="cmwwpstn.wav" /><p/>
 	<input type="button" value="挂机" onclick="ClearCall();" /><p/>
+    <input type="button" value="放音并收键" onclick="PlayFileAndCollects();" /><font>语音文件</font><input type="text" id="filename2" value="cmwwpstn.wav" /><font>最短收键数</font><input type="text" id="min" value="1" /><font>最长收键数</font><input type="text" id="max" value="1" /><font>播放次数</font><input type="text" id="tries" value="3" /><font>等待按键超时</font><input type="text" id="timeout" value="10000" /><font>结束按键</font><input type="text" id="terminators" value="*#" /><p />
 	
     <script type="text/javascript">
 
@@ -86,6 +87,23 @@
 			doSend(JSON.stringify(request));
 		}
 		
+		function PlayFileAndCollects() {
+		    var request = new Object();
+		    request.invokeID = invokeid++;
+		    request.type = "request";
+		    request.request = "PlayFileAndCollects";
+		    request.param = new Object();
+		    request.param.connection = session;
+		    request.param.filename = document.getElementById("filename2").value;
+		    request.param.min = parseInt(document.getElementById("min").value);
+		    request.param.max = parseInt(document.getElementById("max").value);
+		    request.param.tries = parseInt(document.getElementById("tries").value);
+		    request.param.timeout = parseInt(document.getElementById("timeout").value);
+		    request.param.terminators = document.getElementById("terminators").value;
+		    //request.param.digit_timeout = parseInt(document.getElementById("digit_timeout").value);
+		    doSend(JSON.stringify(request));
+		}
+
 		function ClearConnection()
 		{
 			var request = new Object();

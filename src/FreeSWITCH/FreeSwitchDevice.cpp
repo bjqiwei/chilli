@@ -49,6 +49,10 @@ namespace FreeSwitch {
 		{
 			bHandled = m_model->PlayFile(fireData.param, this->log);
 		}
+		else if (fireData.event == "PlayFileAndCollects")
+		{
+			bHandled = m_model->PlayFileAndCollects(fireData.param, this->log);
+		}
 		else
 			m_model->processSend(fireData, param, bHandled, log);
 

@@ -62,6 +62,7 @@
 		FSCause["RECOVERY_ON_TIMER_EXPIRE"] = 1102;
 		FSCause["MANAGER_REQUEST"] = 1503;
 		FSCause["MEDIA_TIMEOUT"] = 1604;
+		FSCause["_none_"] = 0;
 	</script>
 </scriptmodel>
 	<state id="Null">
@@ -193,6 +194,20 @@
 					</send>
 					<transition target="Playing"/>
 				</event>
+				<event event="PlayFileAndCollects">
+					<send target="this" type="cmd" dest="this" event="PlayFileAndCollects">
+						<filename type="script">_event.param.filename</filename>
+						<sessionID type="script">_event.param.sessionID</sessionID>
+						<min type="script">_event.param.min</min>
+						<max type="script">_event.param.max</max>
+						<tries type="script">_event.param.tries</tries>
+						<timeout type="script">_event.param.timeout</timeout>
+						<terminators type="script">_event.param.terminators</terminators>
+						<digit_timeout type="script">_event.param.digit_timeout</digit_timeout>
+					</send>
+					<script>_dtmf=""</script>
+					<transition target="Playing"/>
+				</event>
 				<state id="Held">
 				</state>
 				<state id="Playing">
@@ -205,10 +220,28 @@
 					</onentry>
 					<event event="cmd" cond="_event.cmd =='PlayFile'">
 					</event>
+					<event event="cmd" cond="_event.cmd =='PlayFileAndCollects'">
+					</event>
 					<event event="playback">
 						<send target="eventreport" type="event" event="PlayFileEnd">
 							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
 							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
+						</send>
+						<transition target="Connected"/>
+					</event>
+					<event event="DTMF">
+						<script>_dtmf+=_event.param.DTMFDigit</script>
+					</event>
+					<event event="play_and_get_digits">
+						<!--send target="eventreport" type="event" event="DTMFDetected">
+							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+							<dtmf type="script">_dtmf</dtmf>
+						</send-->
+						
+						<send target="eventreport" type="event" event="PlayFileAndCollectsEnd">
+							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
+							<dtmf type="script">_dtmf</dtmf>
 						</send>
 						<transition target="Connected"/>
 					</event>

@@ -366,7 +366,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];
 			response["type"] = "response";
-			response["response"] = request["request"];
+			response["response"] = requestid;
 			response["status"] = 0;
 
 			if (request["param"]["connection"].isObject()) {
@@ -399,7 +399,44 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 				c->second->Send(response);
 			return;
 		}
+		else if (requestid == "PlayFileAndCollects")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = requestid;
+			response["status"] = 0;
 
+			if (request["param"]["connection"].isObject()) {
+				if (request["param"]["connection"]["deviceID"].isString()) {
+					std::string deviceid = request["param"]["connection"]["deviceID"].asString();
+					const auto & it = this->getPerformElementByGlobal(deviceid);
+					if (it != nullptr) {
+
+						const auto & c = m_Connections.find(id);
+						if (c != m_Connections.end())
+							c->second->Send(response);
+
+						request["param"]["sessionID"] = request["param"]["connection"]["sessionID"];
+						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
+						request["param"]["callID"] = request["param"]["connection"]["callID"];
+						request["param"].removeMember("connection");
+						request["event"] = request["request"];
+						request.removeMember("request");
+						request["id"] = deviceid;
+						model::EventType_t evt(new model::_EventType(request));
+						it->PushEvent(evt);
+						return;
+					}
+				}
+			}
+
+			response["status"] = chilli::INVALID_CALL;
+			const auto & c = m_Connections.find(id);
+			if (c != m_Connections.end())
+				c->second->Send(response);
+			return;
+		}
 		else {
 			Json::Value response;
 			response["invokeID"] = request["invokeID"];

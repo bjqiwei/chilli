@@ -25,6 +25,7 @@ namespace FreeSwitch{
 		bool StartRecord(const Json::Value & param, log4cplus::Logger & log);
 		bool Divert(const Json::Value &param, log4cplus::Logger & log);
 		bool PlayFile(const Json::Value & param, log4cplus::Logger & log);
+		bool PlayFileAndCollects(const Json::Value & param, log4cplus::Logger & log);
 
 
 		std::string dialStringFindNumber(const std::string & dialString);

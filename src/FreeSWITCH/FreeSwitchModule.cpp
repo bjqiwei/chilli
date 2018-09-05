@@ -373,6 +373,54 @@ bool FreeSwitchModule::PlayFile(const Json::Value & param, log4cplus::Logger & l
 	return true;
 }
 
+bool FreeSwitchModule::PlayFileAndCollects(const Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId;
+	std::string filename;
+	uint32_t min = 0;
+	uint32_t max = 1;
+	uint32_t tries = 3;
+	uint32_t timeout = 10000;
+	std::string terminators = "#";
+	std::string & invalid_file = filename;
+	//std::string var_name="_dtmf";
+	//std::string regexp = "\d+";
+	//uint32_t digit_timeout = 5000;
+
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	if (param["filename"].isString())
+		filename = param["filename"].asString();
+
+	if (param["min"].isUInt())
+		min = param["min"].asUInt();
+	
+	if (param["max"].isUInt())
+		max = param["max"].asUInt();
+	
+	if (param["tries"].isUInt())
+		tries = param["tries"].asUInt();
+	
+	if (param["timeout"].isUInt())
+		timeout = param["timeout"].asUInt();
+	
+	if (param["terminators"].isString())
+		terminators = param["terminators"].asString();
+	
+	//if (param["digit_timeout"].isUInt())
+		//digit_timeout = param["digit_timeout"].asUInt();
+	
+
+
+	std::string appdata = std::to_string(min) + " " + std::to_string(max) + " " + std::to_string(tries) + " " + std::to_string(timeout)
+		+ " " + "" + terminators + " " + filename;// +" " + invalid_file + " " + var_name + " " + regexp + " " + std::to_string(digit_timeout);
+	std::string cmd = esl_execute_data("play_and_get_digits", appdata.c_str(), sessionId.c_str(), false, false);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
+	return true;
+}
+
 std::string esl_execute_data(const char * app, const char * arg, const char * uuid, bool eventlock, bool async)
 {
 
@@ -503,7 +551,7 @@ void FreeSwitchModule::receiveFS()
 		LOG4CPLUS_INFO(log, "." + this->getId(), " Connected to FreeSWITCH");
 
 		esl_events(&m_Handle, ESL_EVENT_TYPE_JSON, "All");
-		std::string cmd = "nixevent json PLAYBACK_START PLAYBACK_START CHANNEL_UNPARK CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt";
+		std::string cmd = "nixevent json PLAYBACK_START PLAYBACK_STOP CHANNEL_UNPARK CODEC CALL_UPDATE CHANNEL_CALLSTATE CHANNEL_STATE CHANNEL_HANGUP_COMPLETE API HEARTBEAT RE_SCHEDULE RECV_RTCP_MESSAGE MESSAGE_QUERY MESSAGE_WAITING PRESENCE_IN CUSTOM sofia::pre_register sofia::register_attempt";
 		m_FSSendBuffer.Put(std::make_shared<FSSendDataType>("", cmd));
 		LOG4CPLUS_DEBUG(log, "." + this->getId(), " " << m_Handle.last_sr_reply);
 
@@ -527,7 +575,8 @@ void FreeSwitchModule::receiveFS()
 					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE
 					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE
 					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_PROGRESS_MEDIA
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB))
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB
+					|| m_Handle.last_ievent->event_id == ESL_EVENT_DTMF))
 				{
 					continue;
 				}

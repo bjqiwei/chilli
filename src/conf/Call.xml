@@ -66,6 +66,7 @@
 		</event>
 		
 		<event event="Null">
+				<script>sessionlist[_event.param.sessionID] = sessionlist[_event.param.sessionID] || {}</script>
 				<send target="eventreport" type="event" event="ConnectionCleared">
 					<droppedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</droppedConnection>
 					<releasingDevice type="script">_event.param.deviceID</releasingDevice>
