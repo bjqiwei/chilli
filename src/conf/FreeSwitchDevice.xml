@@ -14,6 +14,7 @@
 	<data id="_callid"/>
 	<data id="_filename"/>
 	<data id="_hangupDirection" expr="1"/> <!--挂机方向，0:本端挂机，1:对端挂机-->
+	<data id="_userdata"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -67,7 +68,7 @@
 </scriptmodel>
 	<state id="Null">
 		<event event="MakeConnection">
-			<script>called = _event.param.called;</script>
+			<script>called = _event.param.called; _userdata = _event.param.userdata;</script>
 			<send target="this" type="cmd" event="MakeConnection">
 				<called type="script">_event.param.called</called>
 				<caller type="script">_event.param.caller</caller>
@@ -226,6 +227,7 @@
 						<send target="eventreport" type="event" event="PlayFileEnd">
 							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
 							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
+							<userdata type="script">_userdata</userdata>
 						</send>
 						<transition target="Connected"/>
 					</event>
@@ -236,12 +238,14 @@
 						<!--send target="eventreport" type="event" event="DTMFDetected">
 							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
 							<dtmf type="script">_dtmf</dtmf>
+							<userdata type="script">_userdata</userdata>
 						</send-->
 						
 						<send target="eventreport" type="event" event="PlayFileAndCollectsEnd">
 							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
 							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
 							<dtmf type="script">_dtmf</dtmf>
+							<userdata type="script">_userdata</userdata>
 						</send>
 						<transition target="Connected"/>
 					</event>

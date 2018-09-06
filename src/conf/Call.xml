@@ -31,8 +31,9 @@
 				<called type="script">_event.param.called</called>
 				<caller type="script">_event.param.caller</caller>
 				<sessionID type="script">_event.param.sessionID</sessionID>
+				<userdata type="script">_event.param.userdata</userdata>
 			</send>
-			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;  sessionlist[_event.param.sessionID].caller = _event.param.caller ;</script>
+			<script>sessionlist[_event.param.sessionID]={};sessionlist[_event.param.sessionID].deviceID = _event.param.called; sessionlist[_event.param.sessionID].called = _event.param.called ;  sessionlist[_event.param.sessionID].caller = _event.param.caller ; sessionlist[_event.param.sessionID].userdata = _event.param.userdata ; </script>
 			<transition target="Originated"/>
 		</event>
 		
@@ -47,8 +48,9 @@
 			<send target="eventreport" type="event" event="Failed">
 				<failedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</failedConnection>
 				<failingDevice type="script">_event.param.deviceID</failingDevice>
-				<calledDevice type="script">sessionlist[_event.param.sessionID].called || _event.param.deviceID</calledDevice>
+				<calledDevice type="script">sessionlist[_event.param.sessionID].called</calledDevice>
 				<cause type="script">parseInt(_event.param.cause)</cause>
+				<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 			</send>
 			
 			<transition target="Blocked"/>
@@ -59,6 +61,7 @@
 			<send target="eventreport" type="event" event="ServiceInitiated">
 				<initiatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</initiatedConnection>
 				<initiatingDevice type="script">_event.param.deviceID</initiatingDevice>
+				<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 			</send>
 			-->
 			<script>sessionlist[_event.param.sessionID]= sessionlist[_event.param.sessionID] || {}; sessionlist[_event.param.sessionID].deviceID = _event.param.deviceID;</script>
@@ -79,6 +82,7 @@
 					<hangupDirection type="script">_event.param.hangupDirection</hangupDirection>
 					<recordPath type="script">_event.param.recordPath</recordPath>
 					<cause type="script">_event.param.cause</cause>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<script>delete sessionlist[_event.param.sessionID]</script>
 				<transition target="Destroy"/>
@@ -99,6 +103,7 @@
 					<originatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</originatedConnection>
 					<callingDevice type="script">caller</callingDevice>
 					<calledDevice type="script">called</calledDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<transition target="Originated"/>
 			</event>
@@ -108,6 +113,7 @@
 					<alertingDevice type="script">_event.param.deviceID</alertingDevice>
 					<callingDevice type="script">caller</callingDevice>
 					<calledDevice type="script">called</calledDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 			</event>
 			<event event="Connected">
@@ -115,12 +121,14 @@
 				<send target="eventreport" type="event" event="Answered">
 					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
 					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				
 				<send target="eventreport" type="event" event="Originated">
 					<originatedConnection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</originatedConnection>
 					<callingDevice type="script">caller</callingDevice>
 					<calledDevice type="script">called</calledDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<transition target="Originated"/>
 			</event>
@@ -136,6 +144,7 @@
 				<send target="eventreport" type="event" event="Answered">
 					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
 					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 			</event>
 			
@@ -152,7 +161,7 @@
 					<hangupDirection type="script">_event.param.hangupDirection</hangupDirection>
 					<recordPath type="script">_event.param.recordPath</recordPath>
 					<cause type="script">_event.param.cause</cause>
-					
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<script>delete sessionlist[_event.param.sessionID]</script>
 				<transition target="Terminated"/>
@@ -164,6 +173,7 @@
 					<failingDevice type="script">_event.param.deviceID</failingDevice>
 					<calledDevice type="script">sessionlist[_event.param.sessionID].called</calledDevice>
 					<cause type="script">_event.param.cause</cause>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				
 				<transition target="Failed"/>
@@ -175,6 +185,7 @@
 					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
 					<callingDevice type="script">caller</callingDevice>
 					<calledDevice type="script">called</calledDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<transition target="Established"/>
 			</event>
@@ -197,6 +208,7 @@
 				<send target="eventreport" type="event" event="Delivered">
 					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
 					<alertingDevice type="script">_event.param.deviceID</alertingDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 				<transition target="Delivered"/>
 			</event>
@@ -205,6 +217,7 @@
 				<send target="eventreport" type="event" event="Answered">
 					<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid;param.sessionID=_event.param.sessionID; param.deviceID=_event.param.deviceID; param;</connection>
 					<answeringDevice type="script">_event.param.deviceID</answeringDevice>
+					<userdata type="script">sessionlist[_event.param.sessionID].userdata</userdata>
 				</send>
 			</event>
 			

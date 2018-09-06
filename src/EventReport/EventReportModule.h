@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include "../TCP/tcp.h"
+#include <mutex>
 
 namespace chilli{
 namespace EventReport{
@@ -59,7 +60,11 @@ public:
 private:
 	void ListenTCP(uint32_t port);
 	bool listenWS(int port);
-
+	void addConnection(uint64_t id, EPConnection * conn);
+	void removeConnection(uint64_t id);
+	void send(uint64_t id, const Json::Value & send);
+	void send(const Json::Value &send);
+	std::mutex m_ConnectionMtx;
 	std::map<uint64_t, EPConnectionPtr>m_Connections;
 
 };

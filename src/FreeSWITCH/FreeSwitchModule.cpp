@@ -406,8 +406,9 @@ bool FreeSwitchModule::PlayFileAndCollects(const Json::Value & param, log4cplus:
 	if (param["timeout"].isUInt())
 		timeout = param["timeout"].asUInt();
 	
-	if (param["terminators"].isString())
+	if (param["terminators"].isString() && !param["terminators"].asString().empty()) {
 		terminators = param["terminators"].asString();
+	}
 	
 	//if (param["digit_timeout"].isUInt())
 		//digit_timeout = param["digit_timeout"].asUInt();
@@ -819,7 +820,7 @@ void FreeSwitchModule::execute(helper::CEventBuffer<model::EventType_t> * eventQ
 		try
 		{
 			model::EventType_t Event;
-			if (eventQueue->Get(Event, 1000 * 2) && !Event->eventName.empty())
+			if (eventQueue->Get(Event, 1000 * 1) && !Event->eventName.empty())
 			{
 				const Json::Value & jsonEvent = Event->jsonEvent;
 				std::string peId = Event->id;
