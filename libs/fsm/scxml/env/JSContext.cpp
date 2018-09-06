@@ -1,9 +1,4 @@
 #include "JSContext.h"
-#include <js/Initialization.h>
-#include <mozilla/Maybe.h>
-#include <jswrapper.h>
-#include <js/Conversions.h>
-#include <jsperf.h>
 #include "../../common/stringHelper.h"
 #include <log4cplus/loggingmacros.h>
 
@@ -123,14 +118,14 @@ namespace env
 		//JS_DumpNamedRoots(JS_GetRuntime(ctx), JsGlobal::dumpRoot, NULL);
 		
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		//JS::RootedObject  obj(this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
 		options.setFileAndLine(filename.c_str(), line);
 
 		JS::RootedValue rv(this->m_jsctx);
-		if (JS::Evaluate(this->m_jsctx, options, expr.c_str(), expr.length(), &rv)) {
+		if (JS::Evaluate(this->m_jsctx, *this->m_global, options, expr.c_str(), expr.length(), &rv)) {
 			return JsvalToJsonValue(rv);
 		}
 		return Json::Value();
@@ -147,8 +142,8 @@ namespace env
 		options.setFileAndLine(filename.c_str(), line);
 
 		JS::RootedValue rv(this->m_jsctx);
-		if (JS::Evaluate(this->m_jsctx, options, expr.c_str(), expr.length(), &rv)) {
-			return JS::ToBoolean(rv);
+		if (JS::Evaluate(this->m_jsctx, *this->m_global, options, expr.c_str(), expr.length(), &rv)) {
+			return rv.toBoolean();
 		}
 		
 		return false;
@@ -163,7 +158,7 @@ namespace env
 		JS::CompileOptions options(this->m_jsctx);
 
 		JS::RootedValue rv(this->m_jsctx);
-		if (JS::Evaluate(this->m_jsctx, options,fileName.c_str(), &rv)) {
+		if (JS::Evaluate(this->m_jsctx, *this->m_global, options,fileName.c_str(), &rv)) {
 			return ;
 		}
 		return ;
@@ -188,19 +183,20 @@ namespace env
 		return true;
 	}
 
-	static bool
-		global_mayResolve(const JSAtomState& names, jsid id, JSObject* maybeObj)
-	{
-		return JS_MayResolveStandardClass(names, id, maybeObj);
-	}
+	//static bool
+	//	global_mayResolve(const JSAtomState& names, jsid id, JSObject* maybeObj)
+	//{
+	//	//return JS_MayResolveStandardClass(names, id, maybeObj);
+	//	return true;
+	//}
 
 	static const JSClass global_class = {
-		"global", JSCLASS_GLOBAL_FLAGS,
+		"chilli", JSCLASS_GLOBAL_FLAGS,
 		nullptr, nullptr, nullptr, nullptr,
-		global_enumerate, global_resolve, global_mayResolve,
+		nullptr, nullptr, nullptr,
 		nullptr,
 		nullptr, nullptr, nullptr,
-		JS_GlobalObjectTraceHook
+		nullptr
 	};
 
 	void JsContext::InitializeInstanceFields()
@@ -248,9 +244,9 @@ namespace env
 		//if (!JS::RegisterPerfMeasurement(m_jsctx, *m_global))
 			//throw std::logic_error("RegisterPerfMeasurement error.");
 
-		bool succeeded;
+		/*bool succeeded;
 		if (!JS_SetImmutablePrototype(m_jsctx, *m_global, &succeeded))
-			throw std::logic_error("JS_SetImmutablePrototype error.");
+			throw std::logic_error("JS_SetImmutablePrototype error.");*/
 
 		JS_FireOnNewGlobalObject(m_jsctx, *m_global);
 	}
@@ -362,22 +358,23 @@ namespace env
 		{
 			Json::Value result;
 			JS::RootedObject obj(this->m_jsctx, value.toObjectOrNull());
-			JS::Rooted<JS::IdVector> props(this->m_jsctx, JS::IdVector(this->m_jsctx));
 
-
-			if (!JS_Enumerate(this->m_jsctx, obj, &props)) {
+			JSIdArray * ids;
+			if ((ids = JS_Enumerate(this->m_jsctx, obj)) == nullptr) {
 				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_Enumerate error");
 				return result;
 			}
 
-			size_t length = props.length();
-			for (size_t i = 0; i < length; i++) {
+			JS::AutoIdArray idsa(this->m_jsctx, ids);
+
+			for (size_t i = 0; i < idsa.length(); i++) {
 				JS::RootedValue v(this->m_jsctx);
 
-				if (JS_GetPropertyById(this->m_jsctx, obj, props[i], &v)) {
+				JS::RootedId id(this->m_jsctx, idsa[i]);
+				if (JS_GetPropertyById(this->m_jsctx, obj,id, &v)) {
 				
-					if (JSID_IS_STRING(props[i])) {
-						JSString *str = JSID_TO_STRING(props[i]);
+					if (JSID_IS_STRING(idsa[i])) {
+						JSString *str = JSID_TO_STRING(idsa[i]);
 						if (str) {
 							JSAutoByteString bytes(this->m_jsctx, str);
 							if (bytes.ptr()) {
@@ -386,8 +383,8 @@ namespace env
 							}
 						}
 					}
-					else if(JSID_IS_INT(props[i])) {
-						result[JSID_TO_INT(props[i])] = JsvalToJsonValue(v);
+					else if(JSID_IS_INT(idsa[i])) {
+						result[JSID_TO_INT(idsa[i])] = JsvalToJsonValue(v);
 
 					}
 				}

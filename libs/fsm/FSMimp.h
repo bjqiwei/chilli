@@ -58,8 +58,8 @@ public:
 		std::string m_strStateFile;
 		std::string m_strStateContent;
 		uint32_t m_xmlType = 0;
-		helper::xml::CXmlDocumentPtr m_xmlDocPtr;
-		helper::xml::CXPathContextPtr xpathCtx;
+		xmlDocPtr m_xmlDocPtr;
+		xmlXPathContextPtr m_xpathCtx;
 		//xmlHelper::xmlDocumentPtr _docPtr2;
 		xmlNodePtr  m_initState = nullptr;
 		xmlNodePtr  m_finalState = nullptr;

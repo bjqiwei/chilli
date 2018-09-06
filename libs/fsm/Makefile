@@ -1,8 +1,9 @@
 #请修改以下内容以确定相关内容
 
-MOZJSDIR = ../mozjs-45.0.2/js/src/
+MOZJSDIR = /usr/include/mozjs-38/
+LIBXML2DIR = /usr/local/include/libxml2/
 #项目类型(可执行程序exe,静态库lib,动态库dll,so)
-export PROJECT_TYPE=a
+export PROJECT_TYPE=so
 
 #项目的版本号
 export PROJECT_VERSION= 1.0.0.0
@@ -11,7 +12,7 @@ export PROJECT_VERSION= 1.0.0.0
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
 #头文件路径(-I目录)
-PROJECT_INCLUDE=-I./ -I./common -I../jsoncpp-src-0.5.0/include/ -I../libxml2-2.9.3/include/ -I$(MOZJSDIR)dist/include/ -include js/RequiredDefines.h
+PROJECT_INCLUDE=-I./ -I./common -I$(MOZJSDIR) -I$(LIBXML2DIR)
 
 #生成的版本文件名称
 PROJCT_VERSION_H= 
@@ -20,14 +21,14 @@ PROJCT_VERSION_H=
 PROJECT_LINK_DIR=
 
 #工程的宏定义
-PROJECT_DEF= -D_LINUX -DLIBXML_STATIC -DEXPORT_JS_API -DMOZILLA_CLIENT  -DLOG4CPLUS_DISABLE_TRACE
+PROJECT_DEF= -D_LINUX  -DLOG4CPLUS_DISABLE_TRACE
 # debug 工程的宏定义
 export PROJECT_DEF_DEBUG= -D_DEBUG -DDEBUG
 # release 工程的宏定义
 export PROJECT_DEF_RELEASE= -DNDEBUG
 
 #工程需要链接的其他动态库
-export PROJECT_IMPORT_DLL= -lpthread -ldl 
+export PROJECT_IMPORT_DLL= -ljsoncpp -lxml2 -llog4cplus -lmozjs-38 -lpthread -ldl 
 
 # debug 工程需要链接的其他静态库文件列表
 export PROJECT_IMPORT_LIB_DEBUG=
@@ -53,11 +54,11 @@ export PWD = $shell('pwd')
 
 DLL_FLAG=
 ifeq ($(PROJECT_TYPE),so)
-DLL_FLAG= -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
+DLL_FLAG= -fPIC -fvisibility-inlines-hidden
 endif
 
 ifeq ($(PROJECT_TYPE),dll)
-DLL_FLAG= -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
+DLL_FLAG= -fPIC -fvisibility-inlines-hidden
 endif
 
 #自动判断32位、64位系统

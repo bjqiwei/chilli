@@ -2,7 +2,11 @@
 #include <string>
 #include <map>
 #ifdef FSM_LIB
-#    define FSM_EXPORT __declspec(dllexport)
+#ifdef WIN32
+#	define FSM_EXPORT __declspec(dllexport)
+#else
+#	define FSM_EXPORT
+#endif
 #else
 #ifdef WIN32
 #	define FSM_EXPORT __declspec(dllimport)

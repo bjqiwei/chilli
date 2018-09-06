@@ -181,7 +181,7 @@ static inline std::vector<xmlNodePtr> filterChildNodes(const std::string& tagNam
 
 class  CXmlDocumentPtr
 {
-public :
+private ://delete
 	// -----------------------------------------------------------------------
 	//  Constructors and Destructor
 	// -----------------------------------------------------------------------
@@ -218,7 +218,7 @@ public :
 
 class  CXPathContextPtr
 {
-public :
+private ://delete
 	// -----------------------------------------------------------------------
 	//  Constructors and Destructor
 	// -----------------------------------------------------------------------
@@ -291,7 +291,7 @@ public :
 };
 
 class  CXmlDocmentHelper{
-public: 
+private://delete
 	CXmlDocmentHelper(void):doc(xmlNewDoc(BAD_CAST "1.0")){}
 
 	virtual ~CXmlDocmentHelper(){}
@@ -299,7 +299,7 @@ public:
 	void setRootNode(const std::string &strRoot)
 	{
 		_root = xmlNewNode(NULL,BAD_CAST strRoot.c_str());
-		xmlNodePtr ret_val = xmlDocSetRootElement(doc._xDocPtr, _root);
+		xmlNodePtr ret_val = xmlDocSetRootElement(doc, _root);
 		if ((ret_val != NULL)) {
 			xmlUnlinkNode(ret_val);
 			xmlFreeNode(ret_val);
@@ -308,7 +308,7 @@ public:
 	void setRootNode(xmlNodePtr rootNode)
 	{
 		_root = xmlCopyNode(rootNode,1);
-		xmlNodePtr ret_val = xmlDocSetRootElement(doc._xDocPtr, _root);
+		xmlNodePtr ret_val = xmlDocSetRootElement(doc, _root);
 		if ((ret_val != NULL)) {
 			xmlUnlinkNode(ret_val);
 			xmlFreeNode(ret_val);
@@ -342,11 +342,11 @@ public:
 	{
 		xmlChar *xmlbuff;
 		int buffersize;
-		xmlDocDumpFormatMemory(doc._xDocPtr, &xmlbuff, &buffersize, 1);
+		xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1);
 		return XStr(xmlbuff).strForm();
 	}
 private:
-	CXmlDocumentPtr doc;
+	xmlDocPtr doc;
 	xmlNodePtr _root;
 	CXmlDocmentHelper(CXmlDocmentHelper & other);
 	CXmlDocmentHelper & operator=( CXmlDocmentHelper & other);
@@ -354,15 +354,15 @@ private:
 };
 
 class  CXmlParseHelper{
-public: 
+private: //delete
 	CXmlParseHelper(const std::string &str):doc(xmlParseMemory(str.c_str(),str.length())),_root(NULL)
 	{
-		if (doc._xDocPtr == NULL)
+		if (doc == NULL)
 		{
 			//LOG4CPLUS_ERROR(log, "." + m_strSessionID,  ": Convert a string to xml error was encountered,string=" << str);
 			return;
 		}
-		_root = xmlDocGetRootElement(doc._xDocPtr);
+		_root = xmlDocGetRootElement(doc);
 
 		if (_root == NULL){
 			//LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": Convert a string to xml error was encountered,string=" << str);
@@ -370,13 +370,13 @@ public:
 	}
 	CXmlParseHelper(const char * xmlCh):doc(xmlParseMemory(xmlCh,::strlen(xmlCh))),_root(NULL){
 
-		if (doc._xDocPtr == NULL)
+		if (doc == NULL)
 		{
 			//LOG4CPLUS_ERROR(log,": Convert a string to xml error was encountered,string=" << xmlCh);
 			return;
 		}
 
-		_root = xmlDocGetRootElement(doc._xDocPtr);
+		_root = xmlDocGetRootElement(doc);
 
 		if (_root == NULL){
 			//LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": Convert a string to xml error was encountered,string=" << xmlCh);
@@ -414,13 +414,13 @@ public:
 	{
 		xmlChar *xmlbuff;
 		int buffersize;
-		if (doc._xDocPtr == NULL) return "";
-		xmlDocDumpFormatMemory(doc._xDocPtr, &xmlbuff, &buffersize, 1);
+		if (doc == NULL) return "";
+		xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1);
 		return XStr(xmlbuff).strForm();
 	}
 	virtual ~CXmlParseHelper(){};
 private:
-	CXmlDocumentPtr doc;
+	xmlDocPtr doc;
 	xmlNodePtr _root;
 	CXmlParseHelper(CXmlParseHelper & other);
 	CXmlParseHelper & operator=( CXmlParseHelper & other);

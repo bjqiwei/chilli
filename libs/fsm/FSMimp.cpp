@@ -35,7 +35,7 @@ namespace fsm {
 }
 
 fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::string &sessionid, const string  &xml, int xtype, helper::OnTimerInterface * func)
-	:m_xmlType(xtype), m_xmlDocPtr(nullptr), xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
+	:m_xmlType(xtype), m_xmlDocPtr(nullptr), m_xpathCtx(nullptr), m_strSessionID(sessionid), m_TimeOutFunc(func), m_Running(false), m_Block(false)
 {
 	log = log4cplus::Logger::getInstance(logId.empty() ? "fsm.StateMachine" : logId);
 
@@ -51,6 +51,10 @@ fsm::StateMachineimp::StateMachineimp(const std::string & logId, const std::stri
 
 fsm::StateMachineimp::~StateMachineimp()
  { 
+	if (m_xpathCtx)
+		xmlXPathFreeContext(m_xpathCtx);
+	if(m_xmlDocPtr)
+		xmlFreeDoc(m_xmlDocPtr);
 	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destruction a scxml object." << this);
  }
 
@@ -59,7 +63,7 @@ bool fsm::StateMachineimp::Init(void)
 	using namespace helper::xml;
 	if (parse()) {
 
-		xmlNodePtr rootNode =  xmlDocGetRootElement(m_xmlDocPtr._xDocPtr);
+		xmlNodePtr rootNode =  xmlDocGetRootElement(m_xmlDocPtr);
 		 if (rootNode !=NULL && xmlStrEqual(rootNode->name,BAD_CAST("fsm")))
 		 {
 			 m_rootNode = rootNode;
@@ -69,12 +73,12 @@ bool fsm::StateMachineimp::Init(void)
 			 LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",set name=" << m_strName);
 
 			  /* Create xpath evaluation context */
-			  if (xpathCtx._xPathCtxPtr == NULL)
+			  if (m_xpathCtx == NULL)
 			  {
-				  xpathCtx = xmlXPathNewContext(m_xmlDocPtr._xDocPtr);
+				  m_xpathCtx = xmlXPathNewContext(m_xmlDocPtr);
 			  }
 
-			  if (xpathCtx._xPathCtxPtr == NULL) {
+			  if (m_xpathCtx == NULL) {
 				  LOG4CPLUS_ERROR(log, "." + m_strSessionID, ": unable to create new XPath context");
 				  throw std::logic_error("Error: unable to create new XPath context");
 			  }
@@ -193,7 +197,7 @@ void fsm::StateMachineimp::pushEvent(const TriggerEvent & trigEvent)
 bool fsm::StateMachineimp::parse()
 {
 
-	if (NULL != m_xmlDocPtr._xDocPtr) {
+	if (NULL != m_xmlDocPtr) {
 		LOG4CPLUS_WARN(log, "." + m_strSessionID, ",xmldocument is not empty , there not Parse file:" << this->m_strStateFile);
 		return true;
 	}
@@ -216,7 +220,7 @@ bool fsm::StateMachineimp::parse()
 		return false;
 	}
 
-	if (NULL == m_xmlDocPtr._xDocPtr) 
+	if (NULL == m_xmlDocPtr) 
 	{  
 		LOG4CPLUS_ERROR(log, "." + m_strSessionID, ",Document not parsed successfully.");
 		//throw std::logic_error( "Document not parsed successfully."); 
@@ -671,7 +675,7 @@ xmlNodePtr fsm::StateMachineimp::getState(const string& stateId) const
 	try{
 		
 		/* Evaluate xpath expression */
-		xpathObj = xmlXPathEvalExpression(BAD_CAST(strExpression.c_str()), xpathCtx._xPathCtxPtr);
+		xpathObj = xmlXPathEvalExpression(BAD_CAST(strExpression.c_str()), m_xpathCtx);
 		if(xpathObj._xPathObjPtr == NULL) {
 			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ",Error: unable to evaluate xpath expression:" << strExpression);
 			throw std::logic_error(string("Error: unable to evaluate xpath expression: " +strExpression).c_str());
