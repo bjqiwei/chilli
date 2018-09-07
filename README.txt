@@ -5,7 +5,7 @@ make 步骤
 4、进入 log4cplus-1.2.0 ./configure CXXFLAGS="-std=c++11"  --without-qt --without-qt5 --without-python --enable-static && make && make install
 5、libevent,使用yum 安装libevent最新版本
 6、libxml2,使用 yum 安装libxml2 最新版本
-7、libmozjs,使用yum 安装安装38版本
+7、libmozjs,使用yum安装，yum install mozjs38
 8、进入jsoncpp-1.8.4目录,cmake -DCMAKE_BUILD_TYPE=release -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=ON -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" && make && make install
 9、 进入mysql代码目录 cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles" && make && make install
 10、 进入openssl 代码目录，./config && make && make install

@@ -1,3 +1,7 @@
+linux 使用yum 安装, yum install mozjs38
+
+windows 编译:
+
 ./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --without-nspr --enable-release --with-pthreads --disable-gc-trace --enable-static-rtl --enable-static
 #禁用动态库参数 --disable-shared-js --disable-shared
 #debug --enable-debug
