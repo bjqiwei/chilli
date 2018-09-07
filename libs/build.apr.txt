@@ -1,1 +1,1 @@
-./configure && make && make install
+yum install apr-devel apr-util-devel

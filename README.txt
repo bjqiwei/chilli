@@ -9,8 +9,7 @@ make 步骤
 8、进入jsoncpp-1.8.4目录,cmake -DCMAKE_BUILD_TYPE=release -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=ON -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" && make && make install
 9、 进入mysql代码目录 cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles" && make && make install
 10、 进入openssl 代码目录，./config && make && make install
-11、 进入apr-1.5.2 代码目录 ./configure --with-apr=../apr-1.5.2 && make && make install
-12、进入 apr-util 代码目录 ./configure --with-apr=../apr-1.5.2 && make && make install
-13、进入lib/FreeSWITCH 代码目录, make 
-14、进入fsm 目录 make
-15、进入 src 目录，make
+11、libapr, yum install apr-devel apr-util-devel
+12、进入lib/FreeSWITCH 代码目录, make 
+13、进入fsm 目录 make
+14、进入 src 目录，make
