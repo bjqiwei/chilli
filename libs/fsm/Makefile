@@ -1,7 +1,7 @@
 #请修改以下内容以确定相关内容
 
 MOZJSDIR = /usr/include/mozjs-38/
-LIBXML2DIR = /usr/local/include/libxml2/
+LIBXML2DIR = /usr/include/libxml2/
 #项目类型(可执行程序exe,静态库lib,动态库dll,so)
 export PROJECT_TYPE=so
 
