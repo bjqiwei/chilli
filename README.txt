@@ -8,7 +8,7 @@ make 步骤
 7、libmozjs,使用yum安装，yum install mozjs38
 8、进入jsoncpp-1.8.4目录,cmake -DCMAKE_BUILD_TYPE=release -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=ON -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" && make && make install
 9、 进入mysql代码目录 cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles" && make && make install
-10、 进入openssl 代码目录，./config && make && make install
+10、openssl, 使用yum install openssl 安装
 11、libapr, yum install apr-devel apr-util-devel
 12、进入lib/FreeSWITCH 代码目录, make 
 13、进入fsm 目录 make
