@@ -3,8 +3,8 @@ make 步骤
 2、解压automake-1.15.tar.gz,进入目录 ./configure && make && make install
 3、解压automake-1.14.tar.gz,进入目录 ./configure && make && make install
 4、进入 log4cplus-1.2.0 ./configure CXXFLAGS="-std=c++11"  --without-qt --without-qt5 --without-python --enable-static && make && make install
-5、解压libevent-2.1.8-stable.tar.gz，进入目录 ./configure --enable-static && make && make install
-6、libxml2,使用yum 安装libxml2 最新版本
+5、libevent,使用yum 安装libevent最新版本
+6、libxml2,使用 yum 安装libxml2 最新版本
 7、libmozjs,使用yum 安装安装38版本
 8、进入jsoncpp-1.8.4目录,cmake -DCMAKE_BUILD_TYPE=release -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=ON -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" && make && make install
 9、 进入mysql代码目录 cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles" && make && make install
