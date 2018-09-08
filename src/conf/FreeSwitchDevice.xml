@@ -15,6 +15,7 @@
 	<data id="_filename"/>
 	<data id="_hangupDirection" expr="1"/> <!--挂机方向，0:本端挂机，1:对端挂机-->
 	<data id="_userdata"/>
+	<data id="_recordfilename"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -89,7 +90,7 @@
 			<transition target="Destroy"/>
 		</event>
 		
-		<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate' &amp;&amp; _event.param.body.indexOf('-ERR')!=-1">
+		<event event="originate" cond="_event.param.body.indexOf('-ERR')!=-1">
 			<send target="call001" type="event" destexpr="_event.param.sessionID" event="Failed">
 				<cause type="script">cause=FSCause[_event.param.body.substr(5,_event.param.body.length-6)];</cause>
 				<deviceID type="script">_device.deviceID</deviceID>
@@ -159,6 +160,20 @@
 				<script>_hangupDirection = 0;</script>
 				<send target="this" type="cmd" dest="this" event="ClearConnection">
 					<deviceID type="script">_device.deviceID</deviceID>
+					<sessionID type="script">_event.param.sessionID</sessionID>
+				</send>
+			</event>
+			
+			<event event="StartRecord">
+				<send target="this" type="cmd" dest="this" event="StartRecord">
+					<filename type="script">_event.param.filename</filename>
+					<sessionID type="script">_event.param.sessionID</sessionID>
+				</send>
+				<script>_recordfilename = _event.param.filename</script>
+			</event>
+			<event event="StopRecord">
+				<send target="this" type="cmd" dest="this" event="StopRecord">
+					<filename type="script">_event.param.filename</filename>
 					<sessionID type="script">_event.param.sessionID</sessionID>
 				</send>
 			</event>
@@ -260,12 +275,12 @@
 						<sessionID type="script">_event.param.sessionID</sessionID>
 					</send>
 				</onentry>
-				<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate'">
+				<event event="originate">
 				</event>
 			</state>
 			
 			<state id="Originated">
-				<event event="BACKGROUND_JOB" cond="_event.param.JobCommand=='originate'">
+				<event event="originate">
 				</event>
 			</state>
 		</state>
@@ -281,7 +296,7 @@
 				<answeredTime type="script">_event.param.CallerChannelAnsweredTime</answeredTime>
 				<hangupTime type="script">_event.param.CallerChannelHangupTime</hangupTime>
 				<hangupDirection type="script">_hangupDirection</hangupDirection>
-				<recordPath type="script">""</recordPath>
+				<recordPath type="script">_recordfilename</recordPath>
 			</send>
 		</onentry>
 	</state>

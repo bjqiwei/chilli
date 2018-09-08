@@ -322,8 +322,8 @@ bool FreeSwitchModule::StartRecord(const Json::Value & param, log4cplus::Logger 
 	std::string sessionId = "";
 	std::string filename = "";
 
-	if (param["ConnectionID"].isString())
-		sessionId = param["ConnectionID"].asString();
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
 
 	if (param["filename"].isString())
 		filename = param["filename"].asString();
@@ -332,6 +332,25 @@ bool FreeSwitchModule::StartRecord(const Json::Value & param, log4cplus::Logger 
 	setJobSession(jobid, sessionId);
 
 	std::string cmd = "bgapi uuid_record " + sessionId + " start " + filename + "\nJob-UUID:" + jobid;
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
+	return true;
+}
+
+bool FreeSwitchModule::StopRecord(const Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId = "";
+	std::string filename = "";
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	if (param["filename"].isString())
+		filename = param["filename"].asString();
+
+	std::string jobid = helper::uuid();
+	setJobSession(jobid, sessionId);
+
+	std::string cmd = "bgapi uuid_record " + sessionId + " stop " + filename + "\nJob-UUID:" + jobid;
 	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 	return true;
 }
@@ -609,6 +628,8 @@ void FreeSwitchModule::receiveFS()
 
 				if (m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE)
 					eventName = newEvt["param"]["Application"].asString();
+				else if (m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB)
+					eventName = newEvt["param"]["JobCommand"].asString();
 				else
 					eventName = newEvt["param"]["EventName"].asString();
 

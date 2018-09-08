@@ -4,7 +4,7 @@
   <EventReport id="eventreport" TCPPort="9985" WSPort="9986">
     <Call>call001</Call>
   </EventReport>
-  <FreeSwitch id = "freeswitch001" host="192.168.2.232" port ="8021" password="ClueCon">
+  <FreeSwitch id = "freeswitch001" host="47.88.171.173" port ="18021" password="qiwei">
     <MySql>mysql</MySql>
     <Devices>
       <Device DeviceID="1000" StateMachine="./conf/FreeSwitchDevice.xml"></Device>

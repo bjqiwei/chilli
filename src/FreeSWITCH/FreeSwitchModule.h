@@ -23,6 +23,7 @@ namespace FreeSwitch{
 		bool MakeConnection(const Json::Value & param, log4cplus::Logger & log);
 		bool ClearConnection(const Json::Value & param, log4cplus::Logger & log);
 		bool StartRecord(const Json::Value & param, log4cplus::Logger & log);
+		bool StopRecord(const Json::Value & param, log4cplus::Logger & log);
 		bool Divert(const Json::Value &param, log4cplus::Logger & log);
 		bool PlayFile(const Json::Value & param, log4cplus::Logger & log);
 		bool PlayFileAndCollects(const Json::Value & param, log4cplus::Logger & log);

@@ -20,7 +20,7 @@
 	<input type="button" value="放音" onclick="PlayFile();" /><font>语音文件</font><input type="text" id="filename" value="cmwwpstn.wav" /><p/>
 	<input type="button" value="挂机" onclick="ClearCall();" /><p/>
     <input type="button" value="放音并收键" onclick="PlayFileAndCollects();" /><font>语音文件</font><input type="text" id="filename2" value="cmwwpstn.wav" /><font>最短收键数</font><input type="text" id="min" value="1" /><font>最长收键数</font><input type="text" id="max" value="1" /><font>播放次数</font><input type="text" id="tries" value="3" /><font>等待按键超时</font><input type="text" id="timeout" value="10000" /><font>结束按键</font><input type="text" id="terminators" value="*#" /><p />
-	
+	<input type="button" value="开始录音" onclick="StartRecord();" /><font>语音文件</font><input type="text" id="recordfilename" value="/record/99754f55-239b-4bd1-980e-3b4b7f389253.wav" /><input type="button" value="停止录音" onclick="StopRecord();" /><p/>
     <script type="text/javascript">
 
 		var websocket;
@@ -72,6 +72,7 @@
 			request.param = new Object();
 			request.param.initiatingDevice = document.getElementById("called2").value;
 			request.param.caller = "10086";
+			request.param.userdata="qiwei";
 			doSend(JSON.stringify(request));
 		}
 		
@@ -103,7 +104,31 @@
 		    //request.param.digit_timeout = parseInt(document.getElementById("digit_timeout").value);
 		    doSend(JSON.stringify(request));
 		}
+		
+		function StartRecord()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "StartRecord";
+			request.param = new Object();
+			request.param.connection = session;
+			request.param.filename = document.getElementById("recordfilename").value;
+			doSend(JSON.stringify(request));
+		}
 
+		function StopRecord()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "StopRecord";
+			request.param = new Object();
+			request.param.connection = session;
+			request.param.filename = document.getElementById("recordfilename").value;
+			doSend(JSON.stringify(request));
+		}
+		
 		function ClearConnection()
 		{
 			var request = new Object();

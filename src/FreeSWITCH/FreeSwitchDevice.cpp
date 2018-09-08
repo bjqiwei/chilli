@@ -53,6 +53,14 @@ namespace FreeSwitch {
 		{
 			bHandled = m_model->PlayFileAndCollects(fireData.param, this->log);
 		}
+		else if (fireData.event == "StartRecord")
+		{
+			bHandled = m_model->StartRecord(fireData.param, this->log);
+		}
+		else if (fireData.event == "StopRecord")
+		{
+			bHandled = m_model->StopRecord(fireData.param, this->log);
+		}
 		else
 			m_model->processSend(fireData, param, bHandled, log);
 
