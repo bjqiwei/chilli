@@ -44,6 +44,21 @@ public:
 		
 		return result;
 	}
+
+	bool Get(T&& data, long long dwMilliseconeds = INT32_MAX)
+	{
+		std::unique_lock<std::mutex> lck(m_mtx);
+
+		bool result = this->m_cv.wait_for(lck, std::chrono::milliseconds(dwMilliseconeds), [&]()->bool { return !this->m_dataBuffer.empty(); });
+
+		if (result) {
+			data = std::move(m_dataBuffer.front());
+			m_dataBuffer.pop_front();
+		}
+
+		return result;
+	}
+
 	unsigned long size()
 	{
 		std::unique_lock<std::mutex> lck(m_mtx);

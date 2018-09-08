@@ -99,7 +99,7 @@ namespace xml{
 		XStr & operator=(const XStr & other);
 		inline const std::string & strForm() const
 		{
-			return _strValue;
+			return std::move(_strValue);
 		}
 	private:
 		std::string _strValue ;
@@ -121,7 +121,12 @@ static inline std::string  getXmlChildNodeValue(const ::xmlNodePtr xNode,const s
 
 		if(xchildNode->type == XML_ELEMENT_NODE && xmlStrEqual(xchildNode->name,BAD_CAST(strChildNodeName.c_str())))
 		{
-			return XStr(xmlNodeGetContent(xchildNode)).strForm();
+			xmlChar * xmlbuff = xmlNodeGetContent(xchildNode);
+			std::string value;
+			if (xmlbuff)
+				value = (char *)xmlbuff;
+			xmlFree(xmlbuff);
+			return std::move(value);
 		}
 	}
 	return "";
@@ -145,7 +150,13 @@ static inline ::xmlNodePtr  getXmlChildNode(const ::xmlNodePtr xNode,const std::
 static inline std::string  getXmlNodeAttributesValue( xmlNodePtr xNode,const std::string &strAttributeName)
 {
 	if (!xNode) return  "";
-	return XStr(xmlGetProp(xNode,BAD_CAST strAttributeName.c_str())).strForm();
+	xmlChar * value = xmlGetProp(xNode, BAD_CAST strAttributeName.c_str());
+	std::string str;
+	if (value){
+		str = (char *)value;
+	}
+	xmlFree(value);
+	return std::move(str);
 }
 static inline void setXmlNodeAttributesValue (xmlNodePtr xNode ,const std::string &strAttributeName,const std::string &strValue)
 {
@@ -343,7 +354,11 @@ private://delete
 		xmlChar *xmlbuff;
 		int buffersize;
 		xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1);
-		return XStr(xmlbuff).strForm();
+		std::string value;
+		if (xmlbuff)
+			value = (char *)xmlbuff;
+		xmlFree(xmlbuff);
+		return std::move(value);
 	}
 private:
 	xmlDocPtr doc;
@@ -416,7 +431,11 @@ private: //delete
 		int buffersize;
 		if (doc == NULL) return "";
 		xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1);
-		return XStr(xmlbuff).strForm();
+		std::string value;
+		if (xmlbuff)
+			value = (char *)xmlbuff;
+		xmlFree(xmlbuff);
+		return std::move(value);
 	}
 	virtual ~CXmlParseHelper(){};
 private:

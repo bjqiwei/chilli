@@ -53,8 +53,10 @@ namespace env
 		if (!m_contexts.empty())
 			LOG4CPLUS_WARN(log, "", "has " << m_contexts.size() << " context when evaluator delete.");
 
-		if (m_jsrt)
+		if (m_jsrt) {
+			JS_GC(m_jsrt);
 			JS_DestroyRuntime(m_jsrt);
+		}
 
 		g_InitMtx.lock();
 		if (g_JSEvaluatorReferce.fetch_sub(1) == 1) {
@@ -95,6 +97,7 @@ namespace env
 			m_removedContexts.pop_front();
 			delete cx;
 		}
+		JS_GC(this->m_jsrt);
 	}
 
 	size_t JSEvaluator::getContextCount()
