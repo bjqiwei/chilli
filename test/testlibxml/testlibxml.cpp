@@ -29,6 +29,7 @@
 #include <libxml/tree.h>
 #include <WinSock2.h>
 #include<iostream>
+#include <vector>
 #pragma comment(lib,"ws2_32.lib")
 
 using namespace std;
@@ -94,24 +95,37 @@ int main()
 
     xmlFreeDoc(doc);
 
-	doc = xmlParseFile("CreatedXml.xml");
+	int i = 10000;
 	ofstream out("write.txt", ios::binary);
-	xmlNodePtr rootNode =  xmlDocGetRootElement(doc);
-	
-	
-	for (xmlNodePtr  xchildNode = rootNode->children; xchildNode != NULL; xchildNode = xchildNode->next)
-	{
-		if(xchildNode->type == XML_ELEMENT_NODE)
+	std::vector<xmlDocPtr> docs;
+	while (i--) {
+		doc = xmlParseFile("CreatedXml.xml");
+		docs.push_back(doc);
+		xmlNodePtr rootNode = xmlDocGetRootElement(doc);
+
+
+		for (xmlNodePtr xchildNode = rootNode->children; xchildNode != NULL; xchildNode = xchildNode->next)
 		{
-			std::string str;
-			xmlChar * content = xmlNodeGetContent(xchildNode);
-			printf("%s=%s", xchildNode->name, content);
-			str.append((const char *)xchildNode->name);
-			str.append("=");
-			str.append((const char *)content);
-			out.write(str.c_str(),str.length());
-			xmlFree(content);
+			if (xchildNode->type == XML_ELEMENT_NODE)
+			{
+				std::string str;
+				xmlChar * content = xmlNodeGetContent(xchildNode);
+				printf("%s=%s", xchildNode->name, content);
+				str.append((const char *)xchildNode->name);
+				str.append("=");
+				str.append((const char *)content);
+				out.write(str.c_str(), str.length());
+				xmlFree(content);
+			}
 		}
+	}
+
+	getchar();
+
+	while (!docs.empty()) {
+		xmlDocPtr doc = docs.back();
+		xmlFreeDoc(doc);
+		docs.pop_back();
 	}
 	out.close();
 	getchar();
