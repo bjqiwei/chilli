@@ -78,7 +78,16 @@ void Agent::mainEventLoop()
 			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event->origData);
 
 			if (m_StateMachines.begin() == m_StateMachines.end()) {
-				StateMachine sm(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
+				StateMachine sm(fsm::fsmParseFile(m_SMFileName));
+
+				if (sm == nullptr){
+					LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");
+					return;
+				}
+
+				sm->setLoggerId(this->log.getName());
+				sm->setSessionID(m_Id);
+				sm->setOnTimer(this->m_model);
 				m_StateMachines[connectid] = sm;
 
 				for (auto & itt : this->m_Vars.getMemberNames())

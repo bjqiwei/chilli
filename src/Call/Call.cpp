@@ -74,8 +74,16 @@ namespace Call {
 
 				if (m_StateMachines.empty()) {
 					
-					StateMachine call(new fsm::StateMachine(log.getName(), m_Id, m_SMFileName, this->m_model));
+					StateMachine call(fsm::fsmParseFile(m_SMFileName));
 
+					if (call == nullptr) {
+						LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");
+						return;
+					}
+
+					call->setLoggerId(this->log.getName());
+					call->setSessionID(m_Id);
+					call->setOnTimer(this->m_model);
 					m_StateMachines[m_Id] = call;
 					for (auto & itt : this->m_Vars.getMemberNames())
 					{

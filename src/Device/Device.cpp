@@ -74,7 +74,17 @@ namespace chilli {
 					}
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
-						Session session(new fsm::StateMachine(log.getName(), this->getId() +"." + sessionId, m_SMFileName, this->m_model));
+						Session session(fsm::fsmParseFile(m_SMFileName));
+
+						if (session == nullptr) {
+							LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");
+							return;
+						}
+
+						session->setLoggerId(this->log.getName());
+						session->setSessionID(this->getId() + "." + sessionId);
+						session->setOnTimer(this->m_model);
+
 						m_Sessions[sessionId] = session;
 
 						for (auto & itt : this->m_Vars.getMemberNames())

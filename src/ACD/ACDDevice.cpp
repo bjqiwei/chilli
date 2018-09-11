@@ -40,7 +40,15 @@ void ACDDevice::mainEventLoop()
 			LOG4CPLUS_DEBUG(log, "." + this->getId(), " Recived a event," << Event->origData);
 
 			if (m_Sessions.begin() == m_Sessions.end()) {
-				Session connection(new fsm::StateMachine(this->log.getName(), m_Id, m_SMFileName, this->m_model));
+				Session connection(fsm::fsmParseFile(m_SMFileName));
+				if (connection == nullptr)
+				{
+					LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");
+					return;
+				}
+				connection->setLoggerId(this->log.getName());
+				connection->setSessionID(m_Id);
+				connection->setOnTimer(this->m_model);
 				m_Sessions[connectid] = connection;
 
 				for (auto & itt : this->m_Vars.getMemberNames())
