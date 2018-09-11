@@ -11,6 +11,13 @@ namespace model
 
 	}
 
+	State::~State()
+	{
+		m_OnEntrys.clear();
+		m_OnExits.clear();
+		m_Events.clear();
+	}
+
 	void State::setId(const std::string & id)
 	{
 		this->m_strId = id;

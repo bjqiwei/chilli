@@ -27,6 +27,9 @@ fsm::StateMachineimp::StateMachineimp(): m_Running(false), m_Block(false)
 
 fsm::StateMachineimp::~StateMachineimp()
  { 
+	m_States.clear();
+	m_ScriptModel.clear();
+	m_Datamodel.clear();
 	LOG4CPLUS_DEBUG(log4cplus::Logger::getInstance("scxml"), "." + m_strSessionID, ",destruction a scxml object." << this);
  }
 

@@ -34,7 +34,7 @@ namespace model
 		std::vector<std::shared_ptr<Event>>m_Events;
 
 		State(const std::string &filename, uint32_t lineno);
-		virtual ~State(){};
+		virtual ~State();
 		void setId(const std::string & id);
 		void setName(const std::string & name);
 		void setDescription(const std::string & desc);

@@ -11,6 +11,12 @@ namespace model
 	{
 	}
 
+
+	Event::~Event()
+	{
+		m_Actions.clear();
+	}
+
 	const std::string &Event::getEvent()const
 	{
 		return m_strEvent ;

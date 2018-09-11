@@ -15,6 +15,7 @@ void Scriptmodel::addScript(std::shared_ptr<model::Script> script)
 
 Scriptmodel::~Scriptmodel(void)
 {
+	m_Scripts.clear();
 }
 }//end namespace model
 }// end namespace fsm

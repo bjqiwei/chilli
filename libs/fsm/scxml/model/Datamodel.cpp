@@ -11,6 +11,11 @@ namespace model
 	{
 	}
 
+	Datamodel::~Datamodel()
+	{
+		m_Datas.clear();
+	}
+
 	void Datamodel::addData(std::shared_ptr<Data> data)
 	{
 		m_Datas.push_back(data);

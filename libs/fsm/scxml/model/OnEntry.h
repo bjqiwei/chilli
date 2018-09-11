@@ -13,7 +13,7 @@ namespace model
 		
 	public:
 		OnEntry(const std::string &filename, uint32_t lineno):m_strFilename(filename), m_lineNo(lineno){};
-		~OnEntry(){};
+		virtual ~OnEntry();
 		std::vector<std::shared_ptr<Action>> m_Actions;
 		void addAction(std::shared_ptr<Action> actionptr);
 	private: 

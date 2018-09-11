@@ -19,6 +19,7 @@ namespace model
 		
 	public:
 		Event(const std::string &filename, uint32_t lineno);
+		virtual ~Event();
 
 		const std::string &getEvent() const;
 		void setEvent(const std::string & event);

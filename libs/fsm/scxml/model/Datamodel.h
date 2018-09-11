@@ -25,7 +25,7 @@ namespace model
 
 	public:
 		Datamodel(const std::string &filename, uint32_t lineno);
-
+		virtual ~Datamodel();
 		void addData(std::shared_ptr<Data> data);
 		std::vector<std::shared_ptr<Data>> m_Datas;
 	};
