@@ -57,7 +57,7 @@ namespace fsm{
 
 	private:
 		StateMachineimp * imp;
-		friend class StateMachine * fsmParseFile(const std::string & filename);
-		friend class StateMachine * fsmParseMemory(const char *buffer, size_t size);
+		friend FSM_EXPORT StateMachine * fsmParseFile(const std::string & filename);
+		friend FSM_EXPORT StateMachine * fsmParseMemory(const char *buffer, size_t size);
 	};
 }
