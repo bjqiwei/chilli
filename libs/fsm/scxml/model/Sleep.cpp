@@ -1,29 +1,40 @@
 #include "Sleep.h"
-#include "../../common/xmlHelper.h"
 #include <thread>
 #include <log4cplus/loggingmacros.h>
 
 namespace fsm{
 namespace model{
 
-	Sleep::Sleep(xmlNodePtr xNode,const std::string &session,const std::string & filename)
-		:Action(xNode, session, filename)
+	Sleep::Sleep(const std::string &filename, uint32_t lineno)
+		:Action(filename, lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Sleep");
-		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");
+
 	}
 	Sleep::~Sleep(){
 
 	}
 
-	unsigned int Sleep::getInterval()
+	uint32_t Sleep::getInterval()const
 	{
-		return std::stoi(interval);
+		if (!m_Interval.empty()) {
+			try {
+				return std::stoul(m_Interval);
+			}
+			catch (...)
+			{
+				return 0;
+			}
+		}
+		return 0;
 	}
 
-	void Sleep::execute(fsm::Context * ctx)
+	void Sleep::setInterval(const std::string & interval)
 	{
-		LOG4CPLUS_DEBUG(log, "." + m_strSession, ",sleep " << getInterval() << "ms");
+		this->m_Interval = interval;
+	}
+
+	void Sleep::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
+	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(getInterval()));
 	}
 

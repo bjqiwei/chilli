@@ -1,5 +1,4 @@
 #include "Event.h"
-#include "../../common/xmlHelper.h"
 #include <regex>
 #include <log4cplus/loggingmacros.h>
 
@@ -8,41 +7,22 @@ namespace fsm
 namespace model
 {
 
-	Event::Event(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode, session,filename)
+	Event::Event(const std::string &filename, uint32_t lineno) :m_strFilename(filename), m_lineNo(lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Event");
-		m_strEvent = helper::xml::getXmlNodeAttributesValue(m_node,"event");
 	}
 
-	const std::string &Event::getEvent()
+	const std::string &Event::getEvent()const
 	{
 		return m_strEvent ;
 	}
-	
-	void Event::execute(fsm::Context * ctx)
-	{
-		
-		/*for (xmlNodePtr exeNode = node->children ; exeNode !=  NULL; exeNode = exeNode->next)
-		{
-			if(exeNode->type == XML_ELEMENT_NODE &&
-				xmlStrEqual(exeNode->name, BAD_CAST("script"))){
-					model::Script spt(exeNode);
-					spt.execute(evl,ctx);
-			}else if(exeNode->type == XML_ELEMENT_NODE &&
-				xmlStrEqual(exeNode->name, BAD_CAST("log"))){
-					model::Log log(exeNode);
-					log.execute(evl,ctx);
-			}
-			else if(exeNode->type == XML_ELEMENT_NODE &&
-				xmlStrEqual(exeNode->name, BAD_CAST("transition"))){
-					model::Transition tst(exeNode);
-					tst.execute(evl,ctx);
-					break;
-			}
-		}*/
-	}
 
-	bool Event::isEnabledEvent(const std::string& strEventName) const 
+	void Event::setEvent(const std::string & event)
+	{
+		this->m_strEvent = event;
+	}
+	
+
+	bool Event::isEnabledEvent(const std::string& strEventName, const log4cplus::Logger & log, const std::string & sessionId) const
 	{
 		
 		if (m_strEvent.empty()) {
@@ -58,11 +38,24 @@ namespace model
 			}
 			catch (std::exception * e)
 			{
-				LOG4CPLUS_ERROR(log, "." + m_strSession, m_strFileName << ":" << m_node->line << " " << e->what());
+				LOG4CPLUS_ERROR(log, "." + sessionId, m_strFilename << ":" << m_lineNo << " " << e->what());
 				throw *e;
 			}
 		}
 		return true;
+	}
+
+	bool Event::isEnabledCondition(fsm::Context * ctx)
+	{
+		if (!this->getCond().empty() && ctx) {
+			return ctx->evalCond(this->getCond(), m_strFilename, m_lineNo);
+		}
+		return true;
+	}
+
+	void Event::addAction(std::shared_ptr<Action> actionptr)
+	{
+		this->m_Actions.push_back(actionptr);
 	}
 
 }

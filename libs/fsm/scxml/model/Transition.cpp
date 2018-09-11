@@ -1,5 +1,4 @@
 #include "Transition.h"
-#include "../../common/xmlHelper.h"
 
 
 namespace fsm
@@ -7,11 +6,10 @@ namespace fsm
 namespace model
 {
 
-	Transition::Transition(xmlNodePtr xNode,const std::string &session,const std::string &filename)
-		:Action(xNode, session, filename)
+	Transition::Transition(const std::string &filename, uint32_t lineno)
+		:Action(filename,lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Transition");
-		m_strTarget = helper::xml::getXmlNodeAttributesValue(m_node,"target");
+
 	}
 
 
@@ -20,7 +18,12 @@ namespace model
 		return m_strTarget;
 	}
 
-	void Transition::execute(fsm::Context * ctx)
+	void Transition::setTarget(const std::string & target)
+	{
+		this->m_strTarget = target;
+	}
+
+	void Transition::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
 	}
 }

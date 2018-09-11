@@ -1,28 +1,25 @@
 #pragma once
-#ifndef _FSM_MODEL_RAISE_HEADER_
-#define _FSM_MODEL_RAISE_HEADER_
-
-#include <libxml/tree.h>
+#include <string>
 #include "Action.h"
 
 namespace fsm
 {
-	namespace model
+namespace model
+{
+
+	class Raise :public Action
 	{
+	public:
+		Raise(const std::string &filename, uint32_t lineno);
+		virtual ~Raise(void);
 
-		class Raise :public Action
-		{
-		public:
-			Raise(xmlNodePtr xNode,const std::string &session,const std::string & filename);
-			virtual ~Raise(void);
-
-			virtual void execute(fsm::Context * ctx); 
-			const std::string &getEvent()const;
-		private:
-			std::string m_strEvent;
-		};
+		virtual void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const override;
+		const std::string &getEvent()const;
+		void setEvent(const std::string & event);
+	private:
+		std::string m_strEvent;
+	};
 	
-	}//end namespace model
+}//end namespace model
 }//end namespace fsm
-#endif//end header file
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _FSM_MODEL_SCRIPT_HEADER_
-#define  _FSM_MODEL_SCRIPT_HEADER_
 
 #include <string>
 #include "Action.h"
@@ -16,16 +14,16 @@ namespace model
 	private:
 		//TLogFile * log;
 		std::string m_content;
-		std::string m_fileName;
+		std::string m_scriptFileName;
 
 	public:
-		Script(xmlNodePtr xNode,const std::string &session,const std::string & filename);
-		/*std::string &getContent();*/
-		virtual  void execute(Context * ctx);
+		Script(const std::string & filename, uint32_t lineno);
+		const std::string &getContent()const;
+		void setContext(const std::string & context);
+		void setFileName(const std::string & fileName);
+		virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
 	};
 
 
 }
 }
-
-#endif //end scxml.model.script header

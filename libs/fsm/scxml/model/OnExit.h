@@ -1,8 +1,7 @@
 #pragma once
-#ifndef _FSM_MODEL_ONEXIT_HEADER_
-#define _FSM_MODEL_ONEXIT_HEADER_
+#include <string>
+#include <vector>
 #include "Action.h"
-#include <libxml/tree.h>
 
 
 namespace fsm
@@ -10,20 +9,19 @@ namespace fsm
 namespace model
 {
 
-	class OnExit : public Action
+	class OnExit
 	{
 
 	public:
-		OnExit(xmlNodePtr xNode,const std::string &session,const std::string & filename)
-			:Action(xNode, session, filename){};
+		OnExit(const std::string &filename, uint32_t lineno):m_strFilename(filename),m_lineNo(lineno){};
 		~OnExit(){};
-		virtual void execute(fsm::Context * ctx);
-		virtual bool isEnabledCondition(fsm::Context * ctx);
+		std::vector<std::shared_ptr<Action>> m_Actions;
+		void addAction(std::shared_ptr<Action> actionptr);
 	private: 
+		std::string m_strFilename;
+		uint32_t m_lineNo;
 
 	};
 
-
 }
 }
-#endif // end head file

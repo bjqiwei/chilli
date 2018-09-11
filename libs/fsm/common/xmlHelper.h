@@ -172,6 +172,17 @@ static inline void setXmlNodeAttributesValue (xmlNodePtr xNode ,const std::strin
 	}
 	return ;
 }
+
+static inline std::string getGetContent(xmlNodePtr xNode)
+{
+	xmlChar * xmlbuff = xmlNodeGetContent(xNode);
+	std::string value;
+	if (xmlbuff)
+		value = (char *)xmlbuff;
+	xmlFree(xmlbuff);
+	return std::move(value);
+}
+
 static inline std::vector<xmlNodePtr> filterChildNodes(const std::string& tagName, const xmlNodePtr node)
 {
 	std::vector<xmlNodePtr> filteredChilds;

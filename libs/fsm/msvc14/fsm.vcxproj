@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="..\FSM.cpp" />
     <ClCompile Include="..\FSMimp.cpp" />
+    <ClCompile Include="..\parseFSM.cpp" />
     <ClCompile Include="..\scxml\env\JSContext.cpp" />
     <ClCompile Include="..\scxml\env\JSEvaluator.cpp" />
     <ClCompile Include="..\scxml\env\SimpleContext.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\FSM.h" />
     <ClInclude Include="..\FSMimp.h" />
+    <ClInclude Include="..\parseFSM.h" />
     <ClInclude Include="..\scxml\Context.h" />
     <ClInclude Include="..\scxml\env\JSContext.h" />
     <ClInclude Include="..\scxml\env\JSEvaluator.h" />

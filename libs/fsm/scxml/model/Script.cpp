@@ -1,5 +1,4 @@
 #include "Script.h"
-#include "../../common/xmlHelper.h"
 #include <log4cplus/loggingmacros.h>
 
 namespace fsm
@@ -8,28 +7,36 @@ namespace model
 {
 
 
-	Script::Script(xmlNodePtr xNode,const std::string &session,const std::string & filename):Action(xNode, session ,filename)
+	Script::Script(const std::string & filename, uint32_t lineno):Action(filename, lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Script");
-		this->m_content =  helper::xml::XStr(xmlNodeGetContent(m_node)).strForm();
-		this->m_fileName = helper::xml::XStr(xmlGetProp(m_node,BAD_CAST"src")).strForm();
 	}
 
-	//std::string &Script::getContent()
-	//{
-	//	return content;
-	//}
-	void Script::execute(fsm::Context * ctx)
+
+	const std::string &Script::getContent()const
+	{
+		return m_content;
+	}
+
+	void Script::setContext(const std::string & context)
+	{
+		this->m_content = context;
+	}
+
+	void Script::setFileName(const std::string & fileName)
+	{
+		this->m_scriptFileName = fileName;
+	}
+	void Script::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
 		if (ctx == NULL) return ;
 
-		if (!m_fileName.empty()){
-			LOG4CPLUS_TRACE(log, "." + m_strSession, ",script file is:" << m_fileName);
-			ctx->ExecuteFile(m_fileName);
+		if (!m_scriptFileName.empty()){
+			LOG4CPLUS_TRACE(log, "." + m_strSession, ",script file is:" << m_scriptFileName);
+			ctx->ExecuteFile(m_scriptFileName);
 		}
 		else if (!m_content.empty()){
 			LOG4CPLUS_TRACE(log, "." + m_strSession, ",execute script is:" << m_content);
-			ctx->eval(m_content,m_strFileName,m_node->line/*,m_node*/);
+			ctx->eval(m_content,m_strFileName, m_lineNo/*,m_node*/);
 		}
 	}
 }

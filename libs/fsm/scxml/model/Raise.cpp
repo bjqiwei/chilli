@@ -1,26 +1,30 @@
 #include "Raise.h"
 
 namespace fsm{
-	namespace model{
-		Raise::Raise(xmlNodePtr xNode,const std::string &session,const std::string & filename)
-			:Action(xNode, session, filename)
-		{
-			log = log4cplus::Logger::getInstance("fsm.model.Raise");
-			m_strEvent = helper::xml::getXmlNodeAttributesValue(m_node,"event");
-		}
+namespace model {
+	Raise::Raise(const std::string &filename, uint32_t lineno)
+		:Action(filename, lineno)
+	{
 
-
-		Raise::~Raise(void)
-		{
-		}
-
-		const std::string &Raise::getEvent()const
-		{
-			return m_strEvent;
-		}
-
-		void Raise::execute(fsm::Context * ctx)
-		{
-		}
 	}
+
+
+	Raise::~Raise(void)
+	{
+	}
+
+	const std::string &Raise::getEvent()const
+	{
+		return m_strEvent;
+	}
+
+	void Raise::setEvent(const std::string & event)
+	{
+		this->m_strEvent = event;
+	}
+
+	void Raise::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
+	{
+	}
+}
 }

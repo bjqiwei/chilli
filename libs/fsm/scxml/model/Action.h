@@ -1,8 +1,7 @@
 #pragma once
 #include "../Context.h"
-#include <libxml/tree.h>
+#include <string>
 #include <log4cplus/logger.h>
-#include "../../common/xmlHelper.h"
 
 namespace fsm
 {
@@ -21,31 +20,29 @@ namespace model
 		/// </summary>
 	public:
 
-		Action(xmlNodePtr xNode,const std::string & session,const std::string &filename):m_node(xNode),
-			m_strSession(session),m_strFileName(filename),m_bCond(true)
+		Action(const std::string &filename, uint32_t lineno):m_strFileName(filename), m_lineNo(lineno), m_bCond(true)
 		{
-			m_strCond = helper::xml::getXmlNodeAttributesValue(m_node,"cond");
 		}; //super();
 		virtual~Action(){};
-		virtual void execute(fsm::Context * ctx) = 0;
-		virtual bool isEnabledCondition(fsm::Context * ctx)
+		virtual void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const = 0;
+		virtual bool isEnabledCondition(fsm::Context * ctx) const
 		{
 			if (!this->getCond().empty() && ctx){
-				return ctx->evalCond(this->getCond(),m_strFileName,m_node->line);
+				return ctx->evalCond(this->getCond(), m_strFileName, m_lineNo);
 			}
 			return m_bCond;
 		}
-	protected:
-		xmlNodePtr m_node;
-		std::string m_strSession;
-		std::string m_strFileName;
-		std::string m_strCond;
-		log4cplus::Logger log;
-	private:
-		bool m_bCond;
+
+		void setCond(const std::string & cond) { m_strCond = cond; }
+		const std::string &getCond() const { return this->m_strCond; }
+		uint32_t getLineNo()const { return this->m_lineNo; }
 
 	protected:
-		const std::string &getCond(){ return this->m_strCond;}
+		std::string m_strCond;
+		std::string m_strFileName;
+		uint32_t m_lineNo;
+	private:
+		bool m_bCond;
 
 	};
 }

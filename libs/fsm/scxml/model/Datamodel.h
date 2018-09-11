@@ -1,7 +1,6 @@
 #pragma once
-#ifndef _FSM_MODEL_DATAMODEL_HEADER_
-#define _FSM_MODEL_DATAMODEL_HEADER_
-#include "Action.h"
+#include "Data.h"
+#include <vector>
 
 namespace fsm
 {
@@ -14,7 +13,7 @@ namespace model
 	/// &lt;datamodel&gt; element.
 	/// 
 	/// </summary>
-	class Datamodel :public Action
+	class Datamodel
 	{
 
 	private:
@@ -23,12 +22,12 @@ namespace model
 		/// The set of &lt;data&gt; elements, parsed as Elements, that are
 		/// children of this &lt;datamodel&gt; element.
 		/// </summary>
-	
+
 	public:
-		Datamodel(xmlNodePtr xNode,const std::string &session,const std::string &filename);
-		virtual void execute(fsm::Context * ctx);
-		virtual bool isEnabledCondition(fsm::Context * ctx);
+		Datamodel(const std::string &filename, uint32_t lineno);
+
+		void addData(std::shared_ptr<Data> data);
+		std::vector<std::shared_ptr<Data>> m_Datas;
 	};
 }
 }
-#endif //end datamodel head

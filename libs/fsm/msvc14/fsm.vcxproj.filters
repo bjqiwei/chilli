@@ -93,6 +93,9 @@
     <ClCompile Include="..\FSMimp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\parseFSM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scxml\model\Action.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="..\common\TimerInterface.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parseFSM.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

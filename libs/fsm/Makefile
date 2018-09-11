@@ -6,7 +6,7 @@ LIBXML2DIR = /usr/include/libxml2/
 export PROJECT_TYPE=so
 
 #项目的版本号
-export PROJECT_VERSION= 1.0.0.0
+export PROJECT_VERSION= 1.1.0.0
 
 #源文件所在路径 （目录列表）
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model

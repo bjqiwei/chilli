@@ -109,8 +109,7 @@
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,8 +128,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,8 +150,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -175,8 +172,7 @@ xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configu
     <PostBuildEvent>
       <Command>xcopy /Y log4cplus.properties $(OutDir)
 xcopy /Y *.xml $(OutDir)
-xcopy /Y *.js $(OutDir)
-xcopy /Y $(SolutionDir)\libs\mozjs-45.0.2\js\src\build\$(PlatformName)\$(Configuration)\dist\bin\*.dll $(OutDir)</Command>
+xcopy /Y *.js $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

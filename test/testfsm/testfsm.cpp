@@ -40,15 +40,21 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
-		fsm::StateMachine mysmscxml("fsm","0123456",strStateFile, &my_timer);
+		fsm::StateMachine  *  mysmscxml = fsm::fsmParseFile(strStateFile);
+		if (mysmscxml)
+		{
+			mysmscxml->setLoggerId("fsm");
+			mysmscxml->setSessionID("0123456");
+			mysmscxml->setOnTimer(&my_timer);
+		}
 		SendImp mySend;
 
 		std::thread th([&]() {
-			mysmscxml.addSendImplement(&mySend);
+			mysmscxml->addSendImplement(&mySend);
 
-			mysmscxml.start();
-			mysmscxml.mainEventLoop();
-			std::cout << mysmscxml.isInFinalState() << endl;
+			mysmscxml->start();
+			mysmscxml->mainEventLoop();
+			std::cout << mysmscxml->isInFinalState() << endl;
 			fsm::threadCleanup();
 		});
 
@@ -57,12 +63,13 @@ int main(int argc, _TCHAR* argv[])
 		
 		while (std::cin>>strEvent && strEvent.compare("quit") != 0){
 			fsm::TriggerEvent evt(strEvent,"");
-			mysmscxml.pushEvent(evt);
+			mysmscxml->pushEvent(evt);
 			//string stateid = getXmlNodeAttributesValue(mysmscxml.getCurrentState(),"id");
 		}
 
-		mysmscxml.stop();
+		mysmscxml->stop();
 		th.join();
+		delete mysmscxml;
 
 	}
 	catch(exception & e)

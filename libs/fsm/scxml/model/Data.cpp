@@ -1,6 +1,4 @@
 #include "Data.h"
-#include "../../common/xmlHelper.h"
-#include "../../common/stringHelper.h"
 #include <log4cplus/loggingmacros.h>
 
 namespace fsm
@@ -8,11 +6,8 @@ namespace fsm
 namespace model
 {
 
-	Data::Data(xmlNodePtr xNode,const std::string &session,const std::string &filename):Action(xNode,session,filename)
+	Data::Data(const std::string &filename, uint32_t lineno):Action(filename,lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Data");
-		this->m_strId = helper::xml::getXmlNodeAttributesValue(m_node,"id");
-		this->m_strExpr = helper::xml::getXmlNodeAttributesValue(m_node,"expr");
 	}
 
 	const std::string & Data::getId()const
@@ -34,33 +29,28 @@ namespace model
 	//{
 	//	return node->children;
 	//}
-	void Data::execute(fsm::Context * ctx)
+	void Data::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const
 	{
 		if (ctx == NULL){
-			LOG4CPLUS_WARN(log, "." + m_strSession, ",Context is null.");
 			return ;
 		}
-		//LOG4CPLUS_TRACE(log,",execute starting...");
-		/*if (!SCXMLHelper::isStringEmpty(datum.getSrc()))
-		{
-			ctx->setLocal(datum.getId(),datum.getSrc());
-		}
-		else */if (!helper::string::isStringEmpty(this->getExpr()))
+
+		if (!this->getExpr().empty())
 		{
 			//std::string value;
 			//value = evl->eval(ctx, getExpr(),m_strFileName,node->line);
-			ctx->eval("var " + getId()+"="+this->getExpr()+";" , m_strFileName, m_node->line/*, m_node*/);
+			ctx->eval("var " + getId() + "=" + this->getExpr() + ";", m_strFileName, m_lineNo/*, m_node*/);
 			
 		}
 		else
 		{
-			ctx->eval("var " + getId()+";" , m_strFileName, m_node->line/*, m_node*/);
+			ctx->eval("var " + getId()+";" , m_strFileName, m_lineNo/*, m_node*/);
 		}
-		LOG4CPLUS_TRACE(log, "." + m_strSession, ",set data " << getId() << "=" << getExpr());
+		LOG4CPLUS_TRACE(log, "." + sessionId, ",set data " << getId() << "=" << getExpr());
 		//LOG4CPLUS_TRACE(log,",execute end.");
 	}
 
-	bool Data::isEnabledCondition(fsm::Context * ctx)
+	bool Data::isEnabledCondition(fsm::Context * ctx) const
 	{
 		return true;
 	}

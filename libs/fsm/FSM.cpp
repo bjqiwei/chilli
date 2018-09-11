@@ -1,19 +1,53 @@
 #include "FSM.h"
 #include "FSMimp.h"
+#include "parseFSM.h"
 
 
 
 using namespace std;
 
-fsm::StateMachine::StateMachine(const std::string & logId, const std::string &sessionid, const string  &xml, helper::OnTimerInterface * func, xmlType xtype) :imp(nullptr)
+fsm::StateMachine * fsm::fsmParseFile(const std::string & filename)
 {
-	imp = new fsm::StateMachineimp(logId, sessionid, xml, xtype, func);
+	StateMachineimp * imp = parseFSM::fsmParseFileImp(filename);
+	if (imp){
+		fsm::StateMachine * sm = new fsm::StateMachine();
+		sm->imp = imp;
+		return sm;
+	}
+	return nullptr;
+}
+
+fsm::StateMachine * fsm::fsmParseMemory(const char * buffer, size_t size)
+{
+	StateMachineimp * imp = parseFSM::fsmParseMemoryImp(buffer, size);
+	if (imp) {
+		fsm::StateMachine * sm = new fsm::StateMachine();
+		sm->imp = imp;
+		return sm;
+	}
+	return nullptr;
+}
+
+fsm::StateMachine::StateMachine() :imp(nullptr)
+{
 }
 
 fsm::StateMachine::~StateMachine()
- { 
-	 delete imp;
- }
+{ 
+	delete imp;
+}
+
+fsm::StateMachine::StateMachine(const StateMachine & other)
+{
+	this->imp = new StateMachineimp(*other.imp);
+}
+
+fsm::StateMachine & fsm::StateMachine::operator=(const StateMachine & other)
+{
+	// TODO: insert return statement here
+	this->imp = new StateMachineimp(*other.imp);
+	return *this;
+}
 
 const std::string fsm::StateMachine::getCurrentStateID(void) const
 {
@@ -38,8 +72,16 @@ bool fsm::StateMachine::addSendImplement(SendInterface * evtDsp)
 const std::string & fsm::StateMachine::getName() const {
 	return imp->getName();
 }
+void fsm::StateMachine::setOnTimer(OnTimerInterface * func)
+{
+	return imp->setOnTimer(func);
+}
+void fsm::StateMachine::setLoggerId(const std::string & logId)
+{
+	return imp->setLoggerId(logId);
+}
 const std::string & fsm::StateMachine::getSessionId()const {
-	return imp->getSessionId();
+	return imp->getSessionID();
 }
 
 bool fsm::StateMachine::start(bool block)

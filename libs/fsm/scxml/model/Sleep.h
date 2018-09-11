@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _SCXML_MODEL_SLEEP_HEADER_
-#define  _SCXML_MODEL_SLEEP_HEADER_
 
 #include <string>
 #include "Action.h"
@@ -12,14 +10,14 @@ namespace model{
 
 	class  Sleep:public Action{
 	public:
-		Sleep(xmlNodePtr node,const std::string &session,const std::string & filename);
+		Sleep(const std::string &filename, uint32_t lineno);
 		virtual ~Sleep();
-		unsigned int getInterval();
-		virtual  void execute(fsm::Context * ctx);
+		uint32_t getInterval() const;
+		void setInterval(const std::string & interval);
+		virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
 
 	private:
-		std::string interval;
+		std::string m_Interval;
 	};
 }
 }
-#endif // end sleep header

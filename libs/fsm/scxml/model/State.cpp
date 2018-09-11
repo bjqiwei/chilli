@@ -6,22 +6,27 @@ namespace fsm
 namespace model
 {
 
-	State::State(xmlNodePtr xNode,const std::string &session,const std::string & filename):node(xNode),
-		m_strSession(session),m_strFilename(filename)
+	State::State(const std::string &filename, uint32_t lineno):m_strFilename(filename),m_lineNo(lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.State");
-		InitializeInstanceFields();
-		m_strId = helper::xml::getXmlNodeAttributesValue(node,"id");
-		m_strName = helper::xml::getXmlNodeAttributesValue(node,"name");
-		//m_strVersion = xmlHelper::getXmlNodeAttributesValue(node,"version");
-		m_strDescription = helper::xml::getXmlNodeAttributesValue(node,"memo");
+
+	}
+
+	void State::setId(const std::string & id)
+	{
+		this->m_strId = id;
+	}
+
+	void State::setName(const std::string & name)
+	{
+		this->m_strName = name;
+	}
+
+	void State::setDescription(const std::string & desc)
+	{
+		m_strDescription = desc;
 	}
 
 
-	void State::InitializeInstanceFields()
-	{
-		
-	}
 	const std::string & State::getId()const
 	{
 		return m_strId;
@@ -37,6 +42,26 @@ namespace model
 	const std::string & State::getDescription()const
 	{
 		return m_strDescription;
+	}
+	void State::setParent(State * parent)
+	{
+		m_Parent = parent;
+	}
+	State * State::getParent()const
+	{
+		return this->m_Parent;
+	}
+	void State::addOnEntry(std::shared_ptr<OnEntry> onentryptr)
+	{
+		m_OnEntrys.push_back(onentryptr);
+	}
+	void State::addOnExit(std::shared_ptr<OnExit> onexitptr)
+	{
+		this->m_OnExits.push_back(onexitptr);
+	}
+	void State::addEvent(std::shared_ptr<Event> eventptr)
+	{
+		m_Events.push_back(eventptr);
 	}
 }
 }

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _FSM_MODEL_LOG_HEADER_
-#define  _FSM_MODEL_LOG_HEADER_
 
 #include <string>
 #include "Action.h"
@@ -18,15 +16,18 @@ namespace fsm
 			std::string m_Type;
 
 		public:
-			Log(xmlNodePtr xNode,const std::string &sessionid,const std::string &filename);
+			Log(const std::string &filename, uint32_t lineno);
 			virtual ~Log(){};
 			const std::string & getExpr() const;
+			void setExpr(const std::string & expr);
 			const std::string & getLevel() const;
-			virtual  void execute(Context * ctx);
+			void setLevel(const std::string & level);
+			const std::string & getType() const;
+			void setType(const std::string & type);
+
+			virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
 		};
 
 
 	}
 }
-
-#endif //end scxml.model.script header

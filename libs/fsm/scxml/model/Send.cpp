@@ -1,8 +1,6 @@
 #include "Send.h"
 #include <cstring>
 #include <log4cplus/loggingmacros.h>
-#include "../../common/xmlHelper.h"
-#include "../../common/stringHelper.h"
 #include <json/config.h>
 #include <json/json.h>
 
@@ -12,24 +10,10 @@ namespace model
 {
 
 
-	Send::Send(xmlNodePtr xNode,const std::string &session,const std::string &filename)
-		:Action(xNode, session,	filename)
+	Send::Send(const std::string &filename, uint32_t lineno)
+		:Action(filename,lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Send");
 
-		this->id = helper::xml::getXmlNodeAttributesValue(m_node,"id");
-		this->idexpr = helper::xml::getXmlNodeAttributesValue(m_node,"idexpr");
-		this->target = helper::xml::getXmlNodeAttributesValue(m_node,"target");
-		this->targetexpr = helper::xml::getXmlNodeAttributesValue(m_node,"targetexpr");
-		this->type = helper::xml::getXmlNodeAttributesValue(m_node,"type");
-		this->typeexpr = helper::xml::getXmlNodeAttributesValue(m_node,"typeexpr");
-		this->_event = helper::xml::getXmlNodeAttributesValue(m_node,"event");
-		this->eventexpr = helper::xml::getXmlNodeAttributesValue(m_node,"eventexpr");
-		//this->namelist = xmlHelper::getXmlNodeAttributesValue(node,"namelist");
-		this->from = helper::xml::getXmlNodeAttributesValue(m_node,"from");
-		this->fromexpr = helper::xml::getXmlNodeAttributesValue(m_node,"fromexpr");
-		this->dest = helper::xml::getXmlNodeAttributesValue(m_node,"dest");
-		this->destexpr = helper::xml::getXmlNodeAttributesValue(m_node,"destexpr");
 	}
 
 
@@ -39,15 +23,37 @@ namespace model
 	}
 	void Send::setId(const std::string &strValue)
 	{
-		id = strValue;
+		this->id = strValue;
 	}
-	//std::string& Send::getIdLocation()
-	//{
-	//	return idlocation;
-	//}
+	const std::string & Send::getIdExpr()const
+	{
+		// TODO: insert return statement here
+		return idexpr;
+	}
+	void Send::setIdExpr(const std::string & idexpr)
+	{
+		this->idexpr = idexpr;
+	}
+
 	const std::string& Send::getTarget()const
 	{
 		return target;
+	}
+
+	void Send::setTarget(const std::string & target)
+	{
+		this->target = target;
+	}
+
+
+	const std::string& Send::getTargetExpr() const
+	{
+		return this->targetexpr;
+	}
+
+	void Send::setTargetExpr(const std::string & targetexpr)
+	{
+		this->targetexpr = targetexpr;
 	}
 
 	const std::string& Send::getFrom()const
@@ -55,23 +61,94 @@ namespace model
 		return from;
 	}
 
+	void Send::setFrom(const std::string & from)
+	{
+		this->from = from;
+	}
+
+	const std::string & Send::getFromExpr() const
+	{
+		// TODO: insert return statement here
+		return fromexpr;
+	}
+
+	void Send::setFromExpr(const std::string & fromexpr)
+	{
+		this->fromexpr = fromexpr;
+	}
+
 	const std::string& Send::getType()const
 	{
 		return type;
+	}
+
+	void Send::setType(const std::string & type)
+	{
+		this->type = type;
+	}
+
+	const std::string & Send::getTypeExpr() const
+	{
+		// TODO: insert return statement here
+		return this->typeexpr;
+	}
+
+	void Send::setTypeExpr(const std::string & typeexpr)
+	{
+		this->typeexpr = typeexpr;
 	}
 
 	const std::string& Send::getEvent()const
 	{
 		return this->_event;
 	}
-	//std::string& Send::getEventExpr()
-	//{
-	//	return this->eventexpr;
-	//}
+
+	void Send::setEvent(const std::string & event)
+	{
+		this->_event = event;
+	}
+
+	const std::string & Send::getEventExpr()const
+	{
+		// TODO: insert return statement here
+		return this->eventexpr;
+	}
+
+	void Send::setEventExpr(const std::string & eventexpr)
+	{
+		this->eventexpr = eventexpr;
+	}
+
+	void Send::addParam(const std::string & name, const std::string & type, const std::string & value, uint32_t lineno)
+	{
+		ParamStruct param;
+		param.name = name;
+		param.type = type;
+		param.value = value;
+		param.lineno = lineno;
+		m_Params.push_back(param);
+	}
+
 
 	const std::string& Send::getDestination()const
 	{
 		return this->dest;
+	}
+
+	void Send::setDestination(const std::string & dest)
+	{
+		this->dest = dest;
+	}
+
+	const std::string & Send::getDestinationExpr() const
+	{
+		// TODO: insert return statement here
+		return this->destexpr;
+	}
+
+	void Send::setDestinationExpr(const std::string & destexpr)
+	{
+		this->destexpr = destexpr;
 	}
 
 	/*std::string& Send::getNamelist()
@@ -92,47 +169,47 @@ namespace model
 	{
 		return fireData;
 	}
-	void Send::execute(fsm::Context * ctx)
+	void Send::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
-		if (ctx && helper::string::isStringEmpty(id) && !idexpr.empty()){
-			Json::Value jsonid = ctx->eval(idexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"idexpr")*/);
+		if (ctx && id.empty() && !idexpr.empty()){
+			Json::Value jsonid = ctx->eval(idexpr,m_strFileName, m_lineNo/*,xmlHasProp(m_node,BAD_CAST"idexpr")*/);
 			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull()){
-				id = jsonid.asString();
+				const_cast<Send*>(this)->id = jsonid.asString();
 			}
 		}
 		
-		if (ctx && helper::string::isStringEmpty(target) && !targetexpr.empty()){
-			Json::Value jsontarget = ctx->eval(targetexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
+		if (ctx && target.empty() && !targetexpr.empty()){
+			Json::Value jsontarget = ctx->eval(targetexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
 			if (jsontarget.isString() || jsontarget.isBool() || jsontarget.isNull()){
-				target = jsontarget.asString();
+				const_cast<Send*>(this)->target = jsontarget.asString();
 			}
 		}
 
-		if (ctx && helper::string::isStringEmpty(type) && !typeexpr.empty()){
-			Json::Value jsontype = ctx->eval(typeexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"typeexpr")*/);
+		if (ctx && type.empty() && !typeexpr.empty()){
+			Json::Value jsontype = ctx->eval(typeexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"typeexpr")*/);
 			if (jsontype.isString() || jsontype.isBool() || jsontype.isNull()){
-				type = jsontype.asString();
+				const_cast<Send*>(this)->type = jsontype.asString();
 			}
 		}
 
-		if (ctx && helper::string::isStringEmpty(_event) && !eventexpr.empty()){
-			Json::Value jsonEvent = ctx->eval(eventexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"eventexpr")*/);
+		if (ctx && _event.empty() && !eventexpr.empty()){
+			Json::Value jsonEvent = ctx->eval(eventexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"eventexpr")*/);
 			if (jsonEvent.isString() || jsonEvent.isBool() || jsonEvent.isNull()){
-				_event = jsonEvent.asCString();
+				const_cast<Send*>(this)->_event = jsonEvent.asCString();
 			}
 		}
 
-		if (ctx && helper::string::isStringEmpty(from) && !fromexpr.empty()){
-			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
+		if (ctx && from.empty() && !fromexpr.empty()){
+			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
 			if (jsonfrom.isString() || jsonfrom.isBool() || jsonfrom.isNull()){
-				from = jsonfrom.asCString();
+				const_cast<Send*>(this)->from = jsonfrom.asCString();
 			}
 		}
 
-		if (ctx && helper::string::isStringEmpty(dest) && !destexpr.empty()){
-			Json::Value jsondest = ctx->eval(destexpr,m_strFileName,m_node->line/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
+		if (ctx && dest.empty() && !destexpr.empty()){
+			Json::Value jsondest = ctx->eval(destexpr,m_strFileName, m_lineNo/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
 			if (jsondest.isString() || jsondest.isBool() || jsondest.isNull()){
-				dest = jsondest.asString();
+				const_cast<Send*>(this)->dest = jsondest.asString();
 			}
 		}
 
@@ -171,12 +248,12 @@ namespace model
 */
 		//·¢ËÍÊý¾Ý
 	
-		fireData.id = getId();
-		fireData.event = getEvent();
-		fireData.type = getType();
-		fireData.from = getFrom().empty() ? m_strSession : getFrom();
-		fireData.dest = getDestination();
-		fireData.target = getTarget();
+		const_cast<Send*>(this)->fireData.id = getId();
+		const_cast<Send*>(this)->fireData.event = getEvent();
+		const_cast<Send*>(this)->fireData.type = getType();
+		const_cast<Send*>(this)->fireData.from = getFrom().empty() ? sessionId : getFrom();
+		const_cast<Send*>(this)->fireData.dest = getDestination();
+		const_cast<Send*>(this)->fireData.target = getTarget();
 
 		/*xmlAttrPtr attrPtr = m_node->properties;
 		while (attrPtr != NULL)
@@ -200,25 +277,15 @@ namespace model
 		}*/
 
 		//m_xmlDoc.addAddChildList(node->children);
-		xmlNodePtr childNode  = m_node->children;
-		
-		while(childNode != NULL)
-		{
-			if(childNode->type == XML_ELEMENT_NODE){
-				//xmlNodePtr newNode = xmlCopyNode(childNode,0);
-				//xmlNodePtr content = xmlNewText(BAD_CAST params[(char *)newNode->name].c_str());
-				//xmlAddChild(newNode,content);
-				std::string _type = helper::xml::getXmlNodeAttributesValue(childNode,"type");
-				if(ctx && _type.compare("script") == 0)
-					fireData.param[(const char *)childNode->name] = ctx->eval(helper::xml::XStr(xmlNodeGetContent(childNode)).strForm(),m_strFileName,childNode->line/*,childNode*/);
-				else
-					fireData.param[(const char *)childNode->name] = helper::xml::XStr(xmlNodeGetContent(childNode)).strForm();
+		for (auto & param : m_Params) {
 
-				//xmlFreeNode(newNode);
-			}
-			childNode = childNode->next;
-		}
-		
+			if (ctx && param.type.compare("script") == 0)
+				const_cast<Send*>(this)->fireData.param[param.name] = ctx->eval(param.value, m_strFileName, param.lineno/*,childNode*/);
+			else
+				const_cast<Send*>(this)->fireData.param[param.name] = param.value;
+
+			//xmlFreeNode(newNode);
+		}	
 		
 		//LOG4CPLUS_TRACE(log,",send content:" << content);
 	}

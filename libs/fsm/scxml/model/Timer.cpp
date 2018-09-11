@@ -1,17 +1,11 @@
 #include "Timer.h"
-#include "../../common/xmlHelper.h"
 
 namespace fsm{
 namespace model{
 
-	Timer::Timer(xmlNodePtr xNode,const std::string &session,const std::string & filename)
-		:Action(xNode, session, filename)
+	Timer::Timer(const std::string &filename, uint32_t lineno)
+		:Action(filename,lineno)
 	{
-		log = log4cplus::Logger::getInstance("fsm.model.Timer");
-		this->id = helper::xml::getXmlNodeAttributesValue(m_node,"id");
-		this->idexpr = helper::xml::getXmlNodeAttributesValue(m_node,"idexpr");
-		this->interval = helper::xml::getXmlNodeAttributesValue(m_node,"interval");
-		this->intervalexpr = helper::xml::getXmlNodeAttributesValue(m_node, "intervalexpr");
 	}
 	Timer::~Timer(){
 
@@ -21,12 +15,22 @@ namespace model{
 		return id;
 	}
 
+	void Timer::setId(const std::string & id)
+	{
+		this->id = id;
+	}
+
 	const std::string& Timer::getIdExpr()const
 	{
 		return idexpr;
 	}
 
-	unsigned int Timer::getInterval()
+	void Timer::setIdExpr(const std::string idexpr)
+	{
+		this->idexpr = idexpr;
+	}
+
+	uint64_t Timer::getInterval() const
 	{
 		if (!interval.empty()){
 			try {
@@ -50,21 +54,31 @@ namespace model{
 		return 0;
 	}
 
+	void Timer::setInterval(const std::string & interval)
+	{
+		this->interval = interval;
+	}
+
 	const std::string& Timer::getIntervalExpr()const
 	{
 		return intervalexpr;
 	}
 
-	void Timer::execute(fsm::Context * ctx)
+	void Timer::setIntervalExpr(const std::string & intervalexpr)
 	{
-		if (ctx && id.empty()){
-			Json::Value jsonid = ctx->eval(idexpr,m_strFileName,m_node->line);
-			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull()){
-				id = jsonid.asString();
+		this->intervalexpr = intervalexpr;
+	}
+
+	void Timer::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
+	{
+		if (ctx && id.empty() && !idexpr.empty()){
+			Json::Value jsonid = ctx->eval(idexpr, m_strFileName, m_lineNo);
+			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull() || jsonid.isNumeric()){
+				const_cast<Timer *>(this)->id = jsonid.asString();
 			}
 		}
-		if (ctx && interval.empty()){
-			jsonInterval = ctx->eval(intervalexpr, m_strFileName, m_node->line);
+		if (ctx && interval.empty() && !intervalexpr.empty()){
+			const_cast<Timer*>(this)->jsonInterval = ctx->eval(intervalexpr, m_strFileName, m_lineNo);
 		}
 	}
 

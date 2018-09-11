@@ -1,5 +1,4 @@
-#ifndef _INTERPRETER_HEADER_
-#define _INTERPRETER_HEADER_
+#pragma once
 
 #include "config.h"
 #include <string>
@@ -17,22 +16,21 @@ namespace fsm{
 	class StateMachineimp;
 	typedef helper::OnTimerInterface OnTimerInterface;
 	//template class INTERPRETER_EXPORT std::map<std::string, Send *>;
-	enum xmlType{
-		File,
-		Memory,
-	};
 
+	FSM_EXPORT class StateMachine * fsmParseFile(const std::string & filename);
+	FSM_EXPORT class StateMachine * fsmParseMemory(const char *buffer, size_t size);
 	FSM_EXPORT void initialize();
 	FSM_EXPORT void threadCleanup();
 	FSM_EXPORT void threadIdle();
 	FSM_EXPORT void unInitialize();
 
 	class FSM_EXPORT StateMachine {
+	protected:
+		StateMachine();
 	public:
-		StateMachine(const std::string & logId, const std::string &sessionid, const string &xml, OnTimerInterface * func, xmlType xtype = xmlType::File);
 		virtual ~StateMachine();
-		StateMachine(const StateMachine &other) = delete;
-		StateMachine & operator=(const StateMachine & other) = delete;
+		StateMachine(const StateMachine &other);
+		StateMachine & operator=(const StateMachine & other);
 		
 		//开始进入初始化状态
 		bool start(bool block = true);
@@ -44,6 +42,8 @@ namespace fsm{
 		//void setName(const string &strName);
 		const std::string& getName() const;
 
+		void setOnTimer(OnTimerInterface * func);
+		void setLoggerId(const std::string & logId);
 		void setSessionID(const std::string &strSessionid);
 		const std::string& getSessionId()const;
 
@@ -57,6 +57,7 @@ namespace fsm{
 
 	private:
 		StateMachineimp * imp;
+		friend class StateMachine * fsmParseFile(const std::string & filename);
+		friend class StateMachine * fsmParseMemory(const char *buffer, size_t size);
 	};
 }
-#endif

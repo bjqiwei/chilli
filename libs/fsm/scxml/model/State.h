@@ -1,9 +1,8 @@
 #pragma once
-#ifndef _STATE_HEADER_
-#define _STATE_HEADER_
 #include <string>
-#include <libxml/tree.h>
-#include <log4cplus/logger.h>
+#include "OnEntry.h"
+#include "OnExit.h"
+#include "Event.h"
 
 namespace fsm
 {
@@ -21,31 +20,38 @@ namespace model
 	{
 
 	private:
-		xmlNodePtr node;
-		log4cplus::Logger log;
 		std::string m_strId;
 		std::string m_strName;
 		//std::string m_strVersion;
 		std::string m_strDescription;
-		std::string m_strSession;
 		std::string m_strFilename;
-		/// <summary>
-		/// Constructor.
-		/// </summary>
+		uint32_t m_lineNo;
+
 	public:
-		State(xmlNodePtr xNode,const std::string &session,const std::string & filename);
+		State* m_Parent = nullptr;
+		std::vector<std::shared_ptr<OnEntry>> m_OnEntrys;
+		std::vector<std::shared_ptr<OnExit>> m_OnExits;
+		std::vector<std::shared_ptr<Event>>m_Events;
+
+		State(const std::string &filename, uint32_t lineno);
 		virtual ~State(){};
+		void setId(const std::string & id);
+		void setName(const std::string & name);
+		void setDescription(const std::string & desc);
 		const std::string &getId()const;
 		const std::string &getName()const;
 		//std::string &getVersion();
 		const std::string &getDescription()const;
 
-	private:
-		void InitializeInstanceFields();
+		void setParent(State * parent);
+		State * getParent() const;
+
+		void addOnEntry(std::shared_ptr<OnEntry> onentryptr);
+		void addOnExit(std::shared_ptr<OnExit> onexitptr);
+		void addEvent(std::shared_ptr<Event> eventptr);
+
 	};
 
 
 }
 }
-
-#endif // end state

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _FSM_MODEL_DATA_HEADER_
-#define _FSM_MODEL_DATA_HEADER_
 #include <string>
 #include "Action.h"
 
@@ -18,22 +16,14 @@ private:
 	std::string m_strId;
 	std::string m_strExpr;
 public:
-	Data(xmlNodePtr xNode,const std::string & session,const std::string &filename);
-
+	Data(const std::string &filename, uint32_t lineno);
+	void setId(const std::string &id) { m_strId = id; }
+	void setExpr(const std::string &expr) { m_strExpr = expr; }
 	const std::string  &getId() const;
-	//void setId(const std::string &id);
-	//const std::string  getSrc() const ;
-	//void setSrc(const std::string &src);
 	const std::string  &getExpr() const;
-	//void setExpr(const std::string &expr);
-	//xmlNodePtr getNode() ;
-	//void setNode( xmlNodePtr const node);
-	virtual void execute(fsm::Context * ctx);
-	virtual bool isEnabledCondition(fsm::Context * ctx);
-
+	virtual void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
+	virtual bool isEnabledCondition(fsm::Context * ctx) const override;
 };
 
-
 }
 }
-#endif //end header file
