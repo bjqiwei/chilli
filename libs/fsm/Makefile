@@ -72,7 +72,7 @@ override SYSBYTE = -m64
 endif 
 
 #编译用的编译器参数
-export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -fPIC -Wall -static-libstdc++ -static-libgcc -std=c++11 $(SYSBYTE) $(PROJECT_DEF)
+export PROJECT_CPP_FLAGS = $(PROJECT_INCLUDE) $(DLL_FLAG) -fPIC -Wall -std=c++11 $(SYSBYTE) $(PROJECT_DEF)
 
 #链接用的参数
 export PROJECT_EXE_LINK_FLAGS = $(PROJECT_LINK_DIR) -Wall $(SYSBYTE) -Wl,-rpath -Wl,.

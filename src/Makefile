@@ -49,7 +49,7 @@ websocket_OBJ_DIR = $(OBJ_DIR)websocket/
 CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -c -g -O1 
 CXXFLAGS = $(CFLAGS) -std=c++11
 
-LDFLAGS= -static-libstdc++ -static-libgcc -Wall -g -O1 
+LDFLAGS= -Wall -g -O1 
 LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.so ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -levent_extra -levent_core -levent_pthreads -llog4cplus
 LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -luuid -lm -ldl -lrt -lz -lm -ldl  -lrt -Wl,-rpath=./lib
 
