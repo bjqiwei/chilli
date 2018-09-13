@@ -41,7 +41,7 @@ namespace env
 
 	private:
 		void InitializeInstanceFields();
-		JS::Value JsonValueToJsval(const Json::Value &val) const;
+		JS::Value JsonValueToJsval(const Json::Value &val, JS::RootedObject & parent) const;
 		Json::Value JsvalToJsonValue(const JS::Value &val) const;
 	};
 

@@ -72,11 +72,11 @@
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)..\..\..\libs\log4cplus-1.2.0\include\;$(ProjectDir)..\..\..\libs\libxml2-2.9.3\include;$(ProjectDir)..\..\..\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\include\;$(ProjectDir)..\..\..\libs\jsoncpp-1.8.4\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\sdk\lib\;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\js\src;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\intl\icu\target\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)..\..\..\libs\log4cplus-1.2.0\include\;$(ProjectDir)..\..\..\libs\libxml2-2.9.3\include;$(ProjectDir)..\..\..\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\include\;$(ProjectDir)..\..\..\libs\jsoncpp-1.8.4\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\sdk\lib\;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\js\src;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\intl\icu\target\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(LibraryPath)</LibraryPath>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName)D</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -86,11 +86,11 @@
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>$(ProjectDir)..\..\..\libs\log4cplus-1.2.0\include\;$(ProjectDir)..\..\..\libs\libxml2-2.9.3\include;$(ProjectDir)..\..\..\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\include\;$(ProjectDir)..\..\..\libs\jsoncpp-1.8.4\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\sdk\lib\;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\js\src;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\intl\icu\target\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)..\..\..\libs\log4cplus-1.2.0\include\;$(ProjectDir)..\..\..\libs\libxml2-2.9.3\include;$(ProjectDir)..\..\..\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\include\;$(ProjectDir)..\..\..\libs\jsoncpp-1.8.4\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\sdk\lib\;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\js\src;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\intl\icu\target\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\libs\mozjs-38.3.0\js\src\build\$(PlatformName)\$(Configuration)\dist\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(PlatformName)\obj.$(ProjectName).$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -101,7 +101,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -122,7 +122,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)D.pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -142,7 +142,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -160,7 +160,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDLL;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;FSM_LIB;LOG4CPLUS_BUILD_DLL;LOG4CPLUS_DISABLE_TRACE;EXPORT_JS_API;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>

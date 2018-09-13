@@ -25,7 +25,7 @@ namespace env
 		JSAutoRequest ar(this->m_jsctx);
 		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
-		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value));
+		JS::RootedValue val(this->m_jsctx,JsonValueToJsval(value, *this->m_global));
 		
 		std::string _name = name;
 		std::string::size_type pos;
@@ -38,11 +38,11 @@ namespace env
 			if (JS_GetProperty(m_jsctx, obj, objName.c_str(), &rval)){
 				
 				if (rval.isObject()){
-					obj.set(&rval.toObject());
+					obj = JS::RootedObject(this->m_jsctx, &rval.toObject());
 				}
 				else {
 
-					JS::RootedObject _object(m_jsctx, JS_NewObject(m_jsctx, nullptr));
+					JS::RootedObject _object(m_jsctx, JS_NewObject(m_jsctx, nullptr, obj));
 					if (!_object) {
 						LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_NewObject " << objName);
 						return;
@@ -75,14 +75,13 @@ namespace env
 	Json::Value JsContext::getVar(const std::string &name)
 	{
 		JSAutoRequest ar(this->m_jsctx);
-		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::RootedValue rval(this->m_jsctx);
 
 		bool has = false;
-		if (JS_AlreadyHasOwnProperty(m_jsctx, obj, name.c_str(), &has) && has) {
-			bool status = JS_GetProperty(m_jsctx, obj, name.c_str(), &rval);
+		if (JS_AlreadyHasOwnProperty(m_jsctx, *this->m_global, name.c_str(), &has) && has) {
+			bool status = JS_GetProperty(m_jsctx, *this->m_global, name.c_str(), &rval);
 			if (status == true) {
 				return JsvalToJsonValue(rval);
 
@@ -94,12 +93,11 @@ namespace env
 	void JsContext::deleteVar(const std::string & name)
 	{
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JS::RootedObject obj (this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		//LOG4CPLUS_TRACE(log, "." + m_strSessionID, ",delete "<< (va==fsm::globalObject? "global.":"_event.") << name );
 
-		if(!JS_DeleteProperty(m_jsctx, obj, name.c_str())){
+		if(!JS_DeleteProperty(m_jsctx, *this->m_global, name.c_str())){
 			LOG4CPLUS_ERROR(log, "." + m_strSessionID, ", delete Var " << name << " failed.");
 		}
 	
@@ -116,8 +114,7 @@ namespace env
 	Json::Value JsContext::eval(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 		//JS_DumpNamedRoots(JS_GetRuntime(ctx), JsGlobal::dumpRoot, NULL);
-		
-		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
+		JSAutoRequest ar(this->m_jsctx);
 		//JS::RootedObject  obj(this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
@@ -134,8 +131,7 @@ namespace env
 	bool JsContext::evalCond(const std::string &expr,const std::string &filename, unsigned int line)
 	{
 
-		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
+		JSAutoRequest ar(this->m_jsctx);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
@@ -152,7 +148,6 @@ namespace env
 	void JsContext::ExecuteFile(const std::string &fileName)
 	{
 		JSAutoRequest ar = JSAutoRequest(this->m_jsctx);
-		JS::RootedObject  obj(this->m_jsctx, *this->m_global);
 		JSAutoCompartment ac(this->m_jsctx, *this->m_global);
 
 		JS::CompileOptions options(this->m_jsctx);
@@ -263,7 +258,7 @@ namespace env
 		LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",destructioned a fsm.env.JsContext object:" << this );
 	}
 
-	JS::Value JsContext::JsonValueToJsval(const Json::Value &value)const
+	JS::Value JsContext::JsonValueToJsval(const Json::Value &value, JS::RootedObject & parent)const
 	{
 		JS::Value val = JS::NullValue();
 		if (value.isBool()){
@@ -287,7 +282,7 @@ namespace env
 		}
 		else if (value.isObject())
 		{
-			JS::RootedObject  obj(this->m_jsctx, JS_NewObject(m_jsctx, nullptr));
+			JS::RootedObject  obj(this->m_jsctx, JS_NewObject(m_jsctx, nullptr, parent));
 		
 			if (!obj) {
 				LOG4CPLUS_ERROR(log, "." + m_strSessionID, "JS_NewObject " << value.toStyledString());
@@ -296,7 +291,7 @@ namespace env
 
 			for (auto & it : value.getMemberNames()) {
 				
-				JS::RootedValue  val2(this->m_jsctx,JsonValueToJsval(value[it]));
+				JS::RootedValue  val2(this->m_jsctx,JsonValueToJsval(value[it], obj));
 			
 				if(!JS_DefineProperty(this->m_jsctx, obj, it.c_str(), val2, JSPROP_ENUMERATE))
 				{
@@ -315,7 +310,7 @@ namespace env
 			}
 			for (uint32_t i = 0; i < value.size(); i++)
 			{
-				JS::RootedValue val2(this->m_jsctx, JsonValueToJsval(value[i]));
+				JS::RootedValue val2(this->m_jsctx, JsonValueToJsval(value[i], _array));
 				JS_DefineElement(m_jsctx, _array, i, val2, JSPROP_ENUMERATE);
 			}
 			val.setObject(*_array);
