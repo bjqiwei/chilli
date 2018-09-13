@@ -25,6 +25,36 @@ class ontimer :public OnTimerInterface {
 	}
 }my_timer;
 
+int test()
+{
+	int i = 1000;
+	std::vector<fsm::StateMachine *> m_scxml;
+	while (i--) {
+		fsm::StateMachine  *  mysmscxml = fsm::fsmParseFile("./fsm.xml");
+		mysmscxml->setLoggerId("fsm");
+		mysmscxml->setSessionID("0123456");
+		mysmscxml->setOnTimer(&my_timer);
+		mysmscxml->setVar("chilli.qiwei.name", "qiwei");
+		mysmscxml->start(false);
+		m_scxml.push_back(mysmscxml);
+	}
+
+
+	while (!m_scxml.empty()) {
+		m_scxml.back()->stop();
+		delete m_scxml.back();
+		m_scxml.pop_back();
+	}
+
+
+	int ii = 10000;
+	while (ii--)
+	{
+		fsm::threadIdle();
+	}
+
+	return 0;
+}
 
 int main(int argc, _TCHAR* argv[])
 {
@@ -40,6 +70,18 @@ int main(int argc, _TCHAR* argv[])
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 		string strStateFile;
 		strStateFile.append(".\\fsm.xml");
+
+		
+		std::thread th1(test);
+		std::thread th2(test);
+		std::thread th3(test);
+
+		th1.join();
+		th2.join();
+		th3.join();
+
+		getchar();
+
 		fsm::StateMachine  *  mysmscxml = fsm::fsmParseFile(strStateFile);
 		if (mysmscxml)
 		{
@@ -55,6 +97,7 @@ int main(int argc, _TCHAR* argv[])
 			mysmscxml->start();
 			mysmscxml->mainEventLoop();
 			std::cout << mysmscxml->isInFinalState() << endl;
+			fsm::threadIdle();
 			fsm::threadCleanup();
 		});
 
