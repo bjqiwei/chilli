@@ -336,7 +336,7 @@ bool chilli::App::LoadConfig(const std::string & strConfigFile)
 			}
 			else if (nodeName == MYSQL)
 			{
-				model::ProcessModulePtr mysql(new chilli::DataBase::MySqlModule(modelid));
+				model::ProcessModulePtr mysql(new chilli::DataBase::MySqlModule(modelid, 2));
 				XMLPrinter printer;
 				e->Accept(&printer);
 				mysql->LoadConfig(printer.CStr());

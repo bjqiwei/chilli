@@ -583,26 +583,7 @@ void FreeSwitchModule::receiveFS()
 					continue;
 				}
 
-				if (!(m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_CREATE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_PROGRESS
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_ANSWER
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_BRIDGE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_UNBRIDGE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_HANGUP
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_DESTROY
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_OUTGOING
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_ORIGINATE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_PROGRESS_MEDIA
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB
-					|| m_Handle.last_ievent->event_id == ESL_EVENT_DTMF))
-				{
-					continue;
-				}
-
 				std::string eventName;
-
 				Json::Value newEvt;
 
 				for (esl_event_header_t * header = m_Handle.last_ievent->headers; header != nullptr; header = header->next)
@@ -628,16 +609,17 @@ void FreeSwitchModule::receiveFS()
 
 				if (m_Handle.last_ievent->event_id == ESL_EVENT_CHANNEL_EXECUTE_COMPLETE)
 					eventName = newEvt["param"]["Application"].asString();
-				else if (m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB)
+				else if (m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB) {
 					eventName = newEvt["param"]["JobCommand"].asString();
-				else
-					eventName = newEvt["param"]["EventName"].asString();
 
-				if (m_Handle.last_ievent->event_id == ESL_EVENT_BACKGROUND_JOB) {
 					std::string sessionId;
 					getJobSession(newEvt["param"]["JobUUID"].asString(), sessionId);
 					newEvt["param"]["UniqueID"] = sessionId;
+
+					removeJobSession(newEvt["param"]["JobUUID"].asString());
 				}
+				else
+					eventName = newEvt["param"]["EventName"].asString();
 
 				if (m_Handle.last_ievent->body) {
 					newEvt["param"]["body"] = m_Handle.last_ievent->body;
@@ -679,11 +661,7 @@ void FreeSwitchModule::receiveFS()
 					LOG4CPLUS_WARN(log, "." + this->getId(), "Channel is already destroy:" << m_Handle.last_event->body);
 				}
 
-				if (eventName == "BACKGROUND_JOB") {
-					removeJobSession(newEvt["JobUUID"].asString());
-
-				}
-				else if (eventName == "CHANNEL_DESTROY") {
+				if (eventName == "CHANNEL_DESTROY") {
 					removeSessionDevice(sessionId);
 				}
 
