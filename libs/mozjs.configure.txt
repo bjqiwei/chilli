@@ -2,12 +2,14 @@ linux 使用yum 安装, yum install mozjs38
 
 windows 编译:
 
-./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --without-nspr --enable-release --with-pthreads --disable-gc-trace --enable-static-rtl --enable-static
+./configure --disable-tests --disable-readline --disable-build-backend --disable-xterm-updates --disable-jemalloc --without-intl-api --disable-nspr-build --disable-gc-trace --enable-static-rtl --enable-static
 #禁用动态库参数 --disable-shared-js --disable-shared
 #debug --enable-debug
+#release --enable-release
 #编译64位库参数 --target=x86_64-pc-mingw32 --host=x86_64-pc-mingw32
 #修改topdir/config/config.mk RTL_FLAGS=-MT
 
+#mozmake 完成后
 #修改topdir/nsprpub/pr/include/prtypes.h 修改53行到61行为
 #define PR_EXPORT(__type) extern __type
 #define PR_EXPORT_DATA(__type) extern __type
@@ -18,3 +20,4 @@ windows 编译:
 #define PR_IMPLEMENT(__type) __type
 #define PR_EXTERN_DATA(__type) extern __type
 #define PR_IMPLEMENT_DATA(__type) __type
+#重新mozmake
