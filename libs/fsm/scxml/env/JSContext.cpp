@@ -38,7 +38,7 @@ namespace env
 			if (JS_GetProperty(m_jsctx, obj, objName.c_str(), &rval)){
 				
 				if (rval.isObject()){
-					obj = JS::RootedObject(this->m_jsctx, &rval.toObject());
+					obj = &rval.toObject();
 				}
 				else {
 
@@ -191,7 +191,7 @@ namespace env
 		nullptr, nullptr, nullptr,
 		nullptr,
 		nullptr, nullptr, nullptr,
-		nullptr
+		JS_GlobalObjectTraceHook
 	};
 
 	void JsContext::InitializeInstanceFields()
