@@ -9,48 +9,48 @@ namespace model{
 	}
 	void Log::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
-
+		std::string loginfo = m_strExpr;
 		if (ctx && m_Type.compare("script") == 0) { 
 			Json::Value jsonval = ctx->eval(m_strExpr, m_strFileName, m_lineNo/*,m_node*/);
 			if (jsonval.isString() || jsonval.isBool() || jsonval.isNull()){
-				const_cast<Log*>(this)->m_strExpr = jsonval.asString();
+				loginfo = jsonval.asString();
 			}
 			else if (jsonval.isInt()){
-				const_cast<Log*>(this)->m_strExpr = std::to_string(jsonval.asInt());
+				loginfo = std::to_string(jsonval.asInt());
 			}
 			else if (jsonval.isUInt()){
-				const_cast<Log*>(this)->m_strExpr = std::to_string(jsonval.asUInt());
+				loginfo = std::to_string(jsonval.asUInt());
 			}
 			else if (jsonval.isDouble()){
-				const_cast<Log*>(this)->m_strExpr = std::to_string(jsonval.asDouble());
+				loginfo = std::to_string(jsonval.asDouble());
 			}
 			else if (jsonval.isObject())
 			{
-				const_cast<Log*>(this)->m_strExpr = jsonval.toStyledString();
+				loginfo = jsonval.toStyledString();
 			}
 		}
 
 		if (m_strLevel.compare("trace") == 0){
-			LOG4CPLUS_TRACE(log, "." + sessionId,  m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_TRACE(log, "." + sessionId,  m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else if (m_strLevel.compare("debug") == 0){
-			LOG4CPLUS_DEBUG(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_DEBUG(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else if (m_strLevel.compare("info") == 0){
-			LOG4CPLUS_INFO(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_INFO(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else if (m_strLevel.compare("warn") == 0){
-			LOG4CPLUS_WARN(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_WARN(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else if (m_strLevel.compare("error") == 0){
-			LOG4CPLUS_ERROR(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_ERROR(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else if (m_strLevel.compare("fatal") == 0){
-			LOG4CPLUS_FATAL(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_FATAL(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 		else{
 
-			LOG4CPLUS_INFO(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << m_strExpr);
+			LOG4CPLUS_INFO(log, "." + sessionId, m_strFileName << ":" << m_lineNo << "," << loginfo);
 		}
 	}
 	const std::string & Log::getExpr() const

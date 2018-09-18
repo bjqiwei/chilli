@@ -181,7 +181,9 @@ bool fsm::StateMachineimp::processSend(const fsm::model::Send * send)const
 
 	std::map<std::string , SendInterface *>::const_iterator it = m_mapSendObject.find(send->getTarget());
 	if (it != m_mapSendObject.end()) {
-		it->second->fireSend(send->getFireData(), it->second->getUserData());
+		fsm::FireDataType fireData;
+		send->execute(this->getRootContext(), this->log, this->m_strSessionID, fireData);
+		it->second->fireSend(fireData, it->second->getUserData());
 	}
 	else {
 
@@ -206,9 +208,11 @@ bool fsm::StateMachineimp::processTimer(const fsm::model::Timer * timer)const
 
 	if (!timer) return false;
 
+	std::string timerId;
+	uint64_t interval = 0;
 	if (timer->isEnabledCondition(this->getRootContext()))
 	{
-		timer->execute(this->getRootContext(), this->log, this->m_strSessionID);
+		timer->execute(this->getRootContext(), this->log, this->m_strSessionID, timerId, interval);
 	}
 	else {
 		return false;
@@ -216,14 +220,14 @@ bool fsm::StateMachineimp::processTimer(const fsm::model::Timer * timer)const
 
 
 	//LOG4CPLUS_DEBUG(logger,_strName << ":" << _strSessionID << "execute a script:" << script.getContent());
-	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",set a timer,id=" << timer->getId() << ", interval=" << timer->getInterval());
+	LOG4CPLUS_DEBUG(log, "." + m_strSessionID, ",set a timer,id=" << timerId << ", interval=" << interval);
 	Json::Value vars;
 	vars["sessionId"] = this->m_strSessionID;
-	vars["timerId"] = timer->getId();
-	vars["interval"] = timer->getInterval();
+	vars["timerId"] = timerId;
+	vars["interval"] = interval;
 
 	if (this->getTimerServer())
-		this->getTimerServer()->SetTimer(timer->getInterval(), vars.toStyledString(), m_TimeOutFunc, const_cast<StateMachineimp *>(this));
+		this->getTimerServer()->SetTimer(interval, vars.toStyledString(), m_TimeOutFunc, const_cast<StateMachineimp *>(this));
 	
 	}
 	catch (fsm::jsexception & e)

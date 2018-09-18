@@ -13,24 +13,22 @@ namespace model{
 		Timer(const std::string &filename, uint32_t lineno);
 		virtual ~Timer();
 
-		const std::string& getId() const;
 		void setId(const std::string &id);
-		const std::string& getIdExpr() const;
 		void setIdExpr(const std::string idexpr);
-
-		uint64_t getInterval() const;
 		void setInterval(const std::string & interval);
-		const std::string& getIntervalExpr() const;
 		void setIntervalExpr(const std::string & intervalexpr);
-
-		virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
-
+		virtual void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
+		void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId, std::string&id, uint64_t & interval) const;
 	private:
 		std::string id;
 		std::string idexpr;
 		std::string interval;
 		std::string intervalexpr;
-		Json::Value jsonInterval;
+	private:
+		const std::string& getId() const;
+		const std::string& getIdExpr() const;
+		uint64_t getInterval(const Json::Value & jsonInterval) const;
+		const std::string& getIntervalExpr() const;
 	};
 }
 }

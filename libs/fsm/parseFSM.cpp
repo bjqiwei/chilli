@@ -351,7 +351,7 @@ std::shared_ptr<fsm::model::Send> fsm::parseFSM::parseSend(xmlNodePtr sendNode, 
 	sendptr->setId(helper::xml::getXmlNodeAttributesValue(sendNode, "id"));
 	sendptr->setIdExpr(helper::xml::getXmlNodeAttributesValue(sendNode, "idexpr"));
 	sendptr->setTarget(helper::xml::getXmlNodeAttributesValue(sendNode, "target"));
-	sendptr->setTargetExpr(helper::xml::getXmlNodeAttributesValue(sendNode, "targetexpr"));
+	//sendptr->setTargetExpr(helper::xml::getXmlNodeAttributesValue(sendNode, "targetexpr"));
 	sendptr->setType(helper::xml::getXmlNodeAttributesValue(sendNode, "type"));
 	sendptr->setTypeExpr(helper::xml::getXmlNodeAttributesValue(sendNode, "typeexpr"));
 	sendptr->setEvent(helper::xml::getXmlNodeAttributesValue(sendNode, "event"));

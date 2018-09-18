@@ -46,15 +46,15 @@ namespace model
 	}
 
 
-	const std::string& Send::getTargetExpr() const
-	{
-		return this->targetexpr;
-	}
+	//const std::string& Send::getTargetExpr() const
+	//{
+	//	return this->targetexpr;
+	//}
 
-	void Send::setTargetExpr(const std::string & targetexpr)
-	{
-		this->targetexpr = targetexpr;
-	}
+	//void Send::setTargetExpr(const std::string & targetexpr)
+	//{
+	//	this->targetexpr = targetexpr;
+	//}
 
 	const std::string& Send::getFrom()const
 	{
@@ -165,51 +165,56 @@ namespace model
 	//	return targetexpr;
 	//}
 
-	const FireDataType & Send::getFireData()const
-	{
-		return fireData;
-	}
 	void Send::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
+	}
+	void Send::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId, FireDataType & fireData) const
+	{
+		fireData.id = this->getId();
 		if (ctx && id.empty() && !idexpr.empty()){
 			Json::Value jsonid = ctx->eval(idexpr,m_strFileName, m_lineNo/*,xmlHasProp(m_node,BAD_CAST"idexpr")*/);
 			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull()){
-				const_cast<Send*>(this)->id = jsonid.asString();
+				fireData.id = jsonid.asString();
 			}
 		}
 		
-		if (ctx && target.empty() && !targetexpr.empty()){
-			Json::Value jsontarget = ctx->eval(targetexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
-			if (jsontarget.isString() || jsontarget.isBool() || jsontarget.isNull()){
-				const_cast<Send*>(this)->target = jsontarget.asString();
-			}
-		}
+		fireData.target = this->getTarget();
+		//if (ctx && target.empty() && !targetexpr.empty()){
+		//	Json::Value jsontarget = ctx->eval(targetexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"targetexpr")*/);
+		//	if (jsontarget.isString() || jsontarget.isBool() || jsontarget.isNull()){
+		//		fireData.target = jsontarget.asString();
+		//	}
+		//}
 
+		fireData.type = this->getType();
 		if (ctx && type.empty() && !typeexpr.empty()){
 			Json::Value jsontype = ctx->eval(typeexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"typeexpr")*/);
 			if (jsontype.isString() || jsontype.isBool() || jsontype.isNull()){
-				const_cast<Send*>(this)->type = jsontype.asString();
+				fireData.type = jsontype.asString();
 			}
 		}
 
+		fireData.event = this->getEvent();
 		if (ctx && _event.empty() && !eventexpr.empty()){
 			Json::Value jsonEvent = ctx->eval(eventexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"eventexpr")*/);
 			if (jsonEvent.isString() || jsonEvent.isBool() || jsonEvent.isNull()){
-				const_cast<Send*>(this)->_event = jsonEvent.asCString();
+				fireData.event = jsonEvent.asCString();
 			}
 		}
 
+		fireData.from = this->getFrom();
 		if (ctx && from.empty() && !fromexpr.empty()){
 			Json::Value jsonfrom = ctx->eval(fromexpr,m_strFileName,m_lineNo/*,xmlHasProp(m_node,BAD_CAST"fromexpr")*/);
 			if (jsonfrom.isString() || jsonfrom.isBool() || jsonfrom.isNull()){
-				const_cast<Send*>(this)->from = jsonfrom.asCString();
+				fireData.from = jsonfrom.asCString();
 			}
 		}
 
+		fireData.dest = this->getDestination();
 		if (ctx && dest.empty() && !destexpr.empty()){
 			Json::Value jsondest = ctx->eval(destexpr,m_strFileName, m_lineNo/*,xmlHasProp(m_node,BAD_CAST"destexpr")*/);
 			if (jsondest.isString() || jsondest.isBool() || jsondest.isNull()){
-				const_cast<Send*>(this)->dest = jsondest.asString();
+				fireData.dest = jsondest.asString();
 			}
 		}
 
@@ -247,13 +252,6 @@ namespace model
 		}
 */
 		//·¢ËÍÊý¾Ý
-	
-		const_cast<Send*>(this)->fireData.id = getId();
-		const_cast<Send*>(this)->fireData.event = getEvent();
-		const_cast<Send*>(this)->fireData.type = getType();
-		const_cast<Send*>(this)->fireData.from = getFrom().empty() ? sessionId : getFrom();
-		const_cast<Send*>(this)->fireData.dest = getDestination();
-		const_cast<Send*>(this)->fireData.target = getTarget();
 
 		/*xmlAttrPtr attrPtr = m_node->properties;
 		while (attrPtr != NULL)
@@ -280,9 +278,9 @@ namespace model
 		for (auto & param : m_Params) {
 
 			if (ctx && param.type.compare("script") == 0)
-				const_cast<Send*>(this)->fireData.param[param.name] = ctx->eval(param.value, m_strFileName, param.lineno/*,childNode*/);
+				fireData.param[param.name] = ctx->eval(param.value, m_strFileName, param.lineno/*,childNode*/);
 			else
-				const_cast<Send*>(this)->fireData.param[param.name] = param.value;
+				fireData.param[param.name] = param.value;
 
 			//xmlFreeNode(newNode);
 		}	

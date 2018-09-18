@@ -18,10 +18,12 @@ namespace model
 
 	public:
 		Script(const std::string & filename, uint32_t lineno);
-		const std::string &getContent()const;
+
 		void setContext(const std::string & context);
 		void setFileName(const std::string & fileName);
 		virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
+	private:
+		const std::string &getContent()const;
 	};
 
 

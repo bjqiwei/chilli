@@ -30,7 +30,7 @@ namespace model{
 		this->idexpr = idexpr;
 	}
 
-	uint64_t Timer::getInterval() const
+	uint64_t Timer::getInterval( const Json::Value & jsonInterval) const
 	{
 		if (!interval.empty()){
 			try {
@@ -71,15 +71,23 @@ namespace model{
 
 	void Timer::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId)const
 	{
-		if (ctx && id.empty() && !idexpr.empty()){
+	}
+
+	void Timer::execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId, std::string & _id, uint64_t & _interval) const
+	{
+		_id = this->id;
+		if (ctx && id.empty() && !idexpr.empty()) {
 			Json::Value jsonid = ctx->eval(idexpr, m_strFileName, m_lineNo);
-			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull() || jsonid.isNumeric()){
-				const_cast<Timer *>(this)->id = jsonid.asString();
+			if (jsonid.isString() || jsonid.isBool() || jsonid.isNull() || jsonid.isNumeric()) {
+				_id = jsonid.asString();
 			}
 		}
-		if (ctx && interval.empty() && !intervalexpr.empty()){
-			const_cast<Timer*>(this)->jsonInterval = ctx->eval(intervalexpr, m_strFileName, m_lineNo);
+		_interval = 0;
+		Json::Value jsonInterval;
+		if (ctx && interval.empty() && !intervalexpr.empty()) {
+			jsonInterval = ctx->eval(intervalexpr, m_strFileName, m_lineNo);
 		}
+		_interval = getInterval(jsonInterval);
 	}
 
 }

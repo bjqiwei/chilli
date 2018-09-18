@@ -25,7 +25,6 @@ namespace model
 		std::string _event;
 		//std::string namelist;
 		std::string eventexpr;
-		FireDataType fireData;
 
 		struct ParamStruct
 		{
@@ -38,42 +37,38 @@ namespace model
 
 	public:
 		Send(const std::string &filename, uint32_t lineno);
-		const std::string& getId()const;
+
 		void setId(const std::string &strValue);
-		const std::string& getIdExpr()const;
 		void setIdExpr(const std::string & idexpr);
-
-		const std::string& getTarget()const;
 		void setTarget(const std::string & target);
-		const std::string& getTargetExpr()const;
-		void setTargetExpr(const std::string & targetexpr);
-
-		const std::string& getType()const;
+		const std::string& getTarget()const;
+		//void setTargetExpr(const std::string & targetexpr);
 		void setType(const std::string & type);
-		const std::string& getTypeExpr()const;
 		void setTypeExpr(const std::string & typeexpr);
-
-		const std::string& getFrom()const;
 		void setFrom(const std::string & from);
-		const std::string& getFromExpr()const;
 		void setFromExpr(const std::string & fromexpr);
-
-		const std::string& getDestination()const;
 		void setDestination(const std::string & dest);
-		const std::string& getDestinationExpr()const;
 		void setDestinationExpr(const std::string & destexpr);
-
-		const std::string& getEvent()const;
 		void setEvent(const std::string & event);
-		const std::string& getEventExpr()const;
 		void setEventExpr(const std::string & eventexpr);
-
 		void addParam(const std::string &name, const std::string & type, const std::string &value, uint32_t lineno);
 		//std::string& getNamelist();
 		//std::string& getTargetExpr();
-		const FireDataType & getFireData()const;
 		//std::map<std::string, std::string>& getParams();
 		virtual  void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId) const override;
+		void execute(fsm::Context * ctx, const log4cplus::Logger & log, const std::string & sessionId , FireDataType & fireData) const;
+	private:
+		const std::string& getId()const;
+		const std::string& getIdExpr()const;
+		//const std::string& getTargetExpr()const;
+		const std::string& getType()const;
+		const std::string& getTypeExpr()const;
+		const std::string& getFrom()const;
+		const std::string& getFromExpr()const;
+		const std::string& getDestination()const;
+		const std::string& getDestinationExpr()const;
+		const std::string& getEvent()const;
+		const std::string& getEventExpr()const;
 	};
 }
 }
