@@ -23,6 +23,10 @@ namespace model{
 			removePerfromElement(it++->first);
 		}
 
+		for (const auto & it : m_existStateMachine){
+			delete it.second.sm;
+		}
+
 	}
 
 	int ProcessModule::Start()
@@ -115,6 +119,27 @@ namespace model{
 	const std::string ProcessModule::getId()
 	{
 		return m_Id;
+	}
+
+	fsm::StateMachine * ProcessModule::createStateMachine(const std::string & filename)
+	{
+		struct stat fileStatus;
+		stat(filename.c_str(), &fileStatus);
+		StateMachineModifyTime smmt;
+
+		std::unique_lock<std::mutex>lck(m_m_existStateMachineMtx);
+		auto & it = m_existStateMachine.find(filename);
+		if (it != m_existStateMachine.end()){
+			smmt = it->second;
+		}
+
+		if (smmt.modifytime != fileStatus.st_mtime) {
+			delete smmt.sm;
+			smmt.sm = fsm::fsmParseFile(filename);
+			smmt.modifytime = fileStatus.st_mtime;
+			m_existStateMachine[filename] = smmt;
+		}
+		return  new fsm::StateMachine(*smmt.sm);
 	}
 
 	bool ProcessModule::addPerformElement(const std::string &peId, PerformElementPtr & peptr)

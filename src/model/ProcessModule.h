@@ -29,10 +29,11 @@ public:
 	virtual PerformElementPtr removePerfromElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElement(const std::string & peId) final;
 	virtual PerformElementPtr getPerformElementByGlobal(const std::string & peId) final;
-	virtual uint64_t getPerformElementCount();
+	virtual uint64_t getPerformElementCount() final;
 	virtual void OnTimer(unsigned long timerId, const std::string & attr, void * userdata) final;
 	virtual const log4cplus::Logger & getLogger()final;
 	virtual const std::string getId()final;
+	virtual fsm::StateMachine * createStateMachine(const std::string & filename) final;
 
 	static std::vector<std::shared_ptr<model::ProcessModule>> g_Modules;
 
@@ -58,6 +59,12 @@ private:
 	void _execute(helper::CEventBuffer<model::EventType_t> * eventQueue);
 	virtual void execute(helper::CEventBuffer<model::EventType_t> * eventQueue) = 0;
 
+	struct StateMachineModifyTime{
+		time_t modifytime = 0;
+		fsm::StateMachine * sm = nullptr;
+	};
+	std::map<std::string, StateMachineModifyTime> m_existStateMachine;
+	std::mutex m_m_existStateMachineMtx;
 	//Only define a copy constructor and assignment function, these two functions can be disabled
 	ProcessModule(const ProcessModule & other) = delete;
 	ProcessModule & operator=(const ProcessModule &) = delete;

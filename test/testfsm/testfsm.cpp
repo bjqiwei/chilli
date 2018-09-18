@@ -9,7 +9,9 @@
 //#include "io/SCXMLParser.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <thread>
+#include <tchar.h>
 
 using namespace std;
 
@@ -29,8 +31,20 @@ int test()
 {
 	int i = 1000;
 	std::vector<fsm::StateMachine *> m_scxml;
+	time_t mtime = 0;
 	while (i--) {
-		fsm::StateMachine  *  mysmscxml = fsm::fsmParseFile("./fsm.xml");
+		struct stat fileStatus;
+		stat("./fsm.xml", &fileStatus);
+		fsm::StateMachine  *  mysmscxml = nullptr;
+		if (mtime == fileStatus.st_atime) {
+			mysmscxml = new fsm::StateMachine(*m_scxml.back());
+		}
+		else {
+			mysmscxml = fsm::fsmParseFile("./fsm.xml");
+			mtime = fileStatus.st_atime;
+		}
+
+	
 		mysmscxml->setLoggerId("fsm");
 		mysmscxml->setSessionID("0123456");
 		mysmscxml->setOnTimer(&my_timer);
@@ -47,12 +61,13 @@ int test()
 	}
 
 
-	int ii = 10000;
+	int ii = 2000;
 	while (ii--)
 	{
 		fsm::threadIdle();
 	}
-
+	getchar();
+	std::cout << "thread stoped." << std::endl;
 	return 0;
 }
 
@@ -68,9 +83,7 @@ int main(int argc, _TCHAR* argv[])
 
 		//char szFilePath[_MAX_PATH-1];
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
-		string strStateFile;
-		strStateFile.append(".\\fsm.xml");
-
+#if 1
 		
 		std::thread th1(test);
 		std::thread th2(test);
@@ -80,8 +93,12 @@ int main(int argc, _TCHAR* argv[])
 		th2.join();
 		th3.join();
 
+		std::cout << "all thread stoped." << std::endl;
 		getchar();
 
+#else
+		string strStateFile;
+		strStateFile.append(".\\fsm.xml");
 		fsm::StateMachine  *  mysmscxml = fsm::fsmParseFile(strStateFile);
 		if (mysmscxml)
 		{
@@ -113,6 +130,7 @@ int main(int argc, _TCHAR* argv[])
 		mysmscxml->stop();
 		th.join();
 		delete mysmscxml;
+#endif
 
 	}
 	catch(exception & e)

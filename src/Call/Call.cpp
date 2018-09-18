@@ -74,7 +74,7 @@ namespace Call {
 
 				if (m_StateMachines.empty()) {
 					
-					StateMachine call(fsm::fsmParseFile(m_SMFileName));
+					StateMachine call(this->m_model->createStateMachine(m_SMFileName));
 
 					if (call == nullptr) {
 						LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");

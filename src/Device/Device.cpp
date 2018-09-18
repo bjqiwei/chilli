@@ -74,7 +74,8 @@ namespace chilli {
 					}
 
 					if (m_Sessions.find(sessionId) == m_Sessions.end()) {
-						Session session(fsm::fsmParseFile(m_SMFileName));
+
+						Session session(this->m_model->createStateMachine(m_SMFileName));
 
 						if (session == nullptr) {
 							LOG4CPLUS_ERROR(log, "." + getId(), m_SMFileName << " parse filed.");

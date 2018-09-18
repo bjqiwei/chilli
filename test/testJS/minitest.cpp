@@ -108,10 +108,14 @@ int main(int argc, const char *argv[]) {
 		JS_DestroyContext(allcontext.back());
 		allcontext.pop_back();
 	}
+	std::cout << "DestroyContext"  << std::endl;
 	std::getchar();
 	JS_DestroyRuntime(rt);
+	std::cout << "DestroyRuntime" << std::endl;
+	std::getchar();
 	JS_ShutDown();
-	
+	std::cout << "ShutDown" << std::endl;
+	std::getchar();
 	return 0;
 }
 
