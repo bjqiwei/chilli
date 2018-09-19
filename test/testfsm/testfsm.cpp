@@ -49,7 +49,14 @@ int test()
 		mysmscxml->setSessionID("0123456");
 		mysmscxml->setOnTimer(&my_timer);
 		mysmscxml->setVar("chilli.qiwei.name", "qiwei");
+		try
+		{
 		mysmscxml->start(false);
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
 		m_scxml.push_back(mysmscxml);
 	}
 
@@ -84,14 +91,16 @@ int main(int argc, _TCHAR* argv[])
 		//char szFilePath[_MAX_PATH-1];
 		//::GetCurrentDirectory(_MAX_PATH, szFilePath);
 #if 1
-		
-		std::thread th1(test);
-		std::thread th2(test);
-		std::thread th3(test);
+		std::vector<std::thread> threads;
+		for (uint32_t i=0;i<2;i++)
+		{
+			threads.push_back(std::thread(test));
+		}
 
-		th1.join();
-		th2.join();
-		th3.join();
+		for (auto & th: threads)
+		{
+			th.join();
+		}
 
 		std::cout << "all thread stoped." << std::endl;
 		getchar();
