@@ -69,10 +69,12 @@ namespace WebSocket {
 			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED");
 			goto lwsclose;
 			break;
+#if LWS_LIBRARY_VERSION_MAJOR >=2
 		case LWS_CALLBACK_CLOSED_CLIENT_HTTP:
 			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED_CLIENT_HTTP");
 			goto lwsclose;
 			break;
+#endif
 		case LWS_CALLBACK_CLOSED_HTTP:
 		{
 			LOG4CPLUS_DEBUG(This->log, "", "LWS_CALLBACK_CLOSED_HTTP");
@@ -262,6 +264,7 @@ lwsclose:
 		case LWS_CALLBACK_WS_EXT_DEFAULTS:
 			LOG4CPLUS_TRACE(This->log, "", "LWS_CALLBACK_WS_EXT_DEFAULTS");
 			break;
+#if LWS_LIBRARY_VERSION_MAJOR >=2
 		case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
 			//LOG4CPLUS_DEBUG(log,  "","LWS_CALLBACK_HTTP_DROP_PROTOCOL");
 			break;
@@ -279,6 +282,7 @@ lwsclose:
 				}*/
 			}
 			break;
+#endif
 		default:
 			LOG4CPLUS_DEBUG(This->log, "", "Unknown:" << reason);
 			break;
