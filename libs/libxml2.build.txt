@@ -1,2 +1,2 @@
-linux, 使用yum， yum install libxml2
+linux, 使用yum， yum install libxml2-devel
 在Windows 系统下，解压libxml2-2.9.3.tar.gz 到当前目录，到libxml2-2.9.3目录下，修改xmlversion.h头文件，禁用LIBXML_ICU_ENABLED LIBXML_ICONV_ENABLED LIBXML_LZMA_ENABLED LIBXML_FTP_ENABLED LIBXML_HTTP_ENABLED LIBXML_HTML_ENABLED 宏

@@ -489,11 +489,11 @@ std::string FreeSwitchModule::toDialString(const std::string & sipId, const std:
 		std::regex regPattern(pattern);
 		if (std::regex_match(sipId, regPattern)) {
 			std::string ip = this->routeConfig[i]["ip"].asString();
-			uint32_t port = this->routeConfig[i]["port"].asUInt();
+			std::string port = this->routeConfig[i]["port"].asString();
 			if(_caller.empty())
 				_caller = this->routeConfig[i]["defaultcaller"].asString();
 
-			called = "sofia/external/" + sipId + "@" + ip + ":" + std::to_string(port);
+			called = "sofia/external/" + sipId + "@" + ip + ":" + port;
 			break;
 		}
 	}

@@ -11,5 +11,5 @@
       <Device DeviceID=".*" StateMachine="./conf/FreeSwitchDevice.xml"></Device>
     </Devices>
   </FreeSwitch>
-  <MySql id="mysql" Host="192.168.2.232:3306" UserID="root" Password="unitcc" DataBase="cc"/>
+  <MySql id="mysql" Host="192.168.2.232" Port="3306" UserID="root" Password="unitcc" DataBase="cc"/>
 </Config>

@@ -1,4 +1,4 @@
-linux 使用yum 安装, yum install mozjs38
+linux 使用yum 安装, yum install mozjs38-devel
 
 windows 编译:
 

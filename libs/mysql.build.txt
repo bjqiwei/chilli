@@ -1,4 +1,4 @@
-1、安装boost库 yum install boost-devel
-2、安装cmake
-3、cmake -DBUILD_STATIC=ON  . -G "Unix Makefiles"
-4、make && make install
+windows 
+	解压mysql-connector-c-noinstall-6.0.2-winx64.zip 到当前目录
+linux 
+	yum install mysql-devel
