@@ -1,6 +1,7 @@
 #include "ProcessModule.h"
 #include <log4cplus/loggingmacros.h>
 #include <regex>
+#include <sys/stat.h>
 
 namespace chilli{
 namespace model{
