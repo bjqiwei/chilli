@@ -129,7 +129,7 @@ namespace model{
 		StateMachineModifyTime smmt;
 
 		std::unique_lock<std::mutex>lck(m_m_existStateMachineMtx);
-		auto & it = m_existStateMachine.find(filename);
+		const auto & it = m_existStateMachine.find(filename);
 		if (it != m_existStateMachine.end()){
 			smmt = it->second;
 		}
