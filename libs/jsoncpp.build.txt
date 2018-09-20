@@ -1,2 +1,0 @@
-1、安装cmake 3.1或以上版本
-2、cmake -DCMAKE_BUILD_TYPE=release -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=ON -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles"

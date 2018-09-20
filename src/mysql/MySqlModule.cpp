@@ -270,7 +270,7 @@ namespace DataBase {
 				}
 
 
-				result["UpdateCount"] = (uint64_t)res->row_count;
+				result["UpdateCount"] = (uint32_t)res->row_count;
 
 				mysql_free_result(res);
 

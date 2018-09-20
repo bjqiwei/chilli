@@ -224,7 +224,11 @@ bool fsm::StateMachineimp::processTimer(const fsm::model::Timer * timer)const
 	Json::Value vars;
 	vars["sessionId"] = this->m_strSessionID;
 	vars["timerId"] = timerId;
+#if JSONCPP_VERSION_MAJOR == 0
+	vars["interval"] = (uint32_t)interval;
+#else
 	vars["interval"] = interval;
+#endif
 
 	if (this->getTimerServer())
 		this->getTimerServer()->SetTimer(interval, vars.toStyledString(), m_TimeOutFunc, const_cast<StateMachineimp *>(this));

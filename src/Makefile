@@ -26,7 +26,7 @@ TCPSrc = ./TCP/
 tinyxml2Src = ./tinyxml2/
 websocketSrc =./websocket/
 
-INCLUDE = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I/usr/include/apr-1 -I../libs/FreeSWITCH/esl/include -I../libs/Avaya/TSAPI/hdrs
+INCLUDE = -I/usr/include/apr-1 -I/usr/include/jsoncpp -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/FreeSWITCH/esl/include -I../libs/Avaya/TSAPI/hdrs
 
 OBJ_DIR = ./obj/
 ACD_OBJ_DIR = $(OBJ_DIR)ACD/
@@ -50,7 +50,7 @@ CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION)
 CXXFLAGS = $(CFLAGS) -std=c++11
 
 LDFLAGS= -Wall -g -O1 
-LDFLAGS:= $(LDFLAGS) ../libs/fsm/build/libfsm.so ../libs/FreeSWITCH/esl/libesl.a -lmysqlcppconn -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -levent_extra -levent_core -levent_pthreads -llog4cplus
+LDFLAGS:= $(LDFLAGS) -L/usr/lib64/mysql/ ../libs/fsm/build/libfsm.so ../libs/FreeSWITCH/esl/libesl.a -lmysqlclient -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -levent_extra -levent_core -levent_pthreads -llog4cplus
 LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -luuid -lm -ldl -lrt -lz -lm -ldl  -lrt -Wl,-rpath=./lib
 
 OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\

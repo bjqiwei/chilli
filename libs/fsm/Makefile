@@ -2,6 +2,7 @@
 
 MOZJSDIR = /usr/include/mozjs-38/
 LIBXML2DIR = /usr/include/libxml2/
+JSONCPPDIR = /usr/include/jsoncpp/
 #项目类型(可执行程序exe,静态库lib,动态库dll,so)
 export PROJECT_TYPE=so
 
@@ -12,7 +13,7 @@ export PROJECT_VERSION= 1.1.0.0
 PROJECT_SOURCE= ./ ./scxml ./scxml/env ./scxml/model
 
 #头文件路径(-I目录)
-PROJECT_INCLUDE=-I./ -I./common -I$(MOZJSDIR) -I$(LIBXML2DIR)
+PROJECT_INCLUDE=-I./ -I./common -I$(MOZJSDIR) -I$(LIBXML2DIR) -I$(JSONCPPDIR)
 
 #生成的版本文件名称
 PROJCT_VERSION_H= 

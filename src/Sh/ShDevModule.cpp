@@ -151,13 +151,13 @@ std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const s
 	case E_CHG_HookState:
 		{
 			long reason = pEvent->dwParam;
-			jsonEvent["data"] = reason;
+			jsonEvent["data"] = (int32_t)reason;
 		}
 		break;
 	case E_CHG_RingCount:
 		{
 			long reason = pEvent->dwParam;
-			jsonEvent["data"] = reason;
+			jsonEvent["data"] = (int32_t)reason;
 		}
 		break;
 	case E_CHG_ChState:
@@ -186,7 +186,7 @@ std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const s
 	case E_PROC_PlayEnd:
 		{
 			long reason = pEvent->dwParam;
-			jsonEvent["data"] = reason;
+			jsonEvent["data"] = (int32_t)reason;
 		}
 		break;
 	default:
