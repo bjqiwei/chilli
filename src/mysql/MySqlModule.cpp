@@ -105,11 +105,11 @@ namespace DataBase {
 	Json::Value MySqlModule::executeQuery(const std::string & sql)
 	{
 		MYSQL mysql;
-		mysql.options.connect_timeout = 1000*1000;
 		MYSQL_RES *res = nullptr;       //查询结果集，结构类型
 		MYSQL_FIELD *fd = nullptr;     //包含字段信息的结构
 		MYSQL_ROW row = nullptr;       //存放一行查询结果的字符串数组
 		mysql_init(&mysql);
+		mysql.options.connect_timeout = this->m_connect_timeout;
 
 		Json::Value result;
 
@@ -197,12 +197,12 @@ namespace DataBase {
 		while (m_bRunning)
 		{
 			MYSQL mysql;
-			mysql.options.connect_timeout = 1000*1000;
 			MYSQL_RES *res = nullptr;       //查询结果集，结构类型
 			MYSQL_FIELD *fd = nullptr;     //包含字段信息的结构
 			MYSQL_ROW row = nullptr;       //存放一行查询结果的字符串数组
 			mysql_init(&mysql);
 
+			mysql.options.connect_timeout = this->m_connect_timeout;
 			Json::Value result;
 
 			if (mysql_real_connect(&mysql, m_Host.c_str(), m_UserID.c_str(), m_Password.c_str(), m_DataBase.c_str(), m_Port, nullptr, 0) == nullptr)
