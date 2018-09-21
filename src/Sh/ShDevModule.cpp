@@ -193,9 +193,9 @@ std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const s
 		break;
 	}
 	
-	Json::FastWriter writer;
-	writer.omitEndingLineFeed();
-	std::string strEvent = writer.write(jsonEvent);
+	Json::StreamWriterBuilder builder;
+	builder.settings_["indentation"] = "";
+	std::string strEvent = Json::writeString(builder, jsonEvent);
 	LOG4CPLUS_TRACE(log, "", "ch=" << pEvent->nReference << ",Recive a event,event=" << strEvent);
 	return strEvent;
 }

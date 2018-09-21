@@ -639,9 +639,9 @@ public:
 
 	virtual int Send(Json::Value send) override
 	{
-		Json::FastWriter writer;
-		writer.omitEndingLineFeed();
-		std::string sendData = writer.write(send);
+		Json::StreamWriterBuilder builder;
+		builder.settings_["indentation"] = "";
+		std::string sendData = Json::writeString(builder, send);
 		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
@@ -696,9 +696,9 @@ public:
 	}
 
 	virtual int Send(Json::Value send) override {
-		Json::FastWriter writer;
-		writer.omitEndingLineFeed();
-		std::string sendData = writer.write(send);
+		Json::StreamWriterBuilder builder;
+		builder.settings_["indentation"] = "";
+		std::string sendData = Json::writeString(builder, send);
 		LOG4CPLUS_DEBUG(log, "." + std::to_string(this->getId()), " Send:" << sendData);
 		return this->Send(sendData.c_str(), sendData.length());
 	}
