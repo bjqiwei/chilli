@@ -282,7 +282,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 
 						request["param"]["sessionID"] = request["param"]["connectionToBeCleared"]["sessionID"];
 						request["param"].removeMember("connectionToBeCleared");
-						request["event"] = request["request"];
+						request["event"] = requestid;
 						request.removeMember("request");
 						request["id"] = deviceid;
 						model::EventType_t evt(new model::_EventType(request));
@@ -355,7 +355,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
 						request["param"]["callID"] = request["param"]["connection"]["callID"];
 						request["param"].removeMember("connection");
-						request["event"] = request["request"];
+						request["event"] = requestid;
 						request.removeMember("request");
 						request["id"] = deviceid;
 						model::EventType_t evt(new model::_EventType(request));
@@ -389,7 +389,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
 						request["param"]["callID"] = request["param"]["connection"]["callID"];
 						request["param"].removeMember("connection");
-						request["event"] = request["request"];
+						request["event"] = requestid;
 						request.removeMember("request");
 						request["id"] = deviceid;
 						model::EventType_t evt(new model::_EventType(request));
@@ -423,7 +423,7 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
 						request["param"]["callID"] = request["param"]["connection"]["callID"];
 						request["param"].removeMember("connection");
-						request["event"] = request["request"];
+						request["event"] = requestid;
 						request.removeMember("request");
 						request["id"] = deviceid;
 						model::EventType_t evt(new model::_EventType(request));
@@ -457,7 +457,75 @@ void EventReportModule::ConnOnMessage(EPConnection * conn, uint64_t id, const st
 						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
 						request["param"]["callID"] = request["param"]["connection"]["callID"];
 						request["param"].removeMember("connection");
-						request["event"] = request["request"];
+						request["event"] = requestid;
+						request.removeMember("request");
+						request["id"] = deviceid;
+						model::EventType_t evt(new model::_EventType(request));
+						it->PushEvent(evt);
+						return;
+					}
+				}
+			}
+
+			response["status"] = chilli::INVALID_CALL;
+			this->send(id, response);
+			return;
+		}
+		else if (requestid == "StartDTMFCollection")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = requestid;
+			response["status"] = 0;
+
+			if (request["param"]["connection"].isObject()) {
+				if (request["param"]["connection"]["deviceID"].isString()) {
+					std::string deviceid = request["param"]["connection"]["deviceID"].asString();
+					const auto & it = this->getPerformElementByGlobal(deviceid);
+					if (it != nullptr) {
+
+						this->send(id, response);
+
+						request["param"]["sessionID"] = request["param"]["connection"]["sessionID"];
+						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
+						request["param"]["callID"] = request["param"]["connection"]["callID"];
+						request["param"].removeMember("connection");
+						request["event"] = requestid;
+						request.removeMember("request");
+						request["id"] = deviceid;
+						model::EventType_t evt(new model::_EventType(request));
+						it->PushEvent(evt);
+						return;
+					}
+				}
+			}
+
+			response["status"] = chilli::INVALID_CALL;
+			this->send(id, response);
+			return;
+		}
+		else if (requestid == "StopDTMFCollection")
+		{
+			Json::Value response;
+			response["invokeID"] = request["invokeID"];
+			response["type"] = "response";
+			response["response"] = requestid;
+			response["status"] = 0;
+
+			if (request["param"]["connection"].isObject()) {
+				if (request["param"]["connection"]["deviceID"].isString()) {
+					std::string deviceid = request["param"]["connection"]["deviceID"].asString();
+					const auto & it = this->getPerformElementByGlobal(deviceid);
+					if (it != nullptr) {
+
+						this->send(id, response);
+
+						request["param"]["sessionID"] = request["param"]["connection"]["sessionID"];
+						request["param"]["connectionID"] = request["param"]["connection"]["connectionID"];
+						request["param"]["callID"] = request["param"]["connection"]["callID"];
+						request["param"].removeMember("connection");
+						request["event"] = requestid;
 						request.removeMember("request");
 						request["id"] = deviceid;
 						model::EventType_t evt(new model::_EventType(request));

@@ -61,6 +61,14 @@ namespace FreeSwitch {
 		{
 			bHandled = m_model->StopRecord(fireData.param, this->log);
 		}
+		else if (fireData.event =="StartDTMFCollection")
+		{
+			bHandled = m_model->StartDTMFCollection(fireData.param, this->log);
+		}
+		else if (fireData.event == "StopDTMFCollection")
+		{
+			bHandled = m_model->StopDTMFCollection(fireData.param, this->log);
+		}
 		else
 			m_model->processSend(fireData, param, bHandled, log);
 

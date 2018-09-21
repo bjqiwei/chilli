@@ -16,6 +16,7 @@
 	<data id="_hangupDirection" expr="1"/> <!--挂机方向，0:本端挂机，1:对端挂机-->
 	<data id="_userdata"/>
 	<data id="_recordfilename"/>
+	<data id="_start_dtmf" expr="false"/>
 </datamodel>
 <scriptmodel>
 	<script src="./conf/uuid.js" />
@@ -222,8 +223,31 @@
 						<digit_timeout type="script">_event.param.digit_timeout</digit_timeout>
 					</send>
 					<script>_dtmf=""</script>
-					<transition target="Playing"/>
+					<transition target="PlayingAndCollection"/>
 				</event>
+				
+				<event event="StartDTMFCollection">
+					<send target="this" type="cmd" dest="this" event="StartDTMFCollection">
+						<sessionID type="script">_event.param.sessionID</sessionID>
+					</send>
+					<script>_start_dtmf = true;</script>
+				</event>
+				
+				<event event="DTMF">
+					<send target="eventreport" cond="_start_dtmf" type="event" event="DTMFCollected">
+						<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+						<digitsData type="script">_event.param.DTMFDigit</digitsData>
+						<userdata type="script">_userdata</userdata>
+					</send>
+				</event>
+				
+				<event event="StopDTMFCollection">
+					<send target="this" type="cmd" dest="this" event="StopDTMFCollection">
+						<sessionID type="script">_event.param.sessionID</sessionID>
+					</send>
+					<script>_start_dtmf = false;</script>
+				</event>
+				
 				<state id="Held">
 				</state>
 				<state id="Playing">
@@ -234,9 +258,9 @@
 							_callid = _event.param.callID;
 						</script>
 					</onentry>
-					<event event="cmd" cond="_event.cmd =='PlayFile'">
+					<event event="PlayFile">
 					</event>
-					<event event="cmd" cond="_event.cmd =='PlayFileAndCollects'">
+					<event event="PlayFileAndCollects">
 					</event>
 					<event event="playback">
 						<send target="eventreport" type="event" event="PlayFileEnd">
@@ -246,24 +270,37 @@
 						</send>
 						<transition target="Connected"/>
 					</event>
-					<event event="DTMF">
-						<script>_dtmf+=_event.param.DTMFDigit</script>
-					</event>
-					<event event="play_and_get_digits">
-						<!--send target="eventreport" type="event" event="DTMFDetected">
-							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
-							<dtmf type="script">_dtmf</dtmf>
-							<userdata type="script">_userdata</userdata>
-						</send-->
+					<state id="PlayingAndCollection">
+						<onentry>
+							<script>
+								_filename = _event.param.filename;
+								_connectionid = _event.param.connectionID;
+								_callid = _event.param.callID;
+							</script>
+						</onentry>
 						
-						<send target="eventreport" type="event" event="PlayFileAndCollectsEnd">
-							<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
-							<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
-							<dtmf type="script">_dtmf</dtmf>
-							<userdata type="script">_userdata</userdata>
-						</send>
-						<transition target="Connected"/>
-					</event>
+						<event event="DTMF">
+							<script>_dtmf+=_event.param.DTMFDigit</script>
+						</event>
+						<event event="play_and_get_digits">
+							<!--send target="eventreport" type="event" event="DTMFDetected">
+								<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+								<dtmf type="script">_dtmf</dtmf>
+								<userdata type="script">_userdata</userdata>
+							</send-->
+							
+							<send target="eventreport" type="event" event="PlayFileAndCollectsEnd">
+								<connection type="script">var param ={}; param.connectionID=_connectionid; param.callID=_callid; param.deviceID=_event.id; param.sessionID = _event.param.sessionID; param;</connection>
+								<cause type="script">FSCause[_event.param.ApplicationResponse]</cause>
+								<dtmf type="script">_dtmf</dtmf>
+								<userdata type="script">_userdata</userdata>
+							</send>
+							<transition target="Connected"/>
+						</event>
+						
+						<event event="StartDTMFCollection">
+						</event>
+					</state>
 				</state>
 			</state>
 			

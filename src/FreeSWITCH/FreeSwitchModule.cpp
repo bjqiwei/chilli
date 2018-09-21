@@ -114,8 +114,6 @@ void FreeSwitchModule::fireSend(const fsm::FireDataType & fireData, const void *
 
 void FreeSwitchModule::processSend(const fsm::FireDataType & fireData, const void * param, bool & bHandled, log4cplus::Logger & log)
 {
-
-
 	const std::string & eventName = fireData.event;
 	const std::string & typeName = fireData.type;
 	const std::string & dest = fireData.dest;
@@ -128,118 +126,6 @@ void FreeSwitchModule::processSend(const fsm::FireDataType & fireData, const voi
 	model::EventType_t evt(new model::_EventType(newEvent));
 	this->PushEvent(evt);
 	return;
-
-
-	if (eventName == "MakeCall")
-	{
-		bHandled = MakeCall(fireData.param, log);
-	}
-	else if (eventName == "MakeConnection")
-	{
-		bHandled = MakeConnection(fireData.param, log);
-	}
-	else if (eventName == "ClearConnection")
-	{
-		bHandled = ClearConnection(fireData.param, log);
-	}
-	else if (eventName == "DivertCall")
-	{
-		bHandled = Divert(fireData.param, log);
-	}
-	else if (eventName == "StartRecord")
-	{
-		bHandled = StartRecord(fireData.param, log);
-	}
-	else if (eventName == "TransferAgent")
-	{
-		std::string uuid = "";
-		std::string origcaller = "";
-		std::string agentid = "";
-
-		if (fireData.param["ConnectionID"].isString())
-			uuid = fireData.param["ConnectionID"].asString();
-
-		if (fireData.param["origcaller"].isString())
-			origcaller = fireData.param["origcaller"].asString();
-
-		if (fireData.param["agentId"].isString())
-			agentid = fireData.param["agentId"].asString();
-
-		static std::string lastAgent;
-		std::string findAgent;
-
-		/*
-		auto pe = this->getPerformElement(agentid);
-		if (pe != nullptr) {
-			LOG4CPLUS_DEBUG(log, "." + this->getId(), agentid << " state:" << pe->getStateId());
-			if (pe->getStateId() == "Ready") {
-				findAgent = agentid;
-				goto _findAgent;
-			}
-		}
-		
-		LOG4CPLUS_DEBUG(log, "." + this->getId(), " All device:" << this->GetExtensions().size());
-
-		if (lastAgent == ""){
-			for (auto it : this->GetExtensions())
-			{
-				LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
-				if (it.second->getStateId() == "Ready") {
-					findAgent = it.first;
-					break;
-				}
-			}
-		}
-		else{
-			bool bfindLastAgent = false;
-
-
-			for (auto it : this->GetExtensions())
-			{
-				if (it.first == lastAgent){
-					bfindLastAgent = true;
-					continue;
-				}
-
-				if (bfindLastAgent == true)
-				{
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
-					if (it.second->getStateId() == "Ready") {
-						findAgent = it.first;
-						break;
-					}
-				}
-			}
-
-			if (findAgent == "")
-			{
-				for (auto it : this->GetExtensions())
-				{
-					LOG4CPLUS_DEBUG(log, "." + this->getId(), it.first << " state:" << it.second->getStateId());
-					if (it.second->getStateId() == "Ready"){
-						findAgent = it.first;
-						break;
-					}
-				}
-			}
-		}
-		
-	_findAgent:
-		lastAgent = findAgent;
-		LOG4CPLUS_DEBUG(log, "." + this->getId(), " find agent:" << findAgent);
-		if (!findAgent.empty()){
-			Json::Value ext = this->getExtension(findAgent)->getVar("_agent.Device");
-			if (ext.isString())
-			{
-				std::string cmd = "bgapi uuid_transfer " + uuid +" " + ext.asString() + " XML default";
-				esl_status_t status = esl_send(&m_Handle, cmd.c_str());
-				LOG4CPLUS_DEBUG(log, "." + this->getId(), " esl_send:" << cmd << ", status:" << status);
-			}
-		}
-
-		bHandled = true;
-		*/
-	}
 }
 bool FreeSwitchModule::MakeCall(const Json::Value & param, log4cplus::Logger & log)
 {
@@ -437,6 +323,30 @@ bool FreeSwitchModule::PlayFileAndCollects(const Json::Value & param, log4cplus:
 	std::string appdata = std::to_string(min) + " " + std::to_string(max) + " " + std::to_string(tries) + " " + std::to_string(timeout)
 		+ " " + "" + terminators + " " + filename;// +" " + invalid_file + " " + var_name + " " + regexp + " " + std::to_string(digit_timeout);
 	std::string cmd = esl_execute_data("play_and_get_digits", appdata.c_str(), sessionId.c_str(), false, false);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
+	return true;
+}
+
+bool FreeSwitchModule::StartDTMFCollection(const Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId;
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	std::string cmd = esl_execute_data("start_dtmf", nullptr, sessionId.c_str(), false, false);
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
+	return true;
+}
+
+bool FreeSwitchModule::StopDTMFCollection(const Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId;
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	std::string cmd = esl_execute_data("stop_dtmf", nullptr, sessionId.c_str(), false, false);
 	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
 	return true;
 }
