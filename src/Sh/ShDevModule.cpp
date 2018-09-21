@@ -194,6 +194,7 @@ std::string ShDevModule::TransferEvtToJsonEvent(const PSSM_EVENT pEvent, const s
 	}
 	
 	Json::FastWriter writer;
+	writer.omitEndingLineFeed();
 	std::string strEvent = writer.write(jsonEvent);
 	LOG4CPLUS_TRACE(log, "", "ch=" << pEvent->nReference << ",Recive a event,event=" << strEvent);
 	return strEvent;
