@@ -27,6 +27,7 @@ namespace FreeSwitch{
 		bool Divert(const Json::Value &param, log4cplus::Logger & log);
 		bool PlayFile(const Json::Value & param, log4cplus::Logger & log);
 		bool PlayFileAndCollects(const Json::Value & param, log4cplus::Logger & log);
+		bool StopPlayFile(const Json::Value & param, log4cplus::Logger & log);
 		bool StartDTMFCollection(const Json::Value & param, log4cplus::Logger & log);
 		bool StopDTMFCollection(const Json::Value & param, log4cplus::Logger & log);
 

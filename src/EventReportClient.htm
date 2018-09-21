@@ -17,7 +17,7 @@
 	<input type="button" value="断开" onclick="DisConnect();" /><p/>
 	<input type="button" value="外呼" onclick="MakeCall();" /><font>主叫</font><input type="text" id="calling" value="1000" /><font>被叫</font><input type="text" id="called" value="5000" /><p/>
 	<input type="button" value="呼单路" onclick="MakeConnection();" /><font>被叫</font><input type="text" id="called2" value="5000" /><p/>
-	<input type="button" value="放音" onclick="PlayFile();" /><font>语音文件</font><input type="text" id="filename" value="cmwwpstn.wav" /><p/>
+	<input type="button" value="放音" onclick="PlayFile();" /><font>语音文件</font><input type="text" id="filename" value="cmwwpstn.wav" /><input type="button" value="停止放音" onclick="StopPlayFile();" /><p/>
 	<input type="button" value="挂机" onclick="ClearCall();" /><p/>
     <input type="button" value="放音并收键" onclick="PlayFileAndCollects();" /><font>语音文件</font><input type="text" id="filename2" value="cmwwpstn.wav" /><font>最短收键数</font><input type="text" id="min" value="1" /><font>最长收键数</font><input type="text" id="max" value="1" /><font>播放次数</font><input type="text" id="tries" value="3" /><font>等待按键超时</font><input type="text" id="timeout" value="10000" /><font>结束按键</font><input type="text" id="terminators" value="*#" /><p />
 	<input type="button" value="开始录音" onclick="StartRecord();" /><font>语音文件</font><input type="text" id="recordfilename" value="/record/99754f55-239b-4bd1-980e-3b4b7f389253.wav" /><input type="button" value="停止录音" onclick="StopRecord();" /><p/>
@@ -86,6 +86,17 @@
 			request.param = new Object();
 			request.param.connection = session;
 			request.param.filename = document.getElementById("filename").value;
+			doSend(JSON.stringify(request));
+		}
+		
+		function StopPlayFile()
+		{
+			var request = new Object();
+			request.invokeID = invokeid++;
+			request.type = "request";
+			request.request = "StopPlayFile";
+			request.param = new Object();
+			request.param.connection = session;
 			doSend(JSON.stringify(request));
 		}
 		

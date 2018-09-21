@@ -327,6 +327,21 @@ bool FreeSwitchModule::PlayFileAndCollects(const Json::Value & param, log4cplus:
 	return true;
 }
 
+bool FreeSwitchModule::StopPlayFile(const Json::Value & param, log4cplus::Logger & log)
+{
+	std::string sessionId;
+
+	if (param["sessionID"].isString())
+		sessionId = param["sessionID"].asString();
+
+	std::string jobid = helper::uuid();
+	setJobSession(jobid, sessionId);
+
+	std::string cmd = "bgapi uuid_break " + sessionId + "\nJob-UUID:" + jobid;
+	m_FSSendBuffer.Put(std::make_shared<FSSendDataType>(sessionId, cmd));
+	return true;
+}
+
 bool FreeSwitchModule::StartDTMFCollection(const Json::Value & param, log4cplus::Logger & log)
 {
 	std::string sessionId;

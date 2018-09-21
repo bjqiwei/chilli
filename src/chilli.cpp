@@ -381,6 +381,8 @@ void chilli::App::Start()
 	static log4cplus::ConfigureAndWatchThread logconfig("conf/log4cplus.properties", 10 * 1000);
 	log4cplus::Logger log = log4cplus::Logger::getInstance("chilli");
 	LOG4CPLUS_TRACE(log,"",  __FUNCTION__ << " start.");
+	LOG4CPLUS_INFO(log, "", "version:" << appversion);
+	std::cout << "version:" << appversion << std::endl;
 	fsm::initialize();
 	std::string strConfigFile = "conf/" + strFileNameNoExtension + ".xml";
 	LoadConfig(strConfigFile);

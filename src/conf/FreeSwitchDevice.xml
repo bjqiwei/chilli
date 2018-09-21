@@ -258,6 +258,12 @@
 							_callid = _event.param.callID;
 						</script>
 					</onentry>
+					
+					<event event="StopPlayFile">
+						<send target="this" type="cmd" dest="this" event="StopPlayFile">
+							<sessionID type="script">_event.param.sessionID</sessionID>
+						</send>
+					</event>
 					<event event="PlayFile">
 					</event>
 					<event event="PlayFileAndCollects">
