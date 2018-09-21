@@ -1,283 +1,297 @@
-APP =chilli
+#############################################################################
+#
+# Generic Makefile for C/C++ Program
+#
+# License: GPL (General Public License)
+# Author:  whyglinux <whyglinux AT gmail DOT com>
+# Date:    2006/03/04 (version 0.1)
+#          2007/03/24 (version 0.2)
+#          2007/04/09 (version 0.3)
+#          2007/06/26 (version 0.4)
+#          2008/04/05 (version 0.5)
+#
+# Description:
+# ------------
+# This is an easily customizable makefile template. The purpose is to
+# provide an instant building environment for C/C++ programs.
+#
+# It searches all the C/C++ source files in the specified directories,
+# makes dependencies, compiles and links to form an executable.
+#
+# Besides its default ability to build C/C++ programs which use only
+# standard C/C++ libraries, you can customize the Makefile to build
+# those using other libraries. Once done, without any changes you can
+# then build programs using the same or less libraries, even if source
+# files are renamed, added or removed. Therefore, it is particularly
+# convenient to use it to build codes for experimental or study use.
+#
+# GNU make is expected to use the Makefile. Other versions of makes
+# may or may not work.
+#
+# Usage:
+# ------
+# 1. Copy the Makefile to your program directory.
+# 2. Customize in the "Customizable Section" only if necessary:
+#    * to use non-standard C/C++ libraries, set pre-processor or compiler
+#      options to <MY_CFLAGS> and linker ones to <MY_LIBS>
+#      (See Makefile.gtk+-2.0 for an example)
+#    * to search sources in more directories, set to <SRCDIRS>
+#    * to specify your favorite program name, set to <PROGRAM>
+# 3. Type make to start building your program.
+#
+# Make Target:
+# ------------
+# The Makefile provides the following targets to make:
+#   $ make           compile and link
+#   $ make NODEP=yes compile and link without generating dependencies
+#   $ make objs      compile only (no linking)
+#   $ make tags      create tags for Emacs editor
+#   $ make ctags     create ctags for VI editor
+#   $ make clean     clean objects and the executable file
+#   $ make distclean clean objects, the executable and dependencies
+#   $ make help      get the usage of the makefile
+#
+#===========================================================================
+
+## Customizable Section: adapt those variables to suit your program.
+##==========================================================================
+
+# The pre-processor and compiler options.
+MY_CFLAGS = -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I/usr/include/apr-1 -I../libs/FreeSWITCH/esl/include -I../libs/Avaya/TSAPI/hdrs -I/usr/include/jsoncpp -DAPPVERSION=$(APPVERSION)
+
+# The linker options.
+MY_LIBS   = -L../libs/fsm/build -L../libs/FreeSWITCH/esl -L/usr/lib64/mysql/ -lfsm -lesl -lmysqlclient -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -levent_extra -levent_core -levent_pthreads -llog4cplus -lcrypto -lpthread -luuid -lm -ldl -lrt -lz -Wl,-rpath=./lib
+
+# The pre-processor options used by the cpp (man cpp for more).
+CPPFLAGS  =  -std=c++11
+
+# The options used in linking as well as in any direct use of ld.
 APPVERSION=1.0.10.5
-INSTALL_PATH=/usr/local/$(APP)/
+LDFLAGS   = -Wl,-R
 
-#CFLAGS='-D_EVENT_DISABLE_DEBUG_MODE -g -O1' ./configure --disable-shared
+# The directories in which source files reside.
+# If not specified, only the current directory will be serached.
+SRCDIRS   = ./ ./ACD ./Agent ./Avaya ./Call ./Device ./EventReport ./FreeSWITCH ./Group ./IVR ./model ./mysql ./Sh ./TCP ./tinyxml2 ./websocket
 
-COMPILE = g++
-COMPILECC = gcc
+# The executable file name.
+# If not specified, current directory name or `a.out' will be used.
+PROGRAM   = chilli
 
-LINK = g++
+## Implicit Section: change the following only when necessary.
+##==========================================================================
 
-SRC = ./
-ACDSRC = ./ACD/
-AgentSRC = ./Agent/
-AvayaSRC = ./Avaya/
-CallSRC = ./Call/
-DeviceSRC = ./Device/
-EventReportSrc = ./EventReport/
-FreeSWITCHSrc = ./FreeSWITCH/
-GroupSrc = ./Group/
-IVRSrc = ./IVR/
-modelSrc = ./model/
-mysqlSrc = ./mysql/
-ShSrc = ./Sh/
-TCPSrc = ./TCP/
-tinyxml2Src = ./tinyxml2/
-websocketSrc =./websocket/
+# The source file types (headers excluded).
+# .c indicates C source files, and others C++ ones.
+SRCEXTS = .c .C .cc .cpp .CPP .c++ .cxx .cp
 
-INCLUDE = -I/usr/include/apr-1 -I/usr/include/jsoncpp -I./. -I../libs/fsm/ -I../libs/fsm/scxml -I../libs/FreeSWITCH/esl/include -I../libs/Avaya/TSAPI/hdrs
+# The header file types.
+HDREXTS = .h .H .hh .hpp .HPP .h++ .hxx .hp
 
-OBJ_DIR = ./obj/
-ACD_OBJ_DIR = $(OBJ_DIR)ACD/
-Agent_OBJ_DIR = $(OBJ_DIR)Agent/
-Avaya_OBJ_DIR = $(OBJ_DIR)Avaya/
-Call_OBJ_DIR = $(OBJ_DIR)Call/
-Device_OBJ_DIR = $(OBJ_DIR)Device/
-EventReport_OBJ_DIR = $(OBJ_DIR)EventReport/
-FreeSWITCH_OBJ_DIR = $(OBJ_DIR)FreeSWITCH/
-Group_OBJ_DIR = $(OBJ_DIR)Group/
-IVR_OBJ_DIR = $(OBJ_DIR)IVR/
-model_OBJ_DIR = $(OBJ_DIR)model/
-mysql_OBJ_DIR = $(OBJ_DIR)mysql/
-Sh_OBJ_DIR = $(OBJ_DIR)Sh/
-TCP_OBJ_DIR = $(OBJ_DIR)TCP/
-tinyxml2_OBJ_DIR = $(OBJ_DIR)tinyxml2/
-websocket_OBJ_DIR = $(OBJ_DIR)websocket/
+# The pre-processor and compiler options.
+# Users can override those variables from the command line.
+CFLAGS  = -g -O2
+CXXFLAGS= -g -O2
 
+# The C program compiler.
+#CC     = gcc
 
-CFLAGS = -D__linux__ -D__LINUX__  -DSIGTSTP -DSIGQUIT -DAPPVERSION=$(APPVERSION) -c -g -O1 
-CXXFLAGS = $(CFLAGS) -std=c++11
+# The C++ program compiler.
+#CXX    = g++
 
-LDFLAGS= -Wall -g -O1 
-LDFLAGS:= $(LDFLAGS) -L/usr/lib64/mysql/ ../libs/fsm/build/libfsm.so ../libs/FreeSWITCH/esl/libesl.a -lmysqlclient -lwebsockets -lapr-1 -laprutil-1 -ljsoncpp -levent_extra -levent_core -levent_pthreads -llog4cplus
-LDFLAGS:= $(LDFLAGS) -lcrypto -lpthread -luuid -lm -ldl -lrt -lz -lm -ldl  -lrt -Wl,-rpath=./lib
+# Un-comment the following line to compile C programs as C++ ones.
+#CC     = $(CXX)
 
-OBJ = $(OBJ_DIR)chilli.o $(OBJ_DIR)uni_cmdline.o $(OBJ_DIR)uni_daemon.o\
-	  $(ACD_OBJ_DIR)ACDModule.o $(ACD_OBJ_DIR)ACDDevice.o\
-	  $(Agent_OBJ_DIR)AgentModule.o $(Agent_OBJ_DIR)Agent.o\
-      $(Avaya_OBJ_DIR)AvayaACD.o $(Avaya_OBJ_DIR)AvayaAgent.o $(Avaya_OBJ_DIR)AvayaDevice.o $(Avaya_OBJ_DIR)AvayaAPI.o $(Avaya_OBJ_DIR)AvayaVDN.o $(Avaya_OBJ_DIR)TSAPIModule.o\
-	  $(Call_OBJ_DIR)Call.o $(Call_OBJ_DIR)CallModule.o\
-	  $(Device_OBJ_DIR)Device.o\
-	  $(EventReport_OBJ_DIR)EventReportModule.o\
-	  $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o\
-	  $(Group_OBJ_DIR)Group.o $(Group_OBJ_DIR)GroupModule.o\
-	  $(IVR_OBJ_DIR)IVRModule.o\
-	  $(model_OBJ_DIR)PerformElement.o $(model_OBJ_DIR)ProcessModule.o\
-	  $(mysql_OBJ_DIR)MySqlModule.o\
-	  $(Sh_OBJ_DIR)ShAPI.o $(Sh_OBJ_DIR)ShDevModule.o $(Sh_OBJ_DIR)ShExtension.o\
-	  $(TCP_OBJ_DIR)tcp.o\
-	  $(tinyxml2_OBJ_DIR)tinyxml2.o\
-	  $(websocket_OBJ_DIR)websocket.o
-	  
+# The command used to delete file.
+#RM     = rm -f
 
-APP:chkobjdir $(OBJ)
-	$(LINK) -v -g -o $(APP)  $(OBJ) $(LDFLAGS)  
+ETAGS = etags
+ETAGSFLAGS =
 
-$(OBJ_DIR)chilli.o:$(SRC)chilli.cpp
-	$(COMPILE) $(CXXFLAGS) $(SRC)chilli.cpp $(INCLUDE) -o $(OBJ_DIR)chilli.o
+CTAGS = ctags
+CTAGSFLAGS =
 
-$(OBJ_DIR)uni_cmdline.o:$(SRC)uni_cmdline.cpp
-	$(COMPILE) $(CXXFLAGS) -D_GLIBCXX_USE_SCHED_YIELD -D_GLIBCXX_USE_NANOSLEEP $(SRC)uni_cmdline.cpp $(INCLUDE) -o $(OBJ_DIR)uni_cmdline.o
+## Stable Section: usually no need to be changed. But you can add more.
+##==========================================================================
+SHELL   = /bin/sh
+EMPTY   =
+SPACE   = $(EMPTY) $(EMPTY)
+ifeq ($(PROGRAM),)
+  CUR_PATH_NAMES = $(subst /,$(SPACE),$(subst $(SPACE),_,$(CURDIR)))
+  PROGRAM = $(word $(words $(CUR_PATH_NAMES)),$(CUR_PATH_NAMES))
+  ifeq ($(PROGRAM),)
+    PROGRAM = a.out
+  endif
+endif
+ifeq ($(SRCDIRS),)
+  SRCDIRS = .
+endif
+SOURCES = $(foreach d,$(SRCDIRS),$(wildcard $(addprefix $(d)/*,$(SRCEXTS))))
+HEADERS = $(foreach d,$(SRCDIRS),$(wildcard $(addprefix $(d)/*,$(HDREXTS))))
+SRC_CXX = $(filter-out %.c,$(SOURCES))
+OBJS    = $(addsuffix .o, $(basename $(SOURCES)))
+DEPS    = $(OBJS:.o=.d)
 
-$(OBJ_DIR)uni_daemon.o:$(SRC)uni_daemon.cpp
-	$(COMPILE) $(CXXFLAGS) $(SRC)uni_daemon.cpp $(INCLUDE) -o $(OBJ_DIR)uni_daemon.o
+## Define some useful variables.
+DEP_OPT = $(shell if `$(CC) --version | grep "GCC" >/dev/null`; then \
+                  echo "-MM -MP"; else echo "-M"; fi )
+DEPEND      = $(CC)  $(DEP_OPT)  $(MY_CFLAGS) $(CFLAGS) $(CPPFLAGS)
+DEPEND.d    = $(subst -g ,,$(DEPEND))
+COMPILE.c   = $(CC)  $(MY_CFLAGS) $(CFLAGS)   $(CPPFLAGS) -c
+COMPILE.cxx = $(CXX) $(MY_CFLAGS) $(CXXFLAGS) $(CPPFLAGS) -c
+LINK.c      = $(CC)  $(MY_CFLAGS) $(CFLAGS)   $(CPPFLAGS) $(LDFLAGS)
+LINK.cxx    = $(CXX) $(MY_CFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS)
 
+.PHONY: all objs tags ctags clean distclean help show
 
-$(ACD_OBJ_DIR)ACDModule.o:$(ACDSRC)ACDModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(ACDSRC)ACDModule.cpp $(INCLUDE) -o $(ACD_OBJ_DIR)ACDModule.o
+# Delete the default suffixes
+.SUFFIXES:
 
-$(ACD_OBJ_DIR)ACDDevice.o:$(ACDSRC)ACDDevice.cpp
-	$(COMPILE) $(CXXFLAGS) $(ACDSRC)ACDDevice.cpp $(INCLUDE) -o $(ACD_OBJ_DIR)ACDDevice.o
+all: $(PROGRAM)
 
-$(Agent_OBJ_DIR)AgentModule.o:$(AgentSRC)AgentModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(AgentSRC)AgentModule.cpp $(INCLUDE) -o $(Agent_OBJ_DIR)AgentModule.o
+# Rules for creating dependency files (.d).
+#------------------------------------------
 
-$(Agent_OBJ_DIR)Agent.o:$(AgentSRC)Agent.cpp
-	$(COMPILE) $(CXXFLAGS) $(AgentSRC)Agent.cpp $(INCLUDE) -o $(Agent_OBJ_DIR)Agent.o
+%.d:%.c
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)AvayaACD.o:$(AvayaSRC)AvayaACD.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaACD.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaACD.o
+%.d:%.C
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)AvayaAgent.o:$(AvayaSRC)AvayaAgent.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaAgent.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaAgent.o
+%.d:%.cc
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)AvayaAPI.o:$(AvayaSRC)AvayaAPI.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaAPI.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaAPI.o
+%.d:%.cpp
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)AvayaDevice.o:$(AvayaSRC)AvayaDevice.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaDevice.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaDevice.o
+%.d:%.CPP
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)AvayaVDN.o:$(AvayaSRC)AvayaVDN.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)AvayaVDN.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)AvayaVDN.o
+%.d:%.c++
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)TSAPIModule.o:$(AvayaSRC)TSAPIModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)TSAPIModule.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)TSAPIModule.o
+%.d:%.cp
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Avaya_OBJ_DIR)SiaTcpMonitor.o:$(AvayaSRC)SiaTcpMonitor.cpp
-	$(COMPILE) $(CXXFLAGS) $(AvayaSRC)SiaTcpMonitor.cpp $(INCLUDE) -o $(Avaya_OBJ_DIR)SiaTcpMonitor.o
+%.d:%.cxx
+	@echo -n $(dir $<) > $@
+	@$(DEPEND.d) $< >> $@
 
-$(Call_OBJ_DIR)Call.o:$(CallSRC)Call.cpp
-	$(COMPILE) $(CXXFLAGS) $(CallSRC)Call.cpp $(INCLUDE) -o $(Call_OBJ_DIR)Call.o
+# Rules for generating object files (.o).
+#----------------------------------------
+objs:$(OBJS)
 
-$(Call_OBJ_DIR)CallModule.o:$(CallSRC)CallModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(CallSRC)CallModule.cpp $(INCLUDE) -o $(Call_OBJ_DIR)CallModule.o
-	
-$(Device_OBJ_DIR)Device.o:$(DeviceSRC)Device.cpp
-	$(COMPILE) $(CXXFLAGS) $(DeviceSRC)Device.cpp $(INCLUDE) -o $(Device_OBJ_DIR)Device.o
-	
-$(EventReport_OBJ_DIR)EventReportModule.o:$(EventReportSrc)EventReportModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(EventReportSrc)EventReportModule.cpp $(INCLUDE) -o $(EventReport_OBJ_DIR)EventReportModule.o
-	
-$(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o:$(FreeSWITCHSrc)FreeSwitchDevice.cpp
-	$(COMPILE) $(CXXFLAGS) $(FreeSWITCHSrc)FreeSwitchDevice.cpp $(INCLUDE) -o $(FreeSWITCH_OBJ_DIR)FreeSwitchDevice.o
-	
-$(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o:$(FreeSWITCHSrc)FreeSwitchModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(FreeSWITCHSrc)FreeSwitchModule.cpp $(INCLUDE) -o $(FreeSWITCH_OBJ_DIR)FreeSwitchModule.o
-	
-$(Group_OBJ_DIR)GroupModule.o:$(GroupSrc)GroupModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(GroupSrc)GroupModule.cpp $(INCLUDE) -o $(Group_OBJ_DIR)GroupModule.o
-	
-$(Group_OBJ_DIR)Group.o:$(GroupSrc)Group.cpp
-	$(COMPILE) $(CXXFLAGS) $(GroupSrc)Group.cpp $(INCLUDE) -o $(Group_OBJ_DIR)Group.o
-	
-$(IVR_OBJ_DIR)IVRModule.o:$(IVRSrc)IVRModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(IVRSrc)IVRModule.cpp $(INCLUDE) -o $(IVR_OBJ_DIR)IVRModule.o
+%.o:%.c
+	$(COMPILE.c) $< -o $@
 
-$(model_OBJ_DIR)PerformElement.o:$(modelSrc)PerformElement.cpp
-	$(COMPILE) $(CXXFLAGS) $(modelSrc)PerformElement.cpp $(INCLUDE) -o $(model_OBJ_DIR)PerformElement.o
-	
-$(model_OBJ_DIR)ProcessModule.o:$(modelSrc)ProcessModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(modelSrc)ProcessModule.cpp $(INCLUDE) -o $(model_OBJ_DIR)ProcessModule.o
-	
-$(mysql_OBJ_DIR)MySqlModule.o:$(mysqlSrc)MySqlModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(mysqlSrc)MySqlModule.cpp $(INCLUDE) -o $(mysql_OBJ_DIR)MySqlModule.o
-	
-$(Sh_OBJ_DIR)ShAPI.o:$(ShSrc)ShAPI.cpp
-	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShAPI.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShAPI.o
-	
-$(Sh_OBJ_DIR)ShDevModule.o:$(ShSrc)ShDevModule.cpp
-	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShDevModule.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShDevModule.o
-	
-$(Sh_OBJ_DIR)ShExtension.o:$(ShSrc)ShExtension.cpp
-	$(COMPILE) $(CXXFLAGS) $(ShSrc)ShExtension.cpp $(INCLUDE) -o $(Sh_OBJ_DIR)ShExtension.o
-	
-$(TCP_OBJ_DIR)tcp.o:$(TCPSrc)tcp.cpp
-	$(COMPILE) $(CXXFLAGS) $(TCPSrc)tcp.cpp $(INCLUDE) -o $(TCP_OBJ_DIR)tcp.o
-	
-$(tinyxml2_OBJ_DIR)tinyxml2.o:$(tinyxml2Src)tinyxml2.cpp
-	$(COMPILE) $(CXXFLAGS) $(tinyxml2Src)tinyxml2.cpp $(INCLUDE) -o $(tinyxml2_OBJ_DIR)tinyxml2.o
-	
-$(websocket_OBJ_DIR)websocket.o:$(websocketSrc)websocket.cpp
-	$(COMPILE) $(CXXFLAGS) $(websocketSrc)websocket.cpp $(INCLUDE) -o $(websocket_OBJ_DIR)websocket.o
-	
-	
-chkobjdir:
-	@if test ! -d $(OBJ_DIR);\
-	then \
-		mkdir $(OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(ACD_OBJ_DIR);\
-	then \
-		mkdir $(ACD_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(Agent_OBJ_DIR);\
-	then \
-		mkdir $(Agent_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(Avaya_OBJ_DIR);\
-	then \
-		mkdir $(Avaya_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(Call_OBJ_DIR);\
-	then \
-		mkdir $(Call_OBJ_DIR); \
-	fi
+%.o:%.C
+	$(COMPILE.cxx) $< -o $@
 
-	@if test ! -d $(Device_OBJ_DIR);\
-	then \
-		mkdir $(Device_OBJ_DIR); \
-	fi	
-	
-	@if test ! -d $(EventReport_OBJ_DIR);\
-	then \
-		mkdir $(EventReport_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(FreeSWITCH_OBJ_DIR);\
-	then \
-		mkdir $(FreeSWITCH_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(Group_OBJ_DIR);\
-	then \
-		mkdir $(Group_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(IVR_OBJ_DIR);\
-	then \
-		mkdir $(IVR_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(model_OBJ_DIR);\
-	then \
-		mkdir $(model_OBJ_DIR); \
-	fi
+%.o:%.cc
+	$(COMPILE.cxx) $< -o $@
 
-	@if test ! -d $(mysql_OBJ_DIR);\
-	then \
-		mkdir $(mysql_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(Sh_OBJ_DIR);\
-	then \
-		mkdir $(Sh_OBJ_DIR); \
-	fi
+%.o:%.cpp
+	$(COMPILE.cxx) $< -o $@
 
-	@if test ! -d $(TCP_OBJ_DIR);\
-	then \
-		mkdir $(TCP_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(tinyxml2_OBJ_DIR);\
-	then \
-		mkdir $(tinyxml2_OBJ_DIR); \
-	fi
-	
-	@if test ! -d $(websocket_OBJ_DIR);\
-	then \
-		mkdir $(websocket_OBJ_DIR); \
-	fi
-	
+%.o:%.CPP
+	$(COMPILE.cxx) $< -o $@
+
+%.o:%.c++
+	$(COMPILE.cxx) $< -o $@
+
+%.o:%.cp
+	$(COMPILE.cxx) $< -o $@
+
+%.o:%.cxx
+	$(COMPILE.cxx) $< -o $@
+
+# Rules for generating the tags.
+#-------------------------------------
+tags: $(HEADERS) $(SOURCES)
+	$(ETAGS) $(ETAGSFLAGS) $(HEADERS) $(SOURCES)
+
+ctags: $(HEADERS) $(SOURCES)
+	$(CTAGS) $(CTAGSFLAGS) $(HEADERS) $(SOURCES)
+
+# Rules for generating the executable.
+#-------------------------------------
+$(PROGRAM):$(OBJS)
+ifeq ($(SRC_CXX),)              # C program
+	$(LINK.c)   $(OBJS) $(MY_LIBS) -o $@
+	@echo Type ./$@ to execute the program.
+else                            # C++ program
+	$(LINK.cxx) $(OBJS) $(MY_LIBS) -o $@
+	@echo Type ./$@ to execute the program.
+endif
+
+ifndef NODEP
+ifneq ($(DEPS),)
+  sinclude $(DEPS)
+endif
+endif
+
 clean:
-	rm -rdf $(APP)
-	rm -rf $(OBJ_DIR)*
-
-install:
-	mkdir $(INSTALL_PATH)
-	cp ./$(APP) $(INSTALL_PATH)
-	chmod g+x ./restart.sh
-	cp ./restart.sh $(INSTALL_PATH)
-	cp ./conf/* $(INSTALL_PATH)/conf
-	#chmod g+x ./siad
-	#cp -f ./siad /etc/init.d/
-
-uninstall:
-	rm -f $(INSTALL_PATH)$(APP)
-	rm -rf $(INSTALL_PATH)conf
-	rm -f $(INSTALL_PATH)restart.sh
-	rm -rf $(INSTALL_PATH) 
-	rm -rf /etc/init.d/siad
+	$(RM) $(OBJS) $(PROGRAM) $(PROGRAM).exe ./lib/*
 
 tar:
-	@if [ "chilli" != "$(APP)" ]; \
-	then \
-		cp -f "./conf/chilli.xml" "./conf/$(APP).xml"; \
-	fi
-	
-	sed -i '12s/^.*$//log4cplus.appender.D.File=.\/log\/$(APP)/' ./conf/log4cplus.properties;
-	tar -zcvf ./$(APP).$(APPVERSION).tar.gz ./$(APP) ./conf/* ./lib/*
+	tar -zcvf ./$(PROGRAM).$(APPVERSION).tar.gz ./$(PROGRAM) ./conf/* ./lib/*
+
+cplib:
+	@-mkdir -p ./lib
+	@-cp -n /lib64/libapr-1.so.0 ./lib
+	@-cp -n /lib64/libaprutil-1.so.0 ./lib
+	@-cp -n /lib64/libevent_core-2.0.so.5 ./lib
+	@-cp -n /lib64/libevent_extra-2.0.so.5 ./lib
+	@-cp -n /lib64/libevent_pthreads-2.0.so.5 ./lib
+	@-cp -n ../libs/fsm/build/libfsm.* ./lib
+	@-cp -n /lib64/libjsoncpp.so.0 ./lib
+	@-cp -n /lib64/liblog4cplus-1.2.so.5 ./lib
+	@-cp -n /lib64/libmozjs-38.so ./lib
+	@-cp -n /usr/lib64/mysql/libmysqlclient.so.18 ./lib
+	@-cp -n /lib64/libwebsockets.so.7 ./lib
+
+distclean: clean
+	$(RM) $(DEPS) TAGS
+
+# Show help.
+help:
+	@echo 'Generic Makefile for C/C++ Programs (gcmakefile) version 0.5'
+	@echo 'Copyright (C) 2007, 2008 whyglinux <whyglinux@hotmail.com>'
+	@echo
+	@echo 'Usage: make [TARGET]'
+	@echo 'TARGETS:'
+	@echo '  all       (=make) compile and link.'
+	@echo '  NODEP=yes make without generating dependencies.'
+	@echo '  objs      compile only (no linking).'
+	@echo '  tags      create tags for Emacs editor.'
+	@echo '  ctags     create ctags for VI editor.'
+	@echo '  clean     clean objects and the executable file.'
+	@echo '  distclean clean objects, the executable and dependencies.'
+	@echo '  show      show variables (for debug use only).'
+	@echo '  help      print this message.'
+	@echo
+	@echo 'Report bugs to <whyglinux AT gmail DOT com>.'
+
+# Show variables (for debug use only.)
+show:
+	@echo 'PROGRAM     :' $(PROGRAM)
+	@echo 'SRCDIRS     :' $(SRCDIRS)
+	@echo 'HEADERS     :' $(HEADERS)
+	@echo 'SOURCES     :' $(SOURCES)
+	@echo 'SRC_CXX     :' $(SRC_CXX)
+	@echo 'OBJS        :' $(OBJS)
+	@echo 'DEPS        :' $(DEPS)
+	@echo 'DEPEND      :' $(DEPEND)
+	@echo 'COMPILE.c   :' $(COMPILE.c)
+	@echo 'COMPILE.cxx :' $(COMPILE.cxx)
+	@echo 'link.c      :' $(LINK.c)
+	@echo 'link.cxx    :' $(LINK.cxx)
+
+## End of the Makefile ##  Suggestions are welcome  ## All rights reserved ##
+#############################################################################

@@ -1,3 +1,5 @@
+#ifndef _WIN32
+#else
 #include "ServiceModule.h"
 #include "chilli.h"
 #include <iostream>
@@ -282,3 +284,4 @@ stoping:
 	}
 
 }
+#endif

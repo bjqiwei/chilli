@@ -1,3 +1,6 @@
+#ifndef _WIN32
+#else
+
 #pragma once
 #include <winsock2.h>
 #include <windows.h>
@@ -41,3 +44,4 @@ namespace chilli{
 	};
 
 }//end namespace chilli
+#endif
