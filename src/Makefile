@@ -251,7 +251,7 @@ cplib:
 	@-cp -n /lib64/libevent_pthreads-2.0.so.5 ./lib
 	@-cp -n ../libs/fsm/build/libfsm.* ./lib
 	@-cp -n /lib64/libjsoncpp.so.0 ./lib
-	@-cp -n /lib64/liblog4cplus-1.2.so.5 ./lib
+	@-cp -n ../libs/log4cplus-1.2.0/.libs/liblog4cplus-1.2.so.5 ./lib
 	@-cp -n /lib64/libmozjs-38.so ./lib
 	@-cp -n /usr/lib64/mysql/libmysqlclient.so.18 ./lib
 	@-cp -n /lib64/libwebsockets.so.7 ./lib
